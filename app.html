@@ -3093,6 +3093,12 @@
 
                 // --- INITIALIZATION ---
                 async init() {
+                    console.log('AUTH DISABLED: Skipping Firebase initialization for testing');
+                    
+                    // TEMPORARY: Skip all Firebase initialization and go straight to loading steps
+                    this.state.firebaseReady = true;
+                    
+                    /* ORIGINAL FIREBASE INITIALIZATION CODE COMMENTED OUT:
                     // Try to fetch Firebase config from Netlify function
                     try {
                         const response = await fetch('/.netlify/functions/config');
@@ -3245,6 +3251,7 @@
                             return;
                         }
                     }
+                    */
 
                                     // Enhanced initialization sequence with loading feedback
                 const loadingSteps = [
@@ -3482,7 +3489,7 @@
                             // Show success message
                             app.ui.showToast('Authentication bypassed for testing. Welcome to Operator Uplift!', 'success');
                             
-                        }, 2000); // 2 second delay to show loading screen
+                        }, 1000); // 1 second delay to show loading screen
                         
                         /* ORIGINAL AUTH CODE COMMENTED OUT:
                         onAuthStateChanged(auth, async (user) => {
