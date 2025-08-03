@@ -20,7 +20,7 @@
     <!-- tsParticles for enhanced effects -->
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" crossorigin="anonymous"></script>
     <!-- Date-fns for date manipulation -->
-    <script src="assets/js/date-fns.min.js"></script>
+    <script src="https://unpkg.com/date-fns@2.30.0/index.min.js"></script>
     <style>
         /* Immediate background fix to prevent white flash */
         html, body {
@@ -3093,165 +3093,21 @@
 
                 // --- INITIALIZATION ---
                 async init() {
-                    console.log('AUTH DISABLED: Skipping Firebase initialization for testing');
+                    // Initialize Firebase
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyCUVSEKUKC_suEIVuguflAus1zM7b0E3NY",
+                        authDomain: "operator-uplift.firebaseapp.com",
+                        projectId: "operator-uplift",
+                        storageBucket: "operator-uplift.appspot.com",
+                        messagingSenderId: "123456789012",
+                        appId: "1:123456789012:web:abcdef1234567890"
+                    };
                     
-                    // TEMPORARY: Skip all Firebase initialization and go straight to loading steps
+                    const firebaseApp = initializeApp(firebaseConfig);
+                    auth = getAuth(firebaseApp);
+                    db = getFirestore(firebaseApp);
+                    
                     this.state.firebaseReady = true;
-                    
-                    /* ORIGINAL FIREBASE INITIALIZATION CODE COMMENTED OUT:
-                    // Try to fetch Firebase config from Netlify function
-                    try {
-                        const response = await fetch('/.netlify/functions/config');
-                        if (!response.ok) throw new Error('Failed to fetch Firebase config');
-                        const config = await response.json();
-                        
-                        // Check if config has valid values
-                        if (config.firebaseConfig.apiKey === 'MISSING_API_KEY') {
-                            throw new Error('Firebase environment variables not configured');
-                        }
-                        
-                        // Initialize Firebase
-                        const firebaseApp = initializeApp(config.firebaseConfig);
-                        auth = getAuth(firebaseApp);
-                        db = getFirestore(firebaseApp);
-                        
-                        // Firebase initialized successfully
-                        console.log('Firebase initialized successfully');
-                        console.log('Firebase Config Loaded:', !!config.firebaseConfig.apiKey);
-                        console.log('Firebase Config Debug:', {
-                            apiKey: config.firebaseConfig.apiKey ? 'SET' : 'MISSING',
-                            authDomain: config.firebaseConfig.authDomain ? 'SET' : 'MISSING',
-                            projectId: config.firebaseConfig.projectId ? 'SET' : 'MISSING',
-                            storageBucket: config.firebaseConfig.storageBucket ? 'SET' : 'MISSING',
-                            messagingSenderId: config.firebaseConfig.messagingSenderId ? 'SET' : 'MISSING',
-                            appId: config.firebaseConfig.appId ? 'SET' : 'MISSING'
-                        });
-                        
-                        this.state.firebaseReady = true;
-                        
-                        // Test Firebase configuration
-                        await this.auth.testFirebaseConfig();
-
-                    } catch (error) {
-                        console.error("Firebase initialization failed:", error);
-                        
-                        // Use import.meta.env for Vite build system
-                        try {
-                            const firebaseConfig = {
-                                apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-                                authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-                                projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-                                storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-                                messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-                                appId: import.meta.env.VITE_FIREBASE_APP_ID
-                            };
-                            
-                            console.log('Vite Env Loaded:', !!import.meta.env.VITE_FIREBASE_API_KEY);
-                            
-                            console.log('Firebase Config Loaded:', !!firebaseConfig.apiKey);
-                            console.log('Firebase Config Debug (import.meta.env):', {
-                                apiKey: firebaseConfig.apiKey ? 'SET' : 'MISSING',
-                                authDomain: firebaseConfig.authDomain ? 'SET' : 'MISSING',
-                                projectId: firebaseConfig.projectId ? 'SET' : 'MISSING',
-                                storageBucket: firebaseConfig.storageBucket ? 'SET' : 'MISSING',
-                                messagingSenderId: firebaseConfig.messagingSenderId ? 'SET' : 'MISSING',
-                                appId: firebaseConfig.appId ? 'SET' : 'MISSING'
-                            });
-                            
-                            if (!import.meta.env.VITE_FIREBASE_API_KEY) {
-                                console.error('Firebase environment variables not available:', {
-                                    apiKey: firebaseConfig.apiKey,
-                                    authDomain: firebaseConfig.authDomain,
-                                    projectId: firebaseConfig.projectId
-                                });
-                                throw new Error('Firebase environment variables not available');
-                            }
-                            
-                            const firebaseApp = initializeApp(firebaseConfig);
-                            auth = getAuth(firebaseApp);
-                            db = getFirestore(firebaseApp);
-                            
-                            console.log('Firebase initialized with import.meta.env');
-                            this.state.firebaseReady = true;
-                            
-                            // Test Firebase configuration
-                            await this.auth.testFirebaseConfig();
-                            
-                        } catch (envError) {
-                            console.error("Firebase env initialization failed:", envError);
-                            
-                            // Fallback: Local mock authentication for MVP
-                            if (!import.meta.env.VITE_FIREBASE_API_KEY) {
-                                console.warn('Firebase down—using local mock');
-                                
-                                // Mock auth functions
-                                window.mockSignIn = function(email, password) {
-                                    localStorage.setItem('mockUser', JSON.stringify({uid: 'mock', email}));
-                                    console.log('Mock user logged in:', email);
-                                    
-                                    // Trigger UI update
-                                    const authViewWrapper = document.getElementById('auth-view-wrapper');
-                                    const appHeader = document.getElementById('app-header');
-                                    const sidebar = document.getElementById('sidebar');
-                                    const dashboardView = document.getElementById('dashboard-view');
-                                    
-                                    if (authViewWrapper) authViewWrapper.style.display = 'none';
-                                    if (appHeader) appHeader.classList.remove('hidden');
-                                    if (sidebar) sidebar.classList.remove('hidden');
-                                    if (dashboardView) dashboardView.classList.remove('hidden');
-                                    
-                                    // Hide loading overlay
-                                    const loadingOverlay = document.getElementById('loading-overlay');
-                                    if (loadingOverlay) {
-                                        loadingOverlay.style.opacity = '0';
-                                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                                    }
-                                };
-                                
-                                // Update listener to check localStorage if no user
-                                const mockUser = localStorage.getItem('mockUser');
-                                if (mockUser) {
-                                    const user = JSON.parse(mockUser);
-                                    console.log('Mock user found:', user);
-                                    
-                                    // Update UI
-                                    const authViewWrapper = document.getElementById('auth-view-wrapper');
-                                    const appHeader = document.getElementById('app-header');
-                                    const sidebar = document.getElementById('sidebar');
-                                    const dashboardView = document.getElementById('dashboard-view');
-                                    
-                                    if (authViewWrapper) authViewWrapper.style.display = 'none';
-                                    if (appHeader) appHeader.classList.remove('hidden');
-                                    if (sidebar) sidebar.classList.remove('hidden');
-                                    if (dashboardView) dashboardView.classList.remove('hidden');
-                                    
-                                    // Hide loading overlay
-                                    const loadingOverlay = document.getElementById('loading-overlay');
-                                    if (loadingOverlay) {
-                                        loadingOverlay.style.opacity = '0';
-                                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                                    }
-                                }
-                                
-                                this.state.firebaseReady = true;
-                                return;
-                            }
-                            
-                            // Show user-friendly error message
-                            const loadingOverlay = document.getElementById('loading-overlay');
-                            if (loadingOverlay) {
-                                loadingOverlay.innerHTML = `
-                                    <div style="text-align: center; padding: 2rem;">
-                                        <h3 style="color: #f97316; margin-bottom: 1rem;">Service Temporarily Unavailable</h3>
-                                        <p style="color: #9ca3af; margin-bottom: 1rem;">Firebase authentication is not configured. Please contact support.</p>
-                                        <button onclick="window.location.reload()" style="background: #f97316; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">Retry</button>
-                                    </div>
-                                `;
-                            }
-                            return;
-                        }
-                    }
-                    */
 
                                     // Enhanced initialization sequence with loading feedback
                 const loadingSteps = [
@@ -3460,146 +3316,25 @@
                         }
                     },
 
-                    // TEMPORARILY DISABLED: Enhanced auth state listener with security checks
                     listenForAuthState() {
-                        console.log('AUTH DISABLED: Bypassing authentication for testing...'); // Debug
-                        
-                        // TEMPORARY: Bypass authentication and show dashboard immediately
-                        setTimeout(() => {
-                            console.log('Showing dashboard without authentication...'); // Debug
-                            
-                            // Update UI - Hide login, show header/sidebar/dashboard
-                            const authViewWrapper = document.getElementById('auth-view-wrapper');
-                            const appHeader = document.getElementById('app-header');
-                            const sidebar = document.getElementById('sidebar');
-                            const dashboardView = document.getElementById('dashboard-view');
-                            
-                            if (authViewWrapper) authViewWrapper.style.display = 'none';
-                            if (appHeader) appHeader.classList.remove('hidden');
-                            if (sidebar) sidebar.classList.remove('hidden');
-                            if (dashboardView) dashboardView.classList.remove('hidden');
-                            
-                            // Hide loading overlay
-                            const loadingOverlay = document.getElementById('loading-overlay');
-                            if (loadingOverlay) {
-                                loadingOverlay.style.opacity = '0';
-                                setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                            }
-                            
-                            // Show success message
-                            app.ui.showToast('Authentication bypassed for testing. Welcome to Operator Uplift!', 'success');
-                            
-                        }, 1000); // 1 second delay to show loading screen
-                        
-                        /* ORIGINAL AUTH CODE COMMENTED OUT:
-                        onAuthStateChanged(auth, async (user) => {
-                            try {
-                                if (user) {
-                                    console.log('User logged in:', user.uid); // Debug
-                                    console.log('User email:', user.email); // Debug
-                                    console.log('Email verified:', user.emailVerified); // Debug
-                                    
-                                    // Verify email is verified with retry mechanism
-                                    if (!user.emailVerified) {
-                                        console.log('Email not verified, checking for recent verification...'); // Debug
-                                        
-                                        // Use helper function to check verification status
-                                        const isVerified = await this.checkEmailVerificationStatus(user);
-                                        
-                                        if (!isVerified) {
-                                            console.log('Email still not verified after check'); // Debug
-                                            app.ui.showToast('Please verify your email address before continuing. Check your inbox for a verification link.', 'error');
-                                            await signOut(auth);
-                                            return;
-                                        } else {
-                                            console.log('Email verification confirmed, continuing...'); // Debug
-                                        }
-                                    }
-                                    
-                                    // Check for suspicious activity
-                                    const lastLogin = localStorage.getItem(`lastLogin_${user.uid}`);
-                                    const now = new Date().getTime();
-                                    
-                                    if (lastLogin) {
-                                        const timeDiff = now - parseInt(lastLogin);
-                                        const maxTimeDiff = 24 * 60 * 60 * 1000; // 24 hours
-                                        
-                                        if (timeDiff > maxTimeDiff) {
-                                            // Force re-authentication for security
-                                            app.ui.showToast('Session expired. Please log in again.', 'warning');
-                                            await signOut(auth);
-                                            return;
-                                        }
-                                    }
-                                    
-                                    // Update last login time
-                                    localStorage.setItem(`lastLogin_${user.uid}`, now.toString());
-                                    
-                                    // User is signed in
-                                    app.state.currentUser = user;
-                                    
-                                    // Update UI - Hide login, show header/sidebar/dashboard
-                                    const authViewWrapper = document.getElementById('auth-view-wrapper');
-                                    const appHeader = document.getElementById('app-header');
-                                    const sidebar = document.getElementById('sidebar');
-                                    const dashboardView = document.getElementById('dashboard-view');
-                                    
-                                    if (authViewWrapper) authViewWrapper.style.display = 'none';
-                                    if (appHeader) appHeader.classList.remove('hidden');
-                                    if (sidebar) sidebar.classList.remove('hidden');
-                                    if (dashboardView) dashboardView.classList.remove('hidden');
-                                    
-                                    // Initialize secure data listeners
-                                    await this.initializeSecureDataListeners(user.uid);
-                                    
-                                    // Start security monitoring
-                                    this.startSecurityMonitoring();
-                                    
-                                    // Hide loading overlay
-                                    const loadingOverlay = document.getElementById('loading-overlay');
-                                    if (loadingOverlay) {
-                                        loadingOverlay.style.opacity = '0';
-                                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                                    }
-                                    
-                                } else {
-                                    console.log('No user logged in'); // Debug
-                                    
-                                    // User is signed out
-                                    app.cleanup();
-                                    app.router.navigateTo('auth');
-                                    
-                                    // Update UI - Show login, hide header/sidebar/dashboard
-                                    const authViewWrapper = document.getElementById('auth-view-wrapper');
-                                    const appHeader = document.getElementById('app-header');
-                                    const sidebar = document.getElementById('sidebar');
-                                    const dashboardView = document.getElementById('dashboard-view');
-                                    
-                                    if (authViewWrapper) authViewWrapper.style.display = 'flex';
-                                    if (appHeader) appHeader.classList.add('hidden');
-                                    if (sidebar) sidebar.classList.add('hidden');
-                                    if (dashboardView) dashboardView.classList.add('hidden');
-                                    
-                                    // Hide loading overlay
-                                    const loadingOverlay = document.getElementById('loading-overlay');
-                                    if (loadingOverlay) {
-                                        loadingOverlay.style.opacity = '0';
-                                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                                    }
-                                }
-                            } catch (error) {
-                                console.error('Auth state change error:', error);
-                                app.ui.showToast('Authentication error. Please refresh the page.', 'error');
-                                
-                                // Hide loading overlay on error
-                                const loadingOverlay = document.getElementById('loading-overlay');
-                                if (loadingOverlay) {
-                                    loadingOverlay.style.opacity = '0';
-                                    setTimeout(() => loadingOverlay.style.display = 'none', 500);
-                                }
+                        onAuthStateChanged(auth, user => {
+                            if (user) {
+                                // User is signed in
+                                app.state.currentUser = user;
+                                app.firestore.listenForUserData(user.uid);
+                                app.firestore.listenForGoals(user.uid);
+                                app.firestore.listenForCommunityTemplates();
+                                app.firestore.listenForLeaderboard();
+                                app.firestore.listenForChallenges();
+                                app.ui.restartBackgroundEffects();
+                            } else {
+                                // User is signed out
+                                app.cleanup();
+                                app.router.navigateTo('auth');
+                                document.getElementById('loading-overlay').style.opacity = '0';
+                                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
                             }
                         });
-                        */
                     },
 
                     async initializeSecureDataListeners(uid) {
@@ -3692,87 +3427,40 @@
                             app.ui.showToast('Offline changes synced successfully!', 'success');
                         }
                     },
-                    // TEMPORARILY DISABLED: Register function
                     async register(name, email, password) {
-                        console.log('REGISTER DISABLED: Authentication bypassed for testing');
-                        app.ui.showToast('Registration disabled for testing. Dashboard will load automatically.', 'info');
-                        return;
-                        /* ORIGINAL REGISTER CODE COMMENTED OUT:
                         try {
-                            console.log('Attempting registration for:', email); // Debug
                             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                             const user = userCredential.user;
-                            console.log('Registration success, user UID:', user.uid); // Debug
 
-                            // Send email verification
-                            await sendEmailVerification(user);
-                            
                             // Create a new user document in Firestore
                             const newUserDoc = {
                                 uid: user.uid, email: user.email, displayName: name, createdAt: serverTimestamp(),
-                                stats: { points: 0, level: 1, currentStreak: 0, lastCompletedDate: null, totalGoals: 0, completedGoals: 0, dailyCompletions: {}, bestStreak: 0, bestDay: { date: null, count: 0 }, lastLogin: null, tasksUntilChest: 10, energy: { value: 100, lastUpdated: new Date().toISOString() }, aiCredits: 5 },
-                                achievements: [], inventory: { streakProtection: 0, unlockedThemes: [] },
-                                settings: { theme: 'dark', colorScheme: 'Firewall Flare', motivationalStyle: 'Mentor', aiProvider: 'gemini' },
+                                stats: { points: 0, level: 1, currentStreak: 0, lastCompletedDate: null, totalGoals: 0, completedGoals: 0, dailyCompletions: {}, bestStreak: 0, bestDay: { date: null, count: 0 }, lastLogin: null, tasksUntilChest: 10, energy: { value: 100, lastUpdated: new Date().toISOString() } },
+                                achievements: [], inventory: { streakProtection: 0 },
+                                settings: { theme: 'dark', colorScheme: 'Firewall Flare', motivationalStyle: 'Mentor', aiProvider: 'none' },
                                 moods: {},
                                 characterStats: { discipline: 0, creativity: 0, focus: 0, wellness: 0 },
                                 journeys: {},
                                 joinedChallenges: [],
                                 friends: [],
-                                isNewUser: true,
-                                emailVerified: false
+                                isNewUser: true
                             };
                             await setDoc(doc(db, "users", user.uid), newUserDoc);
-                            app.ui.showToast('Registration successful! Please check your email to verify your account.', 'success');
-                            // Sign out user until email is verified
-                            await signOut(auth);
+                            app.ui.showToast('Registration successful! Onboarding initiated.', 'success');
+                            // onAuthStateChanged will handle the rest
                         } catch (error) {
-                            handleFirebaseError(error, 'registration');
+                            app.ui.showToast(error.message, 'error');
+                            console.error("Registration Error:", error);
                         }
-                        */
                     },
-                    // TEMPORARILY DISABLED: Login function
                     async login(email, password) {
-                        console.log('LOGIN DISABLED: Authentication bypassed for testing');
-                        app.ui.showToast('Login disabled for testing. Dashboard will load automatically.', 'info');
-                        return;
-                        /* ORIGINAL LOGIN CODE COMMENTED OUT:
                         try {
-                            console.log('Attempting login for:', email); // Debug
-                            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                            const user = userCredential.user;
-                            console.log('Login success'); // Debug
-                            console.log('User UID:', user.uid); // Debug
-                            
-                            // Check if email is verified with retry mechanism
-                            if (!user.emailVerified) {
-                                console.log('Email not verified, checking for recent verification...'); // Debug
-                                
-                                // Use helper function to check verification status
-                                const isVerified = await this.checkEmailVerificationStatus(user);
-                                
-                                if (!isVerified) {
-                                    console.log('Email still not verified after check'); // Debug
-                                    await signOut(auth);
-                                    app.ui.showToast('Please verify your email address before logging in. Check your inbox for a verification link.', 'error');
-                                    return;
-                                } else {
-                                    console.log('Email verification confirmed, continuing...'); // Debug
-                                }
-                            }
-                            
-                            // Note: emailVerified status is now updated in checkEmailVerificationStatus helper function
-                            
-                            console.log('Login completed, auth state listener will handle UI update'); // Debug
+                            await signInWithEmailAndPassword(auth, email, password);
                             // onAuthStateChanged will handle navigation
                         } catch (error) {
-                            console.error('Login error details:', {
-                                code: error.code,
-                                message: error.message,
-                                email: email
-                            }); // Debug
-                            handleFirebaseError(error, 'login');
+                            app.ui.showToast(error.message, 'error');
+                            console.error("Login Error:", error);
                         }
-                        */
                     },
                     
                     async resetPassword(email) {
@@ -7109,16 +6797,14 @@ Provide the response in this exact JSON format:
                             
                             console.log('Login form submitted for:', email); // Debug
                             
-                            // Check if Firebase is available
-                            if (!import.meta.env?.VITE_FIREBASE_API_KEY && !process.env?.VITE_FIREBASE_API_KEY) {
-                                console.log('Firebase not available, using mock auth'); // Debug
-                                // Use mock authentication
-                                if (window.mockSignIn) {
-                                    window.mockSignIn(email, password);
-                                } else {
-                                    alert('Authentication service unavailable. Please try again later.');
-                                }
-                                return;
+                            try {
+                                console.log('Calling app.auth.login...'); // Debug
+                                await app.auth.login(email, password);
+                                console.log('Login form handler completed'); // Debug
+                                // Auth state listener will handle UI update
+                            } catch (error) {
+                                console.error('Login form error:', error);
+                                app.ui.showToast(error.message, 'error');
                             }
                             
                             try {
