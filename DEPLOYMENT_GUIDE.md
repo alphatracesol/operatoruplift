@@ -102,7 +102,7 @@ This guide provides complete instructions for deploying the Operator Uplift appl
 
 1. **Deploy to Netlify**:
    - Connect your GitHub repository to Netlify
-   - Set build command: `npm install && npm run build`
+   - Set build command: `cd netlify/functions && npm install && cd ../..`
    - Set publish directory: `.`
    - Set Node.js version: `18`
 
@@ -141,7 +141,7 @@ This guide provides complete instructions for deploying the Operator Uplift appl
 ```toml
 [build]
   publish = "."
-  command = "npm install && npm run build"
+  command = "cd netlify/functions && npm install && cd ../.."
   functions = "netlify/functions"
 
 [build.environment]
