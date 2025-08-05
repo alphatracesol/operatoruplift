@@ -35,7 +35,6 @@ const dirsToCopy = [
   'assets',
   'css',
   'js',
-  'components',
   'pages',
   'src',
   'tests',

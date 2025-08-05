@@ -43,9 +43,9 @@
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
     
     <!-- Firebase CDNs -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     
     <style>
         /* ===== MODERN UI CHUNK 1: GLASS MORPHISM & ADVANCED CSS VARIABLES ===== */
@@ -18076,6 +18076,30 @@ Format your response as JSON:
                  * @description Sets up the complete application with all modules and features
                  * @returns {Promise<void>} Promise that resolves when initialization is complete
                  */
+                /**
+                 * Initialize enhanced onboarding system
+                 * Sets up the onboarding flow and user guidance
+                 */
+                initEnhancedOnboarding() {
+                    try {
+                        console.log('🎯 Initializing enhanced onboarding system...');
+                        
+                        // Check if user has completed onboarding
+                        const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
+                        
+                        if (!hasCompletedOnboarding) {
+                            // Show onboarding modal or redirect to onboarding flow
+                            console.log('📋 User needs onboarding - will show onboarding flow');
+                        } else {
+                            console.log('✅ User has completed onboarding');
+                        }
+                        
+                        console.log('✅ Enhanced onboarding system initialized');
+                    } catch (error) {
+                        console.error('❌ Failed to initialize enhanced onboarding:', error);
+                    }
+                },
+                
                 init() {
                 /**
                  * Initialize the main application

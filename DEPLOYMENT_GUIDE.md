@@ -104,7 +104,7 @@ This guide provides complete instructions for deploying the Operator Uplift appl
    - Connect your GitHub repository to Netlify
    - Set build command: `npm run build`
    - Set publish directory: `build`
-   - Set Node.js version: `18`
+   - Set Node.js version: `20`
 
 2. **Environment Variables in Netlify**:
    - Go to Site Settings > Environment Variables
@@ -145,7 +145,7 @@ This guide provides complete instructions for deploying the Operator Uplift appl
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
 # SPA Routing - Handle all routes
