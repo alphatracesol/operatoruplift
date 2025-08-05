@@ -39,9 +39,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
     
     <!-- Firebase CDNs -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -8728,17 +8728,26 @@
                         
                         this.confettiCanvas.style.opacity = '1';
                         
-                        // Use throttled creation for better performance
-                        const createConfetti = (index) => {
-                            const x = Math.random() * window.innerWidth;
-                            const y = -10;
-                            this.confetti.push(new Confetti(x, y));
-                            this.animateConfetti();
-                        };
-                        
-                        // Create confetti with staggered timing
-                        for (let i = 0; i < 100; i++) {
-                            setTimeout(() => createConfetti(i), i * 20);
+                        // Use canvas-confetti library
+                        if (typeof confetti !== 'undefined') {
+                            confetti({
+                                particleCount: 100,
+                                spread: 70,
+                                origin: { y: 0.6 }
+                            });
+                        } else {
+                            // Fallback to custom confetti if library not loaded
+                            const createConfetti = (index) => {
+                                const x = Math.random() * window.innerWidth;
+                                const y = -10;
+                                this.confetti.push(new Confetti(x, y));
+                                this.animateConfetti();
+                            };
+                            
+                            // Create confetti with staggered timing
+                            for (let i = 0; i < 100; i++) {
+                                setTimeout(() => createConfetti(i), i * 20);
+                            }
                         }
                         
                         setTimeout(() => {
@@ -17755,13 +17764,23 @@ Format your response as JSON:
                 
                 createAIProviderChart() {
                     const ctx = document.getElementById('ai-provider-chart');
-                    if (!ctx) return;
+                    if (!ctx) {
+                        console.warn('AI provider chart canvas not found');
+                        return;
+                    }
+                    
+                    // Check if Chart.js is loaded
+                    if (typeof Chart === 'undefined') {
+                        console.warn('Chart.js not loaded, skipping chart creation');
+                        return;
+                    }
                     
                     const data = this.data.aiUsage.providers || {};
                     const labels = Object.keys(data);
                     const values = Object.values(data);
                     
-                    this.charts.aiProvider = new Chart(ctx, {
+                    try {
+                        this.charts.aiProvider = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: labels,
@@ -17790,6 +17809,9 @@ Format your response as JSON:
                             }
                         }
                     });
+                    } catch (error) {
+                        console.error('Failed to create AI provider chart:', error);
+                    }
                 },
                 
                 createPerformanceChart() {

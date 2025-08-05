@@ -27,6 +27,7 @@ const filesToCopy = [
   'manifest.json',
   'sw.js',
   'favicon.ico',
+  'apple-touch-icon.png',
   '_redirects',
   'netlify.toml'
 ];
