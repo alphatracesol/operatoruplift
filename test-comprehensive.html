@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Comprehensive Test Suite</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #0a0a0a;
+            color: #e5e7eb;
+        }
+        .test-section {
+            background: rgba(24, 24, 27, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .test-result {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+        .pass { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .fail { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        button {
+            background: #f97316;
+            color: black;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 600;
+        }
+        button:hover { background: #fb923c; }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Operator Uplift - Comprehensive Test Suite</h1>
+    <p>Testing all functionality and fixes for the PERFECT MVP</p>
+
+    <div class="test-section">
+        <h2>🔧 Core System Tests</h2>
+        <div id="core-tests"></div>
+        <button onclick="runCoreTests()">Run Core Tests</button>
+        <div id="core-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔥 Firebase Integration Tests</h2>
+        <div id="firebase-tests"></div>
+        <button onclick="runFirebaseTests()">Run Firebase Tests</button>
+        <div id="firebase-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🤖 AI Integration Tests</h2>
+        <div id="ai-tests"></div>
+        <button onclick="runAITests()">Run AI Tests</button>
+        <div id="ai-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📱 UI/UX Tests</h2>
+        <div id="ui-tests"></div>
+        <button onclick="runUITests()">Run UI Tests</button>
+        <div id="ui-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Performance Tests</h2>
+        <div id="performance-tests"></div>
+        <button onclick="runPerformanceTests()">Run Performance Tests</button>
+        <div id="performance-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔒 Security Tests</h2>
+        <div id="security-tests"></div>
+        <button onclick="runSecurityTests()">Run Security Tests</button>
+        <div id="security-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Results Summary</h2>
+        <div id="summary"></div>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="generateReport()">Generate Report</button>
+    </div>
+
+    <script>
+        let testResults = {
+            core: { passed: 0, failed: 0, total: 0 },
+            firebase: { passed: 0, failed: 0, total: 0 },
+            ai: { passed: 0, failed: 0, total: 0 },
+            ui: { passed: 0, failed: 0, total: 0 },
+            performance: { passed: 0, failed: 0, total: 0 },
+            security: { passed: 0, failed: 0, total: 0 }
+        };
+
+        function log(section, message) {
+            const logElement = document.getElementById(section + '-log');
+            if (logElement) {
+                logElement.innerHTML += `[${new Date().toLocaleTimeString()}] ${message}\n`;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        }
+
+        function addTestResult(section, testName, passed, message = '') {
+            const container = document.getElementById(section + '-tests');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `${passed ? '✅' : '❌'} ${testName}${message ? ': ' + message : ''}`;
+            container.appendChild(resultDiv);
+
+            testResults[section].total++;
+            if (passed) {
+                testResults[section].passed++;
+            } else {
+                testResults[section].failed++;
+            }
+        }
+
+        function runCoreTests() {
+            log('core', 'Starting core system tests...');
+            
+            // Test 1: App initialization
+            try {
+                if (typeof app !== 'undefined') {
+                    addTestResult('core', 'App Object Exists', true);
+                    log('core', 'App object found');
+                } else {
+                    addTestResult('core', 'App Object Exists', false);
+                    log('core', 'App object not found');
+                }
+            } catch (error) {
+                addTestResult('core', 'App Object Exists', false, error.message);
+                log('core', 'Error checking app object: ' + error.message);
+            }
+
+            // Test 2: State management
+            try {
+                if (app.state && typeof app.state === 'object') {
+                    addTestResult('core', 'State Management', true);
+                    log('core', 'State management working');
+                } else {
+                    addTestResult('core', 'State Management', false);
+                    log('core', 'State management not working');
+                }
+            } catch (error) {
+                addTestResult('core', 'State Management', false, error.message);
+                log('core', 'Error checking state: ' + error.message);
+            }
+
+            // Test 3: Utility functions
+            try {
+                if (app.utils && typeof app.utils.safeGet === 'function') {
+                    addTestResult('core', 'Utility Functions', true);
+                    log('core', 'Utility functions available');
+                } else {
+                    addTestResult('core', 'Utility Functions', false);
+                    log('core', 'Utility functions missing');
+                }
+            } catch (error) {
+                addTestResult('core', 'Utility Functions', false, error.message);
+                log('core', 'Error checking utilities: ' + error.message);
+            }
+
+            // Test 4: Error handling
+            try {
+                if (app.utils && typeof app.utils.logError === 'function') {
+                    addTestResult('core', 'Error Handling', true);
+                    log('core', 'Error handling system available');
+                } else {
+                    addTestResult('core', 'Error Handling', false);
+                    log('core', 'Error handling system missing');
+                }
+            } catch (error) {
+                addTestResult('core', 'Error Handling', false, error.message);
+                log('core', 'Error checking error handling: ' + error.message);
+            }
+
+            // Test 5: Memory management
+            try {
+                if (app.utils && typeof app.utils.cleanup === 'function') {
+                    addTestResult('core', 'Memory Management', true);
+                    log('core', 'Memory management system available');
+                } else {
+                    addTestResult('core', 'Memory Management', false);
+                    log('core', 'Memory management system missing');
+                }
+            } catch (error) {
+                addTestResult('core', 'Memory Management', false, error.message);
+                log('core', 'Error checking memory management: ' + error.message);
+            }
+
+            log('core', 'Core tests completed');
+        }
+
+        function runFirebaseTests() {
+            log('firebase', 'Starting Firebase integration tests...');
+            
+            // Test 1: Firebase availability
+            try {
+                if (typeof firebase !== 'undefined' && firebase.auth && firebase.db) {
+                    addTestResult('firebase', 'Firebase SDK Loaded', true);
+                    log('firebase', 'Firebase SDK available');
+                } else {
+                    addTestResult('firebase', 'Firebase SDK Loaded', false);
+                    log('firebase', 'Firebase SDK not available');
+                }
+            } catch (error) {
+                addTestResult('firebase', 'Firebase SDK Loaded', false, error.message);
+                log('firebase', 'Error checking Firebase: ' + error.message);
+            }
+
+            // Test 2: Authentication methods
+            try {
+                if (app.auth && typeof app.auth.login === 'function') {
+                    addTestResult('firebase', 'Auth Methods', true);
+                    log('firebase', 'Authentication methods available');
+                } else {
+                    addTestResult('firebase', 'Auth Methods', false);
+                    log('firebase', 'Authentication methods missing');
+                }
+            } catch (error) {
+                addTestResult('firebase', 'Auth Methods', false, error.message);
+                log('firebase', 'Error checking auth methods: ' + error.message);
+            }
+
+            // Test 3: Data synchronization
+            try {
+                if (app.goals && typeof app.goals.saveToLocalStorage === 'function') {
+                    addTestResult('firebase', 'Data Sync', true);
+                    log('firebase', 'Data synchronization available');
+                } else {
+                    addTestResult('firebase', 'Data Sync', false);
+                    log('firebase', 'Data synchronization missing');
+                }
+            } catch (error) {
+                addTestResult('firebase', 'Data Sync', false, error.message);
+                log('firebase', 'Error checking data sync: ' + error.message);
+            }
+
+            log('firebase', 'Firebase tests completed');
+        }
+
+        function runAITests() {
+            log('ai', 'Starting AI integration tests...');
+            
+            // Test 1: AI object exists
+            try {
+                if (app.ai && typeof app.ai.sendMessage === 'function') {
+                    addTestResult('ai', 'AI Object', true);
+                    log('ai', 'AI object available');
+                } else {
+                    addTestResult('ai', 'AI Object', false);
+                    log('ai', 'AI object missing');
+                }
+            } catch (error) {
+                addTestResult('ai', 'AI Object', false, error.message);
+                log('ai', 'Error checking AI object: ' + error.message);
+            }
+
+            // Test 2: Token handling
+            try {
+                if (app.ai && typeof app.ai.getAIToken === 'function') {
+                    addTestResult('ai', 'Token Handling', true);
+                    log('ai', 'Token handling available');
+                } else {
+                    addTestResult('ai', 'Token Handling', false);
+                    log('ai', 'Token handling missing');
+                }
+            } catch (error) {
+                addTestResult('ai', 'Token Handling', false, error.message);
+                log('ai', 'Error checking token handling: ' + error.message);
+            }
+
+            // Test 3: Error handling
+            try {
+                if (app.ai && typeof app.ai.getFallbackResponse === 'function') {
+                    addTestResult('ai', 'AI Error Handling', true);
+                    log('ai', 'AI error handling available');
+                } else {
+                    addTestResult('ai', 'AI Error Handling', false);
+                    log('ai', 'AI error handling missing');
+                }
+            } catch (error) {
+                addTestResult('ai', 'AI Error Handling', false, error.message);
+                log('ai', 'Error checking AI error handling: ' + error.message);
+            }
+
+            log('ai', 'AI tests completed');
+        }
+
+        function runUITests() {
+            log('ui', 'Starting UI/UX tests...');
+            
+            // Test 1: Theme system
+            try {
+                if (app.setTheme && typeof app.setTheme === 'function') {
+                    addTestResult('ui', 'Theme System', true);
+                    log('ui', 'Theme system available');
+                } else {
+                    addTestResult('ui', 'Theme System', false);
+                    log('ui', 'Theme system missing');
+                }
+            } catch (error) {
+                addTestResult('ui', 'Theme System', false, error.message);
+                log('ui', 'Error checking theme system: ' + error.message);
+            }
+
+            // Test 2: Modal system
+            try {
+                if (app.ui && typeof app.ui.closeModal === 'function') {
+                    addTestResult('ui', 'Modal System', true);
+                    log('ui', 'Modal system available');
+                } else {
+                    addTestResult('ui', 'Modal System', false);
+                    log('ui', 'Modal system missing');
+                }
+            } catch (error) {
+                addTestResult('ui', 'Modal System', false, error.message);
+                log('ui', 'Error checking modal system: ' + error.message);
+            }
+
+            // Test 3: Toast notifications
+            try {
+                if (app.ui && typeof app.ui.showToast === 'function') {
+                    addTestResult('ui', 'Toast System', true);
+                    log('ui', 'Toast system available');
+                } else {
+                    addTestResult('ui', 'Toast System', false);
+                    log('ui', 'Toast system missing');
+                }
+            } catch (error) {
+                addTestResult('ui', 'Toast System', false, error.message);
+                log('ui', 'Error checking toast system: ' + error.message);
+            }
+
+            // Test 4: Accessibility
+            try {
+                if (app.ui && typeof app.ui.setupAccessibility === 'function') {
+                    addTestResult('ui', 'Accessibility', true);
+                    log('ui', 'Accessibility features available');
+                } else {
+                    addTestResult('ui', 'Accessibility', false);
+                    log('ui', 'Accessibility features missing');
+                }
+            } catch (error) {
+                addTestResult('ui', 'Accessibility', false, error.message);
+                log('ui', 'Error checking accessibility: ' + error.message);
+            }
+
+            log('ui', 'UI tests completed');
+        }
+
+        function runPerformanceTests() {
+            log('performance', 'Starting performance tests...');
+            
+            // Test 1: Loading time
+            try {
+                const loadTime = performance.now();
+                if (loadTime < 5000) { // Less than 5 seconds
+                    addTestResult('performance', 'Load Time', true, `${Math.round(loadTime)}ms`);
+                    log('performance', `Load time: ${Math.round(loadTime)}ms`);
+                } else {
+                    addTestResult('performance', 'Load Time', false, `${Math.round(loadTime)}ms (too slow)`);
+                    log('performance', `Load time too slow: ${Math.round(loadTime)}ms`);
+                }
+            } catch (error) {
+                addTestResult('performance', 'Load Time', false, error.message);
+                log('performance', 'Error checking load time: ' + error.message);
+            }
+
+            // Test 2: Memory usage
+            try {
+                if ('memory' in performance) {
+                    const memory = performance.memory;
+                    const usagePercent = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
+                    if (usagePercent < 80) {
+                        addTestResult('performance', 'Memory Usage', true, `${Math.round(usagePercent)}%`);
+                        log('performance', `Memory usage: ${Math.round(usagePercent)}%`);
+                    } else {
+                        addTestResult('performance', 'Memory Usage', false, `${Math.round(usagePercent)}% (high)`);
+                        log('performance', `Memory usage high: ${Math.round(usagePercent)}%`);
+                    }
+                } else {
+                    addTestResult('performance', 'Memory Usage', true, 'Not available');
+                    log('performance', 'Memory usage not available');
+                }
+            } catch (error) {
+                addTestResult('performance', 'Memory Usage', false, error.message);
+                log('performance', 'Error checking memory usage: ' + error.message);
+            }
+
+            // Test 3: Background effects
+            try {
+                if (app.initBackgroundEffects && typeof app.initBackgroundEffects === 'function') {
+                    addTestResult('performance', 'Background Effects', true);
+                    log('performance', 'Background effects system available');
+                } else {
+                    addTestResult('performance', 'Background Effects', false);
+                    log('performance', 'Background effects system missing');
+                }
+            } catch (error) {
+                addTestResult('performance', 'Background Effects', false, error.message);
+                log('performance', 'Error checking background effects: ' + error.message);
+            }
+
+            log('performance', 'Performance tests completed');
+        }
+
+        function runSecurityTests() {
+            log('security', 'Starting security tests...');
+            
+            // Test 1: Input sanitization
+            try {
+                if (app.utils && typeof app.utils.sanitizeInput === 'function') {
+                    const testInput = '<script>alert("xss")</script>';
+                    const sanitized = app.utils.sanitizeInput(testInput);
+                    if (sanitized.indexOf('<script>') === -1) {
+                        addTestResult('security', 'Input Sanitization', true);
+                        log('security', 'Input sanitization working');
+                    } else {
+                        addTestResult('security', 'Input Sanitization', false);
+                        log('security', 'Input sanitization not working');
+                    }
+                } else {
+                    addTestResult('security', 'Input Sanitization', false);
+                    log('security', 'Input sanitization function missing');
+                }
+            } catch (error) {
+                addTestResult('security', 'Input Sanitization', false, error.message);
+                log('security', 'Error checking input sanitization: ' + error.message);
+            }
+
+            // Test 2: Email validation
+            try {
+                if (app.utils && typeof app.utils.validateEmail === 'function') {
+                    const validEmail = 'test@example.com';
+                    const invalidEmail = 'invalid-email';
+                    if (app.utils.validateEmail(validEmail) && !app.utils.validateEmail(invalidEmail)) {
+                        addTestResult('security', 'Email Validation', true);
+                        log('security', 'Email validation working');
+                    } else {
+                        addTestResult('security', 'Email Validation', false);
+                        log('security', 'Email validation not working');
+                    }
+                } else {
+                    addTestResult('security', 'Email Validation', false);
+                    log('security', 'Email validation function missing');
+                }
+            } catch (error) {
+                addTestResult('security', 'Email Validation', false, error.message);
+                log('security', 'Error checking email validation: ' + error.message);
+            }
+
+            // Test 3: API key protection
+            try {
+                const appHtml = document.documentElement.outerHTML;
+                if (appHtml.indexOf('hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx') !== -1) {
+                    addTestResult('security', 'API Key Protection', true);
+                    log('security', 'API keys are protected');
+                } else {
+                    addTestResult('security', 'API Key Protection', false);
+                    log('security', 'API keys may be exposed');
+                }
+            } catch (error) {
+                addTestResult('security', 'API Key Protection', false, error.message);
+                log('security', 'Error checking API key protection: ' + error.message);
+            }
+
+            log('security', 'Security tests completed');
+        }
+
+        function runAllTests() {
+            // Clear previous results
+            Object.keys(testResults).forEach(section => {
+                document.getElementById(section + '-tests').innerHTML = '';
+                document.getElementById(section + '-log').innerHTML = '';
+                testResults[section] = { passed: 0, failed: 0, total: 0 };
+            });
+
+            // Run all tests
+            runCoreTests();
+            setTimeout(() => runFirebaseTests(), 500);
+            setTimeout(() => runAITests(), 1000);
+            setTimeout(() => runUITests(), 1500);
+            setTimeout(() => runPerformanceTests(), 2000);
+            setTimeout(() => runSecurityTests(), 2500);
+            setTimeout(() => updateSummary(), 3000);
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            let totalPassed = 0;
+            let totalFailed = 0;
+            let totalTests = 0;
+
+            Object.keys(testResults).forEach(section => {
+                totalPassed += testResults[section].passed;
+                totalFailed += testResults[section].failed;
+                totalTests += testResults[section].total;
+            });
+
+            const successRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+            const status = successRate >= 90 ? '🟢 EXCELLENT' : successRate >= 80 ? '🟡 GOOD' : successRate >= 70 ? '🟠 FAIR' : '🔴 NEEDS WORK';
+
+            summary.innerHTML = `
+                <div class="test-result ${successRate >= 90 ? 'pass' : successRate >= 70 ? 'warning' : 'fail'}">
+                    <h3>${status} - ${successRate}% Success Rate</h3>
+                    <p>Total Tests: ${totalTests} | Passed: ${totalPassed} | Failed: ${totalFailed}</p>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <strong>Breakdown:</strong><br>
+                    Core: ${testResults.core.passed}/${testResults.core.total}<br>
+                    Firebase: ${testResults.firebase.passed}/${testResults.firebase.total}<br>
+                    AI: ${testResults.ai.passed}/${testResults.ai.total}<br>
+                    UI: ${testResults.ui.passed}/${testResults.ui.total}<br>
+                    Performance: ${testResults.performance.passed}/${testResults.performance.total}<br>
+                    Security: ${testResults.security.passed}/${testResults.security.total}
+                </div>
+            `;
+        }
+
+        function generateReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                results: testResults,
+                summary: {
+                    totalTests: Object.values(testResults).reduce((sum, section) => sum + section.total, 0),
+                    totalPassed: Object.values(testResults).reduce((sum, section) => sum + section.passed, 0),
+                    totalFailed: Object.values(testResults).reduce((sum, section) => sum + section.failed, 0)
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `operator-uplift-test-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                runAllTests();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

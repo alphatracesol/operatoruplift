@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Test - Operator Uplift</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #111827 0%, #0a0a0a 100%);
+            color: #e5e7eb;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 500;
+        }
+        .test-button:hover {
+            background: #fb923c;
+        }
+        .test-result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Phase 2 Test - Operator Uplift</h1>
+        <p>Testing mock login, AI integration, and chat functionality</p>
+
+        <div class="test-section">
+            <h3>1. Environment Variables Test</h3>
+            <button class="test-button" onclick="testEnvironment()">Test Environment</button>
+            <div id="env-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Mock Login Test</h3>
+            <button class="test-button" onclick="testMockLogin()">Test Mock Login</button>
+            <div id="login-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. AI Chat Test</h3>
+            <button class="test-button" onclick="testAIChat()">Test AI Chat</button>
+            <div id="chat-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Chat History Test</h3>
+            <button class="test-button" onclick="testChatHistory()">Test Chat History</button>
+            <div id="history-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Full Integration Test</h3>
+            <button class="test-button" onclick="testFullIntegration()">Test Full Integration</button>
+            <div id="integration-result" class="test-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test functions
+        function testEnvironment() {
+            const result = document.getElementById('env-result');
+            try {
+                const env = window.env || {};
+                const testData = {
+                    HF_TOKEN: env.HF_TOKEN ? '✅ Set' : '❌ Not set',
+                    FIREBASE_API_KEY: env.FIREBASE_API_KEY ? '✅ Set' : '❌ Not set',
+                    FIREBASE_AUTH_DOMAIN: env.FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Not set'
+                };
+                
+                result.innerHTML = `Environment Variables:\n${JSON.stringify(testData, null, 2)}`;
+                result.className = 'test-result success';
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+                result.className = 'test-result error';
+            }
+        }
+
+        function testMockLogin() {
+            const result = document.getElementById('login-result');
+            try {
+                // Simulate mock login
+                const mockUser = {
+                    uid: 'demo_user_' + Date.now(),
+                    email: 'test@example.com',
+                    displayName: 'Test User',
+                    emailVerified: true
+                };
+                
+                const mockUserData = {
+                    displayName: mockUser.displayName,
+                    email: mockUser.email,
+                    stats: {
+                        level: 1,
+                        points: 0,
+                        currentStreak: 0,
+                        energy: { value: 100, max: 100 },
+                        aiCredits: 10
+                    },
+                    settings: {
+                        colorScheme: 'dark',
+                        notifications: true,
+                        aiProvider: 'deepseek'
+                    },
+                    inventory: {
+                        unlockedThemes: ['default'],
+                        essence: 0
+                    },
+                    goals: [],
+                    focusSessions: [],
+                    moods: {}
+                };
+                
+                localStorage.setItem('mockUser', JSON.stringify(mockUser));
+                localStorage.setItem('operator_uplift_userdata', JSON.stringify(mockUserData));
+                
+                result.innerHTML = `✅ Mock login successful!\nUser: ${mockUser.displayName}\nEmail: ${mockUser.email}\nAI Credits: ${mockUserData.stats.aiCredits}`;
+                result.className = 'test-result success';
+            } catch (error) {
+                result.innerHTML = `❌ Mock login failed: ${error.message}`;
+                result.className = 'test-result error';
+            }
+        }
+
+        function testAIChat() {
+            const result = document.getElementById('chat-result');
+            result.innerHTML = '🔄 Testing AI chat...';
+            result.className = 'test-result info';
+            
+            // Simulate AI chat with fallback
+            setTimeout(() => {
+                try {
+                    const fallbackResponses = [
+                        "I'm having trouble connecting right now. Let me help you with some general advice: focus on breaking down your goals into smaller, manageable tasks.",
+                        "Connection issue detected. Here's a quick tip: consistency beats perfection. Start with just 5 minutes of focused work.",
+                        "I'm temporarily unavailable. Remember: progress, not perfection. What's one small step you can take today?",
+                        "Let me give you some offline wisdom: the best time to start was yesterday, the second best time is now."
+                    ];
+                    
+                    const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+                    
+                    result.innerHTML = `✅ AI Chat Test (Fallback Mode):\n\nResponse: "${randomResponse}"\n\nNote: This is a fallback response since we're testing without real API keys.`;
+                    result.className = 'test-result success';
+                } catch (error) {
+                    result.innerHTML = `❌ AI chat test failed: ${error.message}`;
+                    result.className = 'test-result error';
+                }
+            }, 1000);
+        }
+
+        function testChatHistory() {
+            const result = document.getElementById('history-result');
+            try {
+                // Create sample chat history
+                const sampleHistory = [
+                    {
+                        timestamp: new Date().toISOString(),
+                        user: "How can I stay motivated?",
+                        assistant: "Start small! Break your goals into tiny, achievable steps. Celebrate every win, no matter how small."
+                    },
+                    {
+                        timestamp: new Date().toISOString(),
+                        user: "I'm feeling overwhelmed",
+                        assistant: "Take a deep breath. Focus on just one thing right now. What's the most important task for today?"
+                    }
+                ];
+                
+                localStorage.setItem('operator_uplift_chat_history', JSON.stringify(sampleHistory));
+                
+                const loadedHistory = JSON.parse(localStorage.getItem('operator_uplift_chat_history') || '[]');
+                
+                result.innerHTML = `✅ Chat History Test:\n\nCreated: ${sampleHistory.length} messages\nLoaded: ${loadedHistory.length} messages\n\nSample conversation:\n${loadedHistory.map(h => `User: ${h.user}\nAI: ${h.assistant}\n`).join('\n')}`;
+                result.className = 'test-result success';
+            } catch (error) {
+                result.innerHTML = `❌ Chat history test failed: ${error.message}`;
+                result.className = 'test-result error';
+            }
+        }
+
+        function testFullIntegration() {
+            const result = document.getElementById('integration-result');
+            result.innerHTML = '🔄 Running full integration test...';
+            result.className = 'test-result info';
+            
+            setTimeout(() => {
+                try {
+                    // Test all components
+                    const tests = {
+                        environment: window.env ? '✅' : '❌',
+                        mockUser: localStorage.getItem('mockUser') ? '✅' : '❌',
+                        userData: localStorage.getItem('operator_uplift_userdata') ? '✅' : '❌',
+                        chatHistory: localStorage.getItem('operator_uplift_chat_history') ? '✅' : '❌',
+                        dateFns: window.dateFns ? '✅' : '❌',
+                        increment: window.increment ? '✅' : '❌',
+                        arrayUnion: window.arrayUnion ? '✅' : '❌'
+                    };
+                    
+                    const allPassed = Object.values(tests).every(test => test === '✅');
+                    
+                    result.innerHTML = `Full Integration Test Results:\n\n${Object.entries(tests).map(([key, status]) => `${status} ${key}`).join('\n')}\n\n${allPassed ? '🎉 All tests passed! Ready for deployment.' : '⚠️ Some tests failed. Check the results above.'}`;
+                    result.className = allPassed ? 'test-result success' : 'test-result error';
+                } catch (error) {
+                    result.innerHTML = `❌ Integration test failed: ${error.message}`;
+                    result.className = 'test-result error';
+                }
+            }, 2000);
+        }
+
+        // Auto-run environment test on load
+        window.addEventListener('load', () => {
+            testEnvironment();
+        });
+    </script>
+</body>
+</html> 

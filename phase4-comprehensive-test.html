@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 Comprehensive Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phase 4 Modules -->
+    <script src="js/modules/phase4-gamification.js"></script>
+    <script src="js/modules/phase4-goals.js"></script>
+    <script src="js/modules/phase4-habits-focus.js"></script>
+    
+    <style>
+        .test-log {
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .test-success { color: #10b981; }
+        .test-error { color: #ef4444; }
+        .test-warning { color: #f59e0b; }
+        .test-info { color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">🎮 Phase 4 Comprehensive Testing Suite</h1>
+        
+        <!-- Test Controls -->
+        <div class="bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Controls</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button id="run-all-tests" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold">
+                    🚀 Run All Tests
+                </button>
+                <button id="test-gamification" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold">
+                    🎯 Test Gamification
+                </button>
+                <button id="test-goals" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-semibold">
+                    🎯 Test Goals
+                </button>
+                <button id="test-habits" class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-lg font-semibold">
+                    💪 Test Habits
+                </button>
+                <button id="test-focus" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-semibold">
+                    🎯 Test Focus Sessions
+                </button>
+                <button id="clear-logs" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold">
+                    🗑️ Clear Logs
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Test Log -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">Test Log</h2>
+                <div id="test-log" class="test-log bg-black p-4 rounded-lg"></div>
+            </div>
+
+            <!-- Console Errors -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">Console Errors</h2>
+                <div id="console-errors" class="test-log bg-black p-4 rounded-lg"></div>
+            </div>
+        </div>
+
+        <!-- Test Status -->
+        <div class="bg-gray-800 p-6 rounded-lg mt-6">
+            <h2 class="text-xl font-semibold mb-4">Test Status</h2>
+            <div id="test-status" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Gamification</div>
+                    <div id="gamification-status" class="text-lg font-semibold">⏳ Pending</div>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Goals</div>
+                    <div id="goals-status" class="text-lg font-semibold">⏳ Pending</div>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Habits</div>
+                    <div id="habits-status" class="text-lg font-semibold">⏳ Pending</div>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Focus Sessions</div>
+                    <div id="focus-status" class="text-lg font-semibold">⏳ Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 4 Features Demo -->
+        <div class="bg-gray-800 p-6 rounded-lg mt-6">
+            <h2 class="text-xl font-semibold mb-4">Phase 4 Features Demo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Gamification Demo -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3">🎮 Gamification System</h3>
+                    <div class="space-y-2">
+                        <div>Level: <span id="demo-level">1</span></div>
+                        <div>XP: <span id="demo-xp">0</span></div>
+                        <div>Streak: <span id="demo-streak">0</span></div>
+                        <button id="demo-add-xp" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm">
+                            +100 XP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Goals Demo -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3">🎯 Goal Management</h3>
+                    <div class="space-y-2">
+                        <button id="demo-create-goal" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm">
+                            Create Test Goal
+                        </button>
+                        <button id="demo-complete-goal" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm">
+                            Complete Goal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Habits Demo -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3">💪 Habit Tracking</h3>
+                    <div class="space-y-2">
+                        <button id="demo-create-habit" class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">
+                            Create Test Habit
+                        </button>
+                        <button id="demo-complete-habit" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm">
+                            Complete Habit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Focus Demo -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3">🎯 Focus Sessions</h3>
+                    <div class="space-y-2">
+                        <button id="demo-create-focus" class="bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded text-sm">
+                            Create Focus Session
+                        </button>
+                        <button id="demo-start-focus" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm">
+                            Start Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Logger
+        class TestLogger {
+            constructor() {
+                this.logElement = document.getElementById('test-log');
+                this.errorElement = document.getElementById('console-errors');
+                this.originalConsoleError = console.error;
+                this.originalConsoleWarn = console.warn;
+                this.errors = [];
+                this.warnings = [];
+                
+                this.interceptConsole();
+            }
+
+            interceptConsole() {
+                console.error = (...args) => {
+                    this.originalConsoleError.apply(console, args);
+                    this.errors.push({
+                        timestamp: new Date().toISOString(),
+                        message: args.join(' ')
+                    });
+                    this.updateErrorDisplay();
+                };
+
+                console.warn = (...args) => {
+                    this.originalConsoleWarn.apply(console, args);
+                    this.warnings.push({
+                        timestamp: new Date().toISOString(),
+                        message: args.join(' ')
+                    });
+                    this.updateErrorDisplay();
+                };
+            }
+
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = `test-${type}`;
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                this.logElement.appendChild(logEntry);
+                this.logElement.scrollTop = this.logElement.scrollHeight;
+            }
+
+            updateErrorDisplay() {
+                this.errorElement.innerHTML = '';
+                [...this.errors, ...this.warnings].forEach(error => {
+                    const errorEntry = document.createElement('div');
+                    errorEntry.className = 'test-error';
+                    errorEntry.textContent = `[${error.timestamp}] ${error.message}`;
+                    this.errorElement.appendChild(errorEntry);
+                });
+                this.errorElement.scrollTop = this.errorElement.scrollHeight;
+            }
+
+            clear() {
+                this.logElement.innerHTML = '';
+                this.errorElement.innerHTML = '';
+                this.errors = [];
+                this.warnings = [];
+            }
+        }
+
+        // Test Runner
+        class Phase4TestRunner {
+            constructor() {
+                this.logger = new TestLogger();
+                this.testResults = {
+                    gamification: { status: 'pending', errors: 0, tests: 0 },
+                    goals: { status: 'pending', errors: 0, tests: 0 },
+                    habits: { status: 'pending', errors: 0, tests: 0 },
+                    focus: { status: 'pending', errors: 0, tests: 0 }
+                };
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('run-all-tests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('test-gamification').addEventListener('click', () => this.testGamification());
+                document.getElementById('test-goals').addEventListener('click', () => this.testGoals());
+                document.getElementById('test-habits').addEventListener('click', () => this.testHabits());
+                document.getElementById('test-focus').addEventListener('click', () => this.testFocusSessions());
+                document.getElementById('clear-logs').addEventListener('click', () => this.logger.clear());
+
+                // Demo buttons
+                document.getElementById('demo-add-xp').addEventListener('click', () => this.demoAddXP());
+                document.getElementById('demo-create-goal').addEventListener('click', () => this.demoCreateGoal());
+                document.getElementById('demo-complete-goal').addEventListener('click', () => this.demoCompleteGoal());
+                document.getElementById('demo-create-habit').addEventListener('click', () => this.demoCreateHabit());
+                document.getElementById('demo-complete-habit').addEventListener('click', () => this.demoCompleteHabit());
+                document.getElementById('demo-create-focus').addEventListener('click', () => this.demoCreateFocus());
+                document.getElementById('demo-start-focus').addEventListener('click', () => this.demoStartFocus());
+            }
+
+            async runAllTests() {
+                this.logger.log('🚀 Starting comprehensive Phase 4 testing...', 'info');
+                
+                await this.testGamification();
+                await this.testGoals();
+                await this.testHabits();
+                await this.testFocusSessions();
+                
+                this.logger.log('✅ All tests completed!', 'success');
+                this.updateStatusDisplay();
+            }
+
+            async testGamification() {
+                this.logger.log('🎮 Testing Gamification System...', 'info');
+                this.testResults.gamification.status = 'running';
+                this.updateStatusDisplay();
+
+                try {
+                    // Test Phase4Gamification module
+                    if (!window.Phase4Gamification) {
+                        throw new Error('Phase4Gamification module not found');
+                    }
+
+                    // Test initialization
+                    this.logger.log('Testing gamification initialization...', 'info');
+                    Phase4Gamification.init();
+                    this.testResults.gamification.tests++;
+
+                    // Test XP system
+                    this.logger.log('Testing XP system...', 'info');
+                    const initialXP = Phase4Gamification.state.totalXP;
+                    Phase4Gamification.xpSystem.addXP(100, 'Test');
+                    if (Phase4Gamification.state.totalXP !== initialXP + 100) {
+                        throw new Error('XP system not working correctly');
+                    }
+                    this.testResults.gamification.tests++;
+
+                    // Test achievement system
+                    this.logger.log('Testing achievement system...', 'info');
+                    const initialAchievements = Phase4Gamification.state.achievements.length;
+                    Phase4Gamification.achievements.award('firstGoal');
+                    if (Phase4Gamification.state.achievements.length !== initialAchievements + 1) {
+                        throw new Error('Achievement system not working correctly');
+                    }
+                    this.testResults.gamification.tests++;
+
+                    // Test quest system
+                    this.logger.log('Testing quest system...', 'info');
+                    Phase4Gamification.quests.generateDailyQuests();
+                    if (Phase4Gamification.state.quests.daily.length === 0) {
+                        throw new Error('Quest generation not working');
+                    }
+                    this.testResults.gamification.tests++;
+
+                    this.testResults.gamification.status = 'success';
+                    this.logger.log('✅ Gamification system tests passed!', 'success');
+
+                } catch (error) {
+                    this.testResults.gamification.status = 'error';
+                    this.testResults.gamification.errors++;
+                    this.logger.log(`❌ Gamification test failed: ${error.message}`, 'error');
+                }
+
+                this.updateStatusDisplay();
+            }
+
+            async testGoals() {
+                this.logger.log('🎯 Testing Goal Management System...', 'info');
+                this.testResults.goals.status = 'running';
+                this.updateStatusDisplay();
+
+                try {
+                    // Test Phase4Goals module
+                    if (!window.Phase4Goals) {
+                        throw new Error('Phase4Goals module not found');
+                    }
+
+                    // Test initialization
+                    this.logger.log('Testing goal system initialization...', 'info');
+                    Phase4Goals.init();
+                    this.testResults.goals.tests++;
+
+                    // Test goal creation
+                    this.logger.log('Testing goal creation...', 'info');
+                    const testGoal = Phase4Goals.createGoal({
+                        title: 'Test Goal',
+                        description: 'A test goal for testing',
+                        category: 'productivity',
+                        difficulty: 'medium'
+                    });
+                    if (!testGoal.id) {
+                        throw new Error('Goal creation failed');
+                    }
+                    this.testResults.goals.tests++;
+
+                    // Test AI suggestions
+                    this.logger.log('Testing AI goal suggestions...', 'info');
+                    const suggestions = Phase4Goals.aiSuggestions.getSuggestions({});
+                    if (!Array.isArray(suggestions)) {
+                        throw new Error('AI suggestions not working');
+                    }
+                    this.testResults.goals.tests++;
+
+                    // Test goal completion
+                    this.logger.log('Testing goal completion...', 'info');
+                    Phase4Goals.completeGoal(testGoal.id);
+                    this.testResults.goals.tests++;
+
+                    this.testResults.goals.status = 'success';
+                    this.logger.log('✅ Goal management tests passed!', 'success');
+
+                } catch (error) {
+                    this.testResults.goals.status = 'error';
+                    this.testResults.goals.errors++;
+                    this.logger.log(`❌ Goal test failed: ${error.message}`, 'error');
+                }
+
+                this.updateStatusDisplay();
+            }
+
+            async testHabits() {
+                this.logger.log('💪 Testing Habit Management System...', 'info');
+                this.testResults.habits.status = 'running';
+                this.updateStatusDisplay();
+
+                try {
+                    // Test Phase4HabitsFocus module
+                    if (!window.Phase4HabitsFocus) {
+                        throw new Error('Phase4HabitsFocus module not found');
+                    }
+
+                    // Test initialization
+                    this.logger.log('Testing habit system initialization...', 'info');
+                    Phase4HabitsFocus.init();
+                    this.testResults.habits.tests++;
+
+                    // Test habit creation
+                    this.logger.log('Testing habit creation...', 'info');
+                    const testHabit = Phase4HabitsFocus.createHabit({
+                        title: 'Test Habit',
+                        description: 'A test habit for testing',
+                        category: 'health',
+                        frequency: 'daily'
+                    });
+                    if (!testHabit.id) {
+                        throw new Error('Habit creation failed');
+                    }
+                    this.testResults.habits.tests++;
+
+                    // Test habit completion
+                    this.logger.log('Testing habit completion...', 'info');
+                    Phase4HabitsFocus.completeHabit(testHabit.id);
+                    this.testResults.habits.tests++;
+
+                    // Test AI suggestions
+                    this.logger.log('Testing AI habit suggestions...', 'info');
+                    const suggestions = Phase4HabitsFocus.aiHabitSuggestions.getSuggestions({});
+                    if (!Array.isArray(suggestions)) {
+                        throw new Error('AI habit suggestions not working');
+                    }
+                    this.testResults.habits.tests++;
+
+                    this.testResults.habits.status = 'success';
+                    this.logger.log('✅ Habit management tests passed!', 'success');
+
+                } catch (error) {
+                    this.testResults.habits.status = 'error';
+                    this.testResults.habits.errors++;
+                    this.logger.log(`❌ Habit test failed: ${error.message}`, 'error');
+                }
+
+                this.updateStatusDisplay();
+            }
+
+            async testFocusSessions() {
+                this.logger.log('🎯 Testing Focus Session System...', 'info');
+                this.testResults.focus.status = 'running';
+                this.updateStatusDisplay();
+
+                try {
+                    // Test Phase4HabitsFocus focus sessions
+                    if (!window.Phase4HabitsFocus) {
+                        throw new Error('Phase4HabitsFocus module not found');
+                    }
+
+                    // Test focus session creation
+                    this.logger.log('Testing focus session creation...', 'info');
+                    const testSession = Phase4HabitsFocus.focusSessions.createSession({
+                        title: 'Test Focus Session',
+                        description: 'A test focus session',
+                        duration: 5 // 5 minutes for testing
+                    });
+                    if (!testSession.id) {
+                        throw new Error('Focus session creation failed');
+                    }
+                    this.testResults.focus.tests++;
+
+                    // Test focus session start
+                    this.logger.log('Testing focus session start...', 'info');
+                    Phase4HabitsFocus.focusSessions.startSession(testSession.id);
+                    if (testSession.status !== 'active') {
+                        throw new Error('Focus session start failed');
+                    }
+                    this.testResults.focus.tests++;
+
+                    // Test focus session completion
+                    this.logger.log('Testing focus session completion...', 'info');
+                    Phase4HabitsFocus.focusSessions.completeSession(testSession.id);
+                    if (testSession.status !== 'completed') {
+                        throw new Error('Focus session completion failed');
+                    }
+                    this.testResults.focus.tests++;
+
+                    this.testResults.focus.status = 'success';
+                    this.logger.log('✅ Focus session tests passed!', 'success');
+
+                } catch (error) {
+                    this.testResults.focus.status = 'error';
+                    this.testResults.focus.errors++;
+                    this.logger.log(`❌ Focus session test failed: ${error.message}`, 'error');
+                }
+
+                this.updateStatusDisplay();
+            }
+
+            updateStatusDisplay() {
+                Object.keys(this.testResults).forEach(system => {
+                    const statusElement = document.getElementById(`${system}-status`);
+                    const result = this.testResults[system];
+                    
+                    if (result.status === 'success') {
+                        statusElement.textContent = '✅ Success';
+                        statusElement.className = 'text-lg font-semibold text-green-400';
+                    } else if (result.status === 'error') {
+                        statusElement.textContent = '❌ Error';
+                        statusElement.className = 'text-lg font-semibold text-red-400';
+                    } else if (result.status === 'running') {
+                        statusElement.textContent = '🔄 Running';
+                        statusElement.className = 'text-lg font-semibold text-yellow-400';
+                    } else {
+                        statusElement.textContent = '⏳ Pending';
+                        statusElement.className = 'text-lg font-semibold text-gray-400';
+                    }
+                });
+            }
+
+            // Demo functions
+            demoAddXP() {
+                if (window.Phase4Gamification) {
+                    Phase4Gamification.xpSystem.addXP(100, 'Demo');
+                    this.updateDemoDisplay();
+                    this.logger.log('Demo: Added 100 XP', 'info');
+                }
+            }
+
+            demoCreateGoal() {
+                if (window.Phase4Goals) {
+                    const goal = Phase4Goals.createGoal({
+                        title: 'Demo Goal',
+                        description: 'A demo goal for testing',
+                        category: 'productivity',
+                        difficulty: 'medium'
+                    });
+                    this.logger.log(`Demo: Created goal "${goal.title}"`, 'info');
+                }
+            }
+
+            demoCompleteGoal() {
+                if (window.Phase4Goals && window.app && window.app.state.userData && window.app.state.userData.goals) {
+                    const goals = window.app.state.userData.goals.filter(g => g.status === 'active');
+                    if (goals.length > 0) {
+                        Phase4Goals.completeGoal(goals[0].id);
+                        this.logger.log(`Demo: Completed goal "${goals[0].title}"`, 'info');
+                    }
+                }
+            }
+
+            demoCreateHabit() {
+                if (window.Phase4HabitsFocus) {
+                    const habit = Phase4HabitsFocus.createHabit({
+                        title: 'Demo Habit',
+                        description: 'A demo habit for testing',
+                        category: 'health',
+                        frequency: 'daily'
+                    });
+                    this.logger.log(`Demo: Created habit "${habit.title}"`, 'info');
+                }
+            }
+
+            demoCompleteHabit() {
+                if (window.Phase4HabitsFocus && window.app && window.app.state.userData && window.app.state.userData.habits) {
+                    const habits = window.app.state.userData.habits.filter(h => h.status === 'active');
+                    if (habits.length > 0) {
+                        Phase4HabitsFocus.completeHabit(habits[0].id);
+                        this.logger.log(`Demo: Completed habit "${habits[0].title}"`, 'info');
+                    }
+                }
+            }
+
+            demoCreateFocus() {
+                if (window.Phase4HabitsFocus) {
+                    const session = Phase4HabitsFocus.focusSessions.createSession({
+                        title: 'Demo Focus Session',
+                        description: 'A demo focus session',
+                        duration: 5
+                    });
+                    this.logger.log(`Demo: Created focus session "${session.title}"`, 'info');
+                }
+            }
+
+            demoStartFocus() {
+                if (window.Phase4HabitsFocus && window.app && window.app.state.userData && window.app.state.userData.focusSessions) {
+                    const sessions = window.app.state.userData.focusSessions.filter(s => s.status === 'pending');
+                    if (sessions.length > 0) {
+                        Phase4HabitsFocus.focusSessions.startSession(sessions[0].id);
+                        this.logger.log(`Demo: Started focus session "${sessions[0].title}"`, 'info');
+                    }
+                }
+            }
+
+            updateDemoDisplay() {
+                if (window.Phase4Gamification) {
+                    document.getElementById('demo-level').textContent = Phase4Gamification.state.userLevel;
+                    document.getElementById('demo-xp').textContent = Phase4Gamification.state.totalXP;
+                    document.getElementById('demo-streak').textContent = Phase4Gamification.state.currentStreak;
+                }
+            }
+        }
+
+        // Initialize test runner when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Phase 4 modules
+            if (window.Phase4Gamification) {
+                Phase4Gamification.init();
+            }
+            if (window.Phase4Goals) {
+                Phase4Goals.init();
+            }
+            if (window.Phase4HabitsFocus) {
+                Phase4HabitsFocus.init();
+            }
+            
+            const testRunner = new Phase4TestRunner();
+            
+            // Update demo display periodically
+            setInterval(() => {
+                testRunner.updateDemoDisplay();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

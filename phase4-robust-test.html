@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 Robust Testing</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        .log { 
+            margin: 5px 0; 
+            padding: 8px; 
+            background: #2d2d2d; 
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+        }
+        .log.success { border-left-color: #10b981; }
+        .log.error { border-left-color: #ef4444; }
+        .log.warning { border-left-color: #f59e0b; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2d2d2d;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button.success { background: #10b981; }
+        .test-button.error { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Phase 4 Robust Testing Suite</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button class="test-button" onclick="runAllTests()">🚀 Run All Tests</button>
+        <button class="test-button" onclick="testModuleLoading()">📦 Test Module Loading</button>
+        <button class="test-button" onclick="testInitialization()">⚡ Test Initialization</button>
+        <button class="test-button" onclick="testFunctionality()">🎯 Test Functionality</button>
+        <button class="test-button" onclick="clearLogs()">🗑️ Clear Logs</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Live Demo</h2>
+        <div id="demo-results"></div>
+        <button class="test-button" onclick="demoAddXP()">+100 XP</button>
+        <button class="test-button" onclick="demoCreateGoal()">Create Goal</button>
+        <button class="test-button" onclick="demoCreateHabit()">Create Habit</button>
+        <button class="test-button" onclick="demoCreateFocus()">Create Focus Session</button>
+    </div>
+
+    <!-- Load Phase 4 Modules -->
+    <script src="js/modules/phase4-gamification.js"></script>
+    <script src="js/modules/phase4-goals.js"></script>
+    <script src="js/modules/phase4-habits-focus.js"></script>
+
+    <script>
+        let testResults = {
+            moduleLoading: { status: 'pending', errors: 0, tests: 0 },
+            initialization: { status: 'pending', errors: 0, tests: 0 },
+            functionality: { status: 'pending', errors: 0, tests: 0 }
+        };
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('demo-results').innerHTML = '';
+        }
+
+        function waitForModules(callback, maxAttempts = 10) {
+            let attempts = 0;
+            const checkModules = () => {
+                attempts++;
+                if (window.Phase4Gamification && window.Phase4Goals && window.Phase4HabitsFocus) {
+                    log('✅ All Phase 4 modules loaded successfully', 'success');
+                    callback();
+                } else if (attempts < maxAttempts) {
+                    log(`⏳ Waiting for modules... (attempt ${attempts}/${maxAttempts})`, 'warning');
+                    setTimeout(checkModules, 500);
+                } else {
+                    log('❌ Failed to load Phase 4 modules after maximum attempts', 'error');
+                    log('Available modules:', 'info');
+                    log(`- Phase4Gamification: ${!!window.Phase4Gamification}`, 'info');
+                    log(`- Phase4Goals: ${!!window.Phase4Goals}`, 'info');
+                    log(`- Phase4HabitsFocus: ${!!window.Phase4HabitsFocus}`, 'info');
+                }
+            };
+            checkModules();
+        }
+
+        function testModuleLoading() {
+            log('🔍 Testing Module Loading...', 'info');
+            testResults.moduleLoading.status = 'running';
+            testResults.moduleLoading.tests = 0;
+            testResults.moduleLoading.errors = 0;
+
+            // Test Phase4Gamification
+            if (window.Phase4Gamification) {
+                log('✅ Phase4Gamification module found', 'success');
+                testResults.moduleLoading.tests++;
+            } else {
+                log('❌ Phase4Gamification module not found', 'error');
+                testResults.moduleLoading.errors++;
+            }
+
+            // Test Phase4Goals
+            if (window.Phase4Goals) {
+                log('✅ Phase4Goals module found', 'success');
+                testResults.moduleLoading.tests++;
+            } else {
+                log('❌ Phase4Goals module not found', 'error');
+                testResults.moduleLoading.errors++;
+            }
+
+            // Test Phase4HabitsFocus
+            if (window.Phase4HabitsFocus) {
+                log('✅ Phase4HabitsFocus module found', 'success');
+                testResults.moduleLoading.tests++;
+            } else {
+                log('❌ Phase4HabitsFocus module not found', 'error');
+                testResults.moduleLoading.errors++;
+            }
+
+            testResults.moduleLoading.status = testResults.moduleLoading.errors === 0 ? 'success' : 'error';
+            log(`📊 Module Loading: ${testResults.moduleLoading.tests} passed, ${testResults.moduleLoading.errors} failed`, 'info');
+        }
+
+        function testInitialization() {
+            log('⚡ Testing Module Initialization...', 'info');
+            testResults.initialization.status = 'running';
+            testResults.initialization.tests = 0;
+            testResults.initialization.errors = 0;
+
+            // Test Phase4Gamification initialization
+            try {
+                if (window.Phase4Gamification) {
+                    Phase4Gamification.init();
+                    log('✅ Phase4Gamification initialized successfully', 'success');
+                    testResults.initialization.tests++;
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Phase4Gamification init failed: ${error.message}`, 'error');
+                testResults.initialization.errors++;
+            }
+
+            // Test Phase4Goals initialization
+            try {
+                if (window.Phase4Goals) {
+                    Phase4Goals.init();
+                    log('✅ Phase4Goals initialized successfully', 'success');
+                    testResults.initialization.tests++;
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Phase4Goals init failed: ${error.message}`, 'error');
+                testResults.initialization.errors++;
+            }
+
+            // Test Phase4HabitsFocus initialization
+            try {
+                if (window.Phase4HabitsFocus) {
+                    Phase4HabitsFocus.init();
+                    log('✅ Phase4HabitsFocus initialized successfully', 'success');
+                    testResults.initialization.tests++;
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Phase4HabitsFocus init failed: ${error.message}`, 'error');
+                testResults.initialization.errors++;
+            }
+
+            testResults.initialization.status = testResults.initialization.errors === 0 ? 'success' : 'error';
+            log(`📊 Initialization: ${testResults.initialization.tests} passed, ${testResults.initialization.errors} failed`, 'info');
+        }
+
+        function testFunctionality() {
+            log('🎯 Testing Module Functionality...', 'info');
+            testResults.functionality.status = 'running';
+            testResults.functionality.tests = 0;
+            testResults.functionality.errors = 0;
+
+            // Test XP System
+            try {
+                if (window.Phase4Gamification) {
+                    const initialXP = Phase4Gamification.state.totalXP;
+                    Phase4Gamification.xpSystem.addXP(100, 'Test');
+                    const newXP = Phase4Gamification.state.totalXP;
+                    if (newXP === initialXP + 100) {
+                        log('✅ XP system working correctly', 'success');
+                        testResults.functionality.tests++;
+                    } else {
+                        throw new Error(`XP mismatch: expected ${initialXP + 100}, got ${newXP}`);
+                    }
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ XP system test failed: ${error.message}`, 'error');
+                testResults.functionality.errors++;
+            }
+
+            // Test Goal Creation
+            try {
+                if (window.Phase4Goals) {
+                    const goal = Phase4Goals.createGoal({
+                        title: 'Test Goal',
+                        description: 'A test goal',
+                        category: 'productivity',
+                        difficulty: 'easy'
+                    });
+                    if (goal && goal.id) {
+                        log('✅ Goal creation working correctly', 'success');
+                        testResults.functionality.tests++;
+                    } else {
+                        throw new Error('Goal creation returned invalid object');
+                    }
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Goal creation test failed: ${error.message}`, 'error');
+                testResults.functionality.errors++;
+            }
+
+            // Test Habit Creation
+            try {
+                if (window.Phase4HabitsFocus) {
+                    const habit = Phase4HabitsFocus.createHabit({
+                        title: 'Test Habit',
+                        description: 'A test habit',
+                        category: 'health',
+                        frequency: 'daily'
+                    });
+                    if (habit && habit.id) {
+                        log('✅ Habit creation working correctly', 'success');
+                        testResults.functionality.tests++;
+                    } else {
+                        throw new Error('Habit creation returned invalid object');
+                    }
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Habit creation test failed: ${error.message}`, 'error');
+                testResults.functionality.errors++;
+            }
+
+            // Test Focus Session Creation
+            try {
+                if (window.Phase4HabitsFocus) {
+                    const session = Phase4HabitsFocus.focusSessions.createSession({
+                        title: 'Test Focus Session',
+                        description: 'A test focus session',
+                        duration: 5
+                    });
+                    if (session && session.id) {
+                        log('✅ Focus session creation working correctly', 'success');
+                        testResults.functionality.tests++;
+                    } else {
+                        throw new Error('Focus session creation returned invalid object');
+                    }
+                } else {
+                    throw new Error('Module not available');
+                }
+            } catch (error) {
+                log(`❌ Focus session creation test failed: ${error.message}`, 'error');
+                testResults.functionality.errors++;
+            }
+
+            testResults.functionality.status = testResults.functionality.errors === 0 ? 'success' : 'error';
+            log(`📊 Functionality: ${testResults.functionality.tests} passed, ${testResults.functionality.errors} failed`, 'info');
+        }
+
+        function runAllTests() {
+            log('🚀 Starting comprehensive Phase 4 testing...', 'info');
+            clearLogs();
+            
+            waitForModules(() => {
+                testModuleLoading();
+                setTimeout(() => {
+                    testInitialization();
+                    setTimeout(() => {
+                        testFunctionality();
+                        log('✅ All tests completed!', 'success');
+                        
+                        // Summary
+                        const totalTests = testResults.moduleLoading.tests + testResults.initialization.tests + testResults.functionality.tests;
+                        const totalErrors = testResults.moduleLoading.errors + testResults.initialization.errors + testResults.functionality.errors;
+                        const successRate = totalTests > 0 ? ((totalTests - totalErrors) / totalTests * 100).toFixed(1) : 0;
+                        
+                        log(`📊 FINAL SUMMARY: ${totalTests - totalErrors}/${totalTests} tests passed (${successRate}% success rate)`, 'info');
+                        
+                        if (totalErrors === 0) {
+                            log('🎉 ALL TESTS PASSED! Phase 4 is working correctly!', 'success');
+                        } else {
+                            log(`⚠️ ${totalErrors} tests failed. Please review the errors above.`, 'warning');
+                        }
+                    }, 1000);
+                }, 1000);
+            });
+        }
+
+        // Demo functions
+        function demoAddXP() {
+            if (window.Phase4Gamification) {
+                Phase4Gamification.xpSystem.addXP(100, 'Demo');
+                updateDemoDisplay();
+                log('Demo: Added 100 XP', 'info');
+            } else {
+                log('Demo: Phase4Gamification not available', 'error');
+            }
+        }
+
+        function demoCreateGoal() {
+            if (window.Phase4Goals) {
+                const goal = Phase4Goals.createGoal({
+                    title: 'Demo Goal',
+                    description: 'A demo goal for testing',
+                    category: 'productivity',
+                    difficulty: 'medium'
+                });
+                log(`Demo: Created goal "${goal.title}"`, 'info');
+            } else {
+                log('Demo: Phase4Goals not available', 'error');
+            }
+        }
+
+        function demoCreateHabit() {
+            if (window.Phase4HabitsFocus) {
+                const habit = Phase4HabitsFocus.createHabit({
+                    title: 'Demo Habit',
+                    description: 'A demo habit for testing',
+                    category: 'health',
+                    frequency: 'daily'
+                });
+                log(`Demo: Created habit "${habit.title}"`, 'info');
+            } else {
+                log('Demo: Phase4HabitsFocus not available', 'error');
+            }
+        }
+
+        function demoCreateFocus() {
+            if (window.Phase4HabitsFocus) {
+                const session = Phase4HabitsFocus.focusSessions.createSession({
+                    title: 'Demo Focus Session',
+                    description: 'A demo focus session',
+                    duration: 5
+                });
+                log(`Demo: Created focus session "${session.title}"`, 'info');
+            } else {
+                log('Demo: Phase4HabitsFocus not available', 'error');
+            }
+        }
+
+        function updateDemoDisplay() {
+            const demoResults = document.getElementById('demo-results');
+            if (window.Phase4Gamification) {
+                demoResults.innerHTML = `
+                    <div style="margin: 10px 0; padding: 10px; background: #3d3d3d; border-radius: 4px;">
+                        <strong>Current Status:</strong><br>
+                        Level: ${Phase4Gamification.state.userLevel}<br>
+                        XP: ${Phase4Gamification.state.totalXP}<br>
+                        Streak: ${Phase4Gamification.state.currentStreak}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📋 Phase 4 Robust Testing Suite loaded', 'info');
+            log('Click "Run All Tests" to start comprehensive testing', 'info');
+            
+            // Update demo display periodically
+            setInterval(updateDemoDisplay, 2000);
+        });
+    </script>
+</body>
+</html> 

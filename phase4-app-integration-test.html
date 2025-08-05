@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 App Integration Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        .log { 
+            margin: 5px 0; 
+            padding: 8px; 
+            background: #2d2d2d; 
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+        }
+        .log.success { border-left-color: #10b981; }
+        .log.error { border-left-color: #ef4444; }
+        .log.warning { border-left-color: #f59e0b; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2d2d2d;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button.success { background: #10b981; }
+        .test-button.error { background: #ef4444; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Phase 4 App Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button class="test-button" onclick="loadApp()">📱 Load Main App</button>
+        <button class="test-button" onclick="testPhase4InApp()">🎯 Test Phase 4 in App</button>
+        <button class="test-button" onclick="clearLogs()">🗑️ Clear Logs</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Main Application</h2>
+        <iframe id="app-frame" src="app.html" onload="onAppLoaded()"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let appFrame = null;
+        let appWindow = null;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function loadApp() {
+            log('📱 Loading main application...', 'info');
+            appFrame = document.getElementById('app-frame');
+            appFrame.src = 'app.html';
+        }
+
+        function onAppLoaded() {
+            log('✅ Main application loaded', 'success');
+            appWindow = document.getElementById('app-frame').contentWindow;
+            
+            // Wait a bit for the app to initialize
+            setTimeout(() => {
+                testPhase4InApp();
+            }, 3000);
+        }
+
+        function testPhase4InApp() {
+            log('🎯 Testing Phase 4 modules in main application context...', 'info');
+            
+            if (!appWindow) {
+                log('❌ App window not available', 'error');
+                return;
+            }
+
+            try {
+                // Test if Phase 4 modules are available in the app context
+                if (appWindow.Phase4Gamification) {
+                    log('✅ Phase4Gamification found in app context', 'success');
+                    
+                    // Test initialization
+                    try {
+                        appWindow.Phase4Gamification.init();
+                        log('✅ Phase4Gamification initialized in app context', 'success');
+                    } catch (error) {
+                        log(`❌ Phase4Gamification init failed: ${error.message}`, 'error');
+                    }
+                } else {
+                    log('❌ Phase4Gamification not found in app context', 'error');
+                }
+
+                if (appWindow.Phase4Goals) {
+                    log('✅ Phase4Goals found in app context', 'success');
+                    
+                    // Test initialization
+                    try {
+                        appWindow.Phase4Goals.init();
+                        log('✅ Phase4Goals initialized in app context', 'success');
+                    } catch (error) {
+                        log(`❌ Phase4Goals init failed: ${error.message}`, 'error');
+                    }
+                } else {
+                    log('❌ Phase4Goals not found in app context', 'error');
+                }
+
+                if (appWindow.Phase4HabitsFocus) {
+                    log('✅ Phase4HabitsFocus found in app context', 'success');
+                    
+                    // Test initialization
+                    try {
+                        appWindow.Phase4HabitsFocus.init();
+                        log('✅ Phase4HabitsFocus initialized in app context', 'success');
+                    } catch (error) {
+                        log(`❌ Phase4HabitsFocus init failed: ${error.message}`, 'error');
+                    }
+                } else {
+                    log('❌ Phase4HabitsFocus not found in app context', 'error');
+                }
+
+                // Test if app object is available
+                if (appWindow.app) {
+                    log('✅ App object found in app context', 'success');
+                } else {
+                    log('❌ App object not found in app context', 'error');
+                }
+
+                // Test basic functionality
+                if (appWindow.Phase4Gamification) {
+                    try {
+                        const initialXP = appWindow.Phase4Gamification.state.totalXP;
+                        appWindow.Phase4Gamification.xpSystem.addXP(100, 'Integration Test');
+                        const newXP = appWindow.Phase4Gamification.state.totalXP;
+                        if (newXP === initialXP + 100) {
+                            log('✅ XP system working in app context', 'success');
+                        } else {
+                            log(`❌ XP system not working: expected ${initialXP + 100}, got ${newXP}`, 'error');
+                        }
+                    } catch (error) {
+                        log(`❌ XP system test failed: ${error.message}`, 'error');
+                    }
+                }
+
+            } catch (error) {
+                log(`❌ Error testing Phase 4 in app context: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-load app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📋 Phase 4 App Integration Test loaded', 'info');
+            log('Click "Load Main App" to start testing', 'info');
+        });
+    </script>
+</body>
+</html> 

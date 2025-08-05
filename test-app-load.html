@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Load Test - Operator Uplift</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #0a0a0a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .warning { background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; }
+        .info { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .test-buttons {
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Operator Uplift App Load Test</h1>
+        
+        <div class="test-buttons">
+            <button onclick="testAppLoad()">Test App Load</button>
+            <button onclick="testDashboard()">Test Dashboard</button>
+            <button onclick="testPersonality()">Test Personality Integration</button>
+            <button onclick="clearCache()">Clear Cache</button>
+        </div>
+        
+        <div id="test-results"></div>
+        
+        <h2>App Preview</h2>
+        <iframe id="app-frame" src="app.html"></iframe>
+    </div>
+
+    <script>
+        function addTestResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(resultDiv);
+        }
+
+        function testAppLoad() {
+            addTestResult('Testing app load...', 'info');
+            
+            // Test if app.html exists
+            fetch('app.html')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('✅ app.html file found and accessible', 'success');
+                        return response.text();
+                    } else {
+                        addTestResult('❌ app.html file not found', 'error');
+                        throw new Error('File not found');
+                    }
+                })
+                .then(html => {
+                    // Check for critical elements
+                    if (html.includes('loading-overlay')) {
+                        addTestResult('✅ Loading overlay found', 'success');
+                    } else {
+                        addTestResult('⚠️ Loading overlay not found', 'warning');
+                    }
+                    
+                    if (html.includes('dashboard-view')) {
+                        addTestResult('✅ Dashboard view found', 'success');
+                    } else {
+                        addTestResult('⚠️ Dashboard view not found', 'warning');
+                    }
+                    
+                    if (html.includes('auth-view')) {
+                        addTestResult('✅ Auth view found', 'success');
+                    } else {
+                        addTestResult('⚠️ Auth view not found', 'warning');
+                    }
+                    
+                    if (html.includes('personality-integration.js')) {
+                        addTestResult('✅ Personality integration module found', 'success');
+                    } else {
+                        addTestResult('⚠️ Personality integration module not found', 'warning');
+                    }
+                    
+                    // Check for JavaScript errors
+                    if (html.includes('Property assignment expected') || html.includes('Declaration or statement expected')) {
+                        addTestResult('❌ JavaScript syntax errors detected', 'error');
+                    } else {
+                        addTestResult('✅ No obvious JavaScript syntax errors', 'success');
+                    }
+                })
+                .catch(error => {
+                    addTestResult(`❌ Error testing app: ${error.message}`, 'error');
+                });
+        }
+
+        function testDashboard() {
+            addTestResult('Testing dashboard functionality...', 'info');
+            
+            // Test localStorage for user data
+            const userData = localStorage.getItem('userData');
+            const aiPersonalityData = localStorage.getItem('aiPersonalityData');
+            const onboardingStatus = localStorage.getItem('onboardingStatus');
+            
+            if (userData) {
+                addTestResult('✅ User data found in localStorage', 'success');
+            } else {
+                addTestResult('⚠️ No user data in localStorage', 'warning');
+            }
+            
+            if (aiPersonalityData) {
+                addTestResult('✅ AI personality data found', 'success');
+            } else {
+                addTestResult('⚠️ No AI personality data found', 'warning');
+            }
+            
+            if (onboardingStatus) {
+                addTestResult('✅ Onboarding status found', 'success');
+            } else {
+                addTestResult('⚠️ No onboarding status found', 'warning');
+            }
+            
+            // Test if dashboard elements exist
+            setTimeout(() => {
+                const frame = document.getElementById('app-frame');
+                try {
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    const loadingOverlay = frameDoc.getElementById('loading-overlay');
+                    const dashboardView = frameDoc.getElementById('dashboard-view');
+                    const authView = frameDoc.getElementById('auth-view');
+                    
+                    if (loadingOverlay) {
+                        const isVisible = loadingOverlay.style.display !== 'none';
+                        if (isVisible) {
+                            addTestResult('⚠️ Loading overlay is still visible', 'warning');
+                        } else {
+                            addTestResult('✅ Loading overlay is hidden', 'success');
+                        }
+                    }
+                    
+                    if (dashboardView) {
+                        const isVisible = !dashboardView.classList.contains('hidden');
+                        if (isVisible) {
+                            addTestResult('✅ Dashboard view is visible', 'success');
+                        } else {
+                            addTestResult('❌ Dashboard view is hidden', 'error');
+                        }
+                    }
+                    
+                    if (authView) {
+                        const isVisible = !authView.classList.contains('hidden');
+                        if (isVisible) {
+                            addTestResult('⚠️ Auth view is visible (should be hidden)', 'warning');
+                        } else {
+                            addTestResult('✅ Auth view is hidden', 'success');
+                        }
+                    }
+                } catch (error) {
+                    addTestResult(`⚠️ Cannot access iframe content: ${error.message}`, 'warning');
+                }
+            }, 2000);
+        }
+
+        function testPersonality() {
+            addTestResult('Testing personality integration...', 'info');
+            
+            // Test if personality integration module exists
+            fetch('js/modules/personality-integration.js')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('✅ Personality integration module found', 'success');
+                    } else {
+                        addTestResult('❌ Personality integration module not found', 'error');
+                    }
+                })
+                .catch(error => {
+                    addTestResult(`❌ Error testing personality module: ${error.message}`, 'error');
+                });
+            
+            // Test if AI chat interface exists
+            fetch('ai-chat-interface.html')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('✅ AI chat interface found', 'success');
+                    } else {
+                        addTestResult('❌ AI chat interface not found', 'error');
+                    }
+                })
+                .catch(error => {
+                    addTestResult(`❌ Error testing AI chat interface: ${error.message}`, 'error');
+                });
+        }
+
+        function clearCache() {
+            addTestResult('Clearing localStorage cache...', 'info');
+            
+            // Clear all relevant localStorage items
+            const keysToClear = [
+                'userData',
+                'aiPersonalityData',
+                'onboardingStatus',
+                'aiPersonalitySettings',
+                'userProfile',
+                'cachedUserData'
+            ];
+            
+            keysToClear.forEach(key => {
+                localStorage.removeItem(key);
+            });
+            
+            addTestResult('✅ Cache cleared', 'success');
+            
+            // Reload the iframe
+            const frame = document.getElementById('app-frame');
+            frame.src = frame.src;
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            addTestResult('Page loaded, running initial tests...', 'info');
+            setTimeout(() => {
+                testAppLoad();
+                setTimeout(() => {
+                    testDashboard();
+                    testPersonality();
+                }, 1000);
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

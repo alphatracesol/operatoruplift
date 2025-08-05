@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Fix Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+        iframe { width: 100%; height: 600px; border: 1px solid #333; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Phase 2 Fix Verification</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <button onclick="testUIInteractivity()">Test UI Interactivity</button>
+        <button onclick="testAppFunctionality()">Test App Functionality</button>
+        <button onclick="runComprehensiveTest()">Run Comprehensive Test</button>
+        <button onclick="openAppInNewTab()">Open App in New Tab</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Live App Preview</h2>
+        <iframe id="appFrame" src="app.html"></iframe>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testModuleLoading() {
+            log('🧪 Testing Phase 2 Module Loading...', 'info');
+            
+            // Test if modules are available in the iframe
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            if (iframeWindow) {
+                // Wait for iframe to load
+                setTimeout(() => {
+                    try {
+                        if (iframeWindow.window.AdvancedAIEnhancement) {
+                            log('✅ AdvancedAIEnhancement module found in app', 'success');
+                        } else {
+                            log('❌ AdvancedAIEnhancement module NOT found in app', 'error');
+                        }
+                        
+                        if (iframeWindow.window.AdvancedGamification) {
+                            log('✅ AdvancedGamification module found in app', 'success');
+                        } else {
+                            log('❌ AdvancedGamification module NOT found in app', 'error');
+                        }
+                        
+                        if (iframeWindow.window.app && iframeWindow.window.app.advancedAI) {
+                            log('✅ Advanced AI module initialized in app object', 'success');
+                        } else {
+                            log('❌ Advanced AI module NOT initialized in app object', 'error');
+                        }
+                        
+                        if (iframeWindow.window.app && iframeWindow.window.app.advancedGamification) {
+                            log('✅ Advanced Gamification module initialized in app object', 'success');
+                        } else {
+                            log('❌ Advanced Gamification module NOT initialized in app object', 'error');
+                        }
+                    } catch (error) {
+                        log(`❌ Error accessing iframe content: ${error.message}`, 'error');
+                    }
+                }, 2000);
+            }
+        }
+
+        function testUIInteractivity() {
+            log('🧪 Testing UI Interactivity...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            const iframeDocument = iframe.contentDocument;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeDocument) {
+                        // Test if dashboard is visible
+                        const dashboardView = iframeDocument.getElementById('dashboard-view');
+                        if (dashboardView) {
+                            const display = iframeWindow.getComputedStyle(dashboardView).display;
+                            if (display !== 'none') {
+                                log('✅ Dashboard view is visible', 'success');
+                            } else {
+                                log('❌ Dashboard view is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Dashboard view element not found', 'error');
+                        }
+                        
+                        // Test if sidebar is visible
+                        const sidebar = iframeDocument.getElementById('sidebar');
+                        if (sidebar) {
+                            const display = iframeWindow.getComputedStyle(sidebar).display;
+                            if (display !== 'none') {
+                                log('✅ Sidebar is visible', 'success');
+                            } else {
+                                log('❌ Sidebar is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Sidebar element not found', 'error');
+                        }
+                        
+                        // Test if loading overlay is hidden
+                        const loadingOverlay = iframeDocument.getElementById('loading-overlay');
+                        if (loadingOverlay) {
+                            const display = iframeWindow.getComputedStyle(loadingOverlay).display;
+                            if (display === 'none') {
+                                log('✅ Loading overlay is hidden', 'success');
+                            } else {
+                                log('❌ Loading overlay is still visible', 'error');
+                            }
+                        } else {
+                            log('✅ Loading overlay element not found (good)', 'success');
+                        }
+                        
+                        // Test pointer events
+                        const body = iframeDocument.body;
+                        if (body) {
+                            const pointerEvents = iframeWindow.getComputedStyle(body).pointerEvents;
+                            if (pointerEvents === 'auto') {
+                                log('✅ Body pointer events are enabled', 'success');
+                            } else {
+                                log('❌ Body pointer events are disabled', 'error');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    log(`❌ Error testing UI interactivity: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        function testAppFunctionality() {
+            log('🧪 Testing App Functionality...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeWindow.window.app) {
+                        const app = iframeWindow.window.app;
+                        
+                        // Test app state
+                        if (app.state) {
+                            log(`📊 Active view: ${app.state.activeView}`, 'info');
+                            log(`📊 Firebase ready: ${app.state.firebaseReady}`, 'info');
+                            
+                            if (app.state.activeView === 'dashboard') {
+                                log('✅ App is showing dashboard view', 'success');
+                            } else {
+                                log('❌ App is not showing dashboard view', 'error');
+                            }
+                        }
+                        
+                        // Test Phase 2 module functionality
+                        if (app.advancedAI && typeof app.advancedAI.getPersonalizedAdvice === 'function') {
+                            const advice = app.advancedAI.getPersonalizedAdvice('test goal');
+                            log(`✅ Advanced AI advice function working: ${advice}`, 'success');
+                        } else {
+                            log('❌ Advanced AI advice function not working', 'error');
+                        }
+                        
+                        if (app.advancedGamification && typeof app.advancedGamification.checkAchievements === 'function') {
+                            log('✅ Advanced Gamification checkAchievements function working', 'success');
+                        } else {
+                            log('❌ Advanced Gamification checkAchievements function not working', 'error');
+                        }
+                    } else {
+                        log('❌ App object not found', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing app functionality: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        function runComprehensiveTest() {
+            log('🚀 Running Comprehensive Phase 2 Fix Verification...', 'info');
+            
+            // Clear previous results
+            document.getElementById('results').innerHTML = '';
+            
+            // Run all tests in sequence
+            setTimeout(() => testModuleLoading(), 500);
+            setTimeout(() => testUIInteractivity(), 1500);
+            setTimeout(() => testAppFunctionality(), 2500);
+            
+            // Final summary
+            setTimeout(() => {
+                log('📋 Comprehensive test completed. Check results above.', 'info');
+                log('🎯 If all tests pass, Phase 2 fixes are working correctly!', 'success');
+            }, 4000);
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+            log('🔗 Opened app.html in new tab', 'info');
+        }
+
+        // Auto-run comprehensive test on load
+        window.addEventListener('load', () => {
+            log('📋 Phase 2 Fix Verification page loaded', 'info');
+            setTimeout(runComprehensiveTest, 1000);
+        });
+    </script>
+</body>
+</html> 

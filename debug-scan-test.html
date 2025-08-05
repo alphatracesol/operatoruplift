@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    <title>Operator Uplift - Debug Scan Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .warning { background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; }
+        .info { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #ea580c; }
+        .console-output {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Operator Uplift - Comprehensive Debug Scan</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎮 Interactive Tests</h2>
+        <button onclick="testAppLoad()">Test App Load</button>
+        <button onclick="testLoginFlow()">Test Login Flow</button>
+        <button onclick="testChatFunctionality()">Test Chat</button>
+        <button onclick="testGoalsSystem()">Test Goals</button>
+        <button onclick="testMobileResponsiveness()">Test Mobile</button>
+        <button onclick="testPerformance()">Test Performance</button>
+        <button onclick="testSecurity()">Test Security</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Console Output</h2>
+        <div id="console-output" class="console-output"></div>
+    </div>
+
+    <script>
+        // Console capture
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
+
+        function captureConsole(type, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type.toUpperCase()}: ${args.join(' ')}\n`;
+            output.textContent += message;
+            output.scrollTop = output.scrollHeight;
+            
+            // Also call original console
+            originalConsole[type](...args);
+        }
+
+        console.log = (...args) => captureConsole('log', ...args);
+        console.error = (...args) => captureConsole('error', ...args);
+        console.warn = (...args) => captureConsole('warn', ...args);
+        console.info = (...args) => captureConsole('info', ...args);
+
+        // Test results tracking
+        const testResults = [];
+        
+        function addTestResult(test, status, message, details = null) {
+            const result = { test, status, message, details, timestamp: new Date() };
+            testResults.push(result);
+            
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            resultDiv.innerHTML = `
+                <strong>${test}</strong>: ${message}
+                ${details ? `<br><small>${details}</small>` : ''}
+            `;
+            resultsDiv.appendChild(resultDiv);
+            
+            console.log(`TEST ${status.toUpperCase()}: ${test} - ${message}`);
+        }
+
+        // Test 1: App Load Test
+        async function testAppLoad() {
+            console.log('🧪 Starting App Load Test...');
+            
+            try {
+                // Test if app.html loads (with better error handling)
+                try {
+                    const response = await fetch('app.html');
+                    if (response.ok) {
+                        addTestResult('App Load', 'success', 'app.html loads successfully');
+                    } else {
+                        addTestResult('App Load', 'warning', `app.html returned status: ${response.status}`);
+                    }
+                } catch (fetchError) {
+                    addTestResult('App Load', 'warning', 'app.html not accessible from current context (normal for debug page)');
+                }
+                
+                // Test critical fixes system
+                if (window.SafeElementAccess) {
+                    addTestResult('Critical Fixes', 'success', 'Safe element access system loaded');
+                } else {
+                    addTestResult('Critical Fixes', 'warning', 'Critical fixes not loaded (normal for debug page)');
+                }
+                
+                // Test AI chat system
+                if (window.aiChatSystem) {
+                    addTestResult('AI Chat System', 'success', 'AI chat system available');
+                } else {
+                    addTestResult('AI Chat System', 'warning', 'AI chat system not loaded (normal for debug page)');
+                }
+                
+                // Test memory manager
+                if (window.memoryManager) {
+                    addTestResult('Memory Manager', 'success', 'Memory management system loaded');
+                } else {
+                    addTestResult('Memory Manager', 'warning', 'Memory manager not loaded (normal for debug page)');
+                }
+                
+                // Test security utils
+                if (window.securityUtils) {
+                    addTestResult('Security Utils', 'success', 'Security utilities loaded');
+                } else {
+                    addTestResult('Security Utils', 'warning', 'Security utils not loaded (normal for debug page)');
+                }
+                
+            } catch (error) {
+                addTestResult('App Load', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 2: Login Flow Test
+        async function testLoginFlow() {
+            console.log('🧪 Starting Login Flow Test...');
+            
+            try {
+                // Test login.html (with better error handling)
+                try {
+                    const response = await fetch('login.html');
+                    if (response.ok) {
+                        addTestResult('Login Page', 'success', 'login.html loads successfully');
+                    } else {
+                        addTestResult('Login Page', 'warning', `login.html returned status: ${response.status}`);
+                    }
+                } catch (fetchError) {
+                    addTestResult('Login Page', 'warning', 'login.html not accessible from current context (normal for debug page)');
+                }
+                
+                // Test localStorage
+                if (typeof localStorage !== 'undefined') {
+                    addTestResult('LocalStorage', 'success', 'LocalStorage available');
+                } else {
+                    addTestResult('LocalStorage', 'error', 'LocalStorage not available');
+                }
+                
+                // Test authentication state
+                const isLoggedIn = localStorage.getItem('isLoggedIn');
+                addTestResult('Auth State', 'info', `Current login state: ${isLoggedIn || 'not logged in'}`);
+                
+                // Test critical fixes integration
+                if (window.SafeElementAccess && window.memoryManager) {
+                    addTestResult('Critical Fixes Integration', 'success', 'Critical fixes systems available');
+                } else {
+                    addTestResult('Critical Fixes Integration', 'warning', 'Critical fixes not fully loaded');
+                }
+                
+            } catch (error) {
+                addTestResult('Login Flow', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 3: Chat Functionality Test
+        async function testChatFunctionality() {
+            console.log('🧪 Starting Chat Functionality Test...');
+            
+            try {
+                // Test Hugging Face API availability
+                const hfToken = localStorage.getItem('hf_token') || 'demo_token';
+                addTestResult('HF Token', 'info', `HF Token available: ${hfToken ? 'Yes' : 'No'}`);
+                
+                // Test chat interface elements (would need to load app.html in iframe)
+                addTestResult('Chat Interface', 'warning', 'Chat interface test requires app.html context');
+                
+            } catch (error) {
+                addTestResult('Chat Functionality', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 4: Goals System Test
+        async function testGoalsSystem() {
+            console.log('🧪 Starting Goals System Test...');
+            
+            try {
+                // Test goals storage
+                const goals = localStorage.getItem('userGoals');
+                addTestResult('Goals Storage', 'info', `Goals in storage: ${goals ? 'Yes' : 'No'}`);
+                
+                // Test goals interface
+                addTestResult('Goals Interface', 'warning', 'Goals interface test requires app.html context');
+                
+            } catch (error) {
+                addTestResult('Goals System', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 5: Mobile Responsiveness Test
+        function testMobileResponsiveness() {
+            console.log('🧪 Starting Mobile Responsiveness Test...');
+            
+            try {
+                // Test viewport meta tag
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    addTestResult('Viewport Meta', 'success', 'Viewport meta tag present');
+                } else {
+                    addTestResult('Viewport Meta', 'error', 'Viewport meta tag missing');
+                }
+                
+                // Test responsive CSS
+                const styleSheets = document.styleSheets;
+                addTestResult('CSS Loading', 'info', `${styleSheets.length} stylesheets loaded`);
+                
+                // Test touch support
+                if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                    addTestResult('Touch Support', 'success', 'Touch events supported');
+                } else {
+                    addTestResult('Touch Support', 'warning', 'Touch events not detected (desktop browser)');
+                }
+                
+            } catch (error) {
+                addTestResult('Mobile Responsiveness', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 6: Performance Test
+        function testPerformance() {
+            console.log('🧪 Starting Performance Test...');
+            
+            try {
+                // Test page load time
+                const loadTime = performance.now();
+                addTestResult('Page Load Time', 'info', `${loadTime.toFixed(2)}ms`);
+                
+                // Test memory usage
+                if (performance.memory) {
+                    const memory = performance.memory;
+                    addTestResult('Memory Usage', 'info', 
+                        `Used: ${(memory.usedJSHeapSize / 1048576).toFixed(2)}MB, ` +
+                        `Total: ${(memory.totalJSHeapSize / 1048576).toFixed(2)}MB`);
+                }
+                
+                // Test resource loading
+                const resources = performance.getEntriesByType('resource');
+                addTestResult('Resource Count', 'info', `${resources.length} resources loaded`);
+                
+            } catch (error) {
+                addTestResult('Performance', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Test 7: Security Test
+        function testSecurity() {
+            console.log('🧪 Starting Security Test...');
+            
+            try {
+                // Test CSP
+                const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (csp) {
+                    addTestResult('Content Security Policy', 'success', 'CSP header present');
+                } else {
+                    addTestResult('Content Security Policy', 'warning', 'CSP header missing');
+                }
+                
+                // Test HTTPS
+                if (location.protocol === 'https:') {
+                    addTestResult('HTTPS', 'success', 'HTTPS enabled');
+                } else {
+                    addTestResult('HTTPS', 'warning', 'Not using HTTPS (localhost is OK)');
+                }
+                
+                // Test XSS protection
+                const xssProtection = document.querySelector('meta[http-equiv="X-XSS-Protection"]');
+                if (xssProtection) {
+                    addTestResult('XSS Protection', 'success', 'XSS protection enabled');
+                } else {
+                    addTestResult('XSS Protection', 'warning', 'XSS protection missing');
+                }
+                
+            } catch (error) {
+                addTestResult('Security', 'error', `Exception: ${error.message}`);
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 Debug Scan Test Loaded');
+            testAppLoad();
+            testLoginFlow();
+            testMobileResponsiveness();
+            testPerformance();
+            testSecurity();
+        });
+    </script>
+</body>
+</html> 

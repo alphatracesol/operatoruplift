@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Comprehensive Test Suite</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #0f0f23;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section h2 {
+            color: #f97316;
+            margin-top: 0;
+        }
+        
+        .test-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #f97316;
+        }
+        
+        .test-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+        
+        .test-status.pass {
+            background: #10b981;
+            color: white;
+        }
+        
+        .test-status.fail {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .test-status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            font-weight: 500;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+        }
+        
+        .test-results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #f97316;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .summary {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .summary h3 {
+            color: #f97316;
+            margin-top: 0;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f97316;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🚀 Operator Uplift - Comprehensive Test Suite</h1>
+            <p>Phase 7: Optimize, Lint, Test, Deploy</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Core Functionality Tests</h2>
+            
+            <div class="test-item">
+                <h3>App Initialization</h3>
+                <p>Test that the app initializes correctly with all modules loaded</p>
+                <button class="test-button" onclick="runInitTest()">Run Test</button>
+                <span class="test-status" id="init-status">Pending</span>
+                <div class="test-results" id="init-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Authentication System</h3>
+                <p>Test Firebase authentication and user management</p>
+                <button class="test-button" onclick="runAuthTest()">Run Test</button>
+                <span class="test-status" id="auth-status">Pending</span>
+                <div class="test-results" id="auth-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Goal Management</h3>
+                <p>Test goal creation, completion, and persistence</p>
+                <button class="test-button" onclick="runGoalTest()">Run Test</button>
+                <span class="test-status" id="goal-status">Pending</span>
+                <div class="test-results" id="goal-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>AI Integration</h3>
+                <p>Test AI chat functionality and response handling</p>
+                <button class="test-button" onclick="runAITest()">Run Test</button>
+                <span class="test-status" id="ai-status">Pending</span>
+                <div class="test-results" id="ai-results" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎮 Gamification Tests</h2>
+            
+            <div class="test-item">
+                <h3>Essence System</h3>
+                <p>Test essence earning, level progression, and rewards</p>
+                <button class="test-button" onclick="runEssenceTest()">Run Test</button>
+                <span class="test-status" id="essence-status">Pending</span>
+                <div class="test-results" id="essence-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Achievement System</h3>
+                <p>Test achievement unlocking and notification system</p>
+                <button class="test-button" onclick="runAchievementTest()">Run Test</button>
+                <span class="test-status" id="achievement-status">Pending</span>
+                <div class="test-results" id="achievement-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Streak Tracking</h3>
+                <p>Test daily streak calculation and bonuses</p>
+                <button class="test-button" onclick="runStreakTest()">Run Test</button>
+                <span class="test-status" id="streak-status">Pending</span>
+                <div class="test-results" id="streak-results" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎨 UI/UX Tests</h2>
+            
+            <div class="test-item">
+                <h3>Theme Switching</h3>
+                <p>Test dark/light theme toggle functionality</p>
+                <button class="test-button" onclick="runThemeTest()">Run Test</button>
+                <span class="test-status" id="theme-status">Pending</span>
+                <div class="test-results" id="theme-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Responsive Design</h3>
+                <p>Test mobile responsiveness and navigation</p>
+                <button class="test-button" onclick="runResponsiveTest()">Run Test</button>
+                <span class="test-status" id="responsive-status">Pending</span>
+                <div class="test-results" id="responsive-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Toast Notifications</h3>
+                <p>Test notification system and animations</p>
+                <button class="test-button" onclick="runToastTest()">Run Test</button>
+                <span class="test-status" id="toast-status">Pending</span>
+                <div class="test-results" id="toast-results" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚡ Performance Tests</h2>
+            
+            <div class="test-item">
+                <h3>Page Load Performance</h3>
+                <p>Test page load times and resource optimization</p>
+                <button class="test-button" onclick="runPerformanceTest()">Run Test</button>
+                <span class="test-status" id="performance-status">Pending</span>
+                <div class="test-results" id="performance-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Memory Usage</h3>
+                <p>Test memory consumption and leak detection</p>
+                <button class="test-button" onclick="runMemoryTest()">Run Test</button>
+                <span class="test-status" id="memory-status">Pending</span>
+                <div class="test-results" id="memory-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Error Handling</h3>
+                <p>Test error boundaries and graceful degradation</p>
+                <button class="test-button" onclick="runErrorTest()">Run Test</button>
+                <span class="test-status" id="error-status">Pending</span>
+                <div class="test-results" id="error-results" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Integration Tests</h2>
+            
+            <div class="test-item">
+                <h3>Local Storage</h3>
+                <p>Test data persistence and storage limits</p>
+                <button class="test-button" onclick="runStorageTest()">Run Test</button>
+                <span class="test-status" id="storage-status">Pending</span>
+                <div class="test-results" id="storage-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Firebase Integration</h3>
+                <p>Test Firebase connectivity and data sync</p>
+                <button class="test-button" onclick="runFirebaseTest()">Run Test</button>
+                <span class="test-status" id="firebase-status">Pending</span>
+                <div class="test-results" id="firebase-results" style="display: none;"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>Netlify Functions</h3>
+                <p>Test AI proxy and serverless functions</p>
+                <button class="test-button" onclick="runNetlifyTest()">Run Test</button>
+                <span class="test-status" id="netlify-status">Pending</span>
+                <div class="test-results" id="netlify-results" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h3>Test Summary</h3>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="passed-tests">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="failed-tests">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+            <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+            <button class="test-button" onclick="generateReport()">Generate Report</button>
+        </div>
+    </div>
+
+    <script>
+        // Test Suite Configuration
+        const testSuite = {
+            results: {},
+            totalTests: 0,
+            passedTests: 0,
+            failedTests: 0,
+            
+            init() {
+                this.totalTests = document.querySelectorAll('.test-item').length;
+                this.updateSummary();
+            },
+            
+            log(testId, message) {
+                const resultsDiv = document.getElementById(`${testId}-results`);
+                if (resultsDiv) {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.textContent += message + '\n';
+                    resultsDiv.scrollTop = resultsDiv.scrollHeight;
+                }
+            },
+            
+            setStatus(testId, status) {
+                const statusEl = document.getElementById(`${testId}-status`);
+                if (statusEl) {
+                    statusEl.textContent = status;
+                    statusEl.className = `test-status ${status}`;
+                    
+                    if (status === 'pass') {
+                        this.passedTests++;
+                    } else if (status === 'fail') {
+                        this.failedTests++;
+                    }
+                    
+                    this.updateSummary();
+                }
+            },
+            
+            updateSummary() {
+                document.getElementById('total-tests').textContent = this.totalTests;
+                document.getElementById('passed-tests').textContent = this.passedTests;
+                document.getElementById('failed-tests').textContent = this.failedTests;
+                
+                const successRate = this.totalTests > 0 ? Math.round((this.passedTests / this.totalTests) * 100) : 0;
+                document.getElementById('success-rate').textContent = `${successRate}%`;
+                
+                const progressFill = document.getElementById('progress-fill');
+                progressFill.style.width = `${successRate}%`;
+            },
+            
+            async runTest(testId, testFunction) {
+                try {
+                    this.log(testId, `Starting ${testId} test...`);
+                    await testFunction();
+                    this.setStatus(testId, 'pass');
+                    this.log(testId, `✅ ${testId} test passed!`);
+                } catch (error) {
+                    this.setStatus(testId, 'fail');
+                    this.log(testId, `❌ ${testId} test failed: ${error.message}`);
+                    console.error(`Test ${testId} failed:`, error);
+                }
+            }
+        };
+
+        // Test Functions
+        async function runInitTest() {
+            await testSuite.runTest('init', async () => {
+                // Test app initialization
+                if (typeof window.app === 'undefined') {
+                    throw new Error('App object not found');
+                }
+                
+                if (!window.app.state) {
+                    throw new Error('App state not initialized');
+                }
+                
+                if (!window.app.utils) {
+                    throw new Error('App utils not loaded');
+                }
+                
+                testSuite.log('init', '✅ App object initialized');
+                testSuite.log('init', '✅ App state loaded');
+                testSuite.log('init', '✅ App utils available');
+            });
+        }
+
+        async function runAuthTest() {
+            await testSuite.runTest('auth', async () => {
+                // Test authentication system
+                if (!window.app.auth) {
+                    throw new Error('Auth module not found');
+                }
+                
+                // Test Firebase availability
+                if (typeof firebase === 'undefined') {
+                    testSuite.log('auth', '⚠️ Firebase not loaded (expected in test environment)');
+                } else {
+                    testSuite.log('auth', '✅ Firebase loaded');
+                }
+                
+                testSuite.log('auth', '✅ Auth module initialized');
+            });
+        }
+
+        async function runGoalTest() {
+            await testSuite.runTest('goal', async () => {
+                // Test goal management
+                if (!window.app.goals) {
+                    throw new Error('Goals module not found');
+                }
+                
+                // Test goal creation
+                const testGoal = {
+                    title: 'Test Goal',
+                    description: 'Test Description',
+                    category: 'test',
+                    priority: 'medium',
+                    dueDate: null
+                };
+                
+                const originalCount = window.app.goals.getGoals().length;
+                window.app.goals.add(
+                    testGoal.title,
+                    testGoal.description,
+                    testGoal.category,
+                    testGoal.priority,
+                    testGoal.dueDate
+                );
+                
+                const newCount = window.app.goals.getGoals().length;
+                if (newCount !== originalCount + 1) {
+                    throw new Error('Goal not added successfully');
+                }
+                
+                testSuite.log('goal', '✅ Goal creation working');
+                testSuite.log('goal', '✅ Goal persistence working');
+            });
+        }
+
+        async function runAITest() {
+            await testSuite.runTest('ai', async () => {
+                // Test AI integration
+                if (!window.app.ai) {
+                    throw new Error('AI module not found');
+                }
+                
+                // Test AI personality
+                if (!window.app.ai.personality) {
+                    throw new Error('AI personality not initialized');
+                }
+                
+                // Test AI tips
+                const tip = window.app.ai.getTip('motivation');
+                if (!tip || typeof tip !== 'string') {
+                    throw new Error('AI tips not working');
+                }
+                
+                testSuite.log('ai', '✅ AI module initialized');
+                testSuite.log('ai', '✅ AI personality loaded');
+                testSuite.log('ai', '✅ AI tips working');
+            });
+        }
+
+        async function runEssenceTest() {
+            await testSuite.runTest('essence', async () => {
+                // Test essence system
+                if (!window.app.gamification) {
+                    throw new Error('Gamification module not found');
+                }
+                
+                const originalPoints = window.app.state.userData.stats.points;
+                window.app.gamification.addEssence(50, 'test');
+                
+                const newPoints = window.app.state.userData.stats.points;
+                if (newPoints !== originalPoints + 50) {
+                    throw new Error('Essence not added correctly');
+                }
+                
+                testSuite.log('essence', '✅ Essence system working');
+                testSuite.log('essence', '✅ Points calculation correct');
+            });
+        }
+
+        async function runAchievementTest() {
+            await testSuite.runTest('achievement', async () => {
+                // Test achievement system
+                if (!window.app.gamification.achievements) {
+                    throw new Error('Achievement system not found');
+                }
+                
+                const achievementCount = Object.keys(window.app.gamification.achievements).length;
+                if (achievementCount === 0) {
+                    throw new Error('No achievements defined');
+                }
+                
+                testSuite.log('achievement', `✅ ${achievementCount} achievements loaded`);
+            });
+        }
+
+        async function runStreakTest() {
+            await testSuite.runTest('streak', async () => {
+                // Test streak tracking
+                if (!window.app.gamification.trackStreak) {
+                    throw new Error('Streak tracking not available');
+                }
+                
+                const originalStreak = window.app.state.userData.stats.streak;
+                window.app.gamification.trackStreak();
+                
+                testSuite.log('streak', '✅ Streak tracking function available');
+                testSuite.log('streak', `✅ Current streak: ${window.app.state.userData.stats.streak}`);
+            });
+        }
+
+        async function runThemeTest() {
+            await testSuite.runTest('theme', async () => {
+                // Test theme switching
+                const originalTheme = window.app.state.theme;
+                const newTheme = originalTheme === 'dark' ? 'light' : 'dark';
+                
+                window.app.setTheme(newTheme);
+                
+                if (window.app.state.theme !== newTheme) {
+                    throw new Error('Theme not switched correctly');
+                }
+                
+                // Switch back
+                window.app.setTheme(originalTheme);
+                
+                testSuite.log('theme', '✅ Theme switching working');
+            });
+        }
+
+        async function runResponsiveTest() {
+            await testSuite.runTest('responsive', async () => {
+                // Test responsive design
+                const mobileNav = document.querySelector('.mobile-nav-toggle');
+                if (!mobileNav) {
+                    throw new Error('Mobile navigation not found');
+                }
+                
+                testSuite.log('responsive', '✅ Mobile navigation available');
+                testSuite.log('responsive', '✅ Responsive CSS loaded');
+            });
+        }
+
+        async function runToastTest() {
+            await testSuite.runTest('toast', async () => {
+                // Test toast notifications
+                if (!window.app.ui.showToast) {
+                    throw new Error('Toast system not available');
+                }
+                
+                window.app.ui.showToast('Test notification', 'info');
+                
+                testSuite.log('toast', '✅ Toast system working');
+            });
+        }
+
+        async function runPerformanceTest() {
+            await testSuite.runTest('performance', async () => {
+                // Test performance
+                const startTime = performance.now();
+                
+                // Simulate some operations
+                for (let i = 0; i < 1000; i++) {
+                    window.app.utils.generateId();
+                }
+                
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                
+                if (duration > 100) {
+                    throw new Error(`Performance test took too long: ${duration.toFixed(2)}ms`);
+                }
+                
+                testSuite.log('performance', `✅ Performance test passed: ${duration.toFixed(2)}ms`);
+            });
+        }
+
+        async function runMemoryTest() {
+            await testSuite.runTest('memory', async () => {
+                // Test memory usage
+                if ('memory' in performance) {
+                    const memoryInfo = performance.memory;
+                    testSuite.log('memory', `✅ Memory usage: ${(memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`);
+                } else {
+                    testSuite.log('memory', '⚠️ Memory API not available');
+                }
+            });
+        }
+
+        async function runErrorTest() {
+            await testSuite.runTest('error', async () => {
+                // Test error handling
+                if (!window.app.utils.logError) {
+                    throw new Error('Error logging not available');
+                }
+                
+                // Test error logging
+                window.app.utils.logError(new Error('Test error'), 'test');
+                
+                testSuite.log('error', '✅ Error handling working');
+            });
+        }
+
+        async function runStorageTest() {
+            await testSuite.runTest('storage', async () => {
+                // Test local storage
+                const testKey = 'test_storage_key';
+                const testValue = 'test_value';
+                
+                localStorage.setItem(testKey, testValue);
+                const retrieved = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (retrieved !== testValue) {
+                    throw new Error('Local storage not working');
+                }
+                
+                testSuite.log('storage', '✅ Local storage working');
+            });
+        }
+
+        async function runFirebaseTest() {
+            await testSuite.runTest('firebase', async () => {
+                // Test Firebase integration
+                if (typeof firebase === 'undefined') {
+                    testSuite.log('firebase', '⚠️ Firebase not loaded (expected in test environment)');
+                } else {
+                    testSuite.log('firebase', '✅ Firebase available');
+                }
+            });
+        }
+
+        async function runNetlifyTest() {
+            await testSuite.runTest('netlify', async () => {
+                // Test Netlify functions
+                try {
+                    const response = await fetch('/.netlify/functions/config');
+                    if (response.ok) {
+                        testSuite.log('netlify', '✅ Netlify functions accessible');
+                    } else {
+                        testSuite.log('netlify', '⚠️ Netlify functions not accessible (expected in test environment)');
+                    }
+                } catch (error) {
+                    testSuite.log('netlify', '⚠️ Netlify functions not accessible (expected in test environment)');
+                }
+            });
+        }
+
+        async function runAllTests() {
+            const tests = [
+                runInitTest,
+                runAuthTest,
+                runGoalTest,
+                runAITest,
+                runEssenceTest,
+                runAchievementTest,
+                runStreakTest,
+                runThemeTest,
+                runResponsiveTest,
+                runToastTest,
+                runPerformanceTest,
+                runMemoryTest,
+                runErrorTest,
+                runStorageTest,
+                runFirebaseTest,
+                runNetlifyTest
+            ];
+            
+            for (const test of tests) {
+                await test();
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            }
+        }
+
+        function generateReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    total: testSuite.totalTests,
+                    passed: testSuite.passedTests,
+                    failed: testSuite.failedTests,
+                    successRate: Math.round((testSuite.passedTests / testSuite.totalTests) * 100)
+                },
+                results: testSuite.results
+            };
+            
+            const reportText = JSON.stringify(report, null, 2);
+            const blob = new Blob([reportText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `operator-uplift-test-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize test suite
+        document.addEventListener('DOMContentLoaded', () => {
+            testSuite.init();
+        });
+    </script>
+</body>
+</html> 

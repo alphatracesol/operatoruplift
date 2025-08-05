@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 Simple Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .log { margin: 5px 0; padding: 5px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Phase 4 Module Test</h1>
+    <div id="results"></div>
+
+    <!-- Load Phase 4 Modules -->
+    <script src="js/modules/phase4-gamification.js"></script>
+    <script src="js/modules/phase4-goals.js"></script>
+    <script src="js/modules/phase4-habits-focus.js"></script>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+        }
+
+        function testPhase4Modules() {
+            log('Starting Phase 4 module test...', 'info');
+
+            // Test 1: Check if modules are loaded
+            if (window.Phase4Gamification) {
+                log('✅ Phase4Gamification module found', 'success');
+            } else {
+                log('❌ Phase4Gamification module not found', 'error');
+            }
+
+            if (window.Phase4Goals) {
+                log('✅ Phase4Goals module found', 'success');
+            } else {
+                log('❌ Phase4Goals module not found', 'error');
+            }
+
+            if (window.Phase4HabitsFocus) {
+                log('✅ Phase4HabitsFocus module found', 'success');
+            } else {
+                log('❌ Phase4HabitsFocus module not found', 'error');
+            }
+
+            // Test 2: Initialize modules
+            try {
+                if (window.Phase4Gamification) {
+                    Phase4Gamification.init();
+                    log('✅ Phase4Gamification initialized', 'success');
+                }
+            } catch (error) {
+                log(`❌ Phase4Gamification init failed: ${error.message}`, 'error');
+            }
+
+            try {
+                if (window.Phase4Goals) {
+                    Phase4Goals.init();
+                    log('✅ Phase4Goals initialized', 'success');
+                }
+            } catch (error) {
+                log(`❌ Phase4Goals init failed: ${error.message}`, 'error');
+            }
+
+            try {
+                if (window.Phase4HabitsFocus) {
+                    Phase4HabitsFocus.init();
+                    log('✅ Phase4HabitsFocus initialized', 'success');
+                }
+            } catch (error) {
+                log(`❌ Phase4HabitsFocus init failed: ${error.message}`, 'error');
+            }
+
+            // Test 3: Test basic functionality
+            try {
+                if (window.Phase4Gamification) {
+                    const initialXP = Phase4Gamification.state.totalXP;
+                    Phase4Gamification.xpSystem.addXP(100, 'Test');
+                    const newXP = Phase4Gamification.state.totalXP;
+                    if (newXP === initialXP + 100) {
+                        log('✅ XP system working correctly', 'success');
+                    } else {
+                        log('❌ XP system not working correctly', 'error');
+                    }
+                }
+            } catch (error) {
+                log(`❌ XP system test failed: ${error.message}`, 'error');
+            }
+
+            try {
+                if (window.Phase4Goals) {
+                    const goal = Phase4Goals.createGoal({
+                        title: 'Test Goal',
+                        description: 'A test goal',
+                        category: 'productivity',
+                        difficulty: 'easy'
+                    });
+                    if (goal && goal.id) {
+                        log('✅ Goal creation working correctly', 'success');
+                    } else {
+                        log('❌ Goal creation not working correctly', 'error');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Goal creation test failed: ${error.message}`, 'error');
+            }
+
+            try {
+                if (window.Phase4HabitsFocus) {
+                    const habit = Phase4HabitsFocus.createHabit({
+                        title: 'Test Habit',
+                        description: 'A test habit',
+                        category: 'health',
+                        frequency: 'daily'
+                    });
+                    if (habit && habit.id) {
+                        log('✅ Habit creation working correctly', 'success');
+                    } else {
+                        log('❌ Habit creation not working correctly', 'error');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Habit creation test failed: ${error.message}`, 'error');
+            }
+
+            log('Phase 4 module test completed!', 'info');
+        }
+
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', testPhase4Modules);
+    </script>
+</body>
+</html> 

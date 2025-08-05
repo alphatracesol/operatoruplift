@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 Comprehensive Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        .critical { color: #ef4444; font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; max-height: 600px; overflow-y: auto; }
+        iframe { width: 100%; height: 500px; border: 1px solid #333; border-radius: 5px; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .test-grid { grid-template-columns: 1fr; } }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-success { background: #4ade80; }
+        .status-error { background: #f87171; }
+        .status-warning { background: #fbbf24; }
+        .status-critical { background: #ef4444; }
+        .error-details { background: #2d1b1b; padding: 10px; margin: 5px 0; border-radius: 3px; font-family: monospace; font-size: 12px; }
+        .console-log { background: #1a1a2e; padding: 8px; margin: 3px 0; border-radius: 3px; font-family: monospace; font-size: 11px; }
+        .progress-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Phase 1 Comprehensive Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runPhase1Test()">Run Phase 1 Test</button>
+        <button onclick="testConsoleErrors()">Test Console Errors</button>
+        <button onclick="testJavaScriptErrors()">Test JavaScript Errors</button>
+        <button onclick="testAPIErrors()">Test API/Call Errors</button>
+        <button onclick="testUIElements()">Test UI Elements</button>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        <button onclick="openAppInNewTab()">Open App in New Tab</button>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h2>Live App Preview</h2>
+            <iframe id="appFrame" src="app.html"></iframe>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            warnings: 0,
+            critical: 0,
+            total: 0
+        };
+
+        let consoleErrors = [];
+        let javascriptErrors = [];
+        let apiErrors = [];
+
+        function log(message, type = 'info', details = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            
+            const statusClass = type === 'success' ? 'status-success' : 
+                              type === 'error' ? 'status-error' : 
+                              type === 'warning' ? 'status-warning' : 
+                              type === 'critical' ? 'status-critical' : 'status-warning';
+            
+            let html = `<span class="status-indicator ${statusClass}"></span>[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            if (details) {
+                html += `<div class="error-details">${details}</div>`;
+            }
+            
+            div.innerHTML = html;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            
+            // Update test results
+            if (type === 'success') testResults.passed++;
+            else if (type === 'error') testResults.failed++;
+            else if (type === 'warning') testResults.warnings++;
+            else if (type === 'critical') testResults.critical++;
+            testResults.total++;
+            
+            updateProgressBar();
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateProgressBar() {
+            const progress = (testResults.passed / testResults.total) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = { passed: 0, failed: 0, warnings: 0, critical: 0, total: 0 };
+            updateProgressBar();
+        }
+
+        function runPhase1Test() {
+            log('🚀 Starting Phase 1 Comprehensive Test...', 'info');
+            clearResults();
+            
+            setTimeout(() => {
+                testAppInitialization();
+                setTimeout(() => testUIElements(), 1000);
+                setTimeout(() => testModuleLoading(), 2000);
+                setTimeout(() => testConsoleErrors(), 3000);
+                setTimeout(() => testJavaScriptErrors(), 4000);
+                setTimeout(() => testAPIErrors(), 5000);
+                setTimeout(() => generatePhase1Report(), 6000);
+            }, 1000);
+        }
+
+        function testAppInitialization() {
+            log('🧪 Testing App Initialization...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test if app object exists
+                if (iframeWindow.window.app) {
+                    log('✅ App object found', 'success');
+                    
+                    // Test app state
+                    if (iframeWindow.window.app.state) {
+                        log('✅ App state object found', 'success');
+                        log(`📊 Active view: ${iframeWindow.window.app.state.activeView}`, 'info');
+                        log(`📊 Firebase ready: ${iframeWindow.window.app.state.firebaseReady}`, 'info');
+                    } else {
+                        log('❌ App state object not found', 'error');
+                    }
+                    
+                    // Test app UI
+                    if (iframeWindow.window.app.ui) {
+                        log('✅ App UI object found', 'success');
+                    } else {
+                        log('❌ App UI object not found', 'error');
+                    }
+                    
+                    // Test app modules
+                    if (iframeWindow.window.app.ai) {
+                        log('✅ App AI module found', 'success');
+                    } else {
+                        log('❌ App AI module not found', 'error');
+                    }
+                    
+                    if (iframeWindow.window.app.gamification) {
+                        log('✅ App gamification module found', 'success');
+                    } else {
+                        log('❌ App gamification module not found', 'error');
+                    }
+                    
+                } else {
+                    log('❌ App object not found', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing app initialization', 'critical', error.message);
+            }
+        }
+
+        function testUIElements() {
+            log('🧪 Testing UI Elements...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeDocument = iframe.contentDocument;
+            
+            try {
+                if (iframeDocument) {
+                    // Test dashboard
+                    const dashboardView = iframeDocument.getElementById('dashboard-view');
+                    if (dashboardView) {
+                        const display = iframeDocument.defaultView.getComputedStyle(dashboardView).display;
+                        const visibility = iframeDocument.defaultView.getComputedStyle(dashboardView).visibility;
+                        const pointerEvents = iframeDocument.defaultView.getComputedStyle(dashboardView).pointerEvents;
+                        
+                        if (display !== 'none' && visibility !== 'hidden' && pointerEvents === 'auto') {
+                            log('✅ Dashboard view is visible and interactive', 'success');
+                        } else {
+                            log('❌ Dashboard view issues', 'error', `Display: ${display}, Visibility: ${visibility}, PointerEvents: ${pointerEvents}`);
+                        }
+                    } else {
+                        log('❌ Dashboard view element not found', 'critical');
+                    }
+                    
+                    // Test sidebar
+                    const sidebar = iframeDocument.getElementById('sidebar');
+                    if (sidebar) {
+                        const display = iframeDocument.defaultView.getComputedStyle(sidebar).display;
+                        if (display !== 'none') {
+                            log('✅ Sidebar is visible', 'success');
+                        } else {
+                            log('❌ Sidebar is hidden', 'error');
+                        }
+                    } else {
+                        log('❌ Sidebar element not found', 'critical');
+                    }
+                    
+                    // Test header
+                    const header = iframeDocument.getElementById('app-header');
+                    if (header) {
+                        log('✅ App header found', 'success');
+                    } else {
+                        log('❌ App header not found', 'error');
+                    }
+                    
+                    // Test mobile navigation
+                    const mobileToggle = iframeDocument.getElementById('mobile-nav-toggle');
+                    if (mobileToggle) {
+                        log('✅ Mobile navigation toggle found', 'success');
+                    } else {
+                        log('❌ Mobile navigation toggle not found', 'error');
+                    }
+                    
+                    // Test loading overlay (should be removed)
+                    const loadingOverlay = iframeDocument.getElementById('loading-overlay');
+                    if (loadingOverlay) {
+                        log('❌ Loading overlay still exists', 'critical');
+                    } else {
+                        log('✅ Loading overlay removed', 'success');
+                    }
+                    
+                    // Test auth view (should be hidden)
+                    const authView = iframeDocument.getElementById('auth-view');
+                    if (authView) {
+                        const display = iframeDocument.defaultView.getComputedStyle(authView).display;
+                        if (display === 'none') {
+                            log('✅ Auth view properly hidden', 'success');
+                        } else {
+                            log('❌ Auth view still visible', 'error');
+                        }
+                    } else {
+                        log('✅ Auth view element not found (good)', 'success');
+                    }
+                    
+                } else {
+                    log('❌ Cannot access iframe document', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing UI elements', 'critical', error.message);
+            }
+        }
+
+        function testModuleLoading() {
+            log('🧪 Testing Module Loading...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test Phase 2 modules
+                if (iframeWindow.window.AdvancedAIEnhancement) {
+                    log('✅ AdvancedAIEnhancement module found', 'success');
+                } else {
+                    log('❌ AdvancedAIEnhancement module not found', 'error');
+                }
+                
+                if (iframeWindow.window.AdvancedGamification) {
+                    log('✅ AdvancedGamification module found', 'success');
+                } else {
+                    log('❌ AdvancedGamification module not found', 'error');
+                }
+                
+                // Test module initialization in app
+                if (iframeWindow.window.app) {
+                    if (iframeWindow.window.app.advancedAI) {
+                        log('✅ Advanced AI module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced AI module not initialized in app', 'error');
+                    }
+                    
+                    if (iframeWindow.window.app.advancedGamification) {
+                        log('✅ Advanced Gamification module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced Gamification module not initialized in app', 'error');
+                    }
+                }
+                
+            } catch (error) {
+                log('❌ Error testing module loading', 'critical', error.message);
+            }
+        }
+
+        function testConsoleErrors() {
+            log('🧪 Testing Console Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Override console.error to capture errors
+                const originalError = iframeWindow.console.error;
+                const originalWarn = iframeWindow.console.warn;
+                
+                iframeWindow.console.error = function(...args) {
+                    consoleErrors.push({ type: 'error', message: args.join(' '), timestamp: new Date() });
+                    originalError.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.warn = function(...args) {
+                    consoleErrors.push({ type: 'warning', message: args.join(' '), timestamp: new Date() });
+                    originalWarn.apply(iframeWindow.console, args);
+                };
+                
+                // Check for existing errors
+                if (consoleErrors.length === 0) {
+                    log('✅ No console errors detected', 'success');
+                } else {
+                    log(`❌ ${consoleErrors.length} console errors detected`, 'error');
+                    consoleErrors.forEach((error, index) => {
+                        log(`${error.type.toUpperCase()}: ${error.message}`, 'error', `Time: ${error.timestamp.toLocaleTimeString()}`);
+                    });
+                }
+                
+            } catch (error) {
+                log('❌ Error testing console errors', 'critical', error.message);
+            }
+        }
+
+        function testJavaScriptErrors() {
+            log('🧪 Testing JavaScript Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test for JavaScript syntax errors
+                const scripts = iframe.contentDocument.querySelectorAll('script');
+                let scriptErrors = 0;
+                
+                scripts.forEach((script, index) => {
+                    try {
+                        if (script.textContent) {
+                            // Basic syntax check
+                            new Function(script.textContent);
+                        }
+                    } catch (error) {
+                        scriptErrors++;
+                        log(`❌ Script error in script ${index}`, 'error', error.message);
+                    }
+                });
+                
+                if (scriptErrors === 0) {
+                    log('✅ No JavaScript syntax errors detected', 'success');
+                } else {
+                    log(`❌ ${scriptErrors} JavaScript errors detected`, 'error');
+                }
+                
+                // Test for undefined variables
+                try {
+                    if (iframeWindow.window.app && typeof iframeWindow.window.app.init === 'function') {
+                        log('✅ App init function exists', 'success');
+                    } else {
+                        log('❌ App init function not found', 'error');
+                    }
+                } catch (error) {
+                    log('❌ Error testing app functions', 'error', error.message);
+                }
+                
+            } catch (error) {
+                log('❌ Error testing JavaScript errors', 'critical', error.message);
+            }
+        }
+
+        function testAPIErrors() {
+            log('🧪 Testing API/Call Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test for network errors
+                const performance = iframeWindow.performance;
+                if (performance) {
+                    const entries = performance.getEntriesByType('resource');
+                    const failedRequests = entries.filter(entry => entry.transferSize === 0 && entry.duration > 0);
+                    
+                    if (failedRequests.length === 0) {
+                        log('✅ No failed network requests detected', 'success');
+                    } else {
+                        log(`❌ ${failedRequests.length} failed network requests detected`, 'error');
+                        failedRequests.forEach(request => {
+                            log(`Failed request: ${request.name}`, 'error', `Duration: ${request.duration}ms`);
+                        });
+                    }
+                }
+                
+                // Test for Firebase errors
+                if (iframeWindow.window.app && iframeWindow.window.app.state) {
+                    if (iframeWindow.window.app.state.firebaseReady === false) {
+                        log('⚠️ Firebase not ready', 'warning');
+                    } else {
+                        log('✅ Firebase ready', 'success');
+                    }
+                }
+                
+                // Test for localStorage errors
+                try {
+                    iframeWindow.localStorage.setItem('test', 'test');
+                    iframeWindow.localStorage.removeItem('test');
+                    log('✅ localStorage working', 'success');
+                } catch (error) {
+                    log('❌ localStorage error', 'error', error.message);
+                }
+                
+            } catch (error) {
+                log('❌ Error testing API errors', 'critical', error.message);
+            }
+        }
+
+        function generatePhase1Report() {
+            log('📋 Generating Phase 1 Report...', 'info');
+            
+            const successRate = testResults.total > 0 ? (testResults.passed / testResults.total * 100).toFixed(1) : 0;
+            
+            log('📊 PHASE 1 TEST RESULTS', 'info');
+            log(`✅ Passed: ${testResults.passed}`, 'success');
+            log(`❌ Failed: ${testResults.failed}`, 'error');
+            log(`⚠️ Warnings: ${testResults.warnings}`, 'warning');
+            log(`🚨 Critical: ${testResults.critical}`, 'critical');
+            log(`📈 Success Rate: ${successRate}%`, successRate >= 80 ? 'success' : 'error');
+            
+            if (successRate >= 90) {
+                log('🎉 Phase 1 PASSED - App is fully functional!', 'success');
+            } else if (successRate >= 70) {
+                log('⚠️ Phase 1 PARTIAL PASS - Some issues need attention', 'warning');
+            } else {
+                log('❌ Phase 1 FAILED - Critical issues need immediate attention', 'critical');
+            }
+            
+            // Summary of critical issues
+            if (testResults.critical > 0) {
+                log('🚨 CRITICAL ISSUES SUMMARY:', 'critical');
+                log('- App object not found', 'critical');
+                log('- Dashboard not visible', 'critical');
+                log('- Loading overlay still present', 'critical');
+                log('- Module loading failures', 'critical');
+            }
+        }
+
+        function runAllTests() {
+            log('🚀 Running All Comprehensive Tests...', 'info');
+            clearResults();
+            
+            setTimeout(() => runPhase1Test(), 500);
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+            log('🔗 Opened app.html in new tab', 'info');
+        }
+
+        // Auto-run Phase 1 test on load
+        window.addEventListener('load', () => {
+            log('📋 Phase 1 Comprehensive Test page loaded', 'info');
+            setTimeout(runPhase1Test, 2000);
+        });
+    </script>
+</body>
+</html> 

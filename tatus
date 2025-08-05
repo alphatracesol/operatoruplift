@@ -1,0 +1,10 @@
+[33mcd8b467[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m RESTORE: Working authentication system from last-working-version - simplified Firebase init and auth flow
+[33m9505fe4[m FIX: Bypass Firebase initialization completely - eliminate loading timeout and slow performance
+[33mb555823[m TEMPORARY: Disable Firebase auth for testing - users can now access dashboard without login
+[33mce081bd[m Fix: Remove huggingface_hub Python package from npm dependencies - causing build failure
+[33m7cdf54a[m FINAL FIXES: Fix date-fns CDN URL, add missing initParticles function, and complete VITE env var fixes
+[33mda54468[m CRITICAL FIXES: Fix VITE env vars, date-fns MIME error, null addEventListener, and add robust error handling
+[33md87593e[m Fix app.html: Remove remaining cookie banner code, update background to match index.html, and ensure particles work correctly
+[33mf1a8094[m Fix email verification login issue: add retry mechanism, user reload, and helper function to properly handle email verification status after user verifies email and logs in
+[33mdfdcb4f[m Update app.html background and styling to match index.html: change from blue gradient to dark orange theme, add particle effects, implement glass card styling for login form, and update CSS variables
+[33m622c348[m Implement comprehensive Firebase authentication debug plan: enhance config debugging, improve auth state listener, add detailed error handling, create test functions, and add global debug utility

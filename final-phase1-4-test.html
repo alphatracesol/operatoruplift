@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Phase 1-4 Test - All Fixes Applied</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        .log { 
+            margin: 5px 0; 
+            padding: 8px; 
+            background: #2d2d2d; 
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+        }
+        .log.success { border-left-color: #10b981; }
+        .log.error { border-left-color: #ef4444; }
+        .log.warning { border-left-color: #f59e0b; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2d2d2d;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button.success { background: #10b981; }
+        .test-button.error { background: #ef4444; }
+        .phase-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .phase-pending { background: #6b7280; }
+        .phase-running { background: #f59e0b; }
+        .phase-success { background: #10b981; }
+        .phase-error { background: #ef4444; }
+        .summary-box {
+            background: #3d3d3d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Final Phase 1-4 Test - All Fixes Applied</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button class="test-button" onclick="runCompleteTest()">🚀 Run Complete Test</button>
+        <button class="test-button" onclick="testPhase1Only()">🎯 Test Phase 1</button>
+        <button class="test-button" onclick="testPhase2Only()">🎯 Test Phase 2</button>
+        <button class="test-button" onclick="testPhase3Only()">🎯 Test Phase 3</button>
+        <button class="test-button" onclick="testPhase4Only()">🎯 Test Phase 4</button>
+        <button class="test-button" onclick="clearLogs()">🗑️ Clear Logs</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Phase Status</h2>
+        <div id="phase-status">
+            <span class="phase-status phase-pending" id="phase1-status">Phase 1: Pending</span>
+            <span class="phase-status phase-pending" id="phase2-status">Phase 2: Pending</span>
+            <span class="phase-status phase-pending" id="phase3-status">Phase 3: Pending</span>
+            <span class="phase-status phase-pending" id="phase4-status">Phase 4: Pending</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Summary</h2>
+        <div id="summary"></div>
+    </div>
+
+    <!-- Load the comprehensive fixes -->
+    <script src="comprehensive-phase-fixes.js"></script>
+
+    <script>
+        let testResults = {
+            phase1: { status: 'pending', errors: 0, tests: 0, passed: 0 },
+            phase2: { status: 'pending', errors: 0, tests: 0, passed: 0 },
+            phase3: { status: 'pending', errors: 0, tests: 0, passed: 0 },
+            phase4: { status: 'pending', errors: 0, tests: 0, passed: 0 }
+        };
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').innerHTML = '';
+        }
+
+        function updatePhaseStatus(phase, status) {
+            const statusElement = document.getElementById(`${phase}-status`);
+            statusElement.className = `phase-status phase-${status}`;
+            statusElement.textContent = `Phase ${phase.charAt(5)}: ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            const totalTests = Object.values(testResults).reduce((sum, phase) => sum + phase.tests, 0);
+            const totalPassed = Object.values(testResults).reduce((sum, phase) => sum + phase.passed, 0);
+            const totalErrors = Object.values(testResults).reduce((sum, phase) => sum + phase.errors, 0);
+            const successRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(1) : 0;
+
+            summary.innerHTML = `
+                <div class="summary-box">
+                    <h3>📊 Test Summary</h3>
+                    <p><strong>Total Tests:</strong> ${totalTests}</p>
+                    <p><strong>Passed:</strong> ${totalPassed}</p>
+                    <p><strong>Failed:</strong> ${totalErrors}</p>
+                    <p><strong>Success Rate:</strong> ${successRate}%</p>
+                    <p><strong>Status:</strong> ${totalErrors === 0 ? '✅ ALL TESTS PASSED' : '⚠️ SOME TESTS FAILED'}</p>
+                </div>
+            `;
+        }
+
+        async function testPhase1() {
+            log('🎯 Testing Phase 1: Core Utilities & Error Handling...', 'info');
+            updatePhaseStatus('phase1', 'running');
+            testResults.phase1.status = 'running';
+            testResults.phase1.errors = 0;
+            testResults.phase1.tests = 0;
+            testResults.phase1.passed = 0;
+
+            try {
+                // Test 1: SafeElementAccess
+                testResults.phase1.tests++;
+                if (typeof SafeElementAccess !== 'undefined') {
+                    const testElement = SafeElementAccess.getById('test-element', 'fallback');
+                    if (testElement === 'fallback') {
+                        log('✅ SafeElementAccess working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ SafeElementAccess not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ SafeElementAccess not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                // Test 2: SecurityUtils
+                testResults.phase1.tests++;
+                if (typeof SecurityUtils !== 'undefined') {
+                    const sanitized = SecurityUtils.sanitizeInput('<script>alert("test")</script>');
+                    if (sanitized === 'scriptalert("test")/script') {
+                        log('✅ SecurityUtils working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ SecurityUtils not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ SecurityUtils not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                // Test 3: PerformanceUtils
+                testResults.phase1.tests++;
+                if (typeof PerformanceUtils !== 'undefined') {
+                    const debounced = PerformanceUtils.debounce(() => {}, 100);
+                    if (typeof debounced === 'function') {
+                        log('✅ PerformanceUtils working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ PerformanceUtils not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ PerformanceUtils not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                // Test 4: ErrorBoundary
+                testResults.phase1.tests++;
+                if (typeof ErrorBoundary !== 'undefined') {
+                    const errorInfo = ErrorBoundary.catchError(new Error('Test error'), 'Test');
+                    if (errorInfo && errorInfo.error) {
+                        log('✅ ErrorBoundary working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ ErrorBoundary not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ ErrorBoundary not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                // Test 5: Memory Management
+                testResults.phase1.tests++;
+                if (typeof memoryManager !== 'undefined') {
+                    memoryManager.addInterval(123);
+                    if (memoryManager.intervals.has(123)) {
+                        log('✅ Memory Manager working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ Memory Manager not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ Memory Manager not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                // Test 6: Z-Index Management
+                testResults.phase1.tests++;
+                if (typeof zIndexManager !== 'undefined') {
+                    const zIndex = zIndexManager.getZIndex('modal');
+                    if (zIndex === 1000) {
+                        log('✅ Z-Index Manager working correctly', 'success');
+                        testResults.phase1.passed++;
+                    } else {
+                        log('❌ Z-Index Manager not working correctly', 'error');
+                        testResults.phase1.errors++;
+                    }
+                } else {
+                    log('❌ Z-Index Manager not found', 'error');
+                    testResults.phase1.errors++;
+                }
+
+                testResults.phase1.status = testResults.phase1.errors === 0 ? 'success' : 'error';
+                updatePhaseStatus('phase1', testResults.phase1.status);
+                
+                log(`📊 Phase 1 Complete: ${testResults.phase1.passed}/${testResults.phase1.tests} tests passed`, 'info');
+
+            } catch (error) {
+                log(`❌ Phase 1 test failed: ${error.message}`, 'error');
+                testResults.phase1.status = 'error';
+                testResults.phase1.errors++;
+                updatePhaseStatus('phase1', 'error');
+            }
+        }
+
+        async function testPhase2() {
+            log('🎯 Testing Phase 2: Advanced AI & Gamification...', 'info');
+            updatePhaseStatus('phase2', 'running');
+            testResults.phase2.status = 'running';
+            testResults.phase2.errors = 0;
+            testResults.phase2.tests = 0;
+            testResults.phase2.passed = 0;
+
+            try {
+                // Test 1: AdvancedAIEnhancement
+                testResults.phase2.tests++;
+                if (typeof AdvancedAIEnhancement !== 'undefined') {
+                    const advice = AdvancedAIEnhancement.getPersonalizedAdvice('test goal');
+                    if (advice.includes('test goal')) {
+                        log('✅ AdvancedAIEnhancement working correctly', 'success');
+                        testResults.phase2.passed++;
+                    } else {
+                        log('❌ AdvancedAIEnhancement not working correctly', 'error');
+                        testResults.phase2.errors++;
+                    }
+                } else {
+                    log('❌ AdvancedAIEnhancement not found', 'error');
+                    testResults.phase2.errors++;
+                }
+
+                // Test 2: AdvancedGamification
+                testResults.phase2.tests++;
+                if (typeof AdvancedGamification !== 'undefined') {
+                    const progress = AdvancedGamification.getAchievementProgress({});
+                    if (progress && typeof progress.progress === 'number') {
+                        log('✅ AdvancedGamification working correctly', 'success');
+                        testResults.phase2.passed++;
+                    } else {
+                        log('❌ AdvancedGamification not working correctly', 'error');
+                        testResults.phase2.errors++;
+                    }
+                } else {
+                    log('❌ AdvancedGamification not found', 'error');
+                    testResults.phase2.errors++;
+                }
+
+                // Test 3: PersonalityIntegration
+                testResults.phase2.tests++;
+                if (typeof PersonalityIntegration !== 'undefined') {
+                    const insights = PersonalityIntegration.getPersonalityInsights();
+                    if (insights && insights.type) {
+                        log('✅ PersonalityIntegration working correctly', 'success');
+                        testResults.phase2.passed++;
+                    } else {
+                        log('❌ PersonalityIntegration not working correctly', 'error');
+                        testResults.phase2.errors++;
+                    }
+                } else {
+                    log('❌ PersonalityIntegration not found', 'error');
+                    testResults.phase2.errors++;
+                }
+
+                testResults.phase2.status = testResults.phase2.errors === 0 ? 'success' : 'error';
+                updatePhaseStatus('phase2', testResults.phase2.status);
+                
+                log(`📊 Phase 2 Complete: ${testResults.phase2.passed}/${testResults.phase2.tests} tests passed`, 'info');
+
+            } catch (error) {
+                log(`❌ Phase 2 test failed: ${error.message}`, 'error');
+                testResults.phase2.status = 'error';
+                testResults.phase2.errors++;
+                updatePhaseStatus('phase2', 'error');
+            }
+        }
+
+        async function testPhase3() {
+            log('🎯 Testing Phase 3: Advanced Personalization & Security...', 'info');
+            updatePhaseStatus('phase3', 'running');
+            testResults.phase3.status = 'running';
+            testResults.phase3.errors = 0;
+            testResults.phase3.tests = 0;
+            testResults.phase3.passed = 0;
+
+            try {
+                // Test 1: AdvancedPersonalization
+                testResults.phase3.tests++;
+                if (typeof AdvancedPersonalization !== 'undefined') {
+                    const profile = AdvancedPersonalization.getUserProfile();
+                    if (profile && profile.preferences) {
+                        log('✅ AdvancedPersonalization working correctly', 'success');
+                        testResults.phase3.passed++;
+                    } else {
+                        log('❌ AdvancedPersonalization not working correctly', 'error');
+                        testResults.phase3.errors++;
+                    }
+                } else {
+                    log('❌ AdvancedPersonalization not found', 'error');
+                    testResults.phase3.errors++;
+                }
+
+                // Test 2: EnhancedAI
+                testResults.phase3.tests++;
+                if (typeof EnhancedAI !== 'undefined') {
+                    const response = EnhancedAI.generateResponse('test input');
+                    if (response.includes('test input')) {
+                        log('✅ EnhancedAI working correctly', 'success');
+                        testResults.phase3.passed++;
+                    } else {
+                        log('❌ EnhancedAI not working correctly', 'error');
+                        testResults.phase3.errors++;
+                    }
+                } else {
+                    log('❌ EnhancedAI not found', 'error');
+                    testResults.phase3.errors++;
+                }
+
+                // Test 3: Security
+                testResults.phase3.tests++;
+                if (typeof Security !== 'undefined') {
+                    const validated = Security.validateInput('<script>alert("test")</script>');
+                    if (validated === 'scriptalert("test")/script') {
+                        log('✅ Security module working correctly', 'success');
+                        testResults.phase3.passed++;
+                    } else {
+                        log('❌ Security module not working correctly', 'error');
+                        testResults.phase3.errors++;
+                    }
+                } else {
+                    log('❌ Security module not found', 'error');
+                    testResults.phase3.errors++;
+                }
+
+                // Test 4: Performance
+                testResults.phase3.tests++;
+                if (typeof Performance !== 'undefined') {
+                    const loadTime = Performance.measureLoadTime();
+                    if (typeof loadTime === 'number') {
+                        log('✅ Performance module working correctly', 'success');
+                        testResults.phase3.passed++;
+                    } else {
+                        log('❌ Performance module not working correctly', 'error');
+                        testResults.phase3.errors++;
+                    }
+                } else {
+                    log('❌ Performance module not found', 'error');
+                    testResults.phase3.errors++;
+                }
+
+                // Test 5: Accessibility
+                testResults.phase3.tests++;
+                if (typeof Accessibility !== 'undefined') {
+                    const compliance = Accessibility.checkCompliance();
+                    if (compliance && compliance.wcag) {
+                        log('✅ Accessibility module working correctly', 'success');
+                        testResults.phase3.passed++;
+                    } else {
+                        log('❌ Accessibility module not working correctly', 'error');
+                        testResults.phase3.errors++;
+                    }
+                } else {
+                    log('❌ Accessibility module not found', 'error');
+                    testResults.phase3.errors++;
+                }
+
+                testResults.phase3.status = testResults.phase3.errors === 0 ? 'success' : 'error';
+                updatePhaseStatus('phase3', testResults.phase3.status);
+                
+                log(`📊 Phase 3 Complete: ${testResults.phase3.passed}/${testResults.phase3.tests} tests passed`, 'info');
+
+            } catch (error) {
+                log(`❌ Phase 3 test failed: ${error.message}`, 'error');
+                testResults.phase3.status = 'error';
+                testResults.phase3.errors++;
+                updatePhaseStatus('phase3', 'error');
+            }
+        }
+
+        async function testPhase4() {
+            log('🎯 Testing Phase 4: Gamification, Goals & Habits...', 'info');
+            updatePhaseStatus('phase4', 'running');
+            testResults.phase4.status = 'running';
+            testResults.phase4.errors = 0;
+            testResults.phase4.tests = 0;
+            testResults.phase4.passed = 0;
+
+            try {
+                // Test 1: Phase4Gamification
+                testResults.phase4.tests++;
+                if (typeof Phase4Gamification !== 'undefined') {
+                    const initialXP = Phase4Gamification.state.totalXP;
+                    Phase4Gamification.xpSystem.addXP(100, 'Test');
+                    if (Phase4Gamification.state.totalXP === initialXP + 100) {
+                        log('✅ Phase4Gamification working correctly', 'success');
+                        testResults.phase4.passed++;
+                    } else {
+                        log('❌ Phase4Gamification not working correctly', 'error');
+                        testResults.phase4.errors++;
+                    }
+                } else {
+                    log('❌ Phase4Gamification not found', 'error');
+                    testResults.phase4.errors++;
+                }
+
+                // Test 2: Phase4Goals
+                testResults.phase4.tests++;
+                if (typeof Phase4Goals !== 'undefined') {
+                    const goal = Phase4Goals.createGoal({
+                        title: 'Test Goal',
+                        description: 'Test Description',
+                        category: 'productivity'
+                    });
+                    if (goal && goal.id && goal.title === 'Test Goal') {
+                        log('✅ Phase4Goals working correctly', 'success');
+                        testResults.phase4.passed++;
+                    } else {
+                        log('❌ Phase4Goals not working correctly', 'error');
+                        testResults.phase4.errors++;
+                    }
+                } else {
+                    log('❌ Phase4Goals not found', 'error');
+                    testResults.phase4.errors++;
+                }
+
+                // Test 3: Phase4HabitsFocus
+                testResults.phase4.tests++;
+                if (typeof Phase4HabitsFocus !== 'undefined') {
+                    const habit = Phase4HabitsFocus.createHabit({
+                        title: 'Test Habit',
+                        description: 'Test Description',
+                        category: 'health',
+                        frequency: 'daily'
+                    });
+                    if (habit && habit.id && habit.title === 'Test Habit') {
+                        log('✅ Phase4HabitsFocus working correctly', 'success');
+                        testResults.phase4.passed++;
+                    } else {
+                        log('❌ Phase4HabitsFocus not working correctly', 'error');
+                        testResults.phase4.errors++;
+                    }
+                } else {
+                    log('❌ Phase4HabitsFocus not found', 'error');
+                    testResults.phase4.errors++;
+                }
+
+                testResults.phase4.status = testResults.phase4.errors === 0 ? 'success' : 'error';
+                updatePhaseStatus('phase4', testResults.phase4.status);
+                
+                log(`📊 Phase 4 Complete: ${testResults.phase4.passed}/${testResults.phase4.tests} tests passed`, 'info');
+
+            } catch (error) {
+                log(`❌ Phase 4 test failed: ${error.message}`, 'error');
+                testResults.phase4.status = 'error';
+                testResults.phase4.errors++;
+                updatePhaseStatus('phase4', 'error');
+            }
+        }
+
+        async function runCompleteTest() {
+            log('🚀 Starting complete Phase 1-4 test with all fixes applied...', 'info');
+            clearLogs();
+            
+            // Run all phases sequentially
+            await testPhase1();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testPhase2();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testPhase3();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testPhase4();
+            
+            // Update summary
+            updateSummary();
+            
+            // Final result
+            const totalTests = Object.values(testResults).reduce((sum, phase) => sum + phase.tests, 0);
+            const totalPassed = Object.values(testResults).reduce((sum, phase) => sum + phase.passed, 0);
+            const totalErrors = Object.values(testResults).reduce((sum, phase) => sum + phase.errors, 0);
+            
+            if (totalErrors === 0) {
+                log('🎉 ALL PHASES COMPLETED SUCCESSFULLY! All fixes are working correctly!', 'success');
+            } else {
+                log(`⚠️ ${totalErrors} tests failed across all phases.`, 'warning');
+            }
+        }
+
+        // Individual phase test functions
+        function testPhase1Only() {
+            clearLogs();
+            testPhase1();
+        }
+
+        function testPhase2Only() {
+            clearLogs();
+            testPhase2();
+        }
+
+        function testPhase3Only() {
+            clearLogs();
+            testPhase3();
+        }
+
+        function testPhase4Only() {
+            clearLogs();
+            testPhase4();
+        }
+
+        // Auto-run when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📋 Final Phase 1-4 Test Suite loaded with comprehensive fixes', 'info');
+            log('Click "Run Complete Test" to verify all phases are working correctly', 'info');
+        });
+    </script>
+</body>
+</html> 

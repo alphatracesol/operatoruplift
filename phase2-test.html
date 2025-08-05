@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Test - Bug Fixes & Code Cleanup</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #111827, #0a0a0a);
+            color: #e5e7eb;
+            margin: 0;
+            padding: 2rem;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: rgba(24, 24, 27, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-result {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+        
+        .test-result.pass {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        
+        .test-result.fail {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .test-result.warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .test-result.info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .btn {
+            background: #f97316;
+            color: black;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: #fb923c;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            transition: width 0.3s ease;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Phase 2 Test - Bug Fixes & Code Cleanup</h1>
+        <p>Identifying bugs, unused code, and issues that need to be fixed</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🐛 Bug Detection Test</h2>
+            <div id="bug-test-results"></div>
+            <button class="btn" onclick="testBugDetection()">Test Bug Detection</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🧹 Unused Code Detection</h2>
+            <div id="unused-code-results"></div>
+            <button class="btn" onclick="testUnusedCode()">Test Unused Code</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔒 Security Issues Test</h2>
+            <div id="security-issues-results"></div>
+            <button class="btn" onclick="testSecurityIssues()">Test Security Issues</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>⚡ Performance Issues Test</h2>
+            <div id="performance-issues-results"></div>
+            <button class="btn" onclick="testPerformanceIssues()">Test Performance Issues</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>♿ Accessibility Issues Test</h2>
+            <div id="accessibility-issues-results"></div>
+            <button class="btn" onclick="testAccessibilityIssues()">Test Accessibility Issues</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Mobile Issues Test</h2>
+            <div id="mobile-issues-results"></div>
+            <button class="btn" onclick="testMobileIssues()">Test Mobile Issues</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Code Quality Test</h2>
+            <div id="code-quality-results"></div>
+            <button class="btn" onclick="testCodeQuality()">Test Code Quality</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔄 Integration Test</h2>
+            <div id="integration-issues-results"></div>
+            <button class="btn" onclick="runAllPhase2Tests()">Run All Phase 2 Tests</button>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            bugs: { found: 0, fixed: 0 },
+            unusedCode: { found: 0, removed: 0 },
+            security: { issues: 0, fixed: 0 },
+            performance: { issues: 0, fixed: 0 },
+            accessibility: { issues: 0, fixed: 0 },
+            mobile: { issues: 0, fixed: 0 },
+            codeQuality: { issues: 0, fixed: 0 }
+        };
+        
+        function addTestResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+        }
+        
+        function updateProgress() {
+            const totalIssues = Object.values(testResults).reduce((sum, category) => sum + category.found, 0);
+            const totalFixed = Object.values(testResults).reduce((sum, category) => sum + category.fixed, 0);
+            const percentage = totalIssues > 0 ? (totalFixed / totalIssues) * 100 : 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+        
+        function testBugDetection() {
+            addTestResult('bug-test-results', '🧪 Testing for bugs and issues...', 'info');
+            
+            try {
+                // Test for common JavaScript bugs
+                const bugs = [];
+                
+                // Test for undefined variables
+                if (typeof window.app === 'undefined') {
+                    bugs.push('App object not defined');
+                }
+                
+                // Test for null reference errors
+                if (window.app && !window.app.state) {
+                    bugs.push('App state not initialized');
+                }
+                
+                // Test for missing functions
+                if (window.app && !window.app.utils) {
+                    bugs.push('Utils object missing');
+                }
+                
+                // Test for memory leaks
+                if (window.app && !window.app.utils.memoryManager) {
+                    bugs.push('Memory manager missing');
+                }
+                
+                // Test for event listener leaks
+                const testElement = document.createElement('div');
+                const handler = () => {};
+                testElement.addEventListener('click', handler);
+                testElement.removeEventListener('click', handler);
+                
+                // Test for console logging in production
+                const hasConsoleLogs = /console\.(log|error|warn)/.test(document.documentElement.outerHTML);
+                if (hasConsoleLogs) {
+                    bugs.push('Console logging found in code');
+                }
+                
+                // Test for placeholder values
+                const hasPlaceholders = /placeholder|TODO|FIXME|XXX/.test(document.documentElement.outerHTML);
+                if (hasPlaceholders) {
+                    bugs.push('Placeholder values found in code');
+                }
+                
+                testResults.bugs.found = bugs.length;
+                
+                if (bugs.length === 0) {
+                    addTestResult('bug-test-results', '✅ No bugs detected', 'pass');
+                } else {
+                    addTestResult('bug-test-results', `⚠️ ${bugs.length} potential bugs found:`, 'warning');
+                    bugs.forEach(bug => {
+                        addTestResult('bug-test-results', `  • ${bug}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('bug-test-results', `❌ Bug detection test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testUnusedCode() {
+            addTestResult('unused-code-results', '🧪 Testing for unused code...', 'info');
+            
+            try {
+                const unusedCode = [];
+                
+                // Test for unused CSS classes
+                const cssClasses = document.querySelectorAll('[class]');
+                const usedClasses = new Set();
+                cssClasses.forEach(el => {
+                    el.className.split(' ').forEach(cls => usedClasses.add(cls));
+                });
+                
+                // Test for unused JavaScript functions
+                if (window.app) {
+                    const functions = Object.getOwnPropertyNames(window.app);
+                    const unusedFunctions = functions.filter(fn => {
+                        return typeof window.app[fn] === 'function' && 
+                               !document.documentElement.outerHTML.includes(`${fn}(`);
+                    });
+                    
+                    if (unusedFunctions.length > 0) {
+                        unusedCode.push(`${unusedFunctions.length} potentially unused functions`);
+                    }
+                }
+                
+                // Test for duplicate code
+                const html = document.documentElement.outerHTML;
+                const lines = html.split('\n');
+                const duplicateLines = lines.filter((line, index) => 
+                    lines.indexOf(line) !== index && line.trim().length > 10
+                );
+                
+                if (duplicateLines.length > 0) {
+                    unusedCode.push(`${duplicateLines.length} duplicate code lines`);
+                }
+                
+                testResults.unusedCode.found = unusedCode.length;
+                
+                if (unusedCode.length === 0) {
+                    addTestResult('unused-code-results', '✅ No unused code detected', 'pass');
+                } else {
+                    addTestResult('unused-code-results', `⚠️ ${unusedCode.length} unused code issues found:`, 'warning');
+                    unusedCode.forEach(issue => {
+                        addTestResult('unused-code-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('unused-code-results', `❌ Unused code test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testSecurityIssues() {
+            addTestResult('security-issues-results', '🧪 Testing for security issues...', 'info');
+            
+            try {
+                const securityIssues = [];
+                
+                // Test for exposed API keys
+                const hasApiKeys = /AIzaSy|hf_|sk_|pk_/.test(document.documentElement.outerHTML);
+                if (hasApiKeys) {
+                    securityIssues.push('API keys found in code');
+                }
+                
+                // Test for inline scripts
+                const inlineScripts = document.querySelectorAll('script:not([src])');
+                if (inlineScripts.length > 0) {
+                    securityIssues.push(`${inlineScripts.length} inline scripts found`);
+                }
+                
+                // Test for eval usage
+                const hasEval = /eval\(/.test(document.documentElement.outerHTML);
+                if (hasEval) {
+                    securityIssues.push('eval() function usage found');
+                }
+                
+                // Test for innerHTML usage
+                const hasInnerHTML = /innerHTML/.test(document.documentElement.outerHTML);
+                if (hasInnerHTML) {
+                    securityIssues.push('innerHTML usage found (potential XSS)');
+                }
+                
+                // Test for proper input sanitization
+                const hasSanitization = /sanitizeInput|sanitizeHTML/.test(document.documentElement.outerHTML);
+                if (!hasSanitization) {
+                    securityIssues.push('Input sanitization not found');
+                }
+                
+                testResults.security.issues = securityIssues.length;
+                
+                if (securityIssues.length === 0) {
+                    addTestResult('security-issues-results', '✅ No security issues detected', 'pass');
+                } else {
+                    addTestResult('security-issues-results', `⚠️ ${securityIssues.length} security issues found:`, 'warning');
+                    securityIssues.forEach(issue => {
+                        addTestResult('security-issues-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('security-issues-results', `❌ Security test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testPerformanceIssues() {
+            addTestResult('performance-issues-results', '🧪 Testing for performance issues...', 'info');
+            
+            try {
+                const performanceIssues = [];
+                
+                // Test for large DOM queries
+                const domQueries = document.querySelectorAll('*');
+                if (domQueries.length > 1000) {
+                    performanceIssues.push('Large DOM tree detected');
+                }
+                
+                // Test for missing lazy loading
+                const images = document.querySelectorAll('img');
+                const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+                if (images.length > 0 && lazyImages.length === 0) {
+                    performanceIssues.push('Images not using lazy loading');
+                }
+                
+                // Test for missing debouncing
+                const hasDebounce = /debounce/.test(document.documentElement.outerHTML);
+                if (!hasDebounce) {
+                    performanceIssues.push('Debouncing not implemented');
+                }
+                
+                // Test for memory leaks
+                const hasMemoryManager = /memoryManager/.test(document.documentElement.outerHTML);
+                if (!hasMemoryManager) {
+                    performanceIssues.push('Memory management not implemented');
+                }
+                
+                // Test for large bundle size indicators
+                const scriptTags = document.querySelectorAll('script[src]');
+                const externalScripts = Array.from(scriptTags).filter(script => 
+                    !script.src.includes('localhost') && !script.src.includes('127.0.0.1')
+                );
+                if (externalScripts.length > 5) {
+                    performanceIssues.push('Many external scripts loaded');
+                }
+                
+                testResults.performance.issues = performanceIssues.length;
+                
+                if (performanceIssues.length === 0) {
+                    addTestResult('performance-issues-results', '✅ No performance issues detected', 'pass');
+                } else {
+                    addTestResult('performance-issues-results', `⚠️ ${performanceIssues.length} performance issues found:`, 'warning');
+                    performanceIssues.forEach(issue => {
+                        addTestResult('performance-issues-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('performance-issues-results', `❌ Performance test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testAccessibilityIssues() {
+            addTestResult('accessibility-issues-results', '🧪 Testing for accessibility issues...', 'info');
+            
+            try {
+                const accessibilityIssues = [];
+                
+                // Test for missing alt attributes
+                const images = document.querySelectorAll('img');
+                const imagesWithoutAlt = Array.from(images).filter(img => !img.alt);
+                if (imagesWithoutAlt.length > 0) {
+                    accessibilityIssues.push(`${imagesWithoutAlt.length} images missing alt attributes`);
+                }
+                
+                // Test for missing ARIA labels
+                const interactiveElements = document.querySelectorAll('button, input, select, textarea');
+                const elementsWithoutAria = Array.from(interactiveElements).filter(el => 
+                    !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')
+                );
+                if (elementsWithoutAria.length > 0) {
+                    accessibilityIssues.push(`${elementsWithoutAria.length} interactive elements missing ARIA labels`);
+                }
+                
+                // Test for missing focus indicators
+                const hasFocusStyles = /:focus|focus-visible/.test(document.documentElement.outerHTML);
+                if (!hasFocusStyles) {
+                    accessibilityIssues.push('Focus indicators not found');
+                }
+                
+                // Test for color contrast
+                const hasHighContrast = /prefers-contrast/.test(document.documentElement.outerHTML);
+                if (!hasHighContrast) {
+                    accessibilityIssues.push('High contrast mode support not found');
+                }
+                
+                // Test for keyboard navigation
+                const hasKeyboardNav = /keydown|keyup|keypress/.test(document.documentElement.outerHTML);
+                if (!hasKeyboardNav) {
+                    accessibilityIssues.push('Keyboard navigation not implemented');
+                }
+                
+                testResults.accessibility.issues = accessibilityIssues.length;
+                
+                if (accessibilityIssues.length === 0) {
+                    addTestResult('accessibility-issues-results', '✅ No accessibility issues detected', 'pass');
+                } else {
+                    addTestResult('accessibility-issues-results', `⚠️ ${accessibilityIssues.length} accessibility issues found:`, 'warning');
+                    accessibilityIssues.forEach(issue => {
+                        addTestResult('accessibility-issues-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('accessibility-issues-results', `❌ Accessibility test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testMobileIssues() {
+            addTestResult('mobile-issues-results', '🧪 Testing for mobile issues...', 'info');
+            
+            try {
+                const mobileIssues = [];
+                
+                // Test for viewport meta tag
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (!viewport) {
+                    mobileIssues.push('Viewport meta tag missing');
+                }
+                
+                // Test for touch target sizes
+                const buttons = document.querySelectorAll('button, .btn');
+                const smallButtons = Array.from(buttons).filter(btn => {
+                    const rect = btn.getBoundingClientRect();
+                    return rect.width < 44 || rect.height < 44;
+                });
+                if (smallButtons.length > 0) {
+                    mobileIssues.push(`${smallButtons.length} buttons too small for touch`);
+                }
+                
+                // Test for font size (iOS zoom prevention)
+                const inputs = document.querySelectorAll('input, textarea, select');
+                const smallFontInputs = Array.from(inputs).filter(input => {
+                    const computedStyle = window.getComputedStyle(input);
+                    const fontSize = parseFloat(computedStyle.fontSize);
+                    return fontSize < 16;
+                });
+                if (smallFontInputs.length > 0) {
+                    mobileIssues.push(`${smallFontInputs.length} inputs with small font size`);
+                }
+                
+                // Test for responsive design
+                const hasMediaQueries = /@media/.test(document.documentElement.outerHTML);
+                if (!hasMediaQueries) {
+                    mobileIssues.push('Media queries not found');
+                }
+                
+                // Test for mobile navigation
+                const hasMobileNav = /mobile|responsive|touch/.test(document.documentElement.outerHTML);
+                if (!hasMobileNav) {
+                    mobileIssues.push('Mobile navigation not implemented');
+                }
+                
+                testResults.mobile.issues = mobileIssues.length;
+                
+                if (mobileIssues.length === 0) {
+                    addTestResult('mobile-issues-results', '✅ No mobile issues detected', 'pass');
+                } else {
+                    addTestResult('mobile-issues-results', `⚠️ ${mobileIssues.length} mobile issues found:`, 'warning');
+                    mobileIssues.forEach(issue => {
+                        addTestResult('mobile-issues-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('mobile-issues-results', `❌ Mobile test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testCodeQuality() {
+            addTestResult('code-quality-results', '🧪 Testing code quality...', 'info');
+            
+            try {
+                const qualityIssues = [];
+                
+                // Test for consistent formatting
+                const html = document.documentElement.outerHTML;
+                const lines = html.split('\n');
+                const inconsistentIndentation = lines.filter(line => 
+                    line.startsWith(' ') && !line.startsWith('  ') && !line.startsWith('    ')
+                );
+                if (inconsistentIndentation.length > 0) {
+                    qualityIssues.push('Inconsistent indentation found');
+                }
+                
+                // Test for proper error handling
+                const hasErrorHandling = /try|catch|finally|error/.test(html);
+                if (!hasErrorHandling) {
+                    qualityIssues.push('Error handling not implemented');
+                }
+                
+                // Test for proper comments
+                const hasComments = /<!--|\/\*|\*\//.test(html);
+                if (!hasComments) {
+                    qualityIssues.push('Code comments missing');
+                }
+                
+                // Test for consistent naming conventions
+                const hasInconsistentNaming = /[a-z]+[A-Z]|[A-Z]+[a-z]/.test(html);
+                if (hasInconsistentNaming) {
+                    qualityIssues.push('Inconsistent naming conventions');
+                }
+                
+                // Test for code duplication
+                const duplicateCode = lines.filter((line, index) => 
+                    lines.indexOf(line) !== index && line.trim().length > 20
+                );
+                if (duplicateCode.length > 0) {
+                    qualityIssues.push(`${duplicateCode.length} duplicate code lines`);
+                }
+                
+                testResults.codeQuality.issues = qualityIssues.length;
+                
+                if (qualityIssues.length === 0) {
+                    addTestResult('code-quality-results', '✅ No code quality issues detected', 'pass');
+                } else {
+                    addTestResult('code-quality-results', `⚠️ ${qualityIssues.length} code quality issues found:`, 'warning');
+                    qualityIssues.forEach(issue => {
+                        addTestResult('code-quality-results', `  • ${issue}`, 'warning');
+                    });
+                }
+                updateProgress();
+                
+            } catch (error) {
+                addTestResult('code-quality-results', `❌ Code quality test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        function runAllPhase2Tests() {
+            addTestResult('integration-issues-results', '🚀 Running all Phase 2 tests...', 'info');
+            
+            // Reset results
+            Object.keys(testResults).forEach(key => {
+                testResults[key] = { found: 0, fixed: 0, issues: 0 };
+            });
+            
+            // Run all tests
+            testBugDetection();
+            setTimeout(() => testUnusedCode(), 500);
+            setTimeout(() => testSecurityIssues(), 1000);
+            setTimeout(() => testPerformanceIssues(), 1500);
+            setTimeout(() => testAccessibilityIssues(), 2000);
+            setTimeout(() => testMobileIssues(), 2500);
+            setTimeout(() => testCodeQuality(), 3000);
+            
+            // Show final results
+            setTimeout(() => {
+                const totalIssues = Object.values(testResults).reduce((sum, category) => 
+                    sum + (category.found || category.issues), 0
+                );
+                
+                if (totalIssues === 0) {
+                    addTestResult('integration-issues-results', '🎉 All Phase 2 tests passed! No issues found.', 'pass');
+                } else {
+                    addTestResult('integration-issues-results', `⚠️ ${totalIssues} total issues found across all categories.`, 'warning');
+                    
+                    addTestResult('integration-issues-results', '📋 Issue Summary:', 'info');
+                    Object.entries(testResults).forEach(([category, data]) => {
+                        const issues = data.found || data.issues;
+                        if (issues > 0) {
+                            addTestResult('integration-issues-results', 
+                                `  • ${category}: ${issues} issues`, 'warning');
+                        }
+                    });
+                    
+                    addTestResult('integration-issues-results', 
+                        '🔧 These issues should be addressed in Phase 2 fixes.', 'info');
+                }
+            }, 3500);
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(runAllPhase2Tests, 1000);
+        });
+    </script>
+</body>
+</html> 

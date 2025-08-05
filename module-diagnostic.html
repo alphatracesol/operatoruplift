@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Diagnostic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Module Diagnostic Test</h1>
+    
+    <div class="test-section">
+        <h2>Phase 2 Module Loading Test</h2>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <button onclick="testAppInitialization()">Test App Initialization</button>
+        <button onclick="testUIInteractivity()">Test UI Interactivity</button>
+        <button onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+    </div>
+
+    <div id="results"></div>
+
+    <!-- Load the modules -->
+    <script src="js/modules/advanced-ai-enhancement.js"></script>
+    <script src="js/modules/advanced-gamification.js"></script>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testModuleLoading() {
+            log('🧪 Testing Phase 2 Module Loading...', 'info');
+            
+            // Test if modules are loaded
+            if (window.AdvancedAIEnhancement) {
+                log('✅ AdvancedAIEnhancement module found in window object', 'success');
+            } else {
+                log('❌ AdvancedAIEnhancement module NOT found in window object', 'error');
+            }
+            
+            if (window.AdvancedGamification) {
+                log('✅ AdvancedGamification module found in window object', 'success');
+            } else {
+                log('❌ AdvancedGamification module NOT found in window object', 'error');
+            }
+            
+            // Test if classes can be instantiated
+            try {
+                if (window.AdvancedAIEnhancement) {
+                    const aiModule = new AdvancedAIEnhancement();
+                    log('✅ AdvancedAIEnhancement instantiated successfully', 'success');
+                }
+            } catch (error) {
+                log(`❌ Error instantiating AdvancedAIEnhancement: ${error.message}`, 'error');
+            }
+            
+            try {
+                if (window.AdvancedGamification) {
+                    const gamificationModule = new AdvancedGamification();
+                    log('✅ AdvancedGamification instantiated successfully', 'success');
+                }
+            } catch (error) {
+                log(`❌ Error instantiating AdvancedGamification: ${error.message}`, 'error');
+            }
+        }
+
+        function testAppInitialization() {
+            log('🧪 Testing App Initialization...', 'info');
+            
+            // Check if app object exists
+            if (window.app) {
+                log('✅ App object found', 'success');
+                
+                // Check app state
+                if (app.state) {
+                    log('✅ App state object found', 'success');
+                    log(`📊 Active view: ${app.state.activeView}`, 'info');
+                    log(`📊 Firebase ready: ${app.state.firebaseReady}`, 'info');
+                } else {
+                    log('❌ App state object missing', 'error');
+                }
+                
+                // Check if Phase 2 modules are initialized
+                if (app.advancedAI) {
+                    log('✅ Advanced AI module initialized in app', 'success');
+                } else {
+                    log('❌ Advanced AI module NOT initialized in app', 'error');
+                }
+                
+                if (app.advancedGamification) {
+                    log('✅ Advanced Gamification module initialized in app', 'success');
+                } else {
+                    log('❌ Advanced Gamification module NOT initialized in app', 'error');
+                }
+            } else {
+                log('❌ App object not found', 'error');
+            }
+        }
+
+        function testUIInteractivity() {
+            log('🧪 Testing UI Interactivity...', 'info');
+            
+            // Test if we can access DOM elements
+            const dashboardView = document.getElementById('dashboard-view');
+            if (dashboardView) {
+                log('✅ Dashboard view element found', 'success');
+                log(`📊 Dashboard display: ${dashboardView.style.display}`, 'info');
+                log(`📊 Dashboard visibility: ${dashboardView.style.visibility}`, 'info');
+            } else {
+                log('❌ Dashboard view element NOT found', 'error');
+            }
+            
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                log('✅ Sidebar element found', 'success');
+                log(`📊 Sidebar display: ${sidebar.style.display}`, 'info');
+            } else {
+                log('❌ Sidebar element NOT found', 'error');
+            }
+            
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                log('⚠️ Loading overlay still present', 'warning');
+                log(`📊 Loading overlay display: ${loadingOverlay.style.display}`, 'info');
+            } else {
+                log('✅ Loading overlay not found (good)', 'success');
+            }
+            
+            // Test pointer events
+            if (dashboardView) {
+                const computedStyle = window.getComputedStyle(dashboardView);
+                log(`📊 Dashboard pointer-events: ${computedStyle.pointerEvents}`, 'info');
+                log(`📊 Dashboard z-index: ${computedStyle.zIndex}`, 'info');
+            }
+        }
+
+        function runFullDiagnostic() {
+            log('🚀 Running Full Diagnostic...', 'info');
+            
+            // Clear previous results
+            document.getElementById('results').innerHTML = '';
+            
+            // Run all tests
+            setTimeout(() => testModuleLoading(), 100);
+            setTimeout(() => testAppInitialization(), 200);
+            setTimeout(() => testUIInteractivity(), 300);
+            
+            // Check for JavaScript errors
+            setTimeout(() => {
+                log('🔍 Checking for JavaScript errors...', 'info');
+                const originalError = console.error;
+                const errors = [];
+                
+                console.error = function(...args) {
+                    errors.push(args.join(' '));
+                    originalError.apply(console, args);
+                };
+                
+                setTimeout(() => {
+                    console.error = originalError;
+                    if (errors.length > 0) {
+                        log(`❌ Found ${errors.length} JavaScript errors:`, 'error');
+                        errors.forEach(error => log(`   ${error}`, 'error'));
+                    } else {
+                        log('✅ No JavaScript errors detected', 'success');
+                    }
+                }, 1000);
+            }, 400);
+        }
+
+        // Auto-run diagnostic on load
+        window.addEventListener('load', () => {
+            log('📋 Diagnostic page loaded', 'info');
+            setTimeout(runFullDiagnostic, 500);
+        });
+    </script>
+</body>
+</html> 

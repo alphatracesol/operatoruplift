@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Test Suite</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { margin: 5px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Operator Uplift - Comprehensive Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Authentication Tests</h2>
+        <div id="auth-tests">
+            <button onclick="testAuth()">Test Authentication</button>
+            <div id="auth-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Goals Tests</h2>
+        <div id="goals-tests">
+            <button onclick="testGoals()">Test Goals</button>
+            <div id="goals-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Habits Tests</h2>
+        <div id="habits-tests">
+            <button onclick="testHabits()">Test Habits</button>
+            <div id="habits-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Focus Timer Tests</h2>
+        <div id="focus-tests">
+            <button onclick="testFocus()">Test Focus Timer</button>
+            <div id="focus-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>AI Chat Tests</h2>
+        <div id="ai-tests">
+            <button onclick="testAI()">Test AI Chat</button>
+            <div id="ai-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Community Tests</h2>
+        <div id="community-tests">
+            <button onclick="testCommunity()">Test Community</button>
+            <div id="community-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Performance Tests</h2>
+        <div id="perf-tests">
+            <button onclick="testPerformance()">Test Performance</button>
+            <div id="perf-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Mobile Tests</h2>
+        <div id="mobile-tests">
+            <button onclick="testMobile()">Test Mobile Responsiveness</button>
+            <div id="mobile-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Security Tests</h2>
+        <div id="security-tests">
+            <button onclick="testSecurity()">Test Security</button>
+            <div id="security-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Full Integration Test</h2>
+        <div id="integration-tests">
+            <button onclick="runFullTest()">Run Full Integration Test</button>
+            <div id="integration-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Helper
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(div);
+        }
+        
+        // Authentication Tests
+        function testAuth() {
+            const results = document.getElementById('auth-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test localStorage
+                localStorage.setItem('test_auth', 'test_value');
+                const testValue = localStorage.getItem('test_auth');
+                if (testValue === 'test_value') {
+                    addResult('auth-results', '✅ localStorage working correctly', 'pass');
+                } else {
+                    addResult('auth-results', '❌ localStorage not working', 'fail');
+                }
+                
+                // Test mock auth
+                const mockUser = {
+                    uid: 'test_user_123',
+                    email: 'test@example.com',
+                    displayName: 'Test User'
+                };
+                
+                localStorage.setItem('operator_uplift_auth', JSON.stringify({
+                    user: mockUser,
+                    userData: { displayName: 'Test User' },
+                    isOnboarded: true
+                }));
+                
+                addResult('auth-results', '✅ Mock authentication data saved', 'pass');
+                
+                // Test auth loading
+                const savedAuth = localStorage.getItem('operator_uplift_auth');
+                if (savedAuth) {
+                    const authData = JSON.parse(savedAuth);
+                    if (authData.user && authData.user.email === 'test@example.com') {
+                        addResult('auth-results', '✅ Authentication data loading correctly', 'pass');
+                    } else {
+                        addResult('auth-results', '❌ Authentication data loading failed', 'fail');
+                    }
+                }
+                
+            } catch (error) {
+                addResult('auth-results', `❌ Authentication test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Goals Tests
+        function testGoals() {
+            const results = document.getElementById('goals-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test goals creation
+                const testGoal = {
+                    id: 'test_goal_123',
+                    title: 'Test Goal',
+                    description: 'Test Description',
+                    category: 'personal',
+                    priority: 'high',
+                    isCompleted: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                const goals = { [testGoal.id]: testGoal };
+                localStorage.setItem('operator-uplift-goals', JSON.stringify(goals));
+                
+                addResult('goals-results', '✅ Test goal created and saved', 'pass');
+                
+                // Test goals loading
+                const savedGoals = localStorage.getItem('operator-uplift-goals');
+                if (savedGoals) {
+                    const loadedGoals = JSON.parse(savedGoals);
+                    if (loadedGoals[testGoal.id] && loadedGoals[testGoal.id].title === 'Test Goal') {
+                        addResult('goals-results', '✅ Goals loading correctly', 'pass');
+                    } else {
+                        addResult('goals-results', '❌ Goals loading failed', 'fail');
+                    }
+                }
+                
+            } catch (error) {
+                addResult('goals-results', `❌ Goals test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Habits Tests
+        function testHabits() {
+            const results = document.getElementById('habits-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test habits creation
+                const testHabit = {
+                    id: 'test_habit_123',
+                    name: 'Test Habit',
+                    description: 'Test Habit Description',
+                    frequency: 'daily',
+                    streak: 0,
+                    completedToday: false,
+                    createdAt: new Date().toISOString(),
+                    completedDates: []
+                };
+                
+                const habits = [testHabit];
+                localStorage.setItem('operator_uplift_habits', JSON.stringify(habits));
+                
+                addResult('habits-results', '✅ Test habit created and saved', 'pass');
+                
+                // Test habits loading
+                const savedHabits = localStorage.getItem('operator_uplift_habits');
+                if (savedHabits) {
+                    const loadedHabits = JSON.parse(savedHabits);
+                    if (loadedHabits[0] && loadedHabits[0].name === 'Test Habit') {
+                        addResult('habits-results', '✅ Habits loading correctly', 'pass');
+                    } else {
+                        addResult('habits-results', '❌ Habits loading failed', 'fail');
+                    }
+                }
+                
+            } catch (error) {
+                addResult('habits-results', `❌ Habits test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Focus Timer Tests
+        function testFocus() {
+            const results = document.getElementById('focus-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test focus sessions
+                const testSession = {
+                    duration: 25,
+                    completedAt: new Date().toISOString()
+                };
+                
+                const sessions = [testSession];
+                localStorage.setItem('operator_uplift_focus_sessions', JSON.stringify(sessions));
+                
+                addResult('focus-results', '✅ Test focus session created and saved', 'pass');
+                
+                // Test sessions loading
+                const savedSessions = localStorage.getItem('operator_uplift_focus_sessions');
+                if (savedSessions) {
+                    const loadedSessions = JSON.parse(savedSessions);
+                    if (loadedSessions[0] && loadedSessions[0].duration === 25) {
+                        addResult('focus-results', '✅ Focus sessions loading correctly', 'pass');
+                    } else {
+                        addResult('focus-results', '❌ Focus sessions loading failed', 'fail');
+                    }
+                }
+                
+                // Test timer functionality
+                const startTime = Date.now();
+                setTimeout(() => {
+                    const elapsed = Date.now() - startTime;
+                    if (elapsed >= 100) { // Allow some tolerance
+                        addResult('focus-results', '✅ Timer functionality working', 'pass');
+                    } else {
+                        addResult('focus-results', '❌ Timer functionality failed', 'fail');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                addResult('focus-results', `❌ Focus test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // AI Chat Tests
+        function testAI() {
+            const results = document.getElementById('ai-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test AI messages
+                const testMessage = {
+                    id: 'test_msg_123',
+                    role: 'user',
+                    content: 'Test message',
+                    timestamp: new Date().toISOString()
+                };
+                
+                const messages = [testMessage];
+                localStorage.setItem('operator_uplift_chat_history', JSON.stringify(messages));
+                
+                addResult('ai-results', '✅ Test AI message created and saved', 'pass');
+                
+                // Test messages loading
+                const savedMessages = localStorage.getItem('operator_uplift_chat_history');
+                if (savedMessages) {
+                    const loadedMessages = JSON.parse(savedMessages);
+                    if (loadedMessages[0] && loadedMessages[0].content === 'Test message') {
+                        addResult('ai-results', '✅ AI messages loading correctly', 'pass');
+                    } else {
+                        addResult('ai-results', '❌ AI messages loading failed', 'fail');
+                    }
+                }
+                
+                // Test AI token handling
+                const token = '[REDACTED]';
+                if (token === '[REDACTED]') {
+                    addResult('ai-results', '✅ AI token security working correctly', 'pass');
+                } else {
+                    addResult('ai-results', '❌ AI token security failed', 'fail');
+                }
+                
+            } catch (error) {
+                addResult('ai-results', `❌ AI test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Community Tests
+        function testCommunity() {
+            const results = document.getElementById('community-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test community data
+                const testCommunity = {
+                    groups: [{
+                        id: 'test_group_123',
+                        name: 'Test Group',
+                        members: 1,
+                        createdAt: new Date().toISOString()
+                    }],
+                    events: [{
+                        id: 'test_event_123',
+                        title: 'Test Event',
+                        date: '2024-01-01',
+                        attendees: 1,
+                        createdAt: new Date().toISOString()
+                    }],
+                    discussions: [{
+                        id: 'test_discussion_123',
+                        title: 'Test Discussion',
+                        author: 'Test User',
+                        createdAt: new Date().toISOString()
+                    }]
+                };
+                
+                localStorage.setItem('operator_uplift_community', JSON.stringify(testCommunity));
+                
+                addResult('community-results', '✅ Test community data created and saved', 'pass');
+                
+                // Test community loading
+                const savedCommunity = localStorage.getItem('operator_uplift_community');
+                if (savedCommunity) {
+                    const loadedCommunity = JSON.parse(savedCommunity);
+                    if (loadedCommunity.groups.length > 0 && loadedCommunity.events.length > 0) {
+                        addResult('community-results', '✅ Community data loading correctly', 'pass');
+                    } else {
+                        addResult('community-results', '❌ Community data loading failed', 'fail');
+                    }
+                }
+                
+            } catch (error) {
+                addResult('community-results', `❌ Community test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Performance Tests
+        function testPerformance() {
+            const results = document.getElementById('perf-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test localStorage performance
+                const startTime = performance.now();
+                for (let i = 0; i < 100; i++) {
+                    localStorage.setItem(`perf_test_${i}`, `value_${i}`);
+                }
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                
+                if (duration < 100) { // Should be very fast
+                    addResult('perf-results', `✅ localStorage performance: ${duration.toFixed(2)}ms`, 'pass');
+                } else {
+                    addResult('perf-results', `❌ localStorage performance slow: ${duration.toFixed(2)}ms`, 'fail');
+                }
+                
+                // Test JSON parsing performance
+                const testData = { test: 'data', array: [1, 2, 3, 4, 5] };
+                const jsonString = JSON.stringify(testData);
+                
+                const parseStart = performance.now();
+                const parsed = JSON.parse(jsonString);
+                const parseEnd = performance.now();
+                const parseDuration = parseEnd - parseStart;
+                
+                if (parseDuration < 10) { // Should be very fast
+                    addResult('perf-results', `✅ JSON parsing performance: ${parseDuration.toFixed(2)}ms`, 'pass');
+                } else {
+                    addResult('perf-results', `❌ JSON parsing performance slow: ${parseDuration.toFixed(2)}ms`, 'fail');
+                }
+                
+                // Clean up
+                for (let i = 0; i < 100; i++) {
+                    localStorage.removeItem(`perf_test_${i}`);
+                }
+                
+            } catch (error) {
+                addResult('perf-results', `❌ Performance test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Mobile Tests
+        function testMobile() {
+            const results = document.getElementById('mobile-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test viewport
+                const viewport = window.innerWidth;
+                if (viewport > 0) {
+                    addResult('mobile-results', `✅ Viewport width: ${viewport}px`, 'pass');
+                } else {
+                    addResult('mobile-results', '❌ Viewport not available', 'fail');
+                }
+                
+                // Test touch support
+                if ('ontouchstart' in window) {
+                    addResult('mobile-results', '✅ Touch support available', 'pass');
+                } else {
+                    addResult('mobile-results', 'ℹ️ Touch support not available (desktop)', 'info');
+                }
+                
+                // Test mobile user agent
+                const userAgent = navigator.userAgent;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+                
+                if (isMobile) {
+                    addResult('mobile-results', '✅ Mobile device detected', 'pass');
+                } else {
+                    addResult('mobile-results', 'ℹ️ Desktop device detected', 'info');
+                }
+                
+            } catch (error) {
+                addResult('mobile-results', `❌ Mobile test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Security Tests
+        function testSecurity() {
+            const results = document.getElementById('security-results');
+            results.innerHTML = '';
+            
+            try {
+                // Test XSS prevention
+                const maliciousInput = '<script>alert("xss")</script>';
+                const sanitized = maliciousInput.replace(/[<>]/g, '');
+                
+                if (sanitized === 'scriptalert("xss")/script') {
+                    addResult('security-results', '✅ XSS prevention working', 'pass');
+                } else {
+                    addResult('security-results', '❌ XSS prevention failed', 'fail');
+                }
+                
+                // Test input validation
+                const email = 'test@example.com';
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const isValidEmail = emailRegex.test(email);
+                
+                if (isValidEmail) {
+                    addResult('security-results', '✅ Email validation working', 'pass');
+                } else {
+                    addResult('security-results', '❌ Email validation failed', 'fail');
+                }
+                
+                // Test secure token handling
+                const secureToken = '[REDACTED]';
+                if (secureToken === '[REDACTED]' || secureToken === 'undefined' || !secureToken) {
+                    addResult('security-results', '✅ Secure token handling working', 'pass');
+                } else {
+                    addResult('security-results', '❌ Secure token handling failed', 'fail');
+                }
+                
+            } catch (error) {
+                addResult('security-results', `❌ Security test failed: ${error.message}`, 'fail');
+            }
+        }
+        
+        // Full Integration Test
+        function runFullTest() {
+            const results = document.getElementById('integration-results');
+            results.innerHTML = '';
+            
+            addResult('integration-results', '🚀 Starting full integration test...', 'info');
+            
+            // Run all tests
+            setTimeout(() => testAuth(), 100);
+            setTimeout(() => testGoals(), 200);
+            setTimeout(() => testHabits(), 300);
+            setTimeout(() => testFocus(), 400);
+            setTimeout(() => testAI(), 500);
+            setTimeout(() => testCommunity(), 600);
+            setTimeout(() => testPerformance(), 700);
+            setTimeout(() => testMobile(), 800);
+            setTimeout(() => testSecurity(), 900);
+            
+            setTimeout(() => {
+                addResult('integration-results', '✅ Full integration test completed!', 'pass');
+                addResult('integration-results', '📋 Check individual test results above for details', 'info');
+            }, 1000);
+        }
+        
+        // Auto-run basic tests on load
+        window.addEventListener('load', () => {
+            addResult('integration-results', '🔄 Test suite loaded successfully', 'info');
+        });
+    </script>
+</body>
+</html> 

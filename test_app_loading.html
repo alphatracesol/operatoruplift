@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #0a0a0a;
+            color: white;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .info { background: #3b82f6; }
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <h1>App Loading Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <div>
+        <button onclick="testLoginPage()">Test Login Page</button>
+        <button onclick="testAppPage()">Test App Page</button>
+        <button onclick="testAIChatPage()">Test AI Chat Page</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        async function testLoginPage() {
+            addResult('Testing login page...', 'info');
+            try {
+                const response = await fetch('http://localhost:8080/login.html');
+                if (response.ok) {
+                    addResult('✅ Login page loads successfully', 'success');
+                } else {
+                    addResult(`❌ Login page failed to load: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login page error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAppPage() {
+            addResult('Testing app page...', 'info');
+            try {
+                const response = await fetch('http://localhost:8080/app.html');
+                if (response.ok) {
+                    addResult('✅ App page loads successfully', 'success');
+                } else {
+                    addResult(`❌ App page failed to load: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ App page error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAIChatPage() {
+            addResult('Testing AI chat page...', 'info');
+            try {
+                const response = await fetch('http://localhost:8080/ai-chat-interface.html');
+                if (response.ok) {
+                    addResult('✅ AI chat page loads successfully', 'success');
+                } else {
+                    addResult(`❌ AI chat page failed to load: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ AI chat page error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            addResult('Starting automatic tests...', 'info');
+            setTimeout(() => testLoginPage(), 1000);
+            setTimeout(() => testAppPage(), 2000);
+            setTimeout(() => testAIChatPage(), 3000);
+        });
+    </script>
+</body>
+</html> 

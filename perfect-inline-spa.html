@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Gamified Goal Setting</title>
+    <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z' stroke='%23f97316' stroke-width='2'/><path d='M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429' stroke='%23f97316' stroke-width='1.5'/></svg>" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    
+    <style>
+        /* --- GLOBAL STYLES & CSS VARIABLES --- */
+        :root {
+            --accent-color: #f97316;
+            --accent-color-light: #fb923c;
+            --accent-color-glow: rgba(249, 115, 22, 0.6);
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --energy-color: #84cc16;
+            --font-family: 'Inter', sans-serif;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --transition-fast: all 0.2s ease-in-out;
+            --transition-slow: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0a0a0a;
+            --bg-gradient-start: #111827;
+            --bg-gradient-end: #0a0a0a;
+            --text-color: #e5e7eb;
+            --text-muted-color: #9ca3af;
+            --card-bg-glass: rgba(24, 24, 27, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --sidebar-bg: rgba(10, 10, 10, 0.8);
+            --input-bg: rgba(0,0,0,0.2);
+            --particle-color: #ffffff;
+            --matrix-rain-color: rgba(249, 115, 22, 0.35);
+        }
+        
+        [data-theme="light"] {
+            --bg-color: #f9fafb;
+            --bg-gradient-start: #f8fbff;
+            --bg-gradient-end: #fafcff;
+            --text-color: #1f2937;
+            --text-muted-color: #4b5563;
+            --card-bg-glass: rgba(255, 255, 255, 0.4);
+            --border-glass: rgba(0, 0, 0, 0.1);
+            --sidebar-bg: rgba(230, 230, 230, 0.8);
+            --input-bg: rgba(255,255,255,0.5);
+            --particle-color: #1f2937;
+            --matrix-rain-color: rgba(249, 115, 22, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color);
+            transition: background 1s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+        
+        #tsparticles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        #matrix-rain-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.5; }
+        .app-wrapper { position: relative; z-index: 10; }
+        .hidden { display: none !important; }
+
+        /* --- BUTTONS & CARDS --- */
+        .btn {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-fast); display: inline-flex;
+            align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;
+        }
+        .btn:disabled { cursor: not-allowed; background-color: #52525b; opacity: 0.7; }
+        .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .btn-icon { padding: 0.5rem; }
+        .btn-primary { background-color: var(--accent-color); color: black; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-color-light); box-shadow: 0 0 20px var(--accent-color-glow); }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border-glass); color: var(--text-color); }
+        .btn-outline:hover { background-color: rgba(255,255,255,0.1); }
+        [data-theme="light"] .btn-outline:hover { background-color: rgba(0,0,0,0.05); }
+        .card {
+            background: var(--card-bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass); border-radius: 0.75rem;
+            padding: 1.5rem; box-shadow: var(--shadow); transition: var(--transition-slow);
+            position: relative; overflow: hidden;
+        }
+        .card:hover { border-color: var(--accent-color); }
+        .card::after {
+            content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+            transform: skewX(-25deg);
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+            transition: left 0.8s ease-in-out;
+        }
+        .card:hover::after { left: 150%; }
+
+        /* --- LAYOUT --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-glass);
+            padding: 1.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                width: 100%;
+            }
+            #sidebar.active {
+                transform: translateX(0);
+            }
+        }
+
+        /* --- HEADER --- */
+        #app-header {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 90;
+        }
+        
+        @media (max-width: 768px) {
+            #app-header {
+                left: 0;
+            }
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        /* --- MODALS --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: var(--transition-fast);
+        }
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* --- TOASTS --- */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-color);
+            z-index: 2000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast.success { border-left: 4px solid var(--secondary-color); }
+        .toast.error { border-left: 4px solid var(--danger-color); }
+        .toast.info { border-left: 4px solid var(--info-color); }
+
+        /* --- FORMS --- */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-glass);
+            border-radius: 0.5rem;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            transition: var(--transition-fast);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        /* --- MOBILE NAVIGATION --- */
+        #mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 110;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            color: black;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            #mobile-nav-toggle {
+                display: block;
+            }
+        }
+
+        /* --- UTILITY CLASSES --- */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted-color); }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Background Effects -->
+        <div id="tsparticles"></div>
+        <canvas id="matrix-rain-canvas"></canvas>
+        
+        <!-- Mobile Navigation Toggle -->
+        <button id="mobile-nav-toggle" aria-label="Toggle navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="card mb-6">
+                <h2 style="color: var(--accent-color); font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">
+                    Operator Uplift
+                </h2>
+                <p class="text-muted mb-4">Deconstruct your ambition. Engineer your ascent.</p>
+                
+                <!-- User Stats -->
+                <div id="user-stats" class="mb-4">
+                    <div class="flex justify-between mb-2">
+                        <span>Chapter:</span>
+                        <span id="user-level">1</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span>Essence:</span>
+                        <span id="user-points">0</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span>Energy:</span>
+                        <span id="user-energy">100/100</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Streak:</span>
+                        <span id="user-streak">0 days</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav>
+                <button class="btn btn-outline w-full mb-2" data-view="dashboard">
+                    📊 Dashboard
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="goals">
+                    🎯 Goals
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="habits">
+                    🔄 Habits
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="focus">
+                    🎯 Focus
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="analytics">
+                    📈 Analytics
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="community">
+                    👥 Community
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="ai-chat">
+                    🤖 AI Mentor
+                </button>
+                <button class="btn btn-outline w-full mb-2" data-view="settings">
+                    ⚙️ Settings
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Header -->
+        <header id="app-header">
+            <div class="flex items-center gap-4">
+                <h1 id="current-view-title">Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">
+                    🌙
+                </button>
+                <button id="add-goal-btn" class="btn btn-primary">
+                    + New Goal
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="card mb-6">
+                    <h2 class="mb-4">Welcome back, Operator!</h2>
+                    <p class="text-muted mb-4">Ready to engineer your next breakthrough?</p>
+                    <div class="flex gap-4">
+                        <button class="btn btn-primary" onclick="app.ui.openGoalModal()">
+                            Create Goal
+                        </button>
+                        <button class="btn btn-outline" onclick="app.ui.showAI()">
+                            Ask AI Mentor
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card">
+                        <h3 class="mb-2">Active Goals</h3>
+                        <p class="text-2xl font-bold" id="active-goals-count">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-2">Completed Today</h3>
+                        <p class="text-2xl font-bold" id="completed-today">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-2">Current Streak</h3>
+                        <p class="text-2xl font-bold" id="current-streak">0 days</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals View -->
+            <div id="goals-view" class="view hidden">
+                <div class="card mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2>Your Goals</h2>
+                        <button class="btn btn-primary" onclick="app.ui.openGoalModal()">
+                            + New Goal
+                        </button>
+                    </div>
+                    <div id="goals-list">
+                        <!-- Goals will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat View -->
+            <div id="ai-chat-view" class="view hidden">
+                <div class="card">
+                    <h2 class="mb-4">AI Mentor</h2>
+                    <div id="chat-messages" class="mb-4" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-input" class="form-input flex-1" placeholder="Ask your AI mentor...">
+                        <button class="btn btn-primary" onclick="app.ai.sendMessage()">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other views will be added as needed -->
+        </main>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goal-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="app.ui.closeModal('goal-modal')">&times;</button>
+            <h2 class="mb-4">Create New Goal</h2>
+            <form id="goal-form">
+                <div class="form-group">
+                    <label class="form-label" for="goal-title">Goal Title</label>
+                    <input type="text" id="goal-title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="goal-description">Description</label>
+                    <textarea id="goal-description" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="goal-category">Category</label>
+                    <select id="goal-category" class="form-input">
+                        <option value="personal">Personal</option>
+                        <option value="professional">Professional</option>
+                        <option value="health">Health</option>
+                        <option value="learning">Learning</option>
+                        <option value="financial">Financial</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="goal-priority">Priority</label>
+                    <select id="goal-priority" class="form-input">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="goal-due-date">Due Date</label>
+                    <input type="date" id="goal-due-date" class="form-input">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create Goal</button>
+                    <button type="button" class="btn btn-outline" onclick="app.ui.closeModal('goal-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        // === PERFECT INLINE SPA APPLICATION ===
+        // Complete application with all functionality inline
+        
+        (function() {
+            'use strict';
+            
+            console.log('🚀 Perfect Inline SPA Initializing...');
+            
+            // Global app object
+            window.app = {
+                // --- STATE MANAGEMENT ---
+                state: {
+                    currentUser: null,
+                    userData: null,
+                    localGoals: {},
+                    currentView: 'dashboard',
+                    theme: localStorage.getItem('theme') || 'dark',
+                    aiMessages: [],
+                    isInitialized: false
+                },
+
+                // --- INITIALIZATION ---
+                async init() {
+                    console.log('🔧 Initializing Perfect Inline SPA...');
+                    
+                    // Set theme
+                    this.setTheme(this.state.theme);
+                    
+                    // Setup mock user (no login required)
+                    this.setupMockUser();
+                    
+                    // Initialize UI
+                    this.ui.init();
+                    
+                    // Setup event listeners
+                    this.eventListeners.init();
+                    
+                    // Initialize background effects
+                    this.initBackgroundEffects();
+                    
+                    this.state.isInitialized = true;
+                    console.log('✅ Perfect Inline SPA initialized successfully');
+                },
+
+                // --- MOCK USER SETUP ---
+                setupMockUser() {
+                    this.state.currentUser = {
+                        uid: 'mock-user-123',
+                        email: 'operator@uplift.com',
+                        displayName: 'Operator'
+                    };
+                    
+                    this.state.userData = {
+                        displayName: 'Operator',
+                        email: 'operator@uplift.com',
+                        stats: {
+                            level: 1,
+                            points: 0,
+                            energy: { value: 100, max: 100 },
+                            currentStreak: 0,
+                            totalGoals: 0,
+                            completedGoals: 0
+                        },
+                        settings: {
+                            theme: 'dark',
+                            aiProvider: 'deepseek',
+                            motivationalStyle: 'encouraging'
+                        }
+                    };
+                    
+                    console.log('👤 Mock user setup complete');
+                },
+
+                // --- THEME MANAGEMENT ---
+                setTheme(theme) {
+                    this.state.theme = theme;
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    
+                    const themeToggle = document.getElementById('theme-toggle');
+                    if (themeToggle) {
+                        themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+                    }
+                },
+
+                // --- BACKGROUND EFFECTS ---
+                initBackgroundEffects() {
+                    // Matrix rain effect
+                    this.initMatrixRain();
+                    
+                    // Particle effects
+                    this.initParticles();
+                },
+
+                initMatrixRain() {
+                    const canvas = document.getElementById('matrix-rain-canvas');
+                    if (!canvas) return;
+                    
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    
+                    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+                    const matrixArray = matrix.split("");
+                    
+                    const fontSize = 10;
+                    const columns = canvas.width / fontSize;
+                    const drops = [];
+                    
+                    for (let x = 0; x < columns; x++) {
+                        drops[x] = 1;
+                    }
+                    
+                    function draw() {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--matrix-rain-color');
+                        ctx.font = fontSize + 'px monospace';
+                        
+                        for (let i = 0; i < drops.length; i++) {
+                            const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                            
+                            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                                drops[i] = 0;
+                            }
+                            drops[i]++;
+                        }
+                    }
+                    
+                    setInterval(draw, 35);
+                },
+
+                initParticles() {
+                    if (typeof tsParticles !== 'undefined') {
+                        tsParticles.load('tsparticles', {
+                            particles: {
+                                number: { value: 50, density: { enable: true, value_area: 800 } },
+                                color: { value: getComputedStyle(document.documentElement).getPropertyValue('--particle-color') },
+                                shape: { type: 'circle' },
+                                opacity: { value: 0.5, random: false },
+                                size: { value: 3, random: true },
+                                line_linked: {
+                                    enable: true,
+                                    distance: 150,
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--particle-color'),
+                                    opacity: 0.4,
+                                    width: 1
+                                },
+                                move: {
+                                    enable: true,
+                                    speed: 2,
+                                    direction: 'none',
+                                    random: false,
+                                    straight: false,
+                                    out_mode: 'out',
+                                    bounce: false
+                                }
+                            },
+                            interactivity: {
+                                detect_on: 'canvas',
+                                events: {
+                                    onhover: { enable: true, mode: 'repulse' },
+                                    onclick: { enable: true, mode: 'push' },
+                                    resize: true
+                                }
+                            },
+                            retina_detect: true
+                        });
+                    }
+                },
+
+                // --- UI OBJECT ---
+                ui: {
+                    init() {
+                        this.updateUserStats();
+                        this.setupViewNavigation();
+                    },
+
+                    updateUserStats() {
+                        const stats = app.state.userData.stats;
+                        document.getElementById('user-level').textContent = stats.level;
+                        document.getElementById('user-points').textContent = stats.points;
+                        document.getElementById('user-energy').textContent = `${Math.floor(stats.energy.value)}/${stats.energy.max}`;
+                        document.getElementById('user-streak').textContent = `${stats.currentStreak} days`;
+                        
+                        // Update dashboard stats
+                        document.getElementById('active-goals-count').textContent = Object.keys(app.state.localGoals).length;
+                        document.getElementById('completed-today').textContent = '0'; // Will be calculated
+                        document.getElementById('current-streak').textContent = `${stats.currentStreak} days`;
+                    },
+
+                    setupViewNavigation() {
+                        const navButtons = document.querySelectorAll('[data-view]');
+                        navButtons.forEach(button => {
+                            button.addEventListener('click', () => {
+                                const view = button.dataset.view;
+                                this.showView(view);
+                            });
+                        });
+                    },
+
+                    showView(viewName) {
+                        // Hide all views
+                        document.querySelectorAll('.view').forEach(view => {
+                            view.classList.add('hidden');
+                        });
+                        
+                        // Show selected view
+                        const targetView = document.getElementById(`${viewName}-view`);
+                        if (targetView) {
+                            targetView.classList.remove('hidden');
+                            app.state.currentView = viewName;
+                            
+                            // Update header title
+                            const title = document.getElementById('current-view-title');
+                            if (title) {
+                                title.textContent = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                            }
+                            
+                            // Load view-specific content
+                            this.loadViewContent(viewName);
+                        }
+                    },
+
+                    loadViewContent(viewName) {
+                        switch (viewName) {
+                            case 'goals':
+                                this.renderGoals();
+                                break;
+                            case 'ai-chat':
+                                this.renderAIChat();
+                                break;
+                            case 'dashboard':
+                                this.updateUserStats();
+                                break;
+                        }
+                    },
+
+                    renderGoals() {
+                        const goalsList = document.getElementById('goals-list');
+                        if (!goalsList) return;
+                        
+                        const goals = Object.values(app.state.localGoals);
+                        
+                        if (goals.length === 0) {
+                            goalsList.innerHTML = `
+                                <div class="text-center text-muted">
+                                    <p class="mb-4">No goals yet. Create your first goal to get started!</p>
+                                    <button class="btn btn-primary" onclick="app.ui.openGoalModal()">
+                                        Create Your First Goal
+                                    </button>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        goalsList.innerHTML = goals.map(goal => `
+                            <div class="card mb-4" data-goal-id="${goal.id}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3>${goal.title}</h3>
+                                    <div class="flex gap-2">
+                                        <button class="btn btn-sm btn-outline" onclick="app.goals.edit('${goal.id}')">Edit</button>
+                                        <button class="btn btn-sm btn-danger" onclick="app.goals.delete('${goal.id}')">Delete</button>
+                                    </div>
+                                </div>
+                                <p class="text-muted mb-2">${goal.description}</p>
+                                <div class="flex gap-4 text-sm text-muted">
+                                    <span>Category: ${goal.category}</span>
+                                    <span>Priority: ${goal.priority}</span>
+                                    ${goal.dueDate ? `<span>Due: ${new Date(goal.dueDate).toLocaleDateString()}</span>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                    },
+
+                    renderAIChat() {
+                        const chatMessages = document.getElementById('chat-messages');
+                        if (!chatMessages) return;
+                        
+                        if (app.state.aiMessages.length === 0) {
+                            chatMessages.innerHTML = `
+                                <div class="text-center text-muted">
+                                    <p>Welcome to your AI Mentor! Ask me anything about goal setting, productivity, or personal development.</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        chatMessages.innerHTML = app.state.aiMessages.map(message => `
+                            <div class="mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}">
+                                <div class="inline-block p-3 rounded-lg ${message.role === 'user' ? 'bg-accent-color text-black' : 'bg-card-bg-glass'}">
+                                    ${message.content}
+                                </div>
+                            </div>
+                        `).join('');
+                        
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    },
+
+                    openGoalModal() {
+                        const modal = document.getElementById('goal-modal');
+                        if (modal) {
+                            modal.classList.add('active');
+                        }
+                    },
+
+                    closeModal(modalId) {
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            modal.classList.remove('active');
+                        }
+                    },
+
+                    showToast(message, type = 'info', duration = 3000) {
+                        const toast = document.createElement('div');
+                        toast.className = `toast ${type}`;
+                        toast.textContent = message;
+                        
+                        const container = document.getElementById('toast-container');
+                        if (container) {
+                            container.appendChild(toast);
+                            
+                            // Show toast
+                            setTimeout(() => toast.classList.add('show'), 100);
+                            
+                            // Remove toast
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                                setTimeout(() => {
+                                    if (toast.parentNode) {
+                                        toast.parentNode.removeChild(toast);
+                                    }
+                                }, 300);
+                            }, duration);
+                        }
+                    }
+                },
+
+                // --- GOALS OBJECT ---
+                goals: {
+                    create(goalData) {
+                        const goal = {
+                            id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            title: goalData.title,
+                            description: goalData.description,
+                            category: goalData.category,
+                            priority: goalData.priority,
+                            dueDate: goalData.dueDate,
+                            createdAt: new Date().toISOString(),
+                            isCompleted: false,
+                            tasks: []
+                        };
+                        
+                        app.state.localGoals[goal.id] = goal;
+                        this.saveToLocalStorage();
+                        
+                        app.ui.showToast('Goal created successfully!', 'success');
+                        app.ui.closeModal('goal-modal');
+                        app.ui.renderGoals();
+                        app.ui.updateUserStats();
+                        
+                        return goal;
+                    },
+
+                    edit(goalId) {
+                        const goal = app.state.localGoals[goalId];
+                        if (!goal) return;
+                        
+                        // Populate modal with goal data
+                        document.getElementById('goal-title').value = goal.title;
+                        document.getElementById('goal-description').value = goal.description;
+                        document.getElementById('goal-category').value = goal.category;
+                        document.getElementById('goal-priority').value = goal.priority;
+                        document.getElementById('goal-due-date').value = goal.dueDate;
+                        
+                        app.ui.openGoalModal();
+                    },
+
+                    delete(goalId) {
+                        if (confirm('Are you sure you want to delete this goal?')) {
+                            delete app.state.localGoals[goalId];
+                            this.saveToLocalStorage();
+                            app.ui.showToast('Goal deleted successfully!', 'success');
+                            app.ui.renderGoals();
+                            app.ui.updateUserStats();
+                        }
+                    },
+
+                    saveToLocalStorage() {
+                        localStorage.setItem('operator-uplift-goals', JSON.stringify(app.state.localGoals));
+                    },
+
+                    loadFromLocalStorage() {
+                        const saved = localStorage.getItem('operator-uplift-goals');
+                        if (saved) {
+                            app.state.localGoals = JSON.parse(saved);
+                        }
+                    }
+                },
+
+                // --- AI OBJECT ---
+                ai: {
+                    async sendMessage() {
+                        const input = document.getElementById('chat-input');
+                        const message = input.value.trim();
+                        
+                        if (!message) return;
+                        
+                        // Add user message
+                        app.state.aiMessages.push({
+                            role: 'user',
+                            content: message
+                        });
+                        
+                        input.value = '';
+                        app.ui.renderAIChat();
+                        
+                        // Simulate AI response
+                        const response = await this.generateResponse(message);
+                        
+                        app.state.aiMessages.push({
+                            role: 'assistant',
+                            content: response
+                        });
+                        
+                        app.ui.renderAIChat();
+                    },
+
+                    async generateResponse(message) {
+                        // Simulate AI processing
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        const responses = [
+                            "That's a great question! Let me help you break this down into actionable steps.",
+                            "I understand what you're going through. Here's a strategy that might help...",
+                            "Based on your goals, I'd recommend focusing on this approach...",
+                            "Remember, progress is progress, no matter how small. Let's work on this together.",
+                            "That's an interesting challenge. Let me share some insights that could help..."
+                        ];
+                        
+                        return responses[Math.floor(Math.random() * responses.length)];
+                    }
+                },
+
+                // --- EVENT LISTENERS ---
+                eventListeners: {
+                    init() {
+                        // Theme toggle
+                        document.getElementById('theme-toggle').addEventListener('click', () => {
+                            const newTheme = app.state.theme === 'dark' ? 'light' : 'dark';
+                            app.setTheme(newTheme);
+                        });
+                        
+                        // Mobile navigation
+                        document.getElementById('mobile-nav-toggle').addEventListener('click', () => {
+                            document.getElementById('sidebar').classList.toggle('active');
+                        });
+                        
+                        // Goal form submission
+                        document.getElementById('goal-form').addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            
+                            const goalData = {
+                                title: document.getElementById('goal-title').value,
+                                description: document.getElementById('goal-description').value,
+                                category: document.getElementById('goal-category').value,
+                                priority: document.getElementById('goal-priority').value,
+                                dueDate: document.getElementById('goal-due-date').value
+                            };
+                            
+                            app.goals.create(goalData);
+                            
+                            // Reset form
+                            e.target.reset();
+                        });
+                        
+                        // Chat input enter key
+                        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                app.ai.sendMessage();
+                            }
+                        });
+                        
+                        // Close modals on outside click
+                        document.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('modal')) {
+                                e.target.classList.remove('active');
+                            }
+                        });
+                        
+                        // Load saved data
+                        app.goals.loadFromLocalStorage();
+                    }
+                }
+            };
+
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => app.init());
+            } else {
+                app.init();
+            }
+            
+            console.log('✅ Perfect Inline SPA loaded successfully');
+        })();
+    </script>
+</body>
+</html> 

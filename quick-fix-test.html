@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+        iframe { width: 100%; height: 500px; border: 1px solid #333; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Quick Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testMobileNav()">Test Mobile Navigation</button>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <button onclick="testUIInteractivity()">Test UI Interactivity</button>
+        <button onclick="runAllQuickTests()">Run All Tests</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Live App Preview</h2>
+        <iframe id="appFrame" src="app.html"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testMobileNav() {
+            log('🧪 Testing Mobile Navigation...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeDocument = iframe.contentDocument;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeDocument) {
+                        const mobileToggle = iframeDocument.getElementById('mobile-nav-toggle');
+                        if (mobileToggle) {
+                            log('✅ Mobile navigation toggle button found in header', 'success');
+                        } else {
+                            log('❌ Mobile navigation toggle button NOT found', 'error');
+                        }
+                        
+                        const mobileOverlay = iframeDocument.getElementById('mobile-nav-overlay');
+                        if (mobileOverlay) {
+                            log('✅ Mobile navigation overlay found', 'success');
+                        } else {
+                            log('❌ Mobile navigation overlay NOT found', 'error');
+                        }
+                    }
+                } catch (error) {
+                    log(`❌ Error testing mobile navigation: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        function testModuleLoading() {
+            log('🧪 Testing Module Loading...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedAI) {
+                        log('✅ Advanced AI module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced AI module NOT initialized in app', 'error');
+                    }
+                    
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedGamification) {
+                        log('✅ Advanced Gamification module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced Gamification module NOT initialized in app', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing module loading: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        function testUIInteractivity() {
+            log('🧪 Testing UI Interactivity...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeDocument = iframe.contentDocument;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeDocument) {
+                        const dashboardView = iframeDocument.getElementById('dashboard-view');
+                        if (dashboardView) {
+                            const display = iframeDocument.defaultView.getComputedStyle(dashboardView).display;
+                            if (display !== 'none') {
+                                log('✅ Dashboard view is visible', 'success');
+                            } else {
+                                log('❌ Dashboard view is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Dashboard view element NOT found', 'error');
+                        }
+                        
+                        const sidebar = iframeDocument.getElementById('sidebar');
+                        if (sidebar) {
+                            const display = iframeDocument.defaultView.getComputedStyle(sidebar).display;
+                            if (display !== 'none') {
+                                log('✅ Sidebar is visible', 'success');
+                            } else {
+                                log('❌ Sidebar is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Sidebar element NOT found', 'error');
+                        }
+                        
+                        const body = iframeDocument.body;
+                        if (body) {
+                            const pointerEvents = iframeDocument.defaultView.getComputedStyle(body).pointerEvents;
+                            if (pointerEvents === 'auto') {
+                                log('✅ Body pointer events are enabled', 'success');
+                            } else {
+                                log('❌ Body pointer events are disabled', 'error');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    log(`❌ Error testing UI interactivity: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        function runAllQuickTests() {
+            log('🚀 Running All Quick Tests...', 'info');
+            
+            document.getElementById('results').innerHTML = '';
+            
+            setTimeout(() => testMobileNav(), 500);
+            setTimeout(() => testModuleLoading(), 1500);
+            setTimeout(() => testUIInteractivity(), 2500);
+            
+            setTimeout(() => {
+                log('📋 All quick tests completed. Check results above.', 'info');
+            }, 4000);
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            log('📋 Quick Fix Test page loaded', 'info');
+            setTimeout(runAllQuickTests, 1000);
+        });
+    </script>
+</body>
+</html> 

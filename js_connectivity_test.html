@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Connectivity Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #0a0a0a;
+            color: white;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        .test-result {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .success { background: #22c55e; color: black; }
+        .error { background: #ef4444; }
+        .warning { background: #f59e0b; color: black; }
+        .info { background: #3b82f6; }
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+        .file-list {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        .file-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: #2a2a2a;
+            border-radius: 3px;
+        }
+        .connected { border-left: 4px solid #22c55e; }
+        .disconnected { border-left: 4px solid #ef4444; }
+        .partial { border-left: 4px solid #f59e0b; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Connectivity Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <div class="test-section">
+        <h2>File Connectivity Test</h2>
+        <button onclick="testFileConnectivity()">Test File Connectivity</button>
+        <div id="file-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Function Availability Test</h2>
+        <button onclick="testFunctionAvailability()">Test Function Availability</button>
+        <div id="function-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Module Loading Test</h2>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <div id="module-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Utility Functions Test</h2>
+        <button onclick="testUtilityFunctions()">Test Utility Functions</button>
+        <div id="utility-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Critical Fixes Test</h2>
+        <button onclick="testCriticalFixes()">Test Critical Fixes</button>
+        <div id="critical-test-results"></div>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(div);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        async function testFileConnectivity() {
+            clearResults('file-test-results');
+            addResult('file-test-results', 'Testing file connectivity...', 'info');
+            
+            const files = [
+                { name: 'app.html', path: 'app.html', type: 'main' },
+                { name: 'login.html', path: 'login.html', type: 'main' },
+                { name: 'ai-chat-interface.html', path: 'ai-chat-interface.html', type: 'main' },
+                { name: 'critical-fixes.js', path: 'critical-fixes.js', type: 'utility' },
+                { name: 'js/app.js', path: 'js/app.js', type: 'module' },
+                { name: 'js/utils/DOMUtils.js', path: 'js/utils/DOMUtils.js', type: 'utility' },
+                { name: 'js/utils/SecurityUtils.js', path: 'js/utils/SecurityUtils.js', type: 'utility' },
+                { name: 'js/utils/PerformanceUtils.js', path: 'js/utils/PerformanceUtils.js', type: 'utility' },
+                { name: 'js/modules/core-enhanced.js', path: 'js/modules/core-enhanced.js', type: 'module' },
+                { name: 'js/modules/ui.js', path: 'js/modules/ui.js', type: 'module' },
+                { name: 'js/managers/ErrorBoundary.js', path: 'js/managers/ErrorBoundary.js', type: 'manager' },
+                { name: 'scripts/runtime-audit.js', path: 'scripts/runtime-audit.js', type: 'script' }
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file.path);
+                    if (response.ok) {
+                        addResult('file-test-results', `✅ ${file.name} - Accessible`, 'success');
+                    } else {
+                        addResult('file-test-results', `❌ ${file.name} - HTTP ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult('file-test-results', `❌ ${file.name} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function testFunctionAvailability() {
+            clearResults('function-test-results');
+            addResult('function-test-results', 'Testing function availability...', 'info');
+            
+            const functions = [
+                { name: 'PerformanceUtils', obj: window.PerformanceUtils },
+                { name: 'SecurityUtils', obj: window.SecurityUtils },
+                { name: 'SafeElementAccess', obj: window.SafeElementAccess },
+                { name: 'memoryManager', obj: window.memoryManager },
+                { name: 'zIndexManager', obj: window.zIndexManager },
+                { name: 'securityUtils', obj: window.securityUtils },
+                { name: 'performanceUtils', obj: window.performanceUtils },
+                { name: 'aiChatSystem', obj: window.aiChatSystem },
+                { name: 'userProfileSystem', obj: window.userProfileSystem },
+                { name: 'aiPersonalizationSystem', obj: window.aiPersonalizationSystem }
+            ];
+
+            functions.forEach(func => {
+                if (func.obj) {
+                    addResult('function-test-results', `✅ ${func.name} - Available`, 'success');
+                } else {
+                    addResult('function-test-results', `❌ ${func.name} - Not available`, 'error');
+                }
+            });
+        }
+
+        async function testModuleLoading() {
+            clearResults('module-test-results');
+            addResult('module-test-results', 'Testing module loading...', 'info');
+            
+            const modules = [
+                'js/app.js',
+                'js/modules/core-enhanced.js',
+                'js/modules/ui.js',
+                'js/modules/auth.js',
+                'js/managers/ErrorBoundary.js'
+            ];
+
+            for (const module of modules) {
+                try {
+                    const response = await fetch(module);
+                    if (response.ok) {
+                        const content = await response.text();
+                        if (content.includes('export') || content.includes('import')) {
+                            addResult('module-test-results', `✅ ${module} - ES6 Module`, 'success');
+                        } else {
+                            addResult('module-test-results', `⚠️ ${module} - Not ES6 Module`, 'warning');
+                        }
+                    } else {
+                        addResult('module-test-results', `❌ ${module} - HTTP ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult('module-test-results', `❌ ${module} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function testUtilityFunctions() {
+            clearResults('utility-test-results');
+            addResult('utility-test-results', 'Testing utility functions...', 'info');
+            
+            // Test PerformanceUtils functions
+            if (window.PerformanceUtils) {
+                const perfTests = [
+                    { name: 'debounce', test: () => typeof window.PerformanceUtils.debounce === 'function' },
+                    { name: 'throttle', test: () => typeof window.PerformanceUtils.throttle === 'function' },
+                    { name: 'measureTime', test: () => typeof window.PerformanceUtils.measureTime === 'function' },
+                    { name: 'preloadResources', test: () => typeof window.PerformanceUtils.preloadResources === 'function' },
+                    { name: 'lazyLoadImages', test: () => typeof window.PerformanceUtils.lazyLoadImages === 'function' },
+                    { name: 'getMemoryUsage', test: () => typeof window.PerformanceUtils.getMemoryUsage === 'function' }
+                ];
+
+                perfTests.forEach(test => {
+                    if (test.test()) {
+                        addResult('utility-test-results', `✅ PerformanceUtils.${test.name}`, 'success');
+                    } else {
+                        addResult('utility-test-results', `❌ PerformanceUtils.${test.name}`, 'error');
+                    }
+                });
+            } else {
+                addResult('utility-test-results', '❌ PerformanceUtils not available', 'error');
+            }
+
+            // Test SecurityUtils functions
+            if (window.SecurityUtils) {
+                const secTests = [
+                    { name: 'sanitizeInput', test: () => typeof window.SecurityUtils.sanitizeInput === 'function' },
+                    { name: 'validateEmail', test: () => typeof window.SecurityUtils.validateEmail === 'function' },
+                    { name: 'validatePassword', test: () => typeof window.SecurityUtils.validatePassword === 'function' },
+                    { name: 'sanitizeHTML', test: () => typeof window.SecurityUtils.sanitizeHTML === 'function' },
+                    { name: 'generateSecureToken', test: () => typeof window.SecurityUtils.generateSecureToken === 'function' }
+                ];
+
+                secTests.forEach(test => {
+                    if (test.test()) {
+                        addResult('utility-test-results', `✅ SecurityUtils.${test.name}`, 'success');
+                    } else {
+                        addResult('utility-test-results', `❌ SecurityUtils.${test.name}`, 'error');
+                    }
+                });
+            } else {
+                addResult('utility-test-results', '❌ SecurityUtils not available', 'error');
+            }
+        }
+
+        function testCriticalFixes() {
+            clearResults('critical-test-results');
+            addResult('critical-test-results', 'Testing critical fixes...', 'info');
+            
+            // Test SafeElementAccess
+            if (window.SafeElementAccess) {
+                const safeTests = [
+                    { name: 'getById', test: () => typeof window.SafeElementAccess.getById === 'function' },
+                    { name: 'query', test: () => typeof window.SafeElementAccess.query === 'function' },
+                    { name: 'addListener', test: () => typeof window.SafeElementAccess.addListener === 'function' }
+                ];
+
+                safeTests.forEach(test => {
+                    if (test.test()) {
+                        addResult('critical-test-results', `✅ SafeElementAccess.${test.name}`, 'success');
+                    } else {
+                        addResult('critical-test-results', `❌ SafeElementAccess.${test.name}`, 'error');
+                    }
+                });
+            } else {
+                addResult('critical-test-results', '❌ SafeElementAccess not available', 'error');
+            }
+
+            // Test memory management
+            if (window.memoryManager) {
+                const memTests = [
+                    { name: 'addInterval', test: () => typeof window.memoryManager.addInterval === 'function' },
+                    { name: 'cleanup', test: () => typeof window.memoryManager.cleanup === 'function' }
+                ];
+
+                memTests.forEach(test => {
+                    if (test.test()) {
+                        addResult('critical-test-results', `✅ memoryManager.${test.name}`, 'success');
+                    } else {
+                        addResult('critical-test-results', `❌ memoryManager.${test.name}`, 'error');
+                    }
+                });
+            } else {
+                addResult('critical-test-results', '❌ memoryManager not available', 'error');
+            }
+
+            // Test AI systems
+            if (window.aiChatSystem) {
+                addResult('critical-test-results', '✅ aiChatSystem available', 'success');
+            } else {
+                addResult('critical-test-results', '❌ aiChatSystem not available', 'error');
+            }
+
+            if (window.userProfileSystem) {
+                addResult('critical-test-results', '✅ userProfileSystem available', 'success');
+            } else {
+                addResult('critical-test-results', '❌ userProfileSystem not available', 'error');
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('test-results', 'Starting automatic JavaScript connectivity tests...', 'info');
+                testFileConnectivity();
+                setTimeout(() => testFunctionAvailability(), 1000);
+                setTimeout(() => testModuleLoading(), 2000);
+                setTimeout(() => testUtilityFunctions(), 3000);
+                setTimeout(() => testCriticalFixes(), 4000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

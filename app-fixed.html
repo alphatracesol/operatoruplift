@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Fixed Version</title>
+    <style>
+        :root {
+            --accent-color: #f97316;
+            --accent-color-light: #fb923c;
+            --accent-color-glow: rgba(249, 115, 22, 0.6);
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --energy-color: #84cc16;
+            --font-family: 'Inter', sans-serif;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --transition-fast: all 0.2s ease-in-out;
+            --transition-slow: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0a0a0a;
+            --bg-gradient-start: #111827;
+            --bg-gradient-end: #0a0a0a;
+            --text-color: #e5e7eb;
+            --text-muted-color: #9ca3af;
+            --card-bg-glass: rgba(24, 24, 27, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --sidebar-bg: rgba(10, 10, 10, 0.8);
+            --input-bg: rgba(0,0,0,0.2);
+            --particle-color: #ffffff;
+            --matrix-rain-color: rgba(249, 115, 22, 0.35);
+        }
+        
+        [data-theme="light"] {
+            --bg-color: #f9fafb;
+            --bg-gradient-start: #f8fbff;
+            --bg-gradient-end: #fafcff;
+            --text-color: #1f2937;
+            --text-muted-color: #4b5563;
+            --card-bg-glass: rgba(255, 255, 255, 0.4);
+            --border-glass: rgba(0, 0, 0, 0.1);
+            --sidebar-bg: rgba(230, 230, 230, 0.8);
+            --input-bg: rgba(255,255,255,0.5);
+            --particle-color: #1f2937;
+            --matrix-rain-color: rgba(249, 115, 22, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color);
+            transition: background 1s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+        
+        .hidden { display: none !important; }
+
+        /* --- BUTTONS & CARDS --- */
+        .btn {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-fast); display: inline-flex;
+            align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;
+        }
+        .btn:disabled { cursor: not-allowed; background-color: #52525b; opacity: 0.7; }
+        .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .btn-icon { padding: 0.5rem; }
+        .btn-primary { background-color: var(--accent-color); color: black; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-color-light); box-shadow: 0 0 20px var(--accent-color-glow); }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border-glass); color: var(--text-color); }
+
+        .card {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition-fast);
+        }
+        .card:hover { box-shadow: var(--shadow-lg); }
+
+        /* --- LAYOUT --- */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            background: var(--accent-color);
+            color: black;
+        }
+
+        .nav-text {
+            font-weight: 500;
+        }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        #app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        #view-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- DASHBOARD --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted-color);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- AI MENTOR WIDGET --- */
+        #ai-mentor-widget {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .ai-mentor-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .ai-message {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            
+            #sidebar.show {
+                left: 0;
+            }
+            
+            #main-content {
+                padding: 1rem;
+            }
+            
+            #view-title {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- LOADING OVERLAY --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(249, 115, 22, 0.3);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Initializing Operator Uplift...</p>
+    </div>
+
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div>
+                <div class="logo">
+                    <span>🚀</span>
+                    <span>Operator Uplift</span>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#" data-view="dashboard" class="active"><span>📊</span><span class="nav-text">Dashboard</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="goals"><span>🏆</span><span class="nav-text">Goals</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="journeys"><span>🗺️</span><span class="nav-text">Journeys</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="calendar"><span>📅</span><span class="nav-text">Calendar</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="analytics"><span>📈</span><span class="nav-text">Analytics</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="community"><span>🌐</span><span class="nav-text">Community</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="habits"><span>🔄</span><span class="nav-text">Habits</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="focus"><span>🎯</span><span class="nav-text">Focus</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="achievements"><span>🏅</span><span class="nav-text">Achievements</span></a></li>
+                    <li class="nav-item"><a href="ai-chat-interface.html" target="_blank"><span>🤖</span><span class="nav-text">AI Chat</span></a></li>
+                    <li class="nav-item"><a href="#" data-view="settings"><span>⚙️</span><span class="nav-text">Settings</span></a></li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <div class="card">
+                    <h4>Operator</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted-color);">operator@uplift.com</p>
+                    <button class="btn btn-danger" style="width: 100%; margin-top: 1rem;">Logout</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <header id="app-header">
+                <h1 id="view-title">Dashboard</h1>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button class="btn btn-outline">Create from Template</button>
+                    <button class="btn btn-primary"><span>+</span> New Goal</button>
+                    <button class="btn btn-icon" title="Toggle theme">🌙</button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">1,250</div>
+                        <div class="stat-label">Essence Points</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">85</div>
+                        <div class="stat-label">Energy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">🔥 7</div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                </div>
+
+                <!-- AI Mentor Widget -->
+                <div class="card" id="ai-mentor-widget">
+                    <div class="ai-mentor-header">
+                        <div class="ai-avatar">🤖</div>
+                        <div>
+                            <h3>Your AI Mentor</h3>
+                            <p style="color: var(--text-muted-color);">Ready to help you achieve your goals</p>
+                        </div>
+                    </div>
+                    <div class="ai-message">
+                        <p>Welcome back, Operator! I see you're making great progress. Your energy is at 85% and you're on a 7-day streak. Ready to tackle today's challenges?</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary">Ask for Advice</button>
+                        <button class="btn btn-outline">View Progress</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Recent Goals</h3>
+                        <p style="color: var(--text-muted-color);">No goals yet. Create your first goal to get started!</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;">Create Goal</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Today's Focus</h3>
+                        <p style="color: var(--text-muted-color);">No focus sessions planned for today.</p>
+                        <button class="btn btn-outline" style="margin-top: 1rem;">Start Focus Session</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Habits</h3>
+                        <p style="color: var(--text-muted-color);">No habits tracked yet.</p>
+                        <button class="btn btn-outline" style="margin-top: 1rem;">Add Habit</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple app initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Operator Uplift...');
+            
+            // Hide loading overlay after a short delay
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
+                }
+                console.log('✅ App loaded successfully');
+            }, 1500);
+            
+            // Setup navigation
+            document.querySelectorAll('.nav-item a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('.nav-item a').forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    link.classList.add('active');
+                    
+                    // Update view title
+                    const viewTitle = document.getElementById('view-title');
+                    const viewName = link.querySelector('.nav-text').textContent;
+                    viewTitle.textContent = viewName;
+                    
+                    console.log(`Navigated to: ${viewName}`);
+                });
+            });
+            
+            // Setup theme toggle
+            const themeToggle = document.querySelector('button[title="Toggle theme"]');
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                themeToggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
+                localStorage.setItem('theme', newTheme);
+            });
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'light' ? '🌙' : '☀️';
+            
+            // Setup logout button
+            const logoutBtn = document.querySelector('.btn-danger');
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    console.log('User logged out');
+                    // Here you would typically clear user data and redirect to login
+                    alert('Logout functionality would be implemented here');
+                }
+            });
+            
+            // Setup AI mentor buttons
+            document.querySelectorAll('#ai-mentor-widget .btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.textContent.trim();
+                    console.log(`AI Mentor action: ${action}`);
+                    alert(`${action} functionality would be implemented here`);
+                });
+            });
+            
+            // Setup dashboard action buttons
+            document.querySelectorAll('.dashboard-grid .btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.textContent.trim();
+                    console.log(`Dashboard action: ${action}`);
+                    alert(`${action} functionality would be implemented here`);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

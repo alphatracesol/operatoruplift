@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 Error Logger</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin: 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 2.5rem;
+        }
+        .phase-indicator {
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .phase-3-1 {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        .phase-3-2 {
+            background: linear-gradient(135deg, #4834d4, #686de0);
+            color: white;
+        }
+        .phase-3-3 {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+        .phase-3-4 {
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+            color: white;
+        }
+        .log-section {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .log-section:last-child {
+            border-bottom: none;
+        }
+        .log-section h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+        }
+        #errorLog {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .error { color: #e53e3e; }
+        .warning { color: #d69e2e; }
+        .info { color: #3182ce; }
+        .success { color: #38a169; }
+        .phase-3-1-error { color: #ff6b6b; }
+        .phase-3-2-error { color: #4834d4; }
+        .phase-3-3-error { color: #00b894; }
+        .phase-3-4-error { color: #fdcb6e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Phase 3 Error Logger</h1>
+        
+        <div class="phase-indicator phase-3-1">
+            Phase 3.1: Advanced Personalization & AI Enhancement
+        </div>
+        <div class="phase-indicator phase-3-2">
+            Phase 3.2: Enhanced Security & Compliance
+        </div>
+        <div class="phase-indicator phase-3-3">
+            Phase 3.3: Performance Optimization & Scalability
+        </div>
+        <div class="phase-indicator phase-3-4">
+            Phase 3.4: User Experience & Accessibility
+        </div>
+
+        <div class="log-section">
+            <h2>Controls</h2>
+            <button onclick="startPhase3ErrorLogging()">Start Phase 3 Error Logging</button>
+            <button onclick="stopPhase3ErrorLogging()">Stop Error Logging</button>
+            <button onclick="clearLog()">Clear Log</button>
+            <button onclick="exportLog()">Export Log</button>
+            <button onclick="testPhase3Features()">Test Phase 3 Features</button>
+            <button onclick="openAppInNewTab()">Open App in New Tab</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalErrors">0</div>
+                <div class="stat-label">Total Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="phase3_1Errors">0</div>
+                <div class="stat-label">Phase 3.1 Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="phase3_2Errors">0</div>
+                <div class="stat-label">Phase 3.2 Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="phase3_3Errors">0</div>
+                <div class="stat-label">Phase 3.3 Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="phase3_4Errors">0</div>
+                <div class="stat-label">Phase 3.4 Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="otherErrors">0</div>
+                <div class="stat-label">Other Errors</div>
+            </div>
+        </div>
+
+        <div class="log-section">
+            <h2>Live App Preview</h2>
+            <iframe id="appFrame" src="app.html"></iframe>
+        </div>
+
+        <div class="log-section">
+            <h2>Phase 3 Error Log</h2>
+            <div id="errorLog"></div>
+        </div>
+    </div>
+
+    <script>
+        let errorLog = [];
+        let isLogging = false;
+        let errorCounts = {
+            total: 0,
+            phase3_1: 0,
+            phase3_2: 0,
+            phase3_3: 0,
+            phase3_4: 0,
+            other: 0
+        };
+
+        function log(message, type = 'info', phase = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            errorLog.push({ message: logEntry, type, phase, timestamp });
+            
+            // Update error counts
+            if (type === 'error') {
+                errorCounts.total++;
+                if (phase) {
+                    errorCounts[phase]++;
+                } else {
+                    errorCounts.other++;
+                }
+                updateStats();
+            }
+            
+            const errorLogDiv = document.getElementById('errorLog');
+            const logElement = document.createElement('div');
+            logElement.className = `${type} ${phase ? phase + '-error' : ''}`;
+            logElement.textContent = logEntry;
+            errorLogDiv.appendChild(logElement);
+            errorLogDiv.scrollTop = errorLogDiv.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        function updateStats() {
+            document.getElementById('totalErrors').textContent = errorCounts.total;
+            document.getElementById('phase3_1Errors').textContent = errorCounts.phase3_1;
+            document.getElementById('phase3_2Errors').textContent = errorCounts.phase3_2;
+            document.getElementById('phase3_3Errors').textContent = errorCounts.phase3_3;
+            document.getElementById('phase3_4Errors').textContent = errorCounts.phase3_4;
+            document.getElementById('otherErrors').textContent = errorCounts.other;
+        }
+
+        function clearLog() {
+            document.getElementById('errorLog').innerHTML = '';
+            errorLog = [];
+            errorCounts = { total: 0, phase3_1: 0, phase3_2: 0, phase3_3: 0, phase3_4: 0, other: 0 };
+            updateStats();
+        }
+
+        function exportLog() {
+            const logText = errorLog.map(entry => entry.message).join('\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `phase3-error-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+        }
+
+        function startPhase3ErrorLogging() {
+            if (isLogging) {
+                log('Error logging is already active', 'warning');
+                return;
+            }
+
+            isLogging = true;
+            log('🔍 Starting Phase 3 Error Logging...', 'info');
+            
+            try {
+                const frame = document.getElementById('appFrame');
+                const frameWindow = frame.contentWindow;
+                
+                // Override console methods to capture errors
+                const originalError = frameWindow.console.error;
+                const originalWarn = frameWindow.console.warn;
+                const originalLog = frameWindow.console.log;
+                
+                frameWindow.console.error = function(...args) {
+                    const message = args.join(' ');
+                    log(`Console Error: ${message}`, 'error');
+                    originalError.apply(frameWindow.console, args);
+                };
+                
+                frameWindow.console.warn = function(...args) {
+                    const message = args.join(' ');
+                    log(`Console Warning: ${message}`, 'warning');
+                    originalWarn.apply(frameWindow.console, args);
+                };
+                
+                frameWindow.console.log = function(...args) {
+                    const message = args.join(' ');
+                    if (message.includes('Phase 3') || message.includes('Personalization') || 
+                        message.includes('Security') || message.includes('Performance') || 
+                        message.includes('Accessibility') || message.includes('Compliance')) {
+                        log(`Console Log: ${message}`, 'info');
+                    }
+                    originalLog.apply(frameWindow.console, args);
+                };
+                
+                // Set up error event listeners
+                frameWindow.addEventListener('error', function(event) {
+                    log(`JavaScript Error: ${event.message} at ${event.filename}:${event.lineno}`, 'error');
+                });
+                
+                frameWindow.addEventListener('unhandledrejection', function(event) {
+                    log(`Unhandled Promise Rejection: ${event.reason}`, 'error');
+                });
+                
+                // Monitor Phase 3 specific features
+                monitorPhase3Features(frameWindow);
+                
+                log('✅ Phase 3 Error Logging Started', 'success');
+                
+            } catch (error) {
+                log(`❌ Failed to start error logging: ${error.message}`, 'error');
+                isLogging = false;
+            }
+        }
+
+        function stopPhase3ErrorLogging() {
+            if (!isLogging) {
+                log('Error logging is not active', 'warning');
+                return;
+            }
+
+            isLogging = false;
+            log('🛑 Phase 3 Error Logging Stopped', 'info');
+        }
+
+        function monitorPhase3Features(frameWindow) {
+            // Monitor Phase 3.1: Advanced Personalization
+            if (frameWindow.app && frameWindow.app.advancedPersonalization) {
+                log('✅ Phase 3.1: Advanced Personalization module detected', 'success', 'phase3_1');
+                
+                // Monitor personalization methods
+                const personalizationMethods = [
+                    'getPersonalizedRecommendations',
+                    'generateAdaptiveLearningPath',
+                    'analyzeUserBehavior',
+                    'updateUserPreferences'
+                ];
+                
+                personalizationMethods.forEach(method => {
+                    if (frameWindow.app.advancedPersonalization[method]) {
+                        log(`✅ Phase 3.1: ${method} method available`, 'success', 'phase3_1');
+                    } else {
+                        log(`❌ Phase 3.1: ${method} method not found`, 'error', 'phase3_1');
+                    }
+                });
+            } else {
+                log('❌ Phase 3.1: Advanced Personalization module not found', 'error', 'phase3_1');
+            }
+            
+            // Monitor Phase 3.2: Enhanced Security
+            if (frameWindow.app && frameWindow.app.security) {
+                log('✅ Phase 3.2: Security module detected', 'success', 'phase3_2');
+                
+                const securityMethods = [
+                    'sanitizeInput',
+                    'preventXSS',
+                    'monitorSession',
+                    'validateData'
+                ];
+                
+                securityMethods.forEach(method => {
+                    if (frameWindow.app.security[method]) {
+                        log(`✅ Phase 3.2: ${method} method available`, 'success', 'phase3_2');
+                    } else {
+                        log(`❌ Phase 3.2: ${method} method not found`, 'error', 'phase3_2');
+                    }
+                });
+            } else {
+                log('❌ Phase 3.2: Security module not found', 'error', 'phase3_2');
+            }
+            
+            // Monitor Phase 3.3: Performance
+            if (frameWindow.app && frameWindow.app.performance) {
+                log('✅ Phase 3.3: Performance module detected', 'success', 'phase3_3');
+                
+                const performanceMethods = [
+                    'enableLazyLoading',
+                    'enableCaching',
+                    'optimizePerformance',
+                    'monitorMetrics'
+                ];
+                
+                performanceMethods.forEach(method => {
+                    if (frameWindow.app.performance[method]) {
+                        log(`✅ Phase 3.3: ${method} method available`, 'success', 'phase3_3');
+                    } else {
+                        log(`❌ Phase 3.3: ${method} method not found`, 'error', 'phase3_3');
+                    }
+                });
+            } else {
+                log('❌ Phase 3.3: Performance module not found', 'error', 'phase3_3');
+            }
+            
+            // Monitor Phase 3.4: Accessibility
+            if (frameWindow.app && frameWindow.app.accessibility) {
+                log('✅ Phase 3.4: Accessibility module detected', 'success', 'phase3_4');
+                
+                const accessibilityMethods = [
+                    'enableScreenReaderSupport',
+                    'enableKeyboardNavigation',
+                    'enableHighContrastMode',
+                    'validateAccessibility'
+                ];
+                
+                accessibilityMethods.forEach(method => {
+                    if (frameWindow.app.accessibility[method]) {
+                        log(`✅ Phase 3.4: ${method} method available`, 'success', 'phase3_4');
+                    } else {
+                        log(`❌ Phase 3.4: ${method} method not found`, 'error', 'phase3_4');
+                    }
+                });
+            } else {
+                log('❌ Phase 3.4: Accessibility module not found', 'error', 'phase3_4');
+            }
+        }
+
+        function testPhase3Features() {
+            log('🧪 Testing Phase 3 Features...', 'info');
+            
+            try {
+                const frame = document.getElementById('appFrame');
+                const frameWindow = frame.contentWindow;
+                
+                if (!frameWindow.app) {
+                    log('❌ App object not found - cannot test Phase 3 features', 'error');
+                    return;
+                }
+                
+                // Test Phase 3.1
+                if (frameWindow.app.advancedPersonalization) {
+                    log('🧪 Testing Phase 3.1: Advanced Personalization...', 'info', 'phase3_1');
+                    try {
+                        // Test personalization features
+                        if (frameWindow.app.advancedPersonalization.getPersonalizedRecommendations) {
+                            const recommendations = frameWindow.app.advancedPersonalization.getPersonalizedRecommendations();
+                            log('✅ Phase 3.1: Personalized recommendations generated', 'success', 'phase3_1');
+                        }
+                    } catch (error) {
+                        log(`❌ Phase 3.1: Error testing personalization - ${error.message}`, 'error', 'phase3_1');
+                    }
+                }
+                
+                // Test Phase 3.2
+                if (frameWindow.app.security) {
+                    log('🧪 Testing Phase 3.2: Security Features...', 'info', 'phase3_2');
+                    try {
+                        if (frameWindow.app.security.sanitizeInput) {
+                            const sanitized = frameWindow.app.security.sanitizeInput('<script>alert("test")</script>');
+                            log('✅ Phase 3.2: Input sanitization working', 'success', 'phase3_2');
+                        }
+                    } catch (error) {
+                        log(`❌ Phase 3.2: Error testing security - ${error.message}`, 'error', 'phase3_2');
+                    }
+                }
+                
+                // Test Phase 3.3
+                if (frameWindow.app.performance) {
+                    log('🧪 Testing Phase 3.3: Performance Features...', 'info', 'phase3_3');
+                    try {
+                        if (frameWindow.app.performance.optimizePerformance) {
+                            frameWindow.app.performance.optimizePerformance();
+                            log('✅ Phase 3.3: Performance optimization executed', 'success', 'phase3_3');
+                        }
+                    } catch (error) {
+                        log(`❌ Phase 3.3: Error testing performance - ${error.message}`, 'error', 'phase3_3');
+                    }
+                }
+                
+                // Test Phase 3.4
+                if (frameWindow.app.accessibility) {
+                    log('🧪 Testing Phase 3.4: Accessibility Features...', 'info', 'phase3_4');
+                    try {
+                        if (frameWindow.app.accessibility.enableKeyboardNavigation) {
+                            frameWindow.app.accessibility.enableKeyboardNavigation();
+                            log('✅ Phase 3.4: Keyboard navigation enabled', 'success', 'phase3_4');
+                        }
+                    } catch (error) {
+                        log(`❌ Phase 3.4: Error testing accessibility - ${error.message}`, 'error', 'phase3_4');
+                    }
+                }
+                
+            } catch (error) {
+                log(`❌ Error testing Phase 3 features: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-start logging after page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('🔧 Phase 3 Error Logger Loaded', 'info');
+                startPhase3ErrorLogging();
+            }, 2000);
+        });
+    </script>
+</body>
+</html> 

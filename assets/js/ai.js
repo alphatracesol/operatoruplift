@@ -101,7 +101,7 @@ class AIManager {
                 focus: 'practical'
             }
         };
-    }
+        }
     
     // Provider Setup
     setupProviders() {
@@ -638,8 +638,8 @@ Respond in the style of ${personalityData.name}, being ${personalityData.communi
     // Track AI usage
     trackAIUsage(provider, personality, messageLength) {
         const usage = {
-            provider,
-            personality,
+                provider,
+                personality,
             messageLength,
             timestamp: new Date().toISOString()
         };

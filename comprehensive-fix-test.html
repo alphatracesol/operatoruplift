@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+        iframe { width: 100%; height: 600px; border: 1px solid #333; border-radius: 5px; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .test-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <h1>🔧 Comprehensive Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testModuleLoading()">Test Module Loading</button>
+        <button onclick="testUIInteractivity()">Test UI Interactivity</button>
+        <button onclick="testMobileNavigation()">Test Mobile Navigation</button>
+        <button onclick="testAppFunctionality()">Test App Functionality</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="openAppInNewTab()">Open App in New Tab</button>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h2>Live App Preview</h2>
+            <iframe id="appFrame" src="app.html"></iframe>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testModuleLoading() {
+            log('🧪 Testing Phase 2 Module Loading...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeWindow.window.AdvancedAIEnhancement) {
+                        log('✅ AdvancedAIEnhancement module found', 'success');
+                    } else {
+                        log('❌ AdvancedAIEnhancement module NOT found', 'error');
+                    }
+                    
+                    if (iframeWindow.window.AdvancedGamification) {
+                        log('✅ AdvancedGamification module found', 'success');
+                    } else {
+                        log('❌ AdvancedGamification module NOT found', 'error');
+                    }
+                    
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedAI) {
+                        log('✅ Advanced AI module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced AI module NOT initialized in app', 'error');
+                    }
+                    
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedGamification) {
+                        log('✅ Advanced Gamification module initialized in app', 'success');
+                    } else {
+                        log('❌ Advanced Gamification module NOT initialized in app', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing module loading: ${error.message}`, 'error');
+                }
+            }, 3000);
+        }
+
+        function testUIInteractivity() {
+            log('🧪 Testing UI Interactivity...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            const iframeDocument = iframe.contentDocument;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeDocument) {
+                        // Test dashboard visibility
+                        const dashboardView = iframeDocument.getElementById('dashboard-view');
+                        if (dashboardView) {
+                            const display = iframeWindow.getComputedStyle(dashboardView).display;
+                            if (display !== 'none') {
+                                log('✅ Dashboard view is visible', 'success');
+                            } else {
+                                log('❌ Dashboard view is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Dashboard view element not found', 'error');
+                        }
+                        
+                        // Test sidebar visibility
+                        const sidebar = iframeDocument.getElementById('sidebar');
+                        if (sidebar) {
+                            const display = iframeWindow.getComputedStyle(sidebar).display;
+                            if (display !== 'none') {
+                                log('✅ Sidebar is visible', 'success');
+                            } else {
+                                log('❌ Sidebar is hidden', 'error');
+                            }
+                        } else {
+                            log('❌ Sidebar element not found', 'error');
+                        }
+                        
+                        // Test loading overlay
+                        const loadingOverlay = iframeDocument.getElementById('loading-overlay');
+                        if (loadingOverlay) {
+                            const display = iframeWindow.getComputedStyle(loadingOverlay).display;
+                            if (display === 'none') {
+                                log('✅ Loading overlay is hidden', 'success');
+                            } else {
+                                log('❌ Loading overlay is still visible', 'error');
+                            }
+                        } else {
+                            log('✅ Loading overlay element not found (good)', 'success');
+                        }
+                        
+                        // Test pointer events
+                        const body = iframeDocument.body;
+                        if (body) {
+                            const pointerEvents = iframeWindow.getComputedStyle(body).pointerEvents;
+                            if (pointerEvents === 'auto') {
+                                log('✅ Body pointer events are enabled', 'success');
+                            } else {
+                                log('❌ Body pointer events are disabled', 'error');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    log(`❌ Error testing UI interactivity: ${error.message}`, 'error');
+                }
+            }, 3000);
+        }
+
+        function testMobileNavigation() {
+            log('🧪 Testing Mobile Navigation...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeDocument = iframe.contentDocument;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeDocument) {
+                        // Test mobile toggle button
+                        const mobileToggle = iframeDocument.getElementById('mobile-nav-toggle');
+                        if (mobileToggle) {
+                            log('✅ Mobile navigation toggle button found', 'success');
+                        } else {
+                            log('❌ Mobile navigation toggle button not found', 'error');
+                        }
+                        
+                        // Test mobile overlay
+                        const mobileOverlay = iframeDocument.getElementById('mobile-nav-overlay');
+                        if (mobileOverlay) {
+                            log('✅ Mobile navigation overlay found', 'success');
+                        } else {
+                            log('❌ Mobile navigation overlay not found', 'error');
+                        }
+                        
+                        // Test essential nav items
+                        const essentialItems = iframeDocument.querySelectorAll('.nav-item.mobile-essential');
+                        if (essentialItems.length > 0) {
+                            log(`✅ ${essentialItems.length} essential nav items marked for mobile`, 'success');
+                        } else {
+                            log('❌ No essential nav items marked for mobile', 'error');
+                        }
+                    }
+                } catch (error) {
+                    log(`❌ Error testing mobile navigation: ${error.message}`, 'error');
+                }
+            }, 3000);
+        }
+
+        function testAppFunctionality() {
+            log('🧪 Testing App Functionality...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            setTimeout(() => {
+                try {
+                    if (iframeWindow.window.app) {
+                        const app = iframeWindow.window.app;
+                        
+                        // Test app state
+                        if (app.state) {
+                            log(`📊 Active view: ${app.state.activeView}`, 'info');
+                            log(`📊 Firebase ready: ${app.state.firebaseReady}`, 'info');
+                            
+                            if (app.state.activeView === 'dashboard') {
+                                log('✅ App is showing dashboard view', 'success');
+                            } else {
+                                log('❌ App is not showing dashboard view', 'error');
+                            }
+                        }
+                        
+                        // Test Phase 2 module functionality
+                        if (app.advancedAI && typeof app.advancedAI.getPersonalizedAdvice === 'function') {
+                            const advice = app.advancedAI.getPersonalizedAdvice('test goal');
+                            log(`✅ Advanced AI advice function working: ${advice}`, 'success');
+                        } else {
+                            log('❌ Advanced AI advice function not working', 'error');
+                        }
+                        
+                        if (app.advancedGamification && typeof app.advancedGamification.checkAchievements === 'function') {
+                            log('✅ Advanced Gamification checkAchievements function working', 'success');
+                        } else {
+                            log('❌ Advanced Gamification checkAchievements function not working', 'error');
+                        }
+                    } else {
+                        log('❌ App object not found', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing app functionality: ${error.message}`, 'error');
+                }
+            }, 3000);
+        }
+
+        function runAllTests() {
+            log('🚀 Running All Tests...', 'info');
+            
+            // Clear previous results
+            document.getElementById('results').innerHTML = '';
+            
+            // Run all tests in sequence
+            setTimeout(() => testModuleLoading(), 500);
+            setTimeout(() => testUIInteractivity(), 2000);
+            setTimeout(() => testMobileNavigation(), 3500);
+            setTimeout(() => testAppFunctionality(), 5000);
+            
+            // Final summary
+            setTimeout(() => {
+                log('📋 All tests completed. Check results above.', 'info');
+                log('🎯 If all tests pass, all fixes are working correctly!', 'success');
+            }, 7000);
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+            log('🔗 Opened app.html in new tab', 'info');
+        }
+
+        // Auto-run all tests on load
+        window.addEventListener('load', () => {
+            log('📋 Comprehensive Fix Test page loaded', 'info');
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html> 

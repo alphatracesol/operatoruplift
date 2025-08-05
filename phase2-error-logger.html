@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Error Logger</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .log-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        .success { color: #4ade80; }
+        .critical { color: #ef4444; font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #errorLog { margin-top: 20px; max-height: 800px; overflow-y: auto; background: #0f0f0f; padding: 15px; border-radius: 5px; }
+        .log-entry { margin: 5px 0; padding: 8px; border-radius: 3px; font-family: monospace; font-size: 12px; }
+        .log-error { background: #2d1b1b; border-left: 4px solid #f87171; }
+        .log-warning { background: #2d2b1b; border-left: 4px solid #fbbf24; }
+        .log-info { background: #1b2d2d; border-left: 4px solid #60a5fa; }
+        .log-success { background: #1b2d1b; border-left: 4px solid #4ade80; }
+        .log-critical { background: #2d1b1b; border-left: 4px solid #ef4444; }
+        .timestamp { color: #888; }
+        .error-type { font-weight: bold; }
+        .error-message { margin-top: 5px; }
+        .error-stack { margin-top: 5px; color: #aaa; font-size: 11px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #2a2a2a; padding: 15px; border-radius: 5px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; }
+        .stat-label { color: #888; margin-top: 5px; }
+        iframe { width: 100%; height: 400px; border: 1px solid #333; border-radius: 5px; }
+        .phase-indicator { background: #2a2a2a; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .phase-2-1 { border-left: 4px solid #3b82f6; }
+        .phase-2-2 { border-left: 4px solid #10b981; }
+        .phase-2-3 { border-left: 4px solid #f59e0b; }
+        .phase-2-4 { border-left: 4px solid #8b5cf6; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Phase 2 Error Logger</h1>
+    
+    <div class="phase-indicator phase-2-1">
+        <h3>Phase 2.1: Enhanced AI Integration</h3>
+        <p>Advanced AI capabilities, context memory, adaptive algorithms</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-2">
+        <h3>Phase 2.2: Advanced Gamification</h3>
+        <p>Dynamic achievements, adaptive difficulty, reward systems</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-3">
+        <h3>Phase 2.3: Performance Optimization</h3>
+        <p>Loading optimization, memory management, caching</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-4">
+        <h3>Phase 2.4: User Experience Enhancement</h3>
+        <p>UI/UX improvements, accessibility, responsive design</p>
+    </div>
+    
+    <div class="log-section">
+        <h2>Controls</h2>
+        <button onclick="startPhase2ErrorLogging()">Start Phase 2 Error Logging</button>
+        <button onclick="stopPhase2ErrorLogging()">Stop Error Logging</button>
+        <button onclick="clearLog()">Clear Log</button>
+        <button onclick="exportLog()">Export Log</button>
+        <button onclick="testPhase2Features()">Test Phase 2 Features</button>
+        <button onclick="openAppInNewTab()">Open App in New Tab</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="errorCount">0</div>
+            <div class="stat-label">Errors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="warningCount">0</div>
+            <div class="stat-label">Warnings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="criticalCount">0</div>
+            <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+
+    <div class="log-section">
+        <h2>Live App Preview</h2>
+        <iframe id="appFrame" src="app.html"></iframe>
+    </div>
+
+    <div class="log-section">
+        <h2>Phase 2 Error Log</h2>
+        <div id="errorLog"></div>
+    </div>
+
+    <script>
+        let errorLog = [];
+        let isLogging = false;
+        let originalConsoleError, originalConsoleWarn, originalConsoleLog;
+        let errorCount = 0, warningCount = 0, criticalCount = 0, totalCount = 0;
+
+        function logError(type, message, details = null, stack = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                type,
+                message,
+                details,
+                stack,
+                timestamp
+            };
+            
+            errorLog.push(logEntry);
+            
+            // Update counters
+            if (type === 'error') errorCount++;
+            else if (type === 'warning') warningCount++;
+            else if (type === 'critical') criticalCount++;
+            totalCount++;
+            
+            updateStats();
+            displayLogEntry(logEntry);
+        }
+
+        function displayLogEntry(entry) {
+            const logContainer = document.getElementById('errorLog');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-entry log-${entry.type}`;
+            
+            let html = `
+                <div class="timestamp">[${entry.timestamp}]</div>
+                <div class="error-type">${entry.type.toUpperCase()}</div>
+                <div class="error-message">${entry.message}</div>
+            `;
+            
+            if (entry.details) {
+                html += `<div class="error-details">${entry.details}</div>`;
+            }
+            
+            if (entry.stack) {
+                html += `<div class="error-stack">${entry.stack}</div>`;
+            }
+            
+            logDiv.innerHTML = html;
+            logContainer.appendChild(logDiv);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('errorCount').textContent = errorCount;
+            document.getElementById('warningCount').textContent = warningCount;
+            document.getElementById('criticalCount').textContent = criticalCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+
+        function startPhase2ErrorLogging() {
+            if (isLogging) return;
+            
+            isLogging = true;
+            logError('info', 'Phase 2 Error logging started');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Override console methods
+                originalConsoleError = iframeWindow.console.error;
+                originalConsoleWarn = iframeWindow.console.warn;
+                originalConsoleLog = iframeWindow.console.log;
+                
+                iframeWindow.console.error = function(...args) {
+                    const message = args.join(' ');
+                    logError('error', message, null, new Error().stack);
+                    originalConsoleError.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.warn = function(...args) {
+                    const message = args.join(' ');
+                    logError('warning', message);
+                    originalConsoleWarn.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.log = function(...args) {
+                    const message = args.join(' ');
+                    if (message.includes('error') || message.includes('Error') || message.includes('ERROR')) {
+                        logError('error', message);
+                    } else if (message.includes('warning') || message.includes('Warning') || message.includes('WARNING')) {
+                        logError('warning', message);
+                    } else {
+                        logError('info', message);
+                    }
+                    originalConsoleLog.apply(iframeWindow.console, args);
+                };
+                
+                // Override window.onerror
+                iframeWindow.onerror = function(message, source, lineno, colno, error) {
+                    logError('critical', `JavaScript Error: ${message}`, 
+                        `Source: ${source}, Line: ${lineno}, Column: ${colno}`, 
+                        error ? error.stack : null);
+                    return false;
+                };
+                
+                // Override window.onunhandledrejection
+                iframeWindow.onunhandledrejection = function(event) {
+                    logError('critical', `Unhandled Promise Rejection: ${event.reason}`, 
+                        null, event.reason ? event.reason.stack : null);
+                };
+                
+                // Monitor network errors
+                if (iframeWindow.performance) {
+                    const observer = new iframeWindow.PerformanceObserver((list) => {
+                        list.getEntries().forEach((entry) => {
+                            if (entry.entryType === 'resource' && entry.transferSize === 0 && entry.duration > 0) {
+                                logError('error', `Failed network request: ${entry.name}`, 
+                                    `Duration: ${entry.duration}ms, Size: ${entry.transferSize} bytes`);
+                            }
+                        });
+                    });
+                    observer.observe({ entryTypes: ['resource'] });
+                }
+                
+                logError('success', 'Phase 2 Error logging system initialized successfully');
+                
+            } catch (error) {
+                logError('critical', 'Failed to initialize Phase 2 error logging', error.message, error.stack);
+            }
+        }
+
+        function stopPhase2ErrorLogging() {
+            if (!isLogging) return;
+            
+            isLogging = false;
+            logError('info', 'Phase 2 Error logging stopped');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Restore original console methods
+                if (originalConsoleError) {
+                    iframeWindow.console.error = originalConsoleError;
+                }
+                if (originalConsoleWarn) {
+                    iframeWindow.console.warn = originalConsoleWarn;
+                }
+                if (originalConsoleLog) {
+                    iframeWindow.console.log = originalConsoleLog;
+                }
+                
+                logError('success', 'Phase 2 Error logging system stopped');
+                
+            } catch (error) {
+                logError('critical', 'Failed to stop Phase 2 error logging', error.message, error.stack);
+            }
+        }
+
+        function testPhase2Features() {
+            logError('info', 'Testing Phase 2 Features...');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test Phase 2.1: Enhanced AI Integration
+                logError('info', 'Testing Phase 2.1: Enhanced AI Integration');
+                
+                if (iframeWindow.window.AdvancedAIEnhancement) {
+                    logError('success', 'AdvancedAIEnhancement module found');
+                    
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedAI) {
+                        logError('success', 'Advanced AI module initialized in app');
+                        
+                        const aiModule = iframeWindow.window.app.advancedAI;
+                        
+                        // Test AI features
+                        if (typeof aiModule.updateUserProfile === 'function') {
+                            logError('success', 'User profile management available');
+                        } else {
+                            logError('error', 'User profile management not available');
+                        }
+                        
+                        if (typeof aiModule.addToContext === 'function') {
+                            logError('success', 'Context memory system available');
+                        } else {
+                            logError('error', 'Context memory system not available');
+                        }
+                        
+                        if (typeof aiModule.adaptDifficulty === 'function') {
+                            logError('success', 'Adaptive difficulty system available');
+                        } else {
+                            logError('error', 'Adaptive difficulty system not available');
+                        }
+                        
+                        if (typeof aiModule.optimizeGoals === 'function') {
+                            logError('success', 'Goal optimization engine available');
+                        } else {
+                            logError('error', 'Goal optimization engine not available');
+                        }
+                        
+                        if (typeof aiModule.getPersonalizedAdvice === 'function') {
+                            logError('success', 'Personalized advice system available');
+                        } else {
+                            logError('error', 'Personalized advice system not available');
+                        }
+                        
+                    } else {
+                        logError('error', 'Advanced AI module not initialized in app');
+                    }
+                } else {
+                    logError('critical', 'AdvancedAIEnhancement module not found');
+                }
+                
+                // Test Phase 2.2: Advanced Gamification
+                logError('info', 'Testing Phase 2.2: Advanced Gamification');
+                
+                if (iframeWindow.window.AdvancedGamification) {
+                    logError('success', 'AdvancedGamification module found');
+                    
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedGamification) {
+                        logError('success', 'Advanced Gamification module initialized in app');
+                        
+                        const gamificationModule = iframeWindow.window.app.advancedGamification;
+                        
+                        // Test gamification features
+                        if (typeof gamificationModule.createAchievement === 'function') {
+                            logError('success', 'Dynamic achievement system available');
+                        } else {
+                            logError('error', 'Dynamic achievement system not available');
+                        }
+                        
+                        if (typeof gamificationModule.scaleDifficulty === 'function') {
+                            logError('success', 'Adaptive difficulty scaling available');
+                        } else {
+                            logError('error', 'Adaptive difficulty scaling not available');
+                        }
+                        
+                        if (typeof gamificationModule.grantReward === 'function') {
+                            logError('success', 'Advanced reward system available');
+                        } else {
+                            logError('error', 'Advanced reward system not available');
+                        }
+                        
+                        if (typeof gamificationModule.shareAchievement === 'function') {
+                            logError('success', 'Social features available');
+                        } else {
+                            logError('error', 'Social features not available');
+                        }
+                        
+                        if (typeof gamificationModule.updateLeaderboard === 'function') {
+                            logError('success', 'Leaderboard system available');
+                        } else {
+                            logError('error', 'Leaderboard system not available');
+                        }
+                        
+                    } else {
+                        logError('error', 'Advanced Gamification module not initialized in app');
+                    }
+                } else {
+                    logError('critical', 'AdvancedGamification module not found');
+                }
+                
+                // Test Phase 2.3: Performance Optimization
+                logError('info', 'Testing Phase 2.3: Performance Optimization');
+                
+                if (iframeWindow.window.app) {
+                    // Test loading performance
+                    const loadTime = iframeWindow.performance.timing.loadEventEnd - iframeWindow.performance.timing.navigationStart;
+                    if (loadTime < 3000) {
+                        logError('success', `Fast loading time: ${loadTime}ms`);
+                    } else {
+                        logError('warning', `Slow loading time: ${loadTime}ms`);
+                    }
+                    
+                    // Test memory usage
+                    if (iframeWindow.performance.memory) {
+                        const memoryUsage = iframeWindow.performance.memory.usedJSHeapSize / 1024 / 1024;
+                        if (memoryUsage < 50) {
+                            logError('success', `Low memory usage: ${memoryUsage.toFixed(2)}MB`);
+                        } else {
+                            logError('warning', `High memory usage: ${memoryUsage.toFixed(2)}MB`);
+                        }
+                    }
+                    
+                    // Test caching
+                    if (iframeWindow.localStorage) {
+                        try {
+                            iframeWindow.localStorage.setItem('test-cache', 'test');
+                            iframeWindow.localStorage.removeItem('test-cache');
+                            logError('success', 'Local storage caching working');
+                        } catch (error) {
+                            logError('error', 'Local storage caching failed');
+                        }
+                    }
+                    
+                } else {
+                    logError('critical', 'App object not found for performance testing');
+                }
+                
+                // Test Phase 2.4: User Experience Enhancement
+                logError('info', 'Testing Phase 2.4: User Experience Enhancement');
+                
+                const iframeDocument = iframe.contentDocument;
+                if (iframeDocument) {
+                    // Test responsive design
+                    const viewport = iframeDocument.querySelector('meta[name="viewport"]');
+                    if (viewport) {
+                        logError('success', 'Responsive viewport meta tag found');
+                    } else {
+                        logError('error', 'Responsive viewport meta tag not found');
+                    }
+                    
+                    // Test mobile navigation
+                    const mobileToggle = iframeDocument.getElementById('mobile-nav-toggle');
+                    if (mobileToggle) {
+                        const display = iframeDocument.defaultView.getComputedStyle(mobileToggle).display;
+                        if (display !== 'none') {
+                            logError('success', 'Mobile navigation toggle visible');
+                        } else {
+                            logError('error', 'Mobile navigation toggle hidden');
+                        }
+                    } else {
+                        logError('error', 'Mobile navigation toggle not found');
+                    }
+                    
+                    // Test accessibility
+                    const buttons = iframeDocument.querySelectorAll('button[aria-label], button[title]');
+                    if (buttons.length > 0) {
+                        logError('success', `Accessibility features: ${buttons.length} buttons with labels`);
+                    } else {
+                        logError('warning', 'No accessibility labels found');
+                    }
+                    
+                    // Test theme toggle
+                    const themeToggle = iframeDocument.getElementById('theme-toggle-btn');
+                    if (themeToggle) {
+                        logError('success', 'Theme toggle available');
+                    } else {
+                        logError('error', 'Theme toggle not found');
+                    }
+                    
+                } else {
+                    logError('critical', 'Cannot access iframe document');
+                }
+                
+                logError('success', 'Phase 2 feature testing completed');
+                
+            } catch (error) {
+                logError('critical', 'Error testing Phase 2 features', error.message, error.stack);
+            }
+        }
+
+        function clearLog() {
+            errorLog = [];
+            errorCount = 0;
+            warningCount = 0;
+            criticalCount = 0;
+            totalCount = 0;
+            updateStats();
+            document.getElementById('errorLog').innerHTML = '';
+            logError('info', 'Phase 2 Error log cleared');
+        }
+
+        function exportLog() {
+            const logData = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    errors: errorCount,
+                    warnings: warningCount,
+                    critical: criticalCount,
+                    total: totalCount
+                },
+                entries: errorLog
+            };
+            
+            const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `phase2-error-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            logError('success', 'Phase 2 Error log exported');
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+            logError('info', 'Opened app.html in new tab');
+        }
+
+        // Auto-start Phase 2 error logging when page loads
+        window.addEventListener('load', () => {
+            logError('info', 'Phase 2 Error Logger page loaded');
+            setTimeout(() => {
+                startPhase2ErrorLogging();
+                setTimeout(() => testPhase2Features(), 3000);
+            }, 2000);
+        });
+
+        // Monitor iframe load
+        document.getElementById('appFrame').addEventListener('load', () => {
+            logError('info', 'App iframe loaded');
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Comprehensive Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        .critical { color: #ef4444; font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; max-height: 800px; overflow-y: auto; }
+        iframe { width: 100%; height: 600px; border: 1px solid #333; border-radius: 5px; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .test-grid { grid-template-columns: 1fr; } }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-success { background: #4ade80; }
+        .status-error { background: #f87171; }
+        .status-warning { background: #fbbf24; }
+        .status-critical { background: #ef4444; }
+        .error-details { background: #2d1b1b; padding: 10px; margin: 5px 0; border-radius: 3px; font-family: monospace; font-size: 12px; }
+        .progress-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); transition: width 0.3s; }
+        .phase-indicator { background: #2a2a2a; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .phase-2-1 { border-left: 4px solid #3b82f6; }
+        .phase-2-2 { border-left: 4px solid #10b981; }
+        .phase-2-3 { border-left: 4px solid #f59e0b; }
+        .phase-2-4 { border-left: 4px solid #8b5cf6; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Phase 2 Comprehensive Test</h1>
+    
+    <div class="phase-indicator phase-2-1">
+        <h3>Phase 2.1: Enhanced AI Integration</h3>
+        <p>Advanced AI capabilities, context memory, adaptive algorithms</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-2">
+        <h3>Phase 2.2: Advanced Gamification</h3>
+        <p>Dynamic achievements, adaptive difficulty, reward systems</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-3">
+        <h3>Phase 2.3: Performance Optimization</h3>
+        <p>Loading optimization, memory management, caching</p>
+    </div>
+    
+    <div class="phase-indicator phase-2-4">
+        <h3>Phase 2.4: User Experience Enhancement</h3>
+        <p>UI/UX improvements, accessibility, responsive design</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runPhase2Test()">Run Phase 2 Test</button>
+        <button onclick="testPhase2_1()">Test Phase 2.1 (AI)</button>
+        <button onclick="testPhase2_2()">Test Phase 2.2 (Gamification)</button>
+        <button onclick="testPhase2_3()">Test Phase 2.3 (Performance)</button>
+        <button onclick="testPhase2_4()">Test Phase 2.4 (UX)</button>
+        <button onclick="testConsoleErrors()">Test Console Errors</button>
+        <button onclick="testJavaScriptErrors()">Test JavaScript Errors</button>
+        <button onclick="testAPIErrors()">Test API/Call Errors</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        <button onclick="openAppInNewTab()">Open App in New Tab</button>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h2>Live App Preview</h2>
+            <iframe id="appFrame" src="app.html"></iframe>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            warnings: 0,
+            critical: 0,
+            total: 0
+        };
+
+        let consoleErrors = [];
+        let javascriptErrors = [];
+        let apiErrors = [];
+
+        function log(message, type = 'info', details = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            
+            const statusClass = type === 'success' ? 'status-success' : 
+                              type === 'error' ? 'status-error' : 
+                              type === 'warning' ? 'status-warning' : 
+                              type === 'critical' ? 'status-critical' : 'status-warning';
+            
+            let html = `<span class="status-indicator ${statusClass}"></span>[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            if (details) {
+                html += `<div class="error-details">${details}</div>`;
+            }
+            
+            div.innerHTML = html;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            
+            // Update test results
+            if (type === 'success') testResults.passed++;
+            else if (type === 'error') testResults.failed++;
+            else if (type === 'warning') testResults.warnings++;
+            else if (type === 'critical') testResults.critical++;
+            testResults.total++;
+            
+            updateProgressBar();
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateProgressBar() {
+            const progress = testResults.total > 0 ? (testResults.passed / testResults.total * 100) : 0;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = { passed: 0, failed: 0, warnings: 0, critical: 0, total: 0 };
+            updateProgressBar();
+        }
+
+        function runPhase2Test() {
+            log('🚀 Starting Phase 2 Comprehensive Test...', 'info');
+            clearResults();
+            
+            setTimeout(() => {
+                testPhase2_1();
+                setTimeout(() => testPhase2_2(), 2000);
+                setTimeout(() => testPhase2_3(), 4000);
+                setTimeout(() => testPhase2_4(), 6000);
+                setTimeout(() => testConsoleErrors(), 8000);
+                setTimeout(() => testJavaScriptErrors(), 10000);
+                setTimeout(() => testAPIErrors(), 12000);
+                setTimeout(() => generatePhase2Report(), 14000);
+            }, 1000);
+        }
+
+        function testPhase2_1() {
+            log('🧪 Testing Phase 2.1: Enhanced AI Integration...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test Advanced AI Enhancement module
+                if (iframeWindow.window.AdvancedAIEnhancement) {
+                    log('✅ AdvancedAIEnhancement module found', 'success');
+                    
+                    // Test module initialization
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedAI) {
+                        log('✅ Advanced AI module initialized in app', 'success');
+                        
+                        // Test AI features
+                        const aiModule = iframeWindow.window.app.advancedAI;
+                        
+                        // Test user profile management
+                        if (typeof aiModule.updateUserProfile === 'function') {
+                            log('✅ User profile management available', 'success');
+                        } else {
+                            log('❌ User profile management not available', 'error');
+                        }
+                        
+                        // Test context memory
+                        if (typeof aiModule.addToContext === 'function') {
+                            log('✅ Context memory system available', 'success');
+                        } else {
+                            log('❌ Context memory system not available', 'error');
+                        }
+                        
+                        // Test adaptive algorithms
+                        if (typeof aiModule.adaptDifficulty === 'function') {
+                            log('✅ Adaptive difficulty system available', 'success');
+                        } else {
+                            log('❌ Adaptive difficulty system not available', 'error');
+                        }
+                        
+                        // Test goal optimization
+                        if (typeof aiModule.optimizeGoals === 'function') {
+                            log('✅ Goal optimization engine available', 'success');
+                        } else {
+                            log('❌ Goal optimization engine not available', 'error');
+                        }
+                        
+                        // Test personalized advice
+                        if (typeof aiModule.getPersonalizedAdvice === 'function') {
+                            log('✅ Personalized advice system available', 'success');
+                        } else {
+                            log('❌ Personalized advice system not available', 'error');
+                        }
+                        
+                    } else {
+                        log('❌ Advanced AI module not initialized in app', 'error');
+                    }
+                } else {
+                    log('❌ AdvancedAIEnhancement module not found', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing Phase 2.1', 'critical', error.message);
+            }
+        }
+
+        function testPhase2_2() {
+            log('🧪 Testing Phase 2.2: Advanced Gamification...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test Advanced Gamification module
+                if (iframeWindow.window.AdvancedGamification) {
+                    log('✅ AdvancedGamification module found', 'success');
+                    
+                    // Test module initialization
+                    if (iframeWindow.window.app && iframeWindow.window.app.advancedGamification) {
+                        log('✅ Advanced Gamification module initialized in app', 'success');
+                        
+                        // Test gamification features
+                        const gamificationModule = iframeWindow.window.app.advancedGamification;
+                        
+                        // Test dynamic achievements
+                        if (typeof gamificationModule.createAchievement === 'function') {
+                            log('✅ Dynamic achievement system available', 'success');
+                        } else {
+                            log('❌ Dynamic achievement system not available', 'error');
+                        }
+                        
+                        // Test adaptive difficulty
+                        if (typeof gamificationModule.scaleDifficulty === 'function') {
+                            log('✅ Adaptive difficulty scaling available', 'success');
+                        } else {
+                            log('❌ Adaptive difficulty scaling not available', 'error');
+                        }
+                        
+                        // Test reward system
+                        if (typeof gamificationModule.grantReward === 'function') {
+                            log('✅ Advanced reward system available', 'success');
+                        } else {
+                            log('❌ Advanced reward system not available', 'error');
+                        }
+                        
+                        // Test social features
+                        if (typeof gamificationModule.shareAchievement === 'function') {
+                            log('✅ Social features available', 'success');
+                        } else {
+                            log('❌ Social features not available', 'error');
+                        }
+                        
+                        // Test leaderboards
+                        if (typeof gamificationModule.updateLeaderboard === 'function') {
+                            log('✅ Leaderboard system available', 'success');
+                        } else {
+                            log('❌ Leaderboard system not available', 'error');
+                        }
+                        
+                    } else {
+                        log('❌ Advanced Gamification module not initialized in app', 'error');
+                    }
+                } else {
+                    log('❌ AdvancedGamification module not found', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing Phase 2.2', 'critical', error.message);
+            }
+        }
+
+        function testPhase2_3() {
+            log('🧪 Testing Phase 2.3: Performance Optimization...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test performance features
+                if (iframeWindow.window.app) {
+                    // Test loading performance
+                    const loadTime = iframeWindow.performance.timing.loadEventEnd - iframeWindow.performance.timing.navigationStart;
+                    if (loadTime < 3000) {
+                        log(`✅ Fast loading time: ${loadTime}ms`, 'success');
+                    } else {
+                        log(`⚠️ Slow loading time: ${loadTime}ms`, 'warning');
+                    }
+                    
+                    // Test memory usage
+                    if (iframeWindow.performance.memory) {
+                        const memoryUsage = iframeWindow.performance.memory.usedJSHeapSize / 1024 / 1024;
+                        if (memoryUsage < 50) {
+                            log(`✅ Low memory usage: ${memoryUsage.toFixed(2)}MB`, 'success');
+                        } else {
+                            log(`⚠️ High memory usage: ${memoryUsage.toFixed(2)}MB`, 'warning');
+                        }
+                    }
+                    
+                    // Test caching
+                    if (iframeWindow.localStorage) {
+                        try {
+                            iframeWindow.localStorage.setItem('test-cache', 'test');
+                            iframeWindow.localStorage.removeItem('test-cache');
+                            log('✅ Local storage caching working', 'success');
+                        } catch (error) {
+                            log('❌ Local storage caching failed', 'error');
+                        }
+                    }
+                    
+                    // Test lazy loading
+                    const images = iframe.contentDocument.querySelectorAll('img[loading="lazy"]');
+                    if (images.length > 0) {
+                        log(`✅ Lazy loading implemented: ${images.length} images`, 'success');
+                    } else {
+                        log('⚠️ No lazy loading detected', 'warning');
+                    }
+                    
+                    // Test debouncing/throttling
+                    if (typeof iframeWindow.window.app.debounce === 'function' || 
+                        typeof iframeWindow.window.app.throttle === 'function') {
+                        log('✅ Performance utilities available', 'success');
+                    } else {
+                        log('⚠️ Performance utilities not detected', 'warning');
+                    }
+                    
+                } else {
+                    log('❌ App object not found for performance testing', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing Phase 2.3', 'critical', error.message);
+            }
+        }
+
+        function testPhase2_4() {
+            log('🧪 Testing Phase 2.4: User Experience Enhancement...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeDocument = iframe.contentDocument;
+            
+            try {
+                if (iframeDocument) {
+                    // Test responsive design
+                    const viewport = iframeDocument.querySelector('meta[name="viewport"]');
+                    if (viewport) {
+                        log('✅ Responsive viewport meta tag found', 'success');
+                    } else {
+                        log('❌ Responsive viewport meta tag not found', 'error');
+                    }
+                    
+                    // Test mobile navigation
+                    const mobileToggle = iframeDocument.getElementById('mobile-nav-toggle');
+                    if (mobileToggle) {
+                        const display = iframeDocument.defaultView.getComputedStyle(mobileToggle).display;
+                        if (display !== 'none') {
+                            log('✅ Mobile navigation toggle visible', 'success');
+                        } else {
+                            log('❌ Mobile navigation toggle hidden', 'error');
+                        }
+                    } else {
+                        log('❌ Mobile navigation toggle not found', 'error');
+                    }
+                    
+                    // Test accessibility
+                    const buttons = iframeDocument.querySelectorAll('button[aria-label], button[title]');
+                    if (buttons.length > 0) {
+                        log(`✅ Accessibility features: ${buttons.length} buttons with labels`, 'success');
+                    } else {
+                        log('⚠️ No accessibility labels found', 'warning');
+                    }
+                    
+                    // Test smooth animations
+                    const animatedElements = iframeDocument.querySelectorAll('[style*="transition"], [style*="animation"]');
+                    if (animatedElements.length > 0) {
+                        log(`✅ Smooth animations: ${animatedElements.length} elements`, 'success');
+                    } else {
+                        log('⚠️ No smooth animations detected', 'warning');
+                    }
+                    
+                    // Test dark/light theme
+                    const themeToggle = iframeDocument.getElementById('theme-toggle-btn');
+                    if (themeToggle) {
+                        log('✅ Theme toggle available', 'success');
+                    } else {
+                        log('❌ Theme toggle not found', 'error');
+                    }
+                    
+                    // Test keyboard navigation
+                    const focusableElements = iframeDocument.querySelectorAll('button, a, input, select, textarea, [tabindex]');
+                    if (focusableElements.length > 0) {
+                        log(`✅ Keyboard navigation: ${focusableElements.length} focusable elements`, 'success');
+                    } else {
+                        log('⚠️ No focusable elements found', 'warning');
+                    }
+                    
+                } else {
+                    log('❌ Cannot access iframe document', 'critical');
+                }
+                
+            } catch (error) {
+                log('❌ Error testing Phase 2.4', 'critical', error.message);
+            }
+        }
+
+        function testConsoleErrors() {
+            log('🧪 Testing Console Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Override console.error to capture errors
+                const originalError = iframeWindow.console.error;
+                const originalWarn = iframeWindow.console.warn;
+                
+                iframeWindow.console.error = function(...args) {
+                    consoleErrors.push({ type: 'error', message: args.join(' '), timestamp: new Date() });
+                    originalError.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.warn = function(...args) {
+                    consoleErrors.push({ type: 'warning', message: args.join(' '), timestamp: new Date() });
+                    originalWarn.apply(iframeWindow.console, args);
+                };
+                
+                // Check for existing errors
+                if (consoleErrors.length === 0) {
+                    log('✅ No console errors detected', 'success');
+                } else {
+                    log(`❌ ${consoleErrors.length} console errors detected`, 'error');
+                    consoleErrors.forEach((error, index) => {
+                        log(`${error.type.toUpperCase()}: ${error.message}`, 'error', `Time: ${error.timestamp.toLocaleTimeString()}`);
+                    });
+                }
+                
+            } catch (error) {
+                log('❌ Error testing console errors', 'critical', error.message);
+            }
+        }
+
+        function testJavaScriptErrors() {
+            log('🧪 Testing JavaScript Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test for JavaScript syntax errors
+                const scripts = iframe.contentDocument.querySelectorAll('script');
+                let scriptErrors = 0;
+                
+                scripts.forEach((script, index) => {
+                    try {
+                        if (script.textContent) {
+                            // Basic syntax check
+                            new Function(script.textContent);
+                        }
+                    } catch (error) {
+                        scriptErrors++;
+                        log(`❌ Script error in script ${index}`, 'error', error.message);
+                    }
+                });
+                
+                if (scriptErrors === 0) {
+                    log('✅ No JavaScript syntax errors detected', 'success');
+                } else {
+                    log(`❌ ${scriptErrors} JavaScript errors detected`, 'error');
+                }
+                
+                // Test for undefined variables
+                try {
+                    if (iframeWindow.window.app && typeof iframeWindow.window.app.init === 'function') {
+                        log('✅ App init function exists', 'success');
+                    } else {
+                        log('❌ App init function not found', 'error');
+                    }
+                } catch (error) {
+                    log('❌ Error testing app functions', 'error', error.message);
+                }
+                
+            } catch (error) {
+                log('❌ Error testing JavaScript errors', 'critical', error.message);
+            }
+        }
+
+        function testAPIErrors() {
+            log('🧪 Testing API/Call Errors...', 'info');
+            
+            const iframe = document.getElementById('appFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            try {
+                // Test for network errors
+                const performance = iframeWindow.performance;
+                if (performance) {
+                    const entries = performance.getEntriesByType('resource');
+                    const failedRequests = entries.filter(entry => entry.transferSize === 0 && entry.duration > 0);
+                    
+                    if (failedRequests.length === 0) {
+                        log('✅ No failed network requests detected', 'success');
+                    } else {
+                        log(`❌ ${failedRequests.length} failed network requests detected`, 'error');
+                        failedRequests.forEach(request => {
+                            log(`Failed request: ${request.name}`, 'error', `Duration: ${request.duration}ms`);
+                        });
+                    }
+                }
+                
+                // Test for Firebase errors
+                if (iframeWindow.window.app && iframeWindow.window.app.state) {
+                    if (iframeWindow.window.app.state.firebaseReady === false) {
+                        log('⚠️ Firebase not ready', 'warning');
+                    } else {
+                        log('✅ Firebase ready', 'success');
+                    }
+                }
+                
+                // Test for localStorage errors
+                try {
+                    iframeWindow.localStorage.setItem('test', 'test');
+                    iframeWindow.localStorage.removeItem('test');
+                    log('✅ localStorage working', 'success');
+                } catch (error) {
+                    log('❌ localStorage error', 'error', error.message);
+                }
+                
+            } catch (error) {
+                log('❌ Error testing API errors', 'critical', error.message);
+            }
+        }
+
+        function generatePhase2Report() {
+            log('📋 Generating Phase 2 Report...', 'info');
+            
+            const successRate = testResults.total > 0 ? (testResults.passed / testResults.total * 100).toFixed(1) : 0;
+            
+            log('📊 PHASE 2 TEST RESULTS', 'info');
+            log(`✅ Passed: ${testResults.passed}`, 'success');
+            log(`❌ Failed: ${testResults.failed}`, 'error');
+            log(`⚠️ Warnings: ${testResults.warnings}`, 'warning');
+            log(`🚨 Critical: ${testResults.critical}`, 'critical');
+            log(`📈 Success Rate: ${successRate}%`, successRate >= 80 ? 'success' : 'error');
+            
+            if (successRate >= 90) {
+                log('🎉 Phase 2 PASSED - All features working!', 'success');
+            } else if (successRate >= 70) {
+                log('⚠️ Phase 2 PARTIAL PASS - Some issues need attention', 'warning');
+            } else {
+                log('❌ Phase 2 FAILED - Critical issues need immediate attention', 'critical');
+            }
+            
+            // Summary of critical issues
+            if (testResults.critical > 0) {
+                log('🚨 CRITICAL ISSUES SUMMARY:', 'critical');
+                log('- Advanced AI module not found', 'critical');
+                log('- Advanced Gamification module not found', 'critical');
+                log('- Performance issues detected', 'critical');
+                log('- UX/UI problems detected', 'critical');
+            }
+        }
+
+        function runAllTests() {
+            log('🚀 Running All Phase 2 Tests...', 'info');
+            clearResults();
+            
+            setTimeout(() => runPhase2Test(), 500);
+        }
+
+        function openAppInNewTab() {
+            window.open('app.html', '_blank');
+            log('🔗 Opened app.html in new tab', 'info');
+        }
+
+        // Auto-run Phase 2 test on load
+        window.addEventListener('load', () => {
+            log('📋 Phase 2 Comprehensive Test page loaded', 'info');
+            setTimeout(runPhase2Test, 2000);
+        });
+    </script>
+</body>
+</html> 
