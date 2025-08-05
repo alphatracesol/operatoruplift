@@ -154,4 +154,8 @@ webpack-bundle-analyzer-report.html
 .webpack/
 
 # Local development
-.local/ 
+.local/
+
+# Backup folders
+backup-*/
+backup-*-*/ 

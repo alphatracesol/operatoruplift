@@ -1,59 +1,153 @@
 [build]
   publish = "."
+  command = "echo 'No build step needed for static HTML app'"
   functions = "netlify/functions"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
 
+# SPA Routing - Handle all routes
 [[redirects]]
-  from = "/"
-  to = "/working-app.html"
+  from = "/*"
+  to = "/app.html"
   status = 200
 
+# API Routes
 [[redirects]]
-  from = "/app"
-  to = "/working-app.html"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
-# Security headers
+# Function Routes
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Security Headers for all pages
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
+    X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.gstatic.com https://www.googletagmanager.com https://connect.facebook.net https://cdnjs.cloudflare.com https://www.gstatic.com/firebasejs/ https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.pexels.com https://placehold.co https://pbs.twimg.com https://cdn.jsdelivr.net https://www.facebook.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://fcm.googleapis.com https://www.googletagmanager.com https://connect.facebook.net https://api.ipify.org https://api.operatoruplift.com wss://api.operatoruplift.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.gstatic.com https://cdnjs.cloudflare.com https://placehold.co https://pbs.twimg.com https://images.pexels.com https://www.google-analytics.com https://capig.madgicx.ai; frame-src 'self'; worker-src 'self' blob:"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-*.cloudfunctions.net; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "same-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# Function-specific headers
+# PWA Manifest
 [[headers]]
-  for = "/.netlify/functions/*"
+  for = "/manifest.json"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Cache-Control = "no-cache, no-store, must-revalidate"
-    Pragma = "no-cache"
-    Expires = "0"
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
 
-# Environment variables for production
+# JavaScript Files
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "public, max-age=31536000"
+
+# CSS Files
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Content-Type = "text/css"
+    Cache-Control = "public, max-age=31536000"
+
+# HTML Files
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# Images
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.gif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Fonts
+[[headers]]
+  for = "*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.ttf"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Environment Variables
 [context.production.environment]
   NODE_ENV = "production"
-  ALLOWED_ORIGIN = "https://your-production-domain.netlify.app"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"
 
-# Environment variables for development
 [context.deploy-preview.environment]
-  NODE_ENV = "development"
-  ALLOWED_ORIGIN = "https://your-preview-domain.netlify.app"
+  NODE_ENV = "preview"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"
 
-# Environment variables for branch deployments
 [context.branch-deploy.environment]
   NODE_ENV = "development"
-  ALLOWED_ORIGIN = "https://your-branch-domain.netlify.app" 
-
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"

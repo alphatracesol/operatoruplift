@@ -1,495 +1,581 @@
 /**
- * Performance Utilities for optimization and resource management
- * Provides debouncing, throttling, lazy loading, and performance monitoring
- * 
- * @author Operator Uplift Team
- * @version 1.0.0
- * @since 2025-01-28
+ * Performance Utilities for Operator Uplift
+ * Comprehensive performance monitoring, optimization, and memory management
  */
 
 class PerformanceUtils {
-    /**
-     * Debounce function execution
-     * @param {Function} func - Function to debounce
-     * @param {number} wait - Wait time in milliseconds
-     * @param {boolean} immediate - Whether to execute immediately
-     * @returns {Function} Debounced function
+  constructor() {
+    this.metrics = {
+      loadTime: 0,
+      memoryUsage: 0,
+      eventListeners: 0,
+      domNodes: 0,
+      networkRequests: 0,
+      errors: 0
+    };
+
+    this.observers = new Map();
+    this.intervals = new Map();
+    this.timeouts = new Map();
+    this.eventListeners = new Map();
+    this.domCache = new Map();
+
+    this.isMonitoring = false;
+    this.monitoringInterval = null;
+
+    this.performanceThresholds = {
+      loadTime: 3000, // 3 seconds
+      memoryUsage: 100 * 1024 * 1024, // 100MB
+      eventListeners: 100,
+      domNodes: 1000,
+      networkRequests: 50
+    };
+  }
+
+  /**
+     * Initialize performance monitoring
      */
-    static debounce(func, wait, immediate = false) {
-        let timeout;
-        
-        return function executedFunction(...args) {
-            const later = () => {
-                timeout = null;
-                if (!immediate) func.apply(this, args);
-            };
-            
-            const callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            
-            if (callNow) func.apply(this, args);
-        };
+  init() {
+    if (this.isMonitoring) {return;}
+
+    this.setupPerformanceMonitoring();
+    this.setupMemoryMonitoring();
+    this.setupDOMMonitoring();
+    this.setupNetworkMonitoring();
+    this.setupEventListenerTracking();
+
+    this.isMonitoring = true;
+    this.startPeriodicMonitoring();
+
+    console.log('Performance monitoring initialized');
+  }
+
+  /**
+     * Setup performance monitoring
+     */
+  setupPerformanceMonitoring() {
+    // Monitor page load performance
+    if ('PerformanceObserver' in window) {
+      try {
+        const observer = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            if (entry.entryType === 'navigation') {
+              this.metrics.loadTime = entry.loadEventEnd - entry.loadEventStart;
+              this.checkPerformanceThreshold('loadTime', this.metrics.loadTime);
+            }
+          });
+        });
+        observer.observe({ entryTypes: ['navigation'] });
+        this.observers.set('navigation', observer);
+      } catch (error) {
+        console.warn('Performance monitoring setup failed:', error);
+      }
     }
 
-    /**
-     * Throttle function execution
+    // Monitor long tasks
+    if ('PerformanceObserver' in window) {
+      try {
+        const observer = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            if (entry.duration > 50) { // 50ms threshold
+              this.logPerformanceIssue('Long task detected', {
+                duration: entry.duration,
+                startTime: entry.startTime,
+                name: entry.name
+              });
+            }
+          });
+        });
+        observer.observe({ entryTypes: ['longtask'] });
+        this.observers.set('longtask', observer);
+      } catch (error) {
+        console.warn('Long task monitoring setup failed:', error);
+      }
+    }
+  }
+
+  /**
+     * Setup memory monitoring
+     */
+  setupMemoryMonitoring() {
+    if ('memory' in performance) {
+      const checkMemory = () => {
+        const { memory } = performance;
+        this.metrics.memoryUsage = memory.usedJSHeapSize;
+
+        this.checkPerformanceThreshold('memoryUsage', this.metrics.memoryUsage);
+
+        // Log memory usage if high
+        if (memory.usedJSHeapSize > this.performanceThresholds.memoryUsage) {
+          this.logPerformanceIssue('High memory usage', {
+            used: memory.usedJSHeapSize,
+            total: memory.totalJSHeapSize,
+            limit: memory.jsHeapSizeLimit
+          });
+        }
+      };
+
+      // Check memory every 30 seconds
+      const intervalId = setInterval(checkMemory, 30000);
+      this.intervals.set('memory', intervalId);
+    }
+  }
+
+  /**
+     * Setup DOM monitoring
+     */
+  setupDOMMonitoring() {
+    if ('MutationObserver' in window) {
+      try {
+        const observer = new MutationObserver((mutations) => {
+          let addedNodes = 0;
+          let removedNodes = 0;
+
+          mutations.forEach((mutation) => {
+            addedNodes += mutation.addedNodes.length;
+            removedNodes += mutation.removedNodes.length;
+          });
+
+          // Update DOM node count
+          this.metrics.domNodes = document.querySelectorAll('*').length;
+
+          // Log if many nodes were added/removed
+          if (addedNodes > 10 || removedNodes > 10) {
+            this.logPerformanceIssue('DOM mutation detected', {
+              addedNodes,
+              removedNodes,
+              totalNodes: this.metrics.domNodes
+            });
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+
+        this.observers.set('dom', observer);
+      } catch (error) {
+        console.warn('DOM monitoring setup failed:', error);
+      }
+    }
+  }
+
+  /**
+     * Setup network monitoring
+     */
+  setupNetworkMonitoring() {
+    // Override fetch to monitor network requests
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      this.metrics.networkRequests++;
+
+      const startTime = performance.now();
+      try {
+        const response = await originalFetch(...args);
+        const duration = performance.now() - startTime;
+
+        // Log slow requests
+        if (duration > 5000) { // 5 seconds
+          this.logPerformanceIssue('Slow network request', {
+            url: args[0],
+            duration,
+            status: response.status
+          });
+        }
+
+        return response;
+      } catch (error) {
+        this.metrics.errors++;
+        this.logPerformanceIssue('Network request failed', {
+          url: args[0],
+          error: error.message
+        });
+        throw error;
+      }
+    };
+  }
+
+  /**
+     * Setup event listener tracking
+     */
+  setupEventListenerTracking() {
+    // Override addEventListener to track listeners
+    const originalAddEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+      const key = `${this.id || this.tagName || 'anonymous'}-${type}`;
+      const count = performanceUtils.eventListeners.get(key) || 0;
+      performanceUtils.eventListeners.set(key, count + 1);
+      performanceUtils.metrics.eventListeners++;
+
+      return originalAddEventListener.call(this, type, listener, options);
+    };
+
+    // Override removeEventListener
+    const originalRemoveEventListener = EventTarget.prototype.removeEventListener;
+    EventTarget.prototype.removeEventListener = function(type, listener, options) {
+      const key = `${this.id || this.tagName || 'anonymous'}-${type}`;
+      const count = performanceUtils.eventListeners.get(key) || 0;
+      if (count > 0) {
+        performanceUtils.eventListeners.set(key, count - 1);
+        performanceUtils.metrics.eventListeners--;
+      }
+
+      return originalRemoveEventListener.call(this, type, listener, options);
+    };
+  }
+
+  /**
+     * Start periodic monitoring
+     */
+  startPeriodicMonitoring() {
+    this.monitoringInterval = setInterval(() => {
+      this.collectMetrics();
+      this.checkPerformanceThresholds();
+    }, 10000); // Check every 10 seconds
+  }
+
+  /**
+     * Collect current metrics
+     */
+  collectMetrics() {
+    // Update DOM node count
+    this.metrics.domNodes = document.querySelectorAll('*').length;
+
+    // Update memory usage if available
+    if ('memory' in performance) {
+      this.metrics.memoryUsage = performance.memory.usedJSHeapSize;
+    }
+
+    // Update load time if not set
+    if (this.metrics.loadTime === 0 && performance.timing) {
+      this.metrics.loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+    }
+  }
+
+  /**
+     * Check performance thresholds
+     */
+  checkPerformanceThresholds() {
+    Object.entries(this.performanceThresholds).forEach(([metric, threshold]) => {
+      this.checkPerformanceThreshold(metric, this.metrics[metric]);
+    });
+  }
+
+  /**
+     * Check specific performance threshold
+     * @param {string} metric - Metric name
+     * @param {number} value - Current value
+     */
+  checkPerformanceThreshold(metric, value) {
+    const threshold = this.performanceThresholds[metric];
+    if (value > threshold) {
+      this.logPerformanceIssue(`${metric} exceeded threshold`, {
+        metric,
+        value,
+        threshold
+      });
+    }
+  }
+
+  /**
+     * Log performance issue
+     * @param {string} message - Issue message
+     * @param {object} data - Issue data
+     */
+  logPerformanceIssue(message, data = {}) {
+    const issue = {
+      timestamp: new Date().toISOString(),
+      message,
+      data,
+      metrics: { ...this.metrics }
+    };
+
+    // Log to console
+    console.warn('Performance Issue:', issue);
+
+    // Store in localStorage
+    this.storePerformanceIssue(issue);
+  }
+
+  /**
+     * Store performance issue
+     * @param {object} issue - Performance issue
+     */
+  storePerformanceIssue(issue) {
+    try {
+      const issues = JSON.parse(localStorage.getItem('performance_issues') || '[]');
+      issues.push(issue);
+
+      // Keep only last 50 issues
+      if (issues.length > 50) {
+        issues.splice(0, issues.length - 50);
+      }
+
+      localStorage.setItem('performance_issues', JSON.stringify(issues));
+    } catch (error) {
+      console.warn('Failed to store performance issue:', error);
+    }
+  }
+
+  /**
+     * DOM caching utility
+     */
+  cacheDOM(selector, context = document) {
+    const key = `${selector}_${context === document ? 'doc' : 'ctx'}`;
+
+    if (!this.domCache.has(key)) {
+      const element = context.querySelector(selector);
+      this.domCache.set(key, element);
+    }
+
+    return this.domCache.get(key);
+  }
+
+  /**
+     * Clear DOM cache
+     */
+  clearDOMCache() {
+    this.domCache.clear();
+  }
+
+  /**
+     * Safe setTimeout with cleanup
+     * @param {Function} callback - Callback function
+     * @param {number} delay - Delay in milliseconds
+     * @param {string} id - Unique identifier
+     * @returns {number} Timeout ID
+     */
+  safeSetTimeout(callback, delay, id = null) {
+    const timeoutId = setTimeout(callback, delay);
+
+    if (id) {
+      this.timeouts.set(id, timeoutId);
+    }
+
+    return timeoutId;
+  }
+
+  /**
+     * Safe setInterval with cleanup
+     * @param {Function} callback - Callback function
+     * @param {number} delay - Delay in milliseconds
+     * @param {string} id - Unique identifier
+     * @returns {number} Interval ID
+     */
+  safeSetInterval(callback, delay, id = null) {
+    const intervalId = setInterval(callback, delay);
+
+    if (id) {
+      this.intervals.set(id, intervalId);
+    }
+
+    return intervalId;
+  }
+
+  /**
+     * Clear timeout by ID
+     * @param {string} id - Timeout identifier
+     */
+  clearTimeoutById(id) {
+    const timeoutId = this.timeouts.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      this.timeouts.delete(id);
+    }
+  }
+
+  /**
+     * Clear interval by ID
+     * @param {string} id - Interval identifier
+     */
+  clearIntervalById(id) {
+    const intervalId = this.intervals.get(id);
+    if (intervalId) {
+      clearInterval(intervalId);
+      this.intervals.delete(id);
+    }
+  }
+
+  /**
+     * Safe addEventListener with cleanup tracking
+     * @param {Element} element - DOM element
+     * @param {string} event - Event type
+     * @param {Function} handler - Event handler
+     * @param {object} options - Event options
+     * @returns {Function} Cleanup function
+     */
+  safeAddEventListener(element, event, handler, options = {}) {
+    if (!element || !element.addEventListener) {
+      console.warn('Invalid element for event listener');
+      return () => {};
+    }
+
+    const wrappedHandler = (e) => {
+      try {
+        handler(e);
+      } catch (error) {
+        this.logPerformanceIssue('Event handler error', {
+          event,
+          error: error.message,
+          element: element.tagName
+        });
+      }
+    };
+
+    element.addEventListener(event, wrappedHandler, options);
+
+    const key = `${element.id || 'anonymous'}-${event}`;
+    const cleanup = () => {
+      element.removeEventListener(event, wrappedHandler, options);
+      const count = this.eventListeners.get(key) || 0;
+      if (count > 0) {
+        this.eventListeners.set(key, count - 1);
+        this.metrics.eventListeners--;
+      }
+    };
+
+    // Track listener
+    const count = this.eventListeners.get(key) || 0;
+    this.eventListeners.set(key, count + 1);
+    this.metrics.eventListeners++;
+
+    return cleanup;
+  }
+
+  /**
+     * Debounce function
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Wait time in milliseconds
+     * @returns {Function} Debounced function
+     */
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  /**
+     * Throttle function
      * @param {Function} func - Function to throttle
      * @param {number} limit - Time limit in milliseconds
      * @returns {Function} Throttled function
      */
-    static throttle(func, limit) {
-        let inThrottle;
-        
-        return function(...args) {
-            if (!inThrottle) {
-                func.apply(this, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    }
+  throttle(func, limit) {
+    let inThrottle;
+    return function executedFunction(...args) {
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
 
-    /**
-     * Lazy load images
-     * @param {string} selector - Image selector
-     * @param {Object} options - Loading options
+  /**
+     * Get current metrics
+     * @returns {object} Current performance metrics
      */
-    static lazyLoadImages(selector = 'img[data-src]', options = {}) {
-        const defaultOptions = {
-            rootMargin: '50px',
-            threshold: 0.1,
-            ...options
-        };
+  getMetrics() {
+    return { ...this.metrics };
+  }
 
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    const src = img.getAttribute('data-src');
-                    
-                    if (src) {
-                        img.src = src;
-                        img.removeAttribute('data-src');
-                        img.classList.add('loaded');
-                        observer.unobserve(img);
-                    }
-                }
-            });
-        }, defaultOptions);
-
-        document.querySelectorAll(selector).forEach(img => {
-            imageObserver.observe(img);
-        });
-    }
-
-    /**
-     * Lazy load components
-     * @param {string} selector - Component selector
-     * @param {Function} loader - Component loader function
-     * @param {Object} options - Loading options
+  /**
+     * Get performance report
+     * @returns {object} Comprehensive performance report
      */
-    static lazyLoadComponents(selector, loader, options = {}) {
-        const defaultOptions = {
-            rootMargin: '100px',
-            threshold: 0.1,
-            ...options
-        };
+  getPerformanceReport() {
+    return {
+      metrics: this.getMetrics(),
+      thresholds: this.performanceThresholds,
+      eventListeners: Object.fromEntries(this.eventListeners),
+      issues: this.getPerformanceIssues(),
+      recommendations: this.getRecommendations()
+    };
+  }
 
-        const componentObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const element = entry.target;
-                    loader(element);
-                    observer.unobserve(element);
-                }
-            });
-        }, defaultOptions);
-
-        document.querySelectorAll(selector).forEach(element => {
-            componentObserver.observe(element);
-        });
-    }
-
-    /**
-     * Preload critical resources
-     * @param {Array} resources - Array of resource URLs
+  /**
+     * Get performance issues
+     * @returns {Array} Performance issues
      */
-    static preloadResources(resources = []) {
-        resources.forEach(resource => {
-            const link = document.createElement('link');
-            link.rel = 'preload';
-            link.href = resource.url;
-            link.as = resource.type || 'script';
-            
-            if (resource.crossOrigin) {
-                link.crossOrigin = resource.crossOrigin;
-            }
-            
-            document.head.appendChild(link);
-        });
+  getPerformanceIssues() {
+    try {
+      return JSON.parse(localStorage.getItem('performance_issues') || '[]');
+    } catch (error) {
+      return [];
     }
+  }
 
-    /**
-     * Prefetch non-critical resources
-     * @param {Array} resources - Array of resource URLs
+  /**
+     * Get performance recommendations
+     * @returns {Array} Performance recommendations
      */
-    static prefetchResources(resources = []) {
-        resources.forEach(resource => {
-            const link = document.createElement('link');
-            link.rel = 'prefetch';
-            link.href = resource.url;
-            
-            if (resource.crossOrigin) {
-                link.crossOrigin = resource.crossOrigin;
-            }
-            
-            document.head.appendChild(link);
-        });
+  getRecommendations() {
+    const recommendations = [];
+
+    if (this.metrics.loadTime > this.performanceThresholds.loadTime) {
+      recommendations.push('Consider optimizing page load time by reducing bundle size or implementing lazy loading');
     }
 
-    /**
-     * Measure function execution time
-     * @param {Function} func - Function to measure
-     * @param {string} name - Measurement name
-     * @returns {Function} Wrapped function
+    if (this.metrics.memoryUsage > this.performanceThresholds.memoryUsage) {
+      recommendations.push('High memory usage detected. Consider implementing memory cleanup and avoiding memory leaks');
+    }
+
+    if (this.metrics.eventListeners > this.performanceThresholds.eventListeners) {
+      recommendations.push('Too many event listeners detected. Consider using event delegation or removing unused listeners');
+    }
+
+    if (this.metrics.domNodes > this.performanceThresholds.domNodes) {
+      recommendations.push('Large DOM tree detected. Consider virtualizing long lists or reducing DOM complexity');
+    }
+
+    return recommendations;
+  }
+
+  /**
+     * Cleanup all resources
      */
-    static measureTime(func, name = 'Function') {
-        return function(...args) {
-            const start = performance.now();
-            const result = func.apply(this, args);
-            const end = performance.now();
-            
-            console.log(`${name} execution time: ${(end - start).toFixed(2)}ms`);
-            return result;
-        };
+  cleanup() {
+    // Clear all intervals
+    this.intervals.forEach((intervalId) => clearInterval(intervalId));
+    this.intervals.clear();
+
+    // Clear all timeouts
+    this.timeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+    this.timeouts.clear();
+
+    // Disconnect all observers
+    this.observers.forEach((observer) => observer.disconnect());
+    this.observers.clear();
+
+    // Clear monitoring interval
+    if (this.monitoringInterval) {
+      clearInterval(this.monitoringInterval);
+      this.monitoringInterval = null;
     }
 
-    /**
-     * Async measure function execution time
-     * @param {Function} func - Async function to measure
-     * @param {string} name - Measurement name
-     * @returns {Function} Wrapped async function
-     */
-    static measureAsyncTime(func, name = 'Async Function') {
-        return async function(...args) {
-            const start = performance.now();
-            const result = await func.apply(this, args);
-            const end = performance.now();
-            
-            console.log(`${name} execution time: ${(end - start).toFixed(2)}ms`);
-            return result;
-        };
-    }
+    // Clear caches
+    this.domCache.clear();
+    this.eventListeners.clear();
 
-    /**
-     * Monitor memory usage
-     * @returns {Object} Memory usage information
-     */
-    static getMemoryUsage() {
-        if ('memory' in performance) {
-            const memory = performance.memory;
-            return {
-                used: Math.round(memory.usedJSHeapSize / 1048576 * 100) / 100,
-                total: Math.round(memory.totalJSHeapSize / 1048576 * 100) / 100,
-                limit: Math.round(memory.jsHeapSizeLimit / 1048576 * 100) / 100,
-                percentage: Math.round((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100)
-            };
-        }
-        return null;
-    }
-
-    /**
-     * Monitor performance metrics
-     * @returns {Object} Performance metrics
-     */
-    static getPerformanceMetrics() {
-        const metrics = {};
-        
-        // Navigation Timing API
-        if ('navigation' in performance) {
-            const nav = performance.getEntriesByType('navigation')[0];
-            if (nav) {
-                metrics.DOMContentLoaded = nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart;
-                metrics.loadComplete = nav.loadEventEnd - nav.loadEventStart;
-                metrics.domInteractive = nav.domInteractive - nav.fetchStart;
-                metrics.firstPaint = nav.responseEnd - nav.fetchStart;
-            }
-        }
-        
-        // Paint Timing API
-        if ('PerformancePaintTiming' in window) {
-            const paintEntries = performance.getEntriesByType('paint');
-            paintEntries.forEach(entry => {
-                metrics[entry.name] = entry.startTime;
-            });
-        }
-        
-        // Largest Contentful Paint
-        if ('PerformanceObserver' in window) {
-            const observer = new PerformanceObserver((list) => {
-                const entries = list.getEntries();
-                const lastEntry = entries[entries.length - 1];
-                metrics.LCP = lastEntry.startTime;
-            });
-            observer.observe({ entryTypes: ['largest-contentful-paint'] });
-        }
-        
-        return metrics;
-    }
-
-    /**
-     * Optimize images
-     * @param {string} selector - Image selector
-     * @param {Object} options - Optimization options
-     */
-    static optimizeImages(selector = 'img', options = {}) {
-        const defaultOptions = {
-            quality: 0.8,
-            format: 'webp',
-            ...options
-        };
-
-        document.querySelectorAll(selector).forEach(img => {
-            // Add loading="lazy" if not present
-            if (!img.hasAttribute('loading')) {
-                img.setAttribute('loading', 'lazy');
-            }
-            
-            // Add decoding="async" if not present
-            if (!img.hasAttribute('decoding')) {
-                img.setAttribute('decoding', 'async');
-            }
-            
-            // Add alt attribute if missing
-            if (!img.hasAttribute('alt')) {
-                img.setAttribute('alt', '');
-            }
-        });
-    }
-
-    /**
-     * Optimize CSS delivery
-     * @param {Array} criticalCSS - Critical CSS selectors
-     */
-    static optimizeCSSDelivery(criticalCSS = []) {
-        // Inline critical CSS
-        const criticalStyles = document.createElement('style');
-        criticalStyles.textContent = criticalCSS.join('\n');
-        document.head.insertBefore(criticalStyles, document.head.firstChild);
-        
-        // Defer non-critical CSS
-        const nonCriticalLinks = document.querySelectorAll('link[rel="stylesheet"]:not([data-critical])');
-        nonCriticalLinks.forEach(link => {
-            link.setAttribute('media', 'print');
-            link.setAttribute('onload', "this.media='all'");
-        });
-    }
-
-    /**
-     * Optimize JavaScript loading
-     * @param {Array} scripts - Script URLs to optimize
-     */
-    static optimizeScriptLoading(scripts = []) {
-        scripts.forEach(script => {
-            const scriptElement = document.createElement('script');
-            scriptElement.src = script.url;
-            scriptElement.async = script.async !== false;
-            scriptElement.defer = script.defer || false;
-            
-            if (script.crossOrigin) {
-                scriptElement.crossOrigin = script.crossOrigin;
-            }
-            
-            document.head.appendChild(scriptElement);
-        });
-    }
-
-    /**
-     * Cache DOM queries
-     * @param {Object} selectors - Object with selector names and queries
-     * @returns {Object} Cached DOM elements
-     */
-    static cacheDOMQueries(selectors = {}) {
-        const cache = {};
-        
-        Object.entries(selectors).forEach(([name, selector]) => {
-            cache[name] = document.querySelector(selector);
-        });
-        
-        return cache;
-    }
-
-    /**
-     * Batch DOM updates
-     * @param {Array} updates - Array of update functions
-     */
-    static batchDOMUpdates(updates = []) {
-        // Use requestAnimationFrame for smooth updates
-        requestAnimationFrame(() => {
-            updates.forEach(update => {
-                if (typeof update === 'function') {
-                    update();
-                }
-            });
-        });
-    }
-
-    /**
-     * Virtual scrolling for large lists
-     * @param {HTMLElement} container - Container element
-     * @param {Array} items - Array of items
-     * @param {Object} options - Virtual scrolling options
-     */
-    static virtualScroll(container, items, options = {}) {
-        const defaultOptions = {
-            itemHeight: 50,
-            visibleItems: 10,
-            ...options
-        };
-
-        let startIndex = 0;
-        let endIndex = defaultOptions.visibleItems;
-
-        const updateVisibleItems = () => {
-            const scrollTop = container.scrollTop;
-            startIndex = Math.floor(scrollTop / defaultOptions.itemHeight);
-            endIndex = Math.min(startIndex + defaultOptions.visibleItems, items.length);
-
-            // Clear container
-            container.innerHTML = '';
-
-            // Add visible items
-            for (let i = startIndex; i < endIndex; i++) {
-                const item = items[i];
-                const itemElement = document.createElement('div');
-                itemElement.style.height = `${defaultOptions.itemHeight}px`;
-                itemElement.textContent = item;
-                container.appendChild(itemElement);
-            }
-
-            // Set container height
-            container.style.height = `${items.length * defaultOptions.itemHeight}px`;
-        };
-
-        container.addEventListener('scroll', this.throttle(updateVisibleItems, 16));
-        updateVisibleItems();
-    }
-
-    /**
-     * Optimize animations
-     * @param {Array} elements - Elements to optimize
-     */
-    static optimizeAnimations(elements = []) {
-        elements.forEach(element => {
-            // Use transform and opacity for better performance
-            element.style.willChange = 'transform, opacity';
-            
-            // Use hardware acceleration
-            element.style.transform = 'translateZ(0)';
-        });
-    }
-
-    /**
-     * Monitor frame rate
-     * @param {Function} callback - Callback function for FPS updates
-     * @returns {Function} Stop monitoring function
-     */
-    static monitorFrameRate(callback) {
-        let frameCount = 0;
-        let lastTime = performance.now();
-        let animationId;
-
-        const countFrames = () => {
-            frameCount++;
-            const currentTime = performance.now();
-            
-            if (currentTime - lastTime >= 1000) {
-                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-                callback(fps);
-                frameCount = 0;
-                lastTime = currentTime;
-            }
-            
-            animationId = requestAnimationFrame(countFrames);
-        };
-
-        animationId = requestAnimationFrame(countFrames);
-
-        return () => {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
-        };
-    }
-
-    /**
-     * Optimize event listeners
-     * @param {HTMLElement} element - Target element
-     * @param {string} event - Event type
-     * @param {Function} handler - Event handler
-     * @param {Object} options - Event options
-     */
-    static optimizeEventListener(element, event, handler, options = {}) {
-        const defaultOptions = {
-            passive: true,
-            ...options
-        };
-
-        element.addEventListener(event, handler, defaultOptions);
-    }
-
-    /**
-     * Debounced scroll handler
-     * @param {Function} handler - Scroll handler function
-     * @param {number} delay - Debounce delay
-     * @returns {Function} Debounced scroll handler
-     */
-    static debouncedScroll(handler, delay = 16) {
-        return this.debounce(handler, delay);
-    }
-
-    /**
-     * Throttled resize handler
-     * @param {Function} handler - Resize handler function
-     * @param {number} delay - Throttle delay
-     * @returns {Function} Throttled resize handler
-     */
-    static throttledResize(handler, delay = 100) {
-        return this.throttle(handler, delay);
-    }
-
-    /**
-     * Optimize network requests
-     * @param {string} url - Request URL
-     * @param {Object} options - Request options
-     * @returns {Promise} Optimized request
-     */
-    static optimizedRequest(url, options = {}) {
-        const defaultOptions = {
-            cache: 'default',
-            ...options
-        };
-
-        return fetch(url, defaultOptions);
-    }
-
-    /**
-     * Preload critical data
-     * @param {Array} dataUrls - Array of data URLs to preload
-     */
-    static preloadData(dataUrls = []) {
-        dataUrls.forEach(url => {
-            fetch(url, { cache: 'force-cache' });
-        });
-    }
+    this.isMonitoring = false;
+    console.log('Performance monitoring cleaned up');
+  }
 }
 
-// Export for use in modules
+// Create global instance
+const performanceUtils = new PerformanceUtils();
+
+// Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PerformanceUtils;
+  module.exports = { PerformanceUtils, performanceUtils };
 } else if (typeof window !== 'undefined') {
-    window.PerformanceUtils = PerformanceUtils;
+  window.PerformanceUtils = PerformanceUtils;
+  window.performanceUtils = performanceUtils;
 }
-
-export default PerformanceUtils; 

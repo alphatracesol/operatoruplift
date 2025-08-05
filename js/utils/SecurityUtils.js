@@ -1,440 +1,347 @@
 /**
- * Security Utilities for input validation and XSS prevention
- * Provides comprehensive security measures for user input and data handling
- * 
- * @author Operator Uplift Team
- * @version 1.0.0
- * @since 2025-01-28
+ * Security Utilities for Operator Uplift
+ * Comprehensive security measures to prevent vulnerabilities
  */
 
 class SecurityUtils {
-    /**
+  constructor() {
+    this.xssPatterns = [
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+      /javascript:/gi,
+      /on\w+\s*=/gi,
+      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+      /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
+      /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi
+    ];
+
+    this.sanitizationMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      '\'': '&#x27;',
+      '/': '&#x2F;'
+    };
+  }
+
+  /**
      * Sanitize HTML content to prevent XSS attacks
-     * @param {string} html - HTML string to sanitize
+     * @param {string} html - HTML content to sanitize
      * @returns {string} Sanitized HTML
      */
-    static sanitizeHTML(html) {
-        if (typeof html !== 'string') return '';
-        
-        const div = document.createElement('div');
-        div.textContent = html;
-        return div.innerHTML;
-    }
+  static sanitizeHTML(html) {
+    if (!html || typeof html !== 'string') {return '';}
 
-    /**
+    // Remove dangerous patterns
+    let sanitized = html;
+    this.xssPatterns.forEach(pattern => {
+      sanitized = sanitized.replace(pattern, '');
+    });
+
+    // Escape HTML entities
+    Object.entries(this.sanitizationMap).forEach(([char, entity]) => {
+      sanitized = sanitized.replace(new RegExp(char, 'g'), entity);
+    });
+
+    return sanitized;
+  }
+
+  /**
+     * Safely set innerHTML with XSS prevention
+     * @param {Element} element - DOM element
+     * @param {string} content - Content to set
+     */
+  static safeSetInnerHTML(element, content) {
+    if (!element || !element.innerHTML) {return;}
+    element.innerHTML = this.sanitizeHTML(content);
+  }
+
+  /**
      * Validate email format
      * @param {string} email - Email to validate
-     * @returns {boolean} Whether email is valid
+     * @returns {boolean} Is valid email
      */
-    static isValidEmail(email) {
-        if (typeof email !== 'string') return false;
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email.trim());
-    }
+  static validateEmail(email) {
+    if (!email || typeof email !== 'string') {return false;}
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
 
-    /**
-     * Validate password strength
+  /**
+     * Enhanced password validation
      * @param {string} password - Password to validate
-     * @returns {Object} Validation result with score and feedback
+     * @returns {object} Validation result with details
      */
-    static validatePassword(password) {
-        if (typeof password !== 'string') {
-            return { isValid: false, score: 0, feedback: 'Password must be a string' };
-        }
-
-        const minLength = 8;
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasLowerCase = /[a-z]/.test(password);
-        const hasNumbers = /\d/.test(password);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-        let score = 0;
-        const feedback = [];
-
-        if (password.length >= minLength) {
-            score += 2;
-        } else {
-            feedback.push(`Password must be at least ${minLength} characters long`);
-        }
-
-        if (hasUpperCase) score += 1;
-        if (hasLowerCase) score += 1;
-        if (hasNumbers) score += 1;
-        if (hasSpecialChar) score += 1;
-
-        if (!hasUpperCase) feedback.push('Include at least one uppercase letter');
-        if (!hasLowerCase) feedback.push('Include at least one lowercase letter');
-        if (!hasNumbers) feedback.push('Include at least one number');
-        if (!hasSpecialChar) feedback.push('Include at least one special character');
-
-        const isValid = score >= 4 && password.length >= minLength;
-
-        return {
-            isValid,
-            score,
-            feedback: feedback.length > 0 ? feedback : ['Password meets all requirements']
-        };
+  static validatePassword(password) {
+    if (!password || typeof password !== 'string') {
+      return { valid: false, errors: ['Password must be a string'] };
     }
 
-    /**
-     * Validate username format
-     * @param {string} username - Username to validate
-     * @returns {Object} Validation result
+    const errors = [];
+    const requirements = {
+      minLength: password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    if (!requirements.minLength) {errors.push('Password must be at least 8 characters long');}
+    if (!requirements.hasUpperCase) {errors.push('Password must contain at least one uppercase letter');}
+    if (!requirements.hasLowerCase) {errors.push('Password must contain at least one lowercase letter');}
+    if (!requirements.hasNumber) {errors.push('Password must contain at least one number');}
+    if (!requirements.hasSpecialChar) {errors.push('Password must contain at least one special character');}
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      strength: this.calculatePasswordStrength(password, requirements)
+    };
+  }
+
+  /**
+     * Calculate password strength
+     * @param {string} password - Password to evaluate
+     * @param {object} requirements - Met requirements
+     * @returns {string} Strength level
      */
-    static validateUsername(username) {
-        if (typeof username !== 'string') {
-            return { isValid: false, feedback: 'Username must be a string' };
-        }
+  static calculatePasswordStrength(password, requirements) {
+    let score = 0;
 
-        const trimmed = username.trim();
-        const minLength = 3;
-        const maxLength = 20;
-        const validChars = /^[a-zA-Z0-9_-]+$/;
+    // Length bonus
+    if (password.length >= 12) {score += 2;}
+    else if (password.length >= 8) {score += 1;}
 
-        const feedback = [];
+    // Character variety bonus
+    Object.values(requirements).forEach(met => {
+      if (met) {score += 1;}
+    });
 
-        if (trimmed.length < minLength) {
-            feedback.push(`Username must be at least ${minLength} characters long`);
-        }
-
-        if (trimmed.length > maxLength) {
-            feedback.push(`Username must be no more than ${maxLength} characters long`);
-        }
-
-        if (!validChars.test(trimmed)) {
-            feedback.push('Username can only contain letters, numbers, underscores, and hyphens');
-        }
-
-        const isValid = trimmed.length >= minLength && 
-                       trimmed.length <= maxLength && 
-                       validChars.test(trimmed);
-
-        return {
-            isValid,
-            feedback: feedback.length > 0 ? feedback : ['Username is valid']
-        };
+    // Complexity bonus
+    if (password.length > 8 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+      score += 1;
     }
 
-    /**
-     * Sanitize user input for safe display
+    if (score >= 6) {return 'strong';}
+    if (score >= 4) {return 'medium';}
+    if (score >= 2) {return 'weak';}
+    return 'very-weak';
+  }
+
+  /**
+     * Sanitize user input
      * @param {string} input - User input to sanitize
      * @returns {string} Sanitized input
      */
-    static sanitizeInput(input) {
-        if (typeof input !== 'string') return '';
-        
-        // Remove potentially dangerous characters and patterns
-        return input
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/javascript:/gi, '')
-            .replace(/on\w+\s*=/gi, '')
-            .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-            .trim();
+  static sanitizeInput(input) {
+    if (!input || typeof input !== 'string') {return '';}
+
+    // Remove null bytes and control characters
+    let sanitized = input.replace(/[\x00-\x1F\x7F]/g, '');
+
+    // Trim whitespace
+    sanitized = sanitized.trim();
+
+    // Limit length
+    if (sanitized.length > 1000) {
+      sanitized = sanitized.substring(0, 1000);
     }
 
-    /**
-     * Validate goal title
-     * @param {string} title - Goal title to validate
-     * @returns {Object} Validation result
-     */
-    static validateGoalTitle(title) {
-        if (typeof title !== 'string') {
-            return { isValid: false, feedback: 'Title must be a string' };
-        }
+    return sanitized;
+  }
 
-        const trimmed = title.trim();
-        const minLength = 3;
-        const maxLength = 100;
-
-        const feedback = [];
-
-        if (trimmed.length < minLength) {
-            feedback.push(`Title must be at least ${minLength} characters long`);
-        }
-
-        if (trimmed.length > maxLength) {
-            feedback.push(`Title must be no more than ${maxLength} characters long`);
-        }
-
-        const isValid = trimmed.length >= minLength && trimmed.length <= maxLength;
-
-        return {
-            isValid,
-            feedback: feedback.length > 0 ? feedback : ['Title is valid']
-        };
-    }
-
-    /**
-     * Validate goal description
-     * @param {string} description - Goal description to validate
-     * @returns {Object} Validation result
-     */
-    static validateGoalDescription(description) {
-        if (typeof description !== 'string') {
-            return { isValid: false, feedback: 'Description must be a string' };
-        }
-
-        const trimmed = description.trim();
-        const maxLength = 500;
-
-        const feedback = [];
-
-        if (trimmed.length > maxLength) {
-            feedback.push(`Description must be no more than ${maxLength} characters long`);
-        }
-
-        const isValid = trimmed.length <= maxLength;
-
-        return {
-            isValid,
-            feedback: feedback.length > 0 ? feedback : ['Description is valid']
-        };
-    }
-
-    /**
-     * Validate date format
-     * @param {string} dateString - Date string to validate
-     * @returns {boolean} Whether date is valid
-     */
-    static isValidDate(dateString) {
-        if (typeof dateString !== 'string') return false;
-        
-        const date = new Date(dateString);
-        return !isNaN(date.getTime());
-    }
-
-    /**
-     * Validate future date
-     * @param {string} dateString - Date string to validate
-     * @returns {boolean} Whether date is in the future
-     */
-    static isFutureDate(dateString) {
-        if (!this.isValidDate(dateString)) return false;
-        
-        const date = new Date(dateString);
-        const now = new Date();
-        return date > now;
-    }
-
-    /**
-     * Escape HTML entities
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    static escapeHTML(text) {
-        if (typeof text !== 'string') return '';
-        
-        const htmlEntities = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-        
-        return text.replace(/[&<>"']/g, char => htmlEntities[char]);
-    }
-
-    /**
-     * Validate URL format
+  /**
+     * Validate and sanitize URL
      * @param {string} url - URL to validate
-     * @returns {boolean} Whether URL is valid
+     * @returns {string|null} Valid URL or null
      */
-    static isValidURL(url) {
-        if (typeof url !== 'string') return false;
-        
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            return false;
-        }
+  static validateURL(url) {
+    if (!url || typeof url !== 'string') {return null;}
+
+    try {
+      const urlObj = new URL(url);
+      const allowedProtocols = ['http:', 'https:'];
+
+      if (!allowedProtocols.includes(urlObj.protocol)) {
+        return null;
+      }
+
+      return urlObj.href;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+     * Generate secure random token
+     * @param {number} length - Token length
+     * @returns {string} Secure random token
+     */
+  static generateSecureToken(length = 32) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      const array = new Uint8Array(length);
+      crypto.getRandomValues(array);
+
+      for (let i = 0; i < length; i++) {
+        token += chars[array[i] % chars.length];
+      }
+    } else {
+      // Fallback for older browsers
+      for (let i = 0; i < length; i++) {
+        token += chars[Math.floor(Math.random() * chars.length)];
+      }
     }
 
-    /**
-     * Validate phone number format
-     * @param {string} phone - Phone number to validate
-     * @returns {boolean} Whether phone number is valid
-     */
-    static isValidPhone(phone) {
-        if (typeof phone !== 'string') return false;
-        
-        // Basic phone validation - allows various formats
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        const cleaned = phone.replace(/[\s\-\(\)]/g, '');
-        return phoneRegex.test(cleaned);
-    }
+    return token;
+  }
 
-    /**
-     * Generate secure random string
-     * @param {number} length - Length of random string
-     * @returns {string} Random string
-     */
-    static generateRandomString(length = 32) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        
-        return result;
-    }
-
-    /**
-     * Hash string using simple algorithm (for non-critical use)
-     * @param {string} str - String to hash
-     * @returns {string} Hashed string
-     */
-    static simpleHash(str) {
-        if (typeof str !== 'string') return '';
-        
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return Math.abs(hash).toString(36);
-    }
-
-    /**
-     * Validate file type
-     * @param {File} file - File to validate
-     * @param {Array} allowedTypes - Array of allowed MIME types
-     * @returns {boolean} Whether file type is allowed
-     */
-    static isValidFileType(file, allowedTypes = []) {
-        if (!file || !file.type) return false;
-        
-        if (allowedTypes.length === 0) {
-            // Default allowed types
-            allowedTypes = [
-                'image/jpeg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'text/plain',
-                'application/pdf'
-            ];
-        }
-        
-        return allowedTypes.includes(file.type);
-    }
-
-    /**
-     * Validate file size
-     * @param {File} file - File to validate
-     * @param {number} maxSizeMB - Maximum size in MB
-     * @returns {boolean} Whether file size is within limit
-     */
-    static isValidFileSize(file, maxSizeMB = 5) {
-        if (!file || !file.size) return false;
-        
-        const maxSizeBytes = maxSizeMB * 1024 * 1024;
-        return file.size <= maxSizeBytes;
-    }
-
-    /**
-     * Sanitize object properties recursively
-     * @param {Object} obj - Object to sanitize
-     * @returns {Object} Sanitized object
-     */
-    static sanitizeObject(obj) {
-        if (typeof obj !== 'object' || obj === null) {
-            return typeof obj === 'string' ? this.sanitizeInput(obj) : obj;
-        }
-
-        if (Array.isArray(obj)) {
-            return obj.map(item => this.sanitizeObject(item));
-        }
-
-        const sanitized = {};
-        for (const [key, value] of Object.entries(obj)) {
-            sanitized[key] = this.sanitizeObject(value);
-        }
-
-        return sanitized;
-    }
-
-    /**
-     * Validate JSON string
-     * @param {string} jsonString - JSON string to validate
-     * @returns {boolean} Whether JSON is valid
-     */
-    static isValidJSON(jsonString) {
-        if (typeof jsonString !== 'string') return false;
-        
-        try {
-            JSON.parse(jsonString);
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    /**
-     * Check if string contains potentially dangerous content
-     * @param {string} text - Text to check
-     * @returns {boolean} Whether text contains dangerous content
-     */
-    static containsDangerousContent(text) {
-        if (typeof text !== 'string') return false;
-        
-        const dangerousPatterns = [
-            /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-            /javascript:/gi,
-            /on\w+\s*=/gi,
-            /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
-            /data:text\/html/gi,
-            /vbscript:/gi
-        ];
-        
-        return dangerousPatterns.some(pattern => pattern.test(text));
-    }
-
-    /**
+  /**
      * Rate limiting utility
-     * @param {string} key - Rate limit key
-     * @param {number} maxAttempts - Maximum attempts allowed
-     * @param {number} windowMs - Time window in milliseconds
-     * @returns {boolean} Whether request is allowed
      */
-    static checkRateLimit(key, maxAttempts = 5, windowMs = 60000) {
-        const now = Date.now();
-        const storageKey = `rate_limit_${key}`;
-        
-        let attempts = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        
-        // Remove old attempts outside the time window
-        attempts = attempts.filter(timestamp => now - timestamp < windowMs);
-        
-        if (attempts.length >= maxAttempts) {
-            return false;
-        }
-        
-        attempts.push(now);
-        localStorage.setItem(storageKey, JSON.stringify(attempts));
-        
-        return true;
+  static createRateLimiter(maxRequests = 10, timeWindow = 60000) {
+    const requests = new Map();
+
+    return function(key) {
+      const now = Date.now();
+      const userRequests = requests.get(key) || [];
+
+      // Remove old requests outside the time window
+      const validRequests = userRequests.filter(time => now - time < timeWindow);
+
+      if (validRequests.length >= maxRequests) {
+        return false; // Rate limit exceeded
+      }
+
+      validRequests.push(now);
+      requests.set(key, validRequests);
+
+      return true; // Request allowed
+    };
+  }
+
+  /**
+     * CSRF token management
+     */
+  static generateCSRFToken() {
+    const token = this.generateSecureToken(32);
+    sessionStorage.setItem('csrf_token', token);
+    return token;
+  }
+
+  static validateCSRFToken(token) {
+    const storedToken = sessionStorage.getItem('csrf_token');
+    return token === storedToken;
+  }
+
+  /**
+     * Content Security Policy headers
+     * @returns {object} CSP headers
+     */
+  static getCSPHeaders() {
+    return {
+      'Content-Security-Policy': [
+        'default-src \'self\'',
+        'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' https://cdn.jsdelivr.net https://unpkg.com',
+        'style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com',
+        'font-src \'self\' https://fonts.gstatic.com',
+        'img-src \'self\' data: https:',
+        'connect-src \'self\' https://api.openai.com https://api.deepseek.com https://api.perplexity.ai',
+        'frame-ancestors \'none\'',
+        'base-uri \'self\'',
+        'form-action \'self\''
+      ].join('; ')
+    };
+  }
+
+  /**
+     * Security headers for API responses
+     * @returns {object} Security headers
+     */
+  static getSecurityHeaders() {
+    return {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+    };
+  }
+
+  /**
+     * Validate file upload
+     * @param {File} file - File to validate
+     * @param {object} options - Validation options
+     * @returns {object} Validation result
+     */
+  static validateFileUpload(file, options = {}) {
+    const {
+      maxSize = 5 * 1024 * 1024, // 5MB default
+      allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'text/plain', 'application/pdf'],
+      allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.txt', '.pdf']
+    } = options;
+
+    const errors = [];
+
+    // Check file size
+    if (file.size > maxSize) {
+      errors.push(`File size exceeds maximum allowed size of ${maxSize / 1024 / 1024}MB`);
     }
 
-    /**
-     * Clear rate limit for a key
-     * @param {string} key - Rate limit key to clear
-     */
-    static clearRateLimit(key) {
-        const storageKey = `rate_limit_${key}`;
-        localStorage.removeItem(storageKey);
+    // Check file type
+    if (!allowedTypes.includes(file.type)) {
+      errors.push('File type not allowed');
     }
+
+    // Check file extension
+    const extension = `.${file.name.split('.').pop().toLowerCase()}`;
+    if (!allowedExtensions.includes(extension)) {
+      errors.push('File extension not allowed');
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+     * Log security events
+     * @param {string} event - Security event
+     * @param {object} details - Event details
+     */
+  static logSecurityEvent(event, details = {}) {
+    const securityLog = {
+      timestamp: new Date().toISOString(),
+      event,
+      details,
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    };
+
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Security Event:', securityLog);
+    }
+
+    // Store in localStorage for debugging
+    const logs = JSON.parse(localStorage.getItem('security_logs') || '[]');
+    logs.push(securityLog);
+
+    // Keep only last 100 logs
+    if (logs.length > 100) {
+      logs.splice(0, logs.length - 100);
+    }
+
+    localStorage.setItem('security_logs', JSON.stringify(logs));
+  }
 }
 
-// Export for use in modules
+// Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SecurityUtils;
+  module.exports = SecurityUtils;
 } else if (typeof window !== 'undefined') {
-    window.SecurityUtils = SecurityUtils;
+  window.SecurityUtils = SecurityUtils;
 }
-
-export default SecurityUtils; 

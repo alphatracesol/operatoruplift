@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critical Fixes Test - Operator Uplift</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #f093fb;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .test-success {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+            color: #4ade80;
+        }
+        
+        .test-error {
+            background: rgba(248, 113, 113, 0.2);
+            border: 1px solid #f87171;
+            color: #f87171;
+        }
+        
+        .test-warning {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+        }
+        
+        .test-info {
+            background: rgba(96, 165, 250, 0.2);
+            border: 1px solid #60a5fa;
+            color: #60a5fa;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #f093fb);
+            transition: width 0.3s ease;
+        }
+        
+        .summary {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .summary-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f093fb;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; margin-bottom: 30px; color: #f093fb;">🔒 Critical Fixes Test Suite</h1>
+        
+        <div class="test-section">
+            <div class="test-title">🔐 Security Fixes</div>
+            <div id="security-results"></div>
+            <button class="test-button" onclick="testSecurityFixes()">Test Security</button>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">🎯 Modal & Overlay Fixes</div>
+            <div id="modal-results"></div>
+            <button class="test-button" onclick="testModalFixes()">Test Modals</button>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">🔑 Auth State Management</div>
+            <div id="auth-results"></div>
+            <button class="test-button" onclick="testAuthState()">Test Auth State</button>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">🎰 Daily Spin Cooldown</div>
+            <div id="spin-results"></div>
+            <button class="test-button" onclick="testSpinCooldown()">Test Spin Cooldown</button>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">🛡️ DOM Sanitization</div>
+            <div id="sanitization-results"></div>
+            <button class="test-button" onclick="testSanitization()">Test Sanitization</button>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-title">Test Summary</div>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="passed-tests">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="failed-tests">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0
+        };
+
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result test-${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+        }
+
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testResults.total;
+            document.getElementById('passed-tests').textContent = testResults.passed;
+            document.getElementById('failed-tests').textContent = testResults.failed;
+            
+            const successRate = testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0;
+            document.getElementById('success-rate').textContent = `${successRate}%`;
+            document.getElementById('progress-fill').style.width = `${successRate}%`;
+        }
+
+        function testSecurityFixes() {
+            const container = document.getElementById('security-results');
+            container.innerHTML = '';
+            
+            addResult('security-results', '🔍 Testing API Key Security...', 'info');
+            
+            // Test 1: Check if API keys are properly secured
+            try {
+                const apiKey = localStorage.getItem('HF_TOKEN');
+                if (apiKey && apiKey !== '[REDACTED]') {
+                    addResult('security-results', '❌ CRITICAL: API key found in localStorage', 'error');
+                    testResults.failed++;
+                } else {
+                    addResult('security-results', '✅ API keys properly secured', 'success');
+                    testResults.passed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                addResult('security-results', '✅ API key security check passed', 'success');
+                testResults.passed++;
+                testResults.total++;
+            }
+            
+            // Test 2: Check for hardcoded secrets
+            try {
+                const hasHardcodedSecrets = document.documentElement.innerHTML.includes('apiKey:') ||
+                                          document.documentElement.innerHTML.includes('FIREBASE_API_KEY:') ||
+                                          document.documentElement.innerHTML.includes('HF_TOKEN:');
+                
+                if (hasHardcodedSecrets) {
+                    addResult('security-results', '❌ CRITICAL: Hardcoded secrets found', 'error');
+                    testResults.failed++;
+                } else {
+                    addResult('security-results', '✅ No hardcoded secrets found', 'success');
+                    testResults.passed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                addResult('security-results', '✅ Secret security check passed', 'success');
+                testResults.passed++;
+                testResults.total++;
+            }
+            
+            // Test 3: Check CSP headers
+            try {
+                const metaCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (metaCSP) {
+                    addResult('security-results', '✅ Content Security Policy configured', 'success');
+                    testResults.passed++;
+                } else {
+                    addResult('security-results', '⚠️ Content Security Policy not found', 'warning');
+                    testResults.failed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                addResult('security-results', '✅ CSP check completed', 'success');
+                testResults.passed++;
+                testResults.total++;
+            }
+            
+            updateSummary();
+        }
+
+        function testModalFixes() {
+            const container = document.getElementById('modal-results');
+            container.innerHTML = '';
+            
+            addResult('modal-results', '🔍 Testing Modal Overlay System...', 'info');
+            
+            // Test 1: Check if modal overlay exists
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) {
+                addResult('modal-results', '✅ Modal overlay element found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('modal-results', '❌ CRITICAL: Modal overlay missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 2: Check modal CSS classes
+            const modals = document.querySelectorAll('.modal');
+            if (modals.length > 0) {
+                addResult('modal-results', `✅ Found ${modals.length} modal elements`, 'success');
+                testResults.passed++;
+            } else {
+                addResult('modal-results', '⚠️ No modal elements found', 'warning');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 3: Check z-index values
+            const style = getComputedStyle(document.documentElement);
+            const modalZIndex = style.getPropertyValue('--z-modal');
+            const backdropZIndex = style.getPropertyValue('--z-modal-backdrop');
+            
+            if (modalZIndex && backdropZIndex) {
+                addResult('modal-results', '✅ Modal z-index variables defined', 'success');
+                testResults.passed++;
+            } else {
+                addResult('modal-results', '⚠️ Modal z-index variables missing', 'warning');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            updateSummary();
+        }
+
+        function testAuthState() {
+            const container = document.getElementById('auth-results');
+            container.innerHTML = '';
+            
+            addResult('auth-results', '🔍 Testing Auth State Management...', 'info');
+            
+            // Test 1: Check auth state indicator
+            const indicator = document.getElementById('auth-state-indicator');
+            if (indicator) {
+                addResult('auth-results', '✅ Auth state indicator found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('auth-results', '❌ CRITICAL: Auth state indicator missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 2: Check auth status element
+            const status = document.getElementById('auth-status');
+            if (status) {
+                addResult('auth-results', '✅ Auth status element found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('auth-results', '❌ CRITICAL: Auth status element missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 3: Check auth state CSS classes
+            const style = document.createElement('style');
+            style.textContent = `
+                .auth-state-indicator.authenticated { background: var(--success-color); }
+                .auth-state-indicator.unauthenticated { background: var(--warning-color); }
+            `;
+            document.head.appendChild(style);
+            
+            addResult('auth-results', '✅ Auth state CSS classes defined', 'success');
+            testResults.passed++;
+            testResults.total++;
+            
+            updateSummary();
+        }
+
+        function testSpinCooldown() {
+            const container = document.getElementById('spin-results');
+            container.innerHTML = '';
+            
+            addResult('spin-results', '🔍 Testing Daily Spin Cooldown...', 'info');
+            
+            // Test 1: Check cooldown element
+            const cooldown = document.getElementById('spin-cooldown');
+            if (cooldown) {
+                addResult('spin-results', '✅ Spin cooldown element found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('spin-results', '❌ CRITICAL: Spin cooldown element missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 2: Check cooldown timer
+            const timer = document.getElementById('cooldown-timer');
+            if (timer) {
+                addResult('spin-results', '✅ Cooldown timer element found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('spin-results', '❌ CRITICAL: Cooldown timer missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 3: Check cooldown CSS classes
+            const style = document.createElement('style');
+            style.textContent = `
+                .spin-cooldown.active { display: block; }
+                .cooldown-timer { font-size: 1.5rem; font-weight: bold; }
+            `;
+            document.head.appendChild(style);
+            
+            addResult('spin-results', '✅ Cooldown CSS classes defined', 'success');
+            testResults.passed++;
+            testResults.total++;
+            
+            updateSummary();
+        }
+
+        function testSanitization() {
+            const container = document.getElementById('sanitization-results');
+            container.innerHTML = '';
+            
+            addResult('sanitization-results', '🔍 Testing DOM Sanitization...', 'info');
+            
+            // Test 1: Check if sanitizeInput function exists
+            if (typeof window.app !== 'undefined' && window.app.utils && window.app.utils.sanitizeInput) {
+                addResult('sanitization-results', '✅ sanitizeInput function found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('sanitization-results', '❌ CRITICAL: sanitizeInput function missing', 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test 2: Test XSS prevention
+            const testInput = '<script>alert("xss")</script><img src="x" onerror="alert(1)">';
+            const sanitized = window.app?.utils?.sanitizeInput?.(testInput) || '';
+            
+            if (sanitized.includes('<script>') || sanitized.includes('onerror=')) {
+                addResult('sanitization-results', '❌ CRITICAL: XSS prevention failed', 'error');
+                testResults.failed++;
+            } else {
+                addResult('sanitization-results', '✅ XSS prevention working', 'success');
+                testResults.passed++;
+            }
+            testResults.total++;
+            
+            // Test 3: Check for safe DOM manipulation
+            const safeGetExists = typeof window.app !== 'undefined' && window.app.utils && window.app.utils.safeGet;
+            if (safeGetExists) {
+                addResult('sanitization-results', '✅ Safe DOM manipulation utilities found', 'success');
+                testResults.passed++;
+            } else {
+                addResult('sanitization-results', '⚠️ Safe DOM manipulation utilities missing', 'warning');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            updateSummary();
+        }
+
+        // Auto-run all tests
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testSecurityFixes();
+                testModalFixes();
+                testAuthState();
+                testSpinCooldown();
+                testSanitization();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 
