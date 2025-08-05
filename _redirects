@@ -4,8 +4,8 @@
 # API Routes
 /api/*    /.netlify/functions/:splat    200
 
-# Function Routes
-/.netlify/functions/*    /.netlify/functions/:splat    200
+# Function Routes - Removed problematic redirect that starts with /.netlify
+# Netlify automatically handles function routing
 
 # PWA Routes
 /manifest.json    /manifest.json    200
