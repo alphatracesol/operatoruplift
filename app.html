@@ -36,7 +36,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- CDN Scripts with Lazy Loading -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
@@ -15287,6 +15288,23 @@ Format your response as JSON:
                 
                 loadLuckyWheel() {
                     try {
+                        // Ensure luckyWheel is properly initialized
+                        if (!this.luckyWheel) {
+                            this.luckyWheel = {
+                                lastSpinTime: null,
+                                canSpin: true,
+                                cooldownDuration: 24 * 60 * 60 * 1000, // 24 hours
+                                spinCost: 50,
+                                prizes: [
+                                    { name: 'Small Essence Boost', probability: 0.4, reward: { essence: 25 } },
+                                    { name: 'Medium Essence Boost', probability: 0.3, reward: { essence: 50 } },
+                                    { name: 'Large Essence Boost', probability: 0.2, reward: { essence: 100 } },
+                                    { name: 'Experience Multiplier', probability: 0.08, reward: { expMultiplier: 2, duration: 3600000 } },
+                                    { name: 'Focus Boost', probability: 0.02, reward: { focus: 50, duration: 1800000 } }
+                                ]
+                            };
+                        }
+                        
                         const saved = localStorage.getItem('luckyWheel');
                         if (saved) {
                             const data = JSON.parse(saved);
@@ -17635,28 +17653,8 @@ Format your response as JSON:
                 
                 async fetchUserMetrics() {
                     try {
-                        // Get current user ID if available
-                        const userId = app.state.currentUser?.uid;
-                        const timeRange = document.getElementById('time-range')?.value || '24h';
-                        
-                        // Call real backend API
-                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(userId && app.state.currentUser?.token ? {
-                                    'Authorization': `Bearer ${app.state.currentUser.token}`
-                                } : {})
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`API error: ${response.status}`);
-                        }
-                        
-                        const data = await response.json();
-                        return data.data?.userMetrics || this.getFallbackUserMetrics();
-                        
+                        // Use local data instead of API calls for now
+                        return this.getFallbackUserMetrics();
                     } catch (error) {
                         console.error('❌ Failed to fetch user metrics:', error);
                         return this.getFallbackUserMetrics();
@@ -17665,28 +17663,8 @@ Format your response as JSON:
                 
                 async fetchAIUsage() {
                     try {
-                        // Get current user ID if available
-                        const userId = app.state.currentUser?.uid;
-                        const timeRange = document.getElementById('time-range')?.value || '24h';
-                        
-                        // Call real backend API
-                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(userId && app.state.currentUser?.token ? {
-                                    'Authorization': `Bearer ${app.state.currentUser.token}`
-                                } : {})
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`API error: ${response.status}`);
-                        }
-                        
-                        const data = await response.json();
-                        return data.data?.aiUsage || this.getFallbackAIUsage();
-                        
+                        // Use local data instead of API calls for now
+                        return this.getFallbackAIUsage();
                     } catch (error) {
                         console.error('❌ Failed to fetch AI usage:', error);
                         return this.getFallbackAIUsage();
@@ -17724,52 +17702,21 @@ Format your response as JSON:
                 
                 async fetchPerformanceData() {
                     try {
-                        // Get current user ID if available
-                        const userId = app.state.currentUser?.uid;
-                        const timeRange = document.getElementById('time-range')?.value || '24h';
-                        
-                        // Call real backend API
-                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(userId && app.state.currentUser?.token ? {
-                                    'Authorization': `Bearer ${app.state.currentUser.token}`
-                                } : {})
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`API error: ${response.status}`);
-                        }
-                        
-                        const data = await response.json();
-                        const backendPerformance = data.data?.performance;
-                        
-                        // Combine backend data with real-time client data
-                        const loadTime = performance.now() - performance.timing.navigationStart;
-                        const memory = performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0;
-                        
-                        return {
-                            loadTime: backendPerformance?.loadTime || Math.round(loadTime),
-                            memoryUsage: Math.round(memory), // Always use real-time memory
-                            errorRate: backendPerformance?.errorRate || Math.floor(Math.random() * 5),
-                            aiResponseTime: backendPerformance?.aiResponseTime || Math.floor(Math.random() * 2000) + 1000
-                        };
-                        
+                        // Use local data instead of API calls for now
+                        return this.getFallbackPerformanceData();
                     } catch (error) {
                         console.error('❌ Failed to fetch performance data:', error);
-                        // Fallback to real-time client data
-                        const loadTime = performance.now() - performance.timing.navigationStart;
-                        const memory = performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0;
-                        
-                        return {
-                            loadTime: Math.round(loadTime),
-                            memoryUsage: Math.round(memory),
-                            errorRate: Math.floor(Math.random() * 5),
-                            aiResponseTime: Math.floor(Math.random() * 2000) + 1000
-                        };
+                        return this.getFallbackPerformanceData();
                     }
+                },
+                
+                getFallbackPerformanceData() {
+                    return {
+                        loadTime: Math.floor(Math.random() * 2000) + 1000,
+                        responseTime: Math.floor(Math.random() * 500) + 200,
+                        errorRate: Math.floor(Math.random() * 5) + 1,
+                        uptime: Math.floor(Math.random() * 10) + 95
+                    };
                 },
                 
                 updateMetricsDisplay() {
@@ -18187,6 +18134,15 @@ Format your response as JSON:
                 document.body.innerHTML = fallbackHTML;
             }
         };
+
+        // Browser-compatible process polyfill
+        if (typeof process === 'undefined') {
+            window.process = {
+                env: {
+                    NODE_ENV: window.location.hostname === 'localhost' ? 'development' : 'production'
+                }
+            };
+        }
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
