@@ -17745,16 +17745,30 @@ Format your response as JSON:
                 },
                 
                 initializeCharts() {
-                    // Initialize Chart.js charts
-                    this.createAIProviderChart();
-                    this.createPerformanceChart();
-                    this.createEngagementCharts();
+                    // Initialize Chart.js charts with delay to ensure DOM is ready
+                    setTimeout(() => {
+                        this.createAIProviderChart();
+                        this.createPerformanceChart();
+                        this.createEngagementCharts();
+                    }, 100);
                 },
                 
                 createAIProviderChart() {
                     const ctx = document.getElementById('ai-provider-chart');
                     if (!ctx) {
                         console.warn('AI provider chart canvas not found');
+                        return;
+                    }
+                    
+                    // Check if canvas context is available
+                    try {
+                        const context = ctx.getContext('2d');
+                        if (!context) {
+                            console.warn('AI provider chart canvas context not available');
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn('AI provider chart canvas context error:', error);
                         return;
                     }
                     
@@ -17807,6 +17821,18 @@ Format your response as JSON:
                     const ctx = document.getElementById('ai-performance-chart');
                     if (!ctx) {
                         console.warn('Performance chart canvas not found');
+                        return;
+                    }
+                    
+                    // Check if canvas context is available
+                    try {
+                        const context = ctx.getContext('2d');
+                        if (!context) {
+                            console.warn('Performance chart canvas context not available');
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn('Performance chart canvas context error:', error);
                         return;
                     }
                     
@@ -17870,10 +17896,24 @@ Format your response as JSON:
                 },
                 
                 createEngagementCharts() {
+                    // Check if Chart.js is loaded
+                    if (typeof Chart === 'undefined') {
+                        console.warn('Chart.js not loaded, skipping engagement charts');
+                        return;
+                    }
+                    
                     // Daily activity chart
                     const dailyCtx = document.getElementById('daily-activity-chart');
                     if (dailyCtx) {
-                        this.charts.dailyActivity = new Chart(dailyCtx, {
+                        try {
+                            // Check if canvas context is available
+                            const context = dailyCtx.getContext('2d');
+                            if (!context) {
+                                console.warn('Daily activity chart canvas context not available');
+                                return;
+                            }
+                            
+                            this.charts.dailyActivity = new Chart(dailyCtx, {
                             type: 'line',
                             data: {
                                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -17906,12 +17946,23 @@ Format your response as JSON:
                                 }
                             }
                         });
+                        } catch (error) {
+                            console.error('Failed to create daily activity chart:', error);
+                        }
                     }
                     
                     // Feature usage chart
                     const featureCtx = document.getElementById('feature-usage-chart');
                     if (featureCtx) {
-                        this.charts.featureUsage = new Chart(featureCtx, {
+                        try {
+                            // Check if canvas context is available
+                            const context = featureCtx.getContext('2d');
+                            if (!context) {
+                                console.warn('Feature usage chart canvas context not available');
+                                return;
+                            }
+                            
+                            this.charts.featureUsage = new Chart(featureCtx, {
                             type: 'radar',
                             data: {
                                 labels: ['Goals', 'AI Chat', 'Gamification', 'Mood Tracking', 'Social', 'Analytics'],
@@ -17941,6 +17992,9 @@ Format your response as JSON:
                                 }
                             }
                         });
+                        } catch (error) {
+                            console.error('Failed to create feature usage chart:', error);
+                        }
                     }
                 },
                 
