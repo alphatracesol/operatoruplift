@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - Working Version</title>
+    <meta name="description" content="Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CDN Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    
+    <style>
+        /* CSS Variables */
+        :root {
+            --accent: #f97316;
+            --accent-hover: #ea580c;
+            --accent-light: #fed7aa;
+            
+            /* Dark Theme */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #475569;
+            --card-glass: rgba(30, 41, 59, 0.8);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f1f5f9;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --card-glass: rgba(241, 245, 249, 0.8);
+        }
+        
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Layout */
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Buttons and Cards */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--card-glass);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::after {
+            left: 100%;
+        }
+        
+        .card {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Layout Components */
+        .layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: var(--card-glass);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding: 1rem;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            right: 0;
+            height: 70px;
+            background: var(--card-glass);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+        
+        .main {
+            margin-left: 250px;
+            margin-top: 70px;
+            padding: 2rem;
+        }
+        
+        /* Views */
+        .view {
+            display: none;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        /* Dashboard */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Goals */
+        .goal-item {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .goal-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .goal-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* AI Chat */
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+        
+        .user-message {
+            background: var(--accent);
+            color: white;
+            margin-left: 2rem;
+        }
+        
+        .ai-message {
+            background: var(--bg-tertiary);
+            margin-right: 2rem;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .header {
+                left: 0;
+            }
+            
+            .main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .btn {
+                min-height: 44px;
+            }
+            
+            input {
+                font-size: 16px;
+            }
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+        
+        .toast {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .toast.info {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="card">
+                <h3>User Stats</h3>
+                <div class="stat-card">
+                    <div class="stat-value" id="user-level">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="user-essence">0</div>
+                    <div class="stat-label">Essence</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="user-energy">100</div>
+                    <div class="stat-label">Energy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="user-streak">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+            </div>
+            
+            <nav style="margin-top: 2rem;">
+                <button class="btn nav-btn active" data-view="dashboard" style="width: 100%; margin-bottom: 0.5rem;">Dashboard</button>
+                <button class="btn nav-btn" data-view="goals" style="width: 100%; margin-bottom: 0.5rem;">Goals</button>
+                <button class="btn nav-btn" data-view="ai-chat" style="width: 100%; margin-bottom: 0.5rem;">AI Mentor</button>
+                <button class="btn nav-btn" data-view="habits" style="width: 100%; margin-bottom: 0.5rem;">Habits</button>
+                <button class="btn nav-btn" data-view="focus" style="width: 100%; margin-bottom: 0.5rem;">Focus</button>
+                <button class="btn nav-btn" data-view="analytics" style="width: 100%; margin-bottom: 0.5rem;">Analytics</button>
+                <button class="btn nav-btn" data-view="settings" style="width: 100%; margin-bottom: 0.5rem;">Settings</button>
+            </nav>
+        </aside>
+        
+        <!-- Header -->
+        <header class="header">
+            <h1 id="current-view-title">Dashboard</h1>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="btn" id="theme-toggle">🌙</button>
+                <button class="btn" id="add-goal-btn">Add Goal</button>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <h2>Welcome to Operator Uplift!</h2>
+                <p>Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity.</p>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="active-goals">0</div>
+                        <div class="stat-label">Active Goals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completed-goals">0</div>
+                        <div class="stat-label">Completed Goals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn" onclick="app.ui.showView('goals')">Add Goal</button>
+                        <button class="btn" onclick="app.ui.showView('ai-chat')">Chat with AI</button>
+                        <button class="btn" onclick="app.goals.add('Test Goal', 'A test goal', 'personal', 'medium', null)">Add Test Goal</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Goals View -->
+            <div id="goals-view" class="view">
+                <h2>Goals</h2>
+                <button class="btn" onclick="app.ui.showModal('goal-modal')">Add New Goal</button>
+                <div id="goals-list" style="margin-top: 1rem;"></div>
+            </div>
+            
+            <!-- AI Chat View -->
+            <div id="ai-chat-view" class="view">
+                <h2>AI Mentor</h2>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        Hello! I'm your AI mentor. How can I help you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') app.ai.sendMessage()">
+                    <button class="btn" onclick="app.ai.sendMessage()">Send</button>
+                </div>
+            </div>
+            
+            <!-- Other Views -->
+            <div id="habits-view" class="view">
+                <h2>Habits</h2>
+                <p>Habit tracking coming soon...</p>
+            </div>
+            
+            <div id="focus-view" class="view">
+                <h2>Focus Sessions</h2>
+                <p>Focus timer coming soon...</p>
+            </div>
+            
+            <div id="analytics-view" class="view">
+                <h2>Analytics</h2>
+                <p>Progress charts coming soon...</p>
+            </div>
+            
+            <div id="settings-view" class="view">
+                <h2>Settings</h2>
+                <p>Settings panel coming soon...</p>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Goal Modal -->
+    <div id="goal-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card" style="max-width: 500px; width: 90%;">
+            <h3>Add New Goal</h3>
+            <form id="goal-form">
+                <div style="margin-bottom: 1rem;">
+                    <label for="goal-title">Title:</label>
+                    <input type="text" id="goal-title" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.25rem; color: var(--text-primary);">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label for="goal-description">Description:</label>
+                    <textarea id="goal-description" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.25rem; color: var(--text-primary); height: 100px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label for="goal-priority">Priority:</label>
+                    <select id="goal-priority" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.25rem; color: var(--text-primary);">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn">Add Goal</button>
+                    <button type="button" class="btn" onclick="app.ui.hideModal('goal-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        // Global App Object
+        window.app = {
+            state: {
+                theme: localStorage.getItem('theme') || 'dark',
+                userData: {
+                    stats: {
+                        level: 1,
+                        points: 0,
+                        energy: { value: 100, max: 100 },
+                        streak: 0
+                    }
+                },
+                goals: [],
+                aiMessages: []
+            },
+            
+            utils: {
+                safeGet(id) {
+                    return document.getElementById(id) || null;
+                },
+                
+                sanitizeInput(input) {
+                    return input.replace(/[<>]/g, '').trim();
+                },
+                
+                generateId() {
+                    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+                }
+            },
+            
+            ui: {
+                init() {
+                    this.updateStats();
+                    this.setupEventListeners();
+                },
+                
+                showView(viewName) {
+                    // Hide all views
+                    document.querySelectorAll('.view').forEach(view => {
+                        view.classList.remove('active');
+                    });
+                    
+                    // Show target view
+                    const targetView = this.utils.safeGet(`${viewName}-view`);
+                    if (targetView) {
+                        targetView.classList.add('active');
+                    }
+                    
+                    // Update navigation
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    const activeBtn = document.querySelector(`[data-view="${viewName}"]`);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active');
+                    }
+                    
+                    // Update header title
+                    const titleMap = {
+                        'dashboard': 'Dashboard',
+                        'goals': 'Goals',
+                        'ai-chat': 'AI Mentor',
+                        'habits': 'Habits',
+                        'focus': 'Focus Sessions',
+                        'analytics': 'Analytics',
+                        'settings': 'Settings'
+                    };
+                    
+                    const titleEl = this.utils.safeGet('current-view-title');
+                    if (titleEl && titleMap[viewName]) {
+                        titleEl.textContent = titleMap[viewName];
+                    }
+                },
+                
+                showModal(modalId) {
+                    const modal = this.utils.safeGet(modalId);
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                },
+                
+                hideModal(modalId) {
+                    const modal = this.utils.safeGet(modalId);
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                },
+                
+                showToast(message, type = 'info', duration = 5000) {
+                    const container = this.utils.safeGet('toast-container');
+                    if (!container) return;
+                    
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+                    toast.textContent = message;
+                    
+                    container.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, duration);
+                },
+                
+                updateStats() {
+                    const stats = app.state.userData.stats;
+                    
+                    this.utils.safeGet('user-level').textContent = stats.level;
+                    this.utils.safeGet('user-essence').textContent = stats.points;
+                    this.utils.safeGet('user-energy').textContent = stats.energy.value;
+                    this.utils.safeGet('user-streak').textContent = stats.streak;
+                    
+                    const activeGoals = app.state.goals.filter(g => !g.completed).length;
+                    const completedGoals = app.state.goals.filter(g => g.completed).length;
+                    
+                    this.utils.safeGet('active-goals').textContent = activeGoals;
+                    this.utils.safeGet('completed-goals').textContent = completedGoals;
+                    this.utils.safeGet('current-streak').textContent = stats.streak;
+                },
+                
+                setupEventListeners() {
+                    // Navigation
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const view = btn.getAttribute('data-view');
+                            this.showView(view);
+                        });
+                    });
+                    
+                    // Theme toggle
+                    const themeToggle = this.utils.safeGet('theme-toggle');
+                    if (themeToggle) {
+                        themeToggle.addEventListener('click', () => {
+                            app.setTheme(app.state.theme === 'dark' ? 'light' : 'dark');
+                        });
+                    }
+                    
+                    // Goal form
+                    const goalForm = this.utils.safeGet('goal-form');
+                    if (goalForm) {
+                        goalForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            const title = this.utils.safeGet('goal-title').value;
+                            const description = this.utils.safeGet('goal-description').value;
+                            const priority = this.utils.safeGet('goal-priority').value;
+                            
+                            app.goals.add(title, description, 'personal', priority, null);
+                            
+                            // Reset form
+                            goalForm.reset();
+                            this.hideModal('goal-modal');
+                        });
+                    }
+                    
+                    // Add goal button
+                    const addGoalBtn = this.utils.safeGet('add-goal-btn');
+                    if (addGoalBtn) {
+                        addGoalBtn.addEventListener('click', () => {
+                            this.showModal('goal-modal');
+                        });
+                    }
+                }
+            },
+            
+            goals: {
+                add(title, description, category, priority, dueDate) {
+                    const goal = {
+                        id: this.utils.generateId(),
+                        title: this.utils.sanitizeInput(title),
+                        description: this.utils.sanitizeInput(description),
+                        category,
+                        priority,
+                        dueDate,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    app.state.goals.push(goal);
+                    this.saveToLocalStorage();
+                    this.render();
+                    app.ui.updateStats();
+                    app.ui.showToast('Goal added successfully!', 'success');
+                    
+                    // Add essence points
+                    app.gamification.addEssence(10, 'goal_created');
+                },
+                
+                complete(id) {
+                    const goal = app.state.goals.find(g => g.id === id);
+                    if (goal) {
+                        goal.completed = true;
+                        goal.completedAt = new Date().toISOString();
+                        
+                        this.saveToLocalStorage();
+                        this.render();
+                        app.ui.updateStats();
+                        app.ui.showToast('Goal completed!', 'success');
+                        
+                        // Add essence points based on priority
+                        const essenceReward = goal.priority === 'high' ? 50 : goal.priority === 'medium' ? 30 : 20;
+                        app.gamification.addEssence(essenceReward, 'goal_completed');
+                    }
+                },
+                
+                render() {
+                    const list = this.utils.safeGet('goals-list');
+                    if (!list) return;
+                    
+                    list.innerHTML = app.state.goals.map(goal => `
+                        <div class="goal-item ${goal.completed ? 'completed' : ''}">
+                            <div>
+                                <div class="goal-title">${goal.title}</div>
+                                <div class="goal-description">${goal.description}</div>
+                                <small>Priority: ${goal.priority}</small>
+                            </div>
+                            ${!goal.completed ? 
+                                `<button class="btn" onclick="app.goals.complete('${goal.id}')">Complete</button>` :
+                                `<span style="color: #10b981;">✓ Completed</span>`
+                            }
+                        </div>
+                    `).join('');
+                },
+                
+                saveToLocalStorage() {
+                    localStorage.setItem('goals', JSON.stringify(app.state.goals));
+                },
+                
+                loadFromLocalStorage() {
+                    const saved = localStorage.getItem('goals');
+                    if (saved) {
+                        app.state.goals = JSON.parse(saved);
+                    }
+                }
+            },
+            
+            ai: {
+                sendMessage() {
+                    const input = this.utils.safeGet('chat-input');
+                    const message = input.value.trim();
+                    
+                    if (!message) return;
+                    
+                    // Add user message
+                    this.addMessage('user', message);
+                    input.value = '';
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        const responses = [
+                            "That's a great question! Let me help you with that.",
+                            "I understand what you're looking for. Here's my advice...",
+                            "Based on your goals, I'd recommend focusing on...",
+                            "That's an interesting challenge. Here's how we can approach it...",
+                            "Great progress! Keep up the momentum with..."
+                        ];
+                        
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        this.addMessage('ai', randomResponse);
+                    }, 1000);
+                },
+                
+                addMessage(role, content) {
+                    const messages = this.utils.safeGet('chat-messages');
+                    if (!messages) return;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${role}-message`;
+                    messageDiv.textContent = content;
+                    
+                    messages.appendChild(messageDiv);
+                    messages.scrollTop = messages.scrollHeight;
+                    
+                    // Store in state
+                    app.state.aiMessages.push({ role, content, time: new Date().toISOString() });
+                }
+            },
+            
+            gamification: {
+                addEssence(amount, reason) {
+                    app.state.userData.stats.points += amount;
+                    app.ui.updateStats();
+                    app.ui.showToast(`+${amount} Essence Points!`, 'success');
+                    
+                    // Check for level up
+                    this.checkLevelUp();
+                },
+                
+                checkLevelUp() {
+                    const stats = app.state.userData.stats;
+                    const newLevel = Math.floor(stats.points / 100) + 1;
+                    
+                    if (newLevel > stats.level) {
+                        stats.level = newLevel;
+                        app.ui.updateStats();
+                        app.ui.showToast(`🎉 Level Up! You're now level ${newLevel}!`, 'success');
+                    }
+                }
+            },
+            
+            setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                app.state.theme = theme;
+                localStorage.setItem('theme', theme);
+                
+                const toggle = this.utils.safeGet('theme-toggle');
+                if (toggle) {
+                    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+                }
+            },
+            
+            init() {
+                console.log('🚀 Initializing Operator Uplift...');
+                
+                this.setTheme(this.state.theme);
+                this.goals.loadFromLocalStorage();
+                this.ui.init();
+                this.goals.render();
+                
+                console.log('✅ Operator Uplift initialized successfully!');
+            }
+        };
+        
+        // Initialize app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => app.init());
+        } else {
+            app.init();
+        }
+    </script>
+</body>
+</html> 
