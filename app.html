@@ -4393,6 +4393,8 @@
             
             .sidebar {
                 transform: translateX(-100%);
+                width: 280px;
+                max-width: 80vw;
             }
             
             .sidebar.active {
@@ -4482,6 +4484,8 @@
             padding: var(--spacing-xl);
             max-width: 500px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             margin: 2rem auto;
             position: relative;
             z-index: var(--z-modal);
@@ -12440,7 +12444,11 @@
                     // Initialize auth state
                     this.updateAuthState();
                     
-                    // Check for existing user session
+                    // Always show login first for better UX
+                    this.updateAuthState(false);
+                    app.ui.showView('auth');
+                    
+                    // Check for existing user session in background
                     const mockUser = localStorage.getItem('mockUser');
                     if (mockUser) {
                         try {
@@ -12455,17 +12463,11 @@
                                     streak: 0
                                 }
                             };
-                            this.updateAuthState(true);
-                            app.ui.showView('dashboard');
+                            // Don't auto-login, let user choose
                         } catch (error) {
                             console.error('Failed to parse mock user:', error);
                             localStorage.removeItem('mockUser');
-                            this.updateAuthState(false);
-                            app.ui.showView('auth');
                         }
-                    } else {
-                        this.updateAuthState(false);
-                        app.ui.showView('auth');
                     }
                 },
                 

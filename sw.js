@@ -204,8 +204,15 @@ async function handleExternalRequest(request) {
         // Fallback to network
         const networkResponse = await fetch(request);
         if (networkResponse.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE);
-            cache.put(request, networkResponse.clone());
+            // Skip caching chrome-extension URLs
+            if (!request.url.startsWith('chrome-extension://')) {
+                try {
+                    const cache = await caches.open(DYNAMIC_CACHE);
+                    await cache.put(request, networkResponse.clone());
+                } catch (error) {
+                    console.warn('Failed to cache external request:', error);
+                }
+            }
         }
         
         return networkResponse;
