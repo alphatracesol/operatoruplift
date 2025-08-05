@@ -158,4 +158,8 @@ webpack-bundle-analyzer-report.html
 
 # Backup folders
 backup-*/
-backup-*-*/ 
+backup-*-*/
+
+# Build output
+build/
+dist/ 
