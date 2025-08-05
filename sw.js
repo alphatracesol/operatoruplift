@@ -17,9 +17,9 @@ const STATIC_FILES = [
     '/apple-touch-icon.png',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js',
+    'https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js',
     'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
-    'https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js',
+
       'https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js',
