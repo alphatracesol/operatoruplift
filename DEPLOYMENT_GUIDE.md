@@ -87,22 +87,22 @@ This guide provides complete instructions for deploying the Operator Uplift appl
 2. **Environment Variables**:
    Create a `.env` file with the following variables:
    ```env
-   HF_TOKEN=your-huggingface-token
-   CLAUDE_API_KEY=your-claude-api-key
-   GEMINI_API_KEY=your-gemini-api-key
-   PERPLEXITY_API_KEY=your-perplexity-api-key
-   XAI_API_KEY=your-xai-api-key
-   OPENROUTER_API_KEY=your-openrouter-api-key
-   FIREBASE_PROJECT_ID=your-firebase-project-id
-   FIREBASE_CLIENT_EMAIL=your-firebase-client-email
-   FIREBASE_PRIVATE_KEY=your-firebase-private-key
+   HF_TOKEN=your-huggingface-token-here
+   CLAUDE_API_KEY=your-claude-api-key-here
+   GEMINI_API_KEY=your-gemini-api-key-here
+   PERPLEXITY_API_KEY=your-perplexity-api-key-here
+   XAI_API_KEY=your-xai-api-key-here
+   OPENROUTER_API_KEY=your-openrouter-api-key-here
+   FIREBASE_PROJECT_ID=your-firebase-project-id-here
+   FIREBASE_CLIENT_EMAIL=your-firebase-client-email-here
+   FIREBASE_PRIVATE_KEY=your-firebase-private-key-here
    ```
 
 ### Step 2: Netlify Configuration
 
 1. **Deploy to Netlify**:
    - Connect your GitHub repository to Netlify
-   - Set build command: `echo 'No build step needed for static HTML app'`
+   - Set build command: `npm install && npm run build`
    - Set publish directory: `.`
    - Set Node.js version: `18`
 
@@ -141,7 +141,7 @@ This guide provides complete instructions for deploying the Operator Uplift appl
 ```toml
 [build]
   publish = "."
-  command = "echo 'No build step needed for static HTML app'"
+  command = "npm install && npm run build"
   functions = "netlify/functions"
 
 [build.environment]
