@@ -11893,7 +11893,7 @@
                     this.setupErrorHandling();
                     this.setupPerformanceMonitoring();
                     this.setupLazyLoading();
-                    this.goals.loadFromLocalStorage();
+                    this.goals.init();
                 this.ai.init();
                 this.gamification.init();
                 this.mobileGestures.init();
@@ -12600,7 +12600,17 @@
 
             // Goals Module
             goals: {
-             loadFromLocalStorage() {
+                init() {
+                    try {
+                        this.loadFromLocalStorage();
+                        this.renderGoals();
+                        console.log('✅ Goals module initialized');
+                    } catch (error) {
+                        console.error('❌ Goals module initialization failed:', error);
+                    }
+                },
+                
+                loadFromLocalStorage() {
                     try {
                     const stored = localStorage.getItem('localGoals');
                     if (stored) {
