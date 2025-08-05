@@ -17756,10 +17756,17 @@ Format your response as JSON:
                 },
                 
                 createAIProviderChart() {
-                    const ctx = document.getElementById('ai-provider-chart');
+                    let ctx = document.getElementById('ai-provider-chart');
                     if (!ctx) {
-                        console.warn('AI provider chart canvas not found');
-                        return;
+                        // Create canvas element if it doesn't exist
+                        ctx = document.createElement('canvas');
+                        ctx.id = 'ai-provider-chart';
+                        ctx.width = 400;
+                        ctx.height = 300;
+                        
+                        // Find the analytics container and append the canvas
+                        const container = document.querySelector('.analytics-dashboard') || document.body;
+                        container.appendChild(ctx);
                     }
                     
                     // Check if canvas context is available
@@ -17820,10 +17827,17 @@ Format your response as JSON:
                 },
                 
                 createPerformanceChart() {
-                    const ctx = document.getElementById('ai-performance-chart');
+                    let ctx = document.getElementById('ai-performance-chart');
                     if (!ctx) {
-                        console.warn('Performance chart canvas not found');
-                        return;
+                        // Create canvas element if it doesn't exist
+                        ctx = document.createElement('canvas');
+                        ctx.id = 'ai-performance-chart';
+                        ctx.width = 400;
+                        ctx.height = 300;
+                        
+                        // Find the analytics container and append the canvas
+                        const container = document.querySelector('.analytics-dashboard') || document.body;
+                        container.appendChild(ctx);
                     }
                     
                     // Check if canvas context is available
@@ -17905,17 +17919,28 @@ Format your response as JSON:
                     }
                     
                     // Daily activity chart
-                    const dailyCtx = document.getElementById('daily-activity-chart');
-                    if (dailyCtx) {
-                        try {
-                            // Check if canvas context is available
-                            const context = dailyCtx.getContext('2d');
-                            if (!context) {
-                                console.warn('Daily activity chart canvas context not available');
-                                return;
-                            }
-                            
-                            this.charts.dailyActivity = new Chart(dailyCtx, {
+                    let dailyCtx = document.getElementById('daily-activity-chart');
+                    if (!dailyCtx) {
+                        // Create canvas element if it doesn't exist
+                        dailyCtx = document.createElement('canvas');
+                        dailyCtx.id = 'daily-activity-chart';
+                        dailyCtx.width = 400;
+                        dailyCtx.height = 300;
+                        
+                        // Find the analytics container and append the canvas
+                        const container = document.querySelector('.analytics-dashboard') || document.body;
+                        container.appendChild(dailyCtx);
+                    }
+                    
+                    try {
+                        // Check if canvas context is available
+                        const context = dailyCtx.getContext('2d');
+                        if (!context) {
+                            console.warn('Daily activity chart canvas context not available');
+                            return;
+                        }
+                        
+                        this.charts.dailyActivity = new Chart(dailyCtx, {
                             type: 'line',
                             data: {
                                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -17954,17 +17979,28 @@ Format your response as JSON:
                     }
                     
                     // Feature usage chart
-                    const featureCtx = document.getElementById('feature-usage-chart');
-                    if (featureCtx) {
-                        try {
-                            // Check if canvas context is available
-                            const context = featureCtx.getContext('2d');
-                            if (!context) {
-                                console.warn('Feature usage chart canvas context not available');
-                                return;
-                            }
-                            
-                            this.charts.featureUsage = new Chart(featureCtx, {
+                    let featureCtx = document.getElementById('feature-usage-chart');
+                    if (!featureCtx) {
+                        // Create canvas element if it doesn't exist
+                        featureCtx = document.createElement('canvas');
+                        featureCtx.id = 'feature-usage-chart';
+                        featureCtx.width = 400;
+                        featureCtx.height = 300;
+                        
+                        // Find the analytics container and append the canvas
+                        const container = document.querySelector('.analytics-dashboard') || document.body;
+                        container.appendChild(featureCtx);
+                    }
+                    
+                    try {
+                        // Check if canvas context is available
+                        const context = featureCtx.getContext('2d');
+                        if (!context) {
+                            console.warn('Feature usage chart canvas context not available');
+                            return;
+                        }
+                        
+                        this.charts.featureUsage = new Chart(featureCtx, {
                             type: 'radar',
                             data: {
                                 labels: ['Goals', 'AI Chat', 'Gamification', 'Mood Tracking', 'Social', 'Analytics'],
