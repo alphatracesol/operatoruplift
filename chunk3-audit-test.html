@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 3 Audit: Style Attribution & Restoration Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .audit-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .audit-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .audit-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 10px;
+        }
+        .audit-subtitle {
+            font-size: 1rem;
+            color: #a3a3a3;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f97316;
+            margin-bottom: 15px;
+        }
+        .test-description {
+            color: #a3a3a3;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f97316;
+            margin-bottom: 15px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status.passed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        .status.failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .status.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="audit-container">
+        <div class="audit-header">
+            <h1 class="audit-title">Chunk 3 Audit: Style Attribution & Restoration</h1>
+            <p class="audit-subtitle">Comprehensive analysis of style misattributions and conflicts</p>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 1: Keyframe Animation Audit</h2>
+            <p class="test-description">
+                Checks for duplicate @keyframes animations that could cause conflicts between loading screen and other components.
+            </p>
+            <button class="test-button" onclick="runKeyframeTest()">Run Keyframe Test</button>
+            <div id="keyframe-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 2: Shimmer Effect Attribution</h2>
+            <p class="test-description">
+                Verifies that shimmer effects are properly applied to progress bars and bento boxes, not misattributed to loading screen.
+            </p>
+            <button class="test-button" onclick="runShimmerTest()">Run Shimmer Test</button>
+            <div id="shimmer-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 3: Particle Effect Attribution</h2>
+            <p class="test-description">
+                Ensures particle effects are applied to background elements (tsParticles, matrix rain) and not loading screen.
+            </p>
+            <button class="test-button" onclick="runParticleTest()">Run Particle Test</button>
+            <div id="particle-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 4: Color Shift Attribution</h2>
+            <p class="test-description">
+                Checks that color shifts and accent colors are applied to settings and UI elements, not loading screen.
+            </p>
+            <button class="test-button" onclick="runColorTest()">Run Color Test</button>
+            <div id="color-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 5: Bento Box Effect Attribution</h2>
+            <p class="test-description">
+                Verifies that bento box hover effects are applied to dashboard elements, not misattributed to loading screen.
+            </p>
+            <button class="test-button" onclick="runBentoTest()">Run Bento Test</button>
+            <div id="bento-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 6: Z-Index Layer Audit</h2>
+            <p class="test-description">
+                Checks for proper z-index layering: background (0) → content (10) → header (100) → modal (1100) → loading (99999).
+            </p>
+            <button class="test-button" onclick="runZIndexTest()">Run Z-Index Test</button>
+            <div id="zindex-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 7: CSS Specificity Audit</h2>
+            <p class="test-description">
+                Ensures loading cube and mini cube have distinct selectors to prevent style conflicts.
+            </p>
+            <button class="test-button" onclick="runSpecificityTest()">Run Specificity Test</button>
+            <div id="specificity-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 8: Loading Screen Functionality</h2>
+            <p class="test-description">
+                Tests loading screen elements: cube click, text cycling, progress bar, music toggle, transitions.
+            </p>
+            <button class="test-button" onclick="runLoadingTest()">Run Loading Test</button>
+            <div id="loading-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 9: Linter-Style Error Audit</h2>
+            <p class="test-description">
+                Checks for undefined CSS variables, duplicate IDs, orphaned elements, and other common linter errors.
+            </p>
+            <button class="test-button" onclick="runLinterTest()">Run Linter Test</button>
+            <div id="linter-results" class="results"></div>
+        </div>
+
+        <div class="summary">
+            <h2 class="summary-title">Audit Summary</h2>
+            <div id="audit-summary">
+                <p>Click "Run All Tests" to perform a comprehensive audit of the current state.</p>
+                <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chunk3-audit-test.js"></script>
+    <script>
+        // Test runner functions
+        function runKeyframeTest() {
+            const results = document.getElementById('keyframe-results');
+            results.textContent = 'Running keyframe test...';
+            
+            try {
+                const result = auditKeyframeDuplicates();
+                results.textContent = `Keyframe Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runShimmerTest() {
+            const results = document.getElementById('shimmer-results');
+            results.textContent = 'Running shimmer test...';
+            
+            try {
+                const result = auditShimmerEffects();
+                results.textContent = `Shimmer Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runParticleTest() {
+            const results = document.getElementById('particle-results');
+            results.textContent = 'Running particle test...';
+            
+            try {
+                const result = auditParticleEffects();
+                results.textContent = `Particle Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runColorTest() {
+            const results = document.getElementById('color-results');
+            results.textContent = 'Running color test...';
+            
+            try {
+                const result = auditColorShifts();
+                results.textContent = `Color Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runBentoTest() {
+            const results = document.getElementById('bento-results');
+            results.textContent = 'Running bento test...';
+            
+            try {
+                const result = auditBentoBoxEffects();
+                results.textContent = `Bento Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runZIndexTest() {
+            const results = document.getElementById('zindex-results');
+            results.textContent = 'Running z-index test...';
+            
+            try {
+                const result = auditZIndexLayers();
+                results.textContent = `Z-Index Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runSpecificityTest() {
+            const results = document.getElementById('specificity-results');
+            results.textContent = 'Running specificity test...';
+            
+            try {
+                const result = auditCSSSpecificity();
+                results.textContent = `Specificity Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runLoadingTest() {
+            const results = document.getElementById('loading-results');
+            results.textContent = 'Running loading test...';
+            
+            try {
+                const result = testLoadingScreenFunctionality();
+                results.textContent = `Loading Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runLinterTest() {
+            const results = document.getElementById('linter-results');
+            results.textContent = 'Running linter test...';
+            
+            try {
+                const result = auditLinterErrors();
+                results.textContent = `Linter Test Result: ${result ? 'PASSED' : 'FAILED'}\n\nCheck console for detailed results.`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function runAllTests() {
+            const summary = document.getElementById('audit-summary');
+            summary.innerHTML = '<p>Running comprehensive audit...</p>';
+            
+            try {
+                const result = runChunk3Audit();
+                const statusClass = result ? 'passed' : 'failed';
+                const statusText = result ? 'PASSED' : 'FAILED';
+                
+                summary.innerHTML = `
+                    <div class="status ${statusClass}">${statusText}</div>
+                    <p>Comprehensive audit completed. Check console for detailed results.</p>
+                    <p>${result ? '✅ Ready for Chunk 4' : '⚠️ Fixes needed before Chunk 4'}</p>
+                `;
+            } catch (error) {
+                summary.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-run audit when page loads
+        window.addEventListener('load', () => {
+            console.log('🔍 Chunk 3 Audit Test Page Loaded');
+            console.log('📋 Run individual tests or click "Run All Tests" for comprehensive audit');
+        });
+    </script>
+</body>
+</html> 

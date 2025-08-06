@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Auth Overlay Test</title>
+    <style>
+        /* Final test styles with gradients */
+        :root {
+            --dark-bg: #0a0a0a;
+            --dark-surface: #1f2937;
+            --dark-text: #e5e7eb;
+            --dark-text-secondary: #9ca3af;
+            --accent-color: #f97316;
+            --accent-light: #fb923c;
+            --accent-glow: rgba(249, 115, 22, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --z-auth-overlay: 20000;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1f2937 50%, #374151 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+        }
+        
+        .test-content {
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .test-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--dark-text);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin: 1rem;
+            font-size: 1rem;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-color) 100%);
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+        
+        /* Auth overlay with gradient */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1f2937 50%, #374151 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-auth-overlay);
+        }
+        
+        .auth-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .auth-card h2 {
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.5rem;
+            color: var(--dark-text);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .form-input::placeholder {
+            color: var(--dark-text-secondary);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Test blocking elements */
+        .blocking-element {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(255, 0, 0, 0.3);
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .blocking-element-2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 255, 0, 0.3);
+            z-index: 15000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Test Content -->
+    <div class="test-content">
+        <h1>Final Auth Overlay Test</h1>
+        <p>This page tests the authentication overlay with gradients and proper z-index.</p>
+        <p>The login screen should appear as a full-screen overlay on top of everything.</p>
+        
+        <button class="test-button" onclick="showAuth()">Show Login Screen</button>
+        <button class="test-button" onclick="hideAuth()">Hide Login Screen</button>
+        <button class="test-button" onclick="toggleBlocking1()">Toggle Blocking Element 1 (z-index: 10000)</button>
+        <button class="test-button" onclick="toggleBlocking2()">Toggle Blocking Element 2 (z-index: 15000)</button>
+        
+        <div style="margin-top: 2rem;">
+            <h3>Test Content Below</h3>
+            <p>This content should be hidden when the auth overlay is active.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+    </div>
+    
+    <!-- Blocking Elements for Testing -->
+    <div class="blocking-element hidden" id="blocking-element-1"></div>
+    <div class="blocking-element-2 hidden" id="blocking-element-2"></div>
+    
+    <!-- Auth Overlay -->
+    <div class="auth-overlay hidden" id="auth-overlay">
+        <div class="auth-card">
+            <h2>Welcome to Operator Uplift</h2>
+            <p>Transform your ambitions into epic quests</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+            </form>
+            
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--dark-text-secondary);">
+                Use: demo@operatoruplift.com / demo123
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        function showAuth() {
+            document.getElementById('auth-overlay').classList.remove('hidden');
+            console.log('Auth overlay shown with z-index:', getComputedStyle(document.getElementById('auth-overlay')).zIndex);
+        }
+        
+        function hideAuth() {
+            document.getElementById('auth-overlay').classList.add('hidden');
+            console.log('Auth overlay hidden');
+        }
+        
+        function toggleBlocking1() {
+            const blocking = document.getElementById('blocking-element-1');
+            blocking.classList.toggle('hidden');
+            console.log('Blocking element 1 toggled (z-index: 10000)');
+        }
+        
+        function toggleBlocking2() {
+            const blocking = document.getElementById('blocking-element-2');
+            blocking.classList.toggle('hidden');
+            console.log('Blocking element 2 toggled (z-index: 15000)');
+        }
+        
+        // Handle form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (email === 'demo@operatoruplift.com' && password === 'demo123') {
+                alert('Login successful! This would navigate to the dashboard.');
+                hideAuth();
+            } else {
+                alert('Invalid credentials. Use demo@operatoruplift.com / demo123');
+            }
+        });
+        
+        // Show auth overlay by default for testing
+        showAuth();
+        
+        // Log z-index values for debugging
+        console.log('Auth overlay z-index:', getComputedStyle(document.getElementById('auth-overlay')).zIndex);
+        console.log('Blocking element 1 z-index:', getComputedStyle(document.getElementById('blocking-element-1')).zIndex);
+        console.log('Blocking element 2 z-index:', getComputedStyle(document.getElementById('blocking-element-2')).zIndex);
+    </script>
+</body>
+</html> 

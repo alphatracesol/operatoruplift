@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-Layer Blocking Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+        }
+        
+        .test-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-width: 800px;
+        }
+        
+        .blocking {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .blocking h4 {
+            color: #ef4444;
+            margin-top: 0;
+        }
+        
+        .fixes {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .fixes h4 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+        
+        .injection {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .injection h4 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Z-Layer Blocking Test</h1>
+        <p>Testing z-index conflicts, auth dependencies, and cross-wrapper issues</p>
+        
+        <div class="blocking">
+            <h4>🚨 Z-LAYER BLOCKING ISSUES IDENTIFIED:</h4>
+            <p>Critical conflicts preventing local testing</p>
+            <ul>
+                <li>🚨 <strong>Auth Overlay:</strong> z-index: 20000 (blocks everything)</li>
+                <li>🚨 <strong>Loading Screen:</strong> z-index: 99999 (highest priority)</li>
+                <li>🚨 <strong>Firebase Dependencies:</strong> Waiting for auth initialization</li>
+                <li>🚨 <strong>Modal Conflicts:</strong> Multiple z-index systems</li>
+                <li>🚨 <strong>AI Chat Integration:</strong> Missing dependencies</li>
+                <li>🚨 <strong>Cross-Wrapper Issues:</strong> Enhanced upgrades added on top</li>
+            </ul>
+        </div>
+        
+        <div class="fixes">
+            <h4>🔧 Z-LAYER BLOCKING FIXES:</h4>
+            <p>Comprehensive solution for local testing</p>
+            <ul>
+                <li>✅ <strong>Local Test Mode:</strong> Toggle to bypass auth blocking</li>
+                <li>✅ <strong>Z-Index Normalization:</strong> Fixed conflicting z-indexes</li>
+                <li>✅ <strong>Auth Bypass:</strong> Mock Firebase auth for local testing</li>
+                <li>✅ <strong>Modal System Fix:</strong> Consolidated modal functionality</li>
+                <li>✅ <strong>AI Chat Mock:</strong> Mock AI responses for testing</li>
+                <li>✅ <strong>Test Mode Toggle:</strong> Easy enable/disable for deployment</li>
+            </ul>
+        </div>
+        
+        <div class="injection">
+            <h4>💉 AUTO-INJECTION METHOD:</h4>
+            <p>Direct injection into app.html for immediate testing</p>
+            <ul>
+                <li>💉 <strong>Direct Injection:</strong> Fix applied directly to app.html</li>
+                <li>💉 <strong>Auto-Detection:</strong> Detects when in main app</li>
+                <li>💉 <strong>Immediate Effect:</strong> No need to reload or refresh</li>
+                <li>💉 <strong>Test Mode Toggle:</strong> Visible in top-right corner</li>
+                <li>💉 <strong>Safe Deployment:</strong> Easy toggle for production</li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">
+            Ready to test z-layer blocking fix with auto-injection
+        </div>
+        
+        <button class="test-button" onclick="testAppWithInjection()">Test App with Auto-Injection</button>
+        <button class="test-button" onclick="testApp()">Test App (Manual)</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        
+        <div class="log" id="log">
+            Z-Layer Blocking Test Ready...
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log cleared...\n';
+        }
+        
+        function testAppWithInjection() {
+            log('🚀 Opening main app with auto-injection...');
+            updateStatus('Opening app with auto-injection...');
+            
+            // Open the main app in a new window
+            const appWindow = window.open('http://127.0.0.1:8080/app.html', '_blank');
+            
+            if (appWindow) {
+                log('✅ Main app opened in new window');
+                updateStatus('Main app opened - injecting fix...');
+                
+                // Wait for the app to load, then inject the fix
+                setTimeout(() => {
+                    try {
+                        // Inject the fix script directly into the app window
+                        const script = appWindow.document.createElement('script');
+                        script.src = 'http://127.0.0.1:8080/z-layer-blocking-fix.js';
+                        script.onload = () => {
+                            log('✅ Z-layer blocking fix injected successfully');
+                            updateStatus('Fix injected - check the app window');
+                            log('🎯 Expected results in app window:');
+                            log('  1. "🧪 LOCAL TEST MODE" indicator visible');
+                            log('  2. Test mode toggle in top-right corner');
+                            log('  3. Auth view semi-transparent (opacity: 0.3)');
+                            log('  4. Modals accessible for testing');
+                            log('  5. AI chat working with mock responses');
+                            log('  6. No Firebase auth errors');
+                            log('  7. Z-index conflicts resolved');
+                            log('  8. Cross-wrapper issues fixed');
+                            log('  9. All features testable locally');
+                            log('  10. Toggle button functional');
+                        };
+                        script.onerror = () => {
+                            log('❌ Failed to inject fix script');
+                            updateStatus('Failed to inject fix script');
+                        };
+                        appWindow.document.head.appendChild(script);
+                    } catch (error) {
+                        log('❌ Error injecting fix:', error.message);
+                        updateStatus('Error injecting fix - check console');
+                    }
+                }, 2000); // Wait 2 seconds for app to load
+                
+            } else {
+                log('❌ Failed to open main app (popup blocked?)');
+                updateStatus('Failed to open main app - popup may be blocked');
+            }
+        }
+        
+        function testApp() {
+            log('🚀 Opening main app for manual testing...');
+            updateStatus('Opening main app...');
+            
+            // Open the main app in a new window
+            const appWindow = window.open('http://127.0.0.1:8080/app.html', '_blank');
+            
+            if (appWindow) {
+                log('✅ Main app opened in new window');
+                updateStatus('Main app opened - check the new window');
+                log('💡 Manual testing checklist:');
+                log('  1. Open browser console in the app window');
+                log('  2. Navigate to: http://127.0.0.1:8080/z-layer-blocking-fix.js');
+                log('  3. Copy the script content');
+                log('  4. Paste and run in the app window console');
+                log('  5. Look for "🧪 LOCAL TEST MODE" indicator');
+                log('  6. Check for test mode toggle (top-right)');
+                log('  7. Auth view should be semi-transparent');
+                log('  8. Modals should be accessible');
+                log('  9. AI chat should work with mock responses');
+                log('  10. No Firebase auth errors');
+            } else {
+                log('❌ Failed to open main app (popup blocked?)');
+                updateStatus('Failed to open main app - popup may be blocked');
+            }
+        }
+        
+        // Auto-apply fix on load
+        window.addEventListener('load', () => {
+            log('📋 Test page loaded, ready for testing');
+            setTimeout(() => {
+                log('💡 Tip: Click "Test App with Auto-Injection" for easiest testing');
+                log('🎯 This z-layer blocking solution provides:');
+                log('   - Direct injection into app.html');
+                log('   - Auto-detection of main app');
+                log('   - Immediate application of fixes');
+                log('   - Visual test mode toggle');
+                log('   - Safe deployment option');
+                log('   - Comprehensive cross-wrapper conflict resolution');
+            }, 1000);
+        });
+        
+        log('🎯 Z-Layer Blocking Test initialized');
+    </script>
+</body>
+</html> 

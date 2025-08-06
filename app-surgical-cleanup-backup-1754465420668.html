@@ -40,7 +40,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
+    
 
     
     <!-- Firebase CDNs -->
@@ -230,15 +230,7 @@
         }
         
         /* Background Effects */
-        #tsparticles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: var(--z-background);
-            pointer-events: none;
-        }
+        
         
         #matrix-canvas {
             position: fixed;
@@ -333,30 +325,9 @@
             transition: all var(--transition-normal);
         }
         
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left var(--transition-slow);
-            z-index: 1;
-        }
         
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            opacity: 0;
-            transition: opacity var(--transition-normal);
-            z-index: 1;
-        }
+        
+        
         
         .btn:hover {
             transform: translateY(-3px) scale(1.02);
@@ -364,13 +335,9 @@
             border-color: var(--accent-color);
         }
         
-        .btn:hover::before {
-            left: 100%;
-        }
         
-        .btn:hover::after {
-            opacity: 1;
-        }
+        
+        
         
         .btn:active {
             transform: translateY(-1px) scale(0.98);
@@ -633,22 +600,9 @@
             overflow: hidden;
         }
         
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            opacity: 0;
-            transition: opacity var(--transition-normal);
-            pointer-events: none;
-        }
         
-        .card:hover::before {
-            opacity: 1;
-        }
+        
+        
         
         .card:hover {
             transform: translateY(-4px);
@@ -657,26 +611,11 @@
         }
         
         /* Bento box shimmer effect */
-        .card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: bentoShimmer 3s infinite;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity var(--transition-normal);
-        }
         
-        .card:hover::after {
-            opacity: 1;
-        }
         
-        @keyframes bentoShimmer {
-            0% { left: -100%; }
+        
+        
+        
             100% { left: 100%; }
         }
         
@@ -3239,16 +3178,7 @@
 
         
         /* Matrix Rain Effect */
-        .matrix-rain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-            opacity: 0.3;
-            pointer-events: none;
-        }
+        
         
         /* Auth container - CONSOLIDATED INTO MAIN AUTH DEFINITION */
         
@@ -5856,21 +5786,7 @@
         }
         
         /* Modals */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
+        
         
         .modal.active {
             opacity: 1;
@@ -8683,7 +8599,7 @@
     </div>
 
     <!-- ===== SIMPLIFIED BACKGROUND EFFECTS ===== -->
-    <div id="tsparticles"></div>
+    
     
     <!-- ===== BACKGROUND MUSIC (SINGLE INSTANCE) ===== -->
     <audio id="background-music" loop preload="auto" volume="0.05">
@@ -8868,7 +8784,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Particles Background for Dashboard -->
-            <div id="particles-js" class="particles-background"></div>
+            
             <div class="container">
                 <!-- Views will be rendered here -->
                 
@@ -9548,7 +9464,7 @@
                                     <div class="settings-description">Show matrix rain effect on login</div>
                                 </div>
                                 <div class="settings-control">
-                                    <div class="toggle-switch" id="matrix-rain-toggle" onclick="app.settings.toggleMatrixRain()"></div>
+                                    
                                 </div>
                             </div>
                             <div class="settings-item">
@@ -14497,68 +14413,7 @@
                             // Background Effects
                 initBackgroundEffects() {
                     // Initialize enhanced particles
-                    if (typeof tsParticles !== 'undefined') {
-                        try {
-                            tsParticles.load('tsparticles', {
-                                fpsLimit: 60,
-                                particles: {
-                                    number: { 
-                                        value: 80,
-                                        density: { enable: true, value_area: 800 }
-                                    },
-                                    color: { value: 'var(--accent-color)' },
-                                    shape: { 
-                                        type: 'circle',
-                                        stroke: { width: 0, color: '#000000' }
-                                    },
-                                    opacity: { 
-                                        value: 0.4,
-                                        random: true,
-                                        anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
-                                    },
-                                    size: { 
-                                        value: 3,
-                                        random: true,
-                                        anim: { enable: true, speed: 2, size_min: 0.1, sync: false }
-                                    },
-                                    line_linked: {
-                                        enable: true,
-                                        distance: 150,
-                                        color: 'var(--accent-color)',
-                                        opacity: 0.3,
-                                        width: 1
-                                    },
-                                    move: {
-                                        enable: true,
-                                        speed: 1.5,
-                                        direction: 'none',
-                                        random: true,
-                                        straight: false,
-                                        out_mode: 'out',
-                                        bounce: false,
-                                        attract: { enable: true, rotateX: 600, rotateY: 1200 }
-                                    }
-                                },
-                                interactivity: {
-                                    detect_on: 'canvas',
-                                    events: {
-                                        onhover: { enable: true, mode: 'repulse' },
-                                        onclick: { enable: true, mode: 'push' },
-                                        resize: true
-                                    },
-                                    modes: {
-                                        repulse: { distance: 100, duration: 0.4 },
-                                        push: { particles_nb: 4 }
-                                    }
-                                },
-                                retina_detect: true
-                            }).then(container => {
-                                app.state.particlesInstance = container;
-                                console.log('✅ Enhanced tsParticles initialized successfully');
-                            }).catch(error => {
-                                console.warn('Enhanced particles failed to load:', error);
-                            });
-                        } catch (error) {
+                     catch (error) {
                             console.warn('tsParticles not available:', error);
                         }
                     }
@@ -21834,35 +21689,7 @@ Format your response as JSON:
                     }
                     
                     // Apply matrix rain
-                    const matrixCanvas = document.getElementById('matrix-rain');
-                    if (matrixCanvas) {
-                        matrixCanvas.style.display = this.config.matrixRain ? 'block' : 'none';
-                    }
                     
-                    // Apply background music
-                    const backgroundMusic = document.getElementById('background-music');
-                    if (backgroundMusic) {
-                        backgroundMusic.volume = this.config.musicVolume / 100;
-                        if (this.config.backgroundMusic) {
-                            // Try to play music (may fail due to autoplay policies)
-                            backgroundMusic.play().catch(error => {
-                                console.log('Music autoplay blocked:', error);
-                            });
-                        } else {
-                            backgroundMusic.pause();
-                        }
-                    }
-                },
-                
-                updateSettingsUI() {
-                    // Update theme select
-                    const themeSelect = app.utils.safeGet('#theme-select');
-                    if (themeSelect) themeSelect.value = this.config.theme;
-                    
-                    // Update toggles
-                    this.updateToggle('animations-toggle', this.config.animations);
-                    this.updateToggle('particles-toggle', this.config.particles);
-                    this.updateToggle('matrix-rain-toggle', this.config.matrixRain);
                     this.updateToggle('background-music-toggle', this.config.backgroundMusic);
                     this.updateToggle('personality-analysis-toggle', this.config.personalityAnalysis);
                     this.updateToggle('push-notifications-toggle', this.config.pushNotifications);
@@ -22944,64 +22771,7 @@ Format your response as JSON:
         
         // Particles Effect for Dashboard
         function initParticles() {
-            if (typeof tsParticles !== 'undefined') {
-                tsParticles.load("particles-js", {
-                    particles: {
-                        number: {
-                            value: 80,
-                            density: {
-                                enable: true,
-                                value_area: 800
-                            }
-                        },
-                        color: {
-                            value: "#f97316"
-                        },
-                        shape: {
-                            type: "circle"
-                        },
-                        opacity: {
-                            value: 0.5,
-                            random: false
-                        },
-                        size: {
-                            value: 3,
-                            random: true
-                        },
-                        line_linked: {
-                            enable: true,
-                            distance: 150,
-                            color: "#f97316",
-                            opacity: 0.4,
-                            width: 1
-                        },
-                        move: {
-                            enable: true,
-                            speed: 2,
-                            direction: "none",
-                            random: false,
-                            straight: false,
-                            out_mode: "out",
-                            bounce: false
-                        }
-                    },
-                    interactivity: {
-                        detect_on: "canvas",
-                        events: {
-                            onhover: {
-                                enable: true,
-                                mode: "repulse"
-                            },
-                            onclick: {
-                                enable: true,
-                                mode: "push"
-                            },
-                            resize: true
-                        }
-                    },
-                    retina_detect: true
-                });
-            }
+            
         }
         
         // Debug function to force show auth overlay

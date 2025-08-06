@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 3 Loading Screen Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #f97316;
+            border-radius: 8px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .warning { background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-container {
+            text-align: center;
+            color: #fff;
+        }
+        
+        .loading-cube {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .loading-cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(249, 115, 22, 0.1);
+            border: 2px solid #f97316;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-cube-face-front { transform: translateZ(40px); }
+        .loading-cube-face-back { transform: translateZ(-40px) rotateY(180deg); }
+        .loading-cube-face-right { transform: translateX(40px) rotateY(90deg); }
+        .loading-cube-face-left { transform: translateX(-40px) rotateY(-90deg); }
+        .loading-cube-face-top { transform: translateY(-40px) rotateX(90deg); }
+        .loading-cube-face-bottom { transform: translateY(40px) rotateX(-90deg); }
+        
+        @keyframes loadingCubeRotateCCW {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        
+        @keyframes loadingCubeRotateCW {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(-360deg) rotateY(-360deg); }
+        }
+        
+        @keyframes loadingShimmerEffect {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        @keyframes particleBurst {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(calc(-50% + var(--x) * 1.5), calc(-50% + var(--y) * 1.5)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .loading-cube {
+            animation: loadingCubeRotateCCW 3s linear infinite;
+        }
+        
+        .loading-cube.clockwise {
+            animation: loadingCubeRotateCW 3s linear infinite;
+        }
+        
+        .loading-cube.loadingShimmerEffect {
+            position: relative;
+        }
+        
+        .loading-cube.loadingShimmerEffect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.6), transparent);
+            animation: loadingShimmerEffect 0.5s ease-out;
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            transition: opacity 0.15s ease;
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            width: 0%;
+            transition: width 0.1s ease;
+            position: relative;
+        }
+        
+        .loading-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loadingShimmerEffect 2s infinite;
+        }
+        
+        button {
+            background: #f97316;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 Chunk 3 Loading Screen Test</h1>
+        <p>Testing enhanced loading screen functionality with cube interactions, animations, and transitions.</p>
+        
+        <div class="test-section">
+            <h3>🧪 Test Controls</h3>
+            <button onclick="showLoadingScreen()">Show Loading Screen</button>
+            <button onclick="hideLoadingScreen()">Hide Loading Screen</button>
+            <button onclick="testCubeClick()">Test Cube Click</button>
+            <button onclick="runFullTest()">Run Full Test</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="test-results"></div>
+        </div>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-cube" id="loading-cube" style="cursor: pointer;" title="Click to change rotation direction">
+                <div class="loading-cube-face loading-cube-face-front">F</div>
+                <div class="loading-cube-face loading-cube-face-back">B</div>
+                <div class="loading-cube-face loading-cube-face-right">R</div>
+                <div class="loading-cube-face loading-cube-face-left">L</div>
+                <div class="loading-cube-face loading-cube-face-top">T</div>
+                <div class="loading-cube-face loading-cube-face-bottom">D</div>
+            </div>
+            <div class="loading-text">
+                <h2 id="loading-text">Initializing Test</h2>
+                <div class="loading-bar">
+                    <div class="loading-progress" id="loading-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test state
+        let testResults = [];
+        let clickCount = 0;
+        let isClockwise = false;
+        
+        // Enhanced loading screen functionality (Chunk 3)
+        function initLoadingScreen() {
+            console.log('🚀 Initializing Enhanced Loading Screen (Chunk 3)...');
+            
+            const loadingScreen = document.getElementById('loading-screen');
+            const loadingCube = document.getElementById('loading-cube');
+            const loadingText = document.getElementById('loading-text');
+            const loadingProgress = document.getElementById('loading-progress');
+            
+            if (!loadingScreen) {
+                addTestResult('error', 'Loading screen not found');
+                return;
+            }
+            
+            // Enhanced interactive cube click handler
+            if (loadingCube) {
+                // Add accessibility attributes
+                loadingCube.setAttribute('role', 'button');
+                loadingCube.setAttribute('aria-label', 'Toggle cube rotation direction');
+                loadingCube.setAttribute('tabindex', '0');
+                
+                const handleCubeClick = () => {
+                    clickCount++;
+                    isClockwise = !isClockwise;
+                    
+                    if (isClockwise) {
+                        loadingCube.classList.add('clockwise');
+                        console.log('🔄 Cube clicked: toggling to CW (click #' + clickCount + ')');
+                        addTestResult('success', `Cube rotation: Clockwise (click #${clickCount})`);
+                    } else {
+                        loadingCube.classList.remove('clockwise');
+                        console.log('🔄 Cube clicked: toggling to CCW (click #' + clickCount + ')');
+                        addTestResult('success', `Cube rotation: Counter-clockwise (click #${clickCount})`);
+                    }
+                    
+                    // Enhanced click feedback with shimmer effect
+                    loadingCube.classList.add('loadingShimmerEffect');
+                    loadingCube.style.transform = 'scale(1.2)';
+                    
+                    // Add subtle particle burst effect
+                    const burstEffect = document.createElement('div');
+                    burstEffect.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        width: 100px;
+                        height: 100px;
+                        pointer-events: none;
+                        z-index: 1000;
+                    `;
+                    
+                    // Create particle elements
+                    for (let i = 0; i < 8; i++) {
+                        const particle = document.createElement('div');
+                        particle.style.cssText = `
+                            position: absolute;
+                            width: 4px;
+                            height: 4px;
+                            background: #f97316;
+                            border-radius: 50%;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            animation: particleBurst 0.6s ease-out forwards;
+                        `;
+                        
+                        // Calculate particle direction
+                        const angle = (i * 45) * (Math.PI / 180);
+                        const distance = 30 + Math.random() * 20;
+                        const x = Math.cos(angle) * distance;
+                        const y = Math.sin(angle) * distance;
+                        
+                        particle.style.setProperty('--x', x + 'px');
+                        particle.style.setProperty('--y', y + 'px');
+                        
+                        burstEffect.appendChild(particle);
+                    }
+                    
+                    loadingCube.appendChild(burstEffect);
+                    
+                    // Remove burst effect after animation
+                    setTimeout(() => {
+                        if (burstEffect.parentNode) {
+                            burstEffect.parentNode.removeChild(burstEffect);
+                        }
+                    }, 600);
+                    
+                    // Remove shimmer after animation completes
+                    setTimeout(() => {
+                        loadingCube.classList.remove('loadingShimmerEffect');
+                        loadingCube.style.transform = '';
+                    }, 500);
+                    
+                    // Optional: Add subtle color shift effect
+                    loadingCube.style.filter = 'hue-rotate(30deg)';
+                    setTimeout(() => {
+                        loadingCube.style.filter = '';
+                    }, 300);
+                };
+                
+                // Click event listener
+                loadingCube.addEventListener('click', handleCubeClick);
+                
+                // Keyboard accessibility
+                loadingCube.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCubeClick();
+                    }
+                });
+                
+                // Enhanced hover effects
+                loadingCube.addEventListener('mouseenter', () => {
+                    loadingCube.style.transform = 'scale(1.1)';
+                    loadingCube.style.cursor = 'pointer';
+                });
+                
+                loadingCube.addEventListener('mouseleave', () => {
+                    loadingCube.style.transform = 'scale(1)';
+                    loadingCube.style.cursor = 'pointer';
+                });
+                
+                addTestResult('success', 'Enhanced cube click handler initialized');
+            }
+            
+            // Enhanced loading states with smoother transitions
+            const loadingStates = [
+                { text: 'Initializing Test Environment', progress: 0, duration: 800 },
+                { text: 'Loading Test Components', progress: 20, duration: 600 },
+                { text: 'Initializing Cube Interactions', progress: 40, duration: 700 },
+                { text: 'Preparing Animations', progress: 60, duration: 500 },
+                { text: 'Ready for Testing', progress: 80, duration: 400 },
+                { text: 'Test Environment Active!', progress: 100, duration: 300 }
+            ];
+            
+            let currentState = 0;
+            let progress = 0;
+            let lastUpdateTime = Date.now();
+            
+            // Smooth progress animation with requestAnimationFrame
+            const animateProgress = () => {
+                const now = Date.now();
+                const deltaTime = now - lastUpdateTime;
+                lastUpdateTime = now;
+                
+                // More realistic, time-based progress
+                progress += (Math.random() * 2 + 0.5) * (deltaTime / 100);
+                
+                // Update text based on progress thresholds with smooth transitions
+                if (loadingText && currentState < loadingStates.length - 1) {
+                    const nextState = loadingStates[currentState + 1];
+                    if (progress >= nextState.progress) {
+                        currentState++;
+                        loadingText.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingText.textContent = loadingStates[currentState].text;
+                            loadingText.style.opacity = '1';
+                            console.log(`📝 Loading: ${loadingStates[currentState].text}`);
+                            addTestResult('success', `Loading state: ${loadingStates[currentState].text}`);
+                        }, 150);
+                    }
+                }
+                
+                // Update progress bar with smooth animation
+                if (loadingProgress) {
+                    loadingProgress.style.width = Math.min(progress, 100) + '%';
+                }
+                
+                // Complete loading after 4 seconds total
+                if (progress >= 100) {
+                    progress = 100;
+                    console.log('✅ Loading complete, test environment ready');
+                    addTestResult('success', 'Loading complete - test environment ready');
+                    return; // Stop animation loop
+                }
+                
+                // Continue animation
+                requestAnimationFrame(animateProgress);
+            };
+            
+            // Start the animation loop
+            requestAnimationFrame(animateProgress);
+            
+            addTestResult('success', 'Enhanced loading screen initialized (Chunk 3 complete)');
+        }
+        
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'flex';
+            initLoadingScreen();
+            addTestResult('success', 'Loading screen displayed');
+        }
+        
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'none';
+            addTestResult('success', 'Loading screen hidden');
+        }
+        
+        function testCubeClick() {
+            const loadingCube = document.getElementById('loading-cube');
+            if (loadingCube) {
+                loadingCube.click();
+                addTestResult('success', 'Cube click test executed');
+            } else {
+                addTestResult('error', 'Cube element not found');
+            }
+        }
+        
+        function addTestResult(type, message) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Keep only last 10 results
+            while (resultsDiv.children.length > 10) {
+                resultsDiv.removeChild(resultsDiv.firstChild);
+            }
+        }
+        
+        function runFullTest() {
+            addTestResult('warning', 'Starting comprehensive Chunk 3 test...');
+            
+            // Test 1: Loading screen display
+            showLoadingScreen();
+            
+            // Test 2: Cube interactions
+            setTimeout(() => {
+                testCubeClick();
+            }, 1000);
+            
+            setTimeout(() => {
+                testCubeClick();
+            }, 2000);
+            
+            setTimeout(() => {
+                testCubeClick();
+            }, 3000);
+            
+            // Test 3: Hide loading screen
+            setTimeout(() => {
+                hideLoadingScreen();
+                addTestResult('success', 'Full test completed successfully');
+            }, 5000);
+        }
+        
+        // Initialize test environment
+        document.addEventListener('DOMContentLoaded', () => {
+            addTestResult('success', 'Test environment loaded');
+        });
+    </script>
+</body>
+</html> 

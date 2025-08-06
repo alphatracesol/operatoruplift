@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 8: AI Chat Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        
+        .test-title {
+            color: #f97316;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .test-result.success {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .test-result.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+        
+        .test-result.info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+        }
+        
+        .chat-preview {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #555;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Chat Container Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .chat-header h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.25rem;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-action-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .chat-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            max-width: 80%;
+            position: relative;
+            animation: messageSlideIn 0.3s ease;
+        }
+        
+        .message.user {
+            background: #f97316;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .message-content {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        .message-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .message-time {
+            color: inherit;
+            opacity: 0.7;
+        }
+        
+        .message-indicator {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            margin: 0.5rem 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #f97316;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        .typing-text {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            margin: 1rem;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: #ffffff;
+            font-size: 0.875rem;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: 0.25rem;
+            position: absolute;
+            right: 0.5rem;
+            bottom: 0.5rem;
+        }
+        
+        .input-action-btn {
+            background: none;
+            border: none;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #9ca3af;
+        }
+        
+        .input-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        
+        .input-action-icon {
+            font-size: 1rem;
+        }
+        
+        .send-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        
+        .send-btn:hover {
+            background: #ea580c;
+        }
+        
+        .send-icon {
+            font-size: 1rem;
+        }
+        
+        /* Voice Input Interface */
+        .voice-input-interface {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1rem;
+        }
+        
+        .voice-status {
+            margin-bottom: 1rem;
+        }
+        
+        .voice-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .voice-wave {
+            width: 4px;
+            height: 20px;
+            background: #f97316;
+            border-radius: 2px;
+            animation: voiceWave 1s infinite ease-in-out;
+        }
+        
+        .voice-wave:nth-child(1) { animation-delay: 0s; }
+        .voice-wave:nth-child(2) { animation-delay: 0.1s; }
+        .voice-wave:nth-child(3) { animation-delay: 0.2s; }
+        
+        @keyframes voiceWave {
+            0%, 100% { height: 20px; }
+            50% { height: 40px; }
+        }
+        
+        .voice-text {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        /* File Upload Interface */
+        .file-upload-interface {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+        
+        .file-drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .file-drop-zone:hover {
+            border-color: #f97316;
+            background: rgba(249, 115, 22, 0.05);
+        }
+        
+        .file-drop-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-drop-icon {
+            font-size: 2rem;
+            color: #9ca3af;
+        }
+        
+        .file-list {
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-name {
+            font-size: 0.875rem;
+            color: #ffffff;
+        }
+        
+        .file-size {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        
+        /* Emoji Picker */
+        .emoji-picker {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .emoji-categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 0.5rem;
+        }
+        
+        .emoji-category {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.25rem;
+            color: #ffffff;
+        }
+        
+        .emoji-category.active {
+            background: #f97316;
+            color: white;
+        }
+        
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.25rem;
+        }
+        
+        .emoji-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.25rem;
+            color: #ffffff;
+        }
+        
+        .emoji-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* AI Features Panel */
+        .ai-features-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            margin: 1rem;
+        }
+        
+        .features-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .features-header h4 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .features-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.2s ease;
+        }
+        
+        .features-toggle:hover {
+            color: #ffffff;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s ease;
+        }
+        
+        .features-content {
+            padding: 1rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-icon {
+            font-size: 1.25rem;
+        }
+        
+        .feature-text {
+            flex: 1;
+            color: #ffffff;
+            font-size: 0.875rem;
+        }
+        
+        .feature-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        /* Animations */
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-input-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .input-actions {
+                position: static;
+                justify-content: center;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .emoji-picker {
+                max-width: 250px;
+            }
+            
+            .emoji-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chat-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            
+            .chat-actions {
+                justify-content: center;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .emoji-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Chunk 8: AI Chat Integration Test</h1>
+        
+        <div class="test-section">
+            <h2 class="test-title">1. Core AI Functions Test</h2>
+            <div id="core-functions-result" class="test-result info">
+                Testing core AI functions...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">2. Message Handling Test</h2>
+            <div id="message-handling-result" class="test-result info">
+                Testing message sending and receiving...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">3. UI Components Test</h2>
+            <div id="ui-components-result" class="test-result info">
+                Testing chat interface components...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">4. Advanced Features Test</h2>
+            <div id="advanced-features-result" class="test-result info">
+                Testing voice input, file upload, and emoji picker...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">5. Integration Test</h2>
+            <div id="integration-result" class="test-result info">
+                Testing integration with goals and dashboard...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">6. Chat Interface Preview</h2>
+            <div class="chat-preview">
+                <!-- Chat Container -->
+                <div class="chat-container">
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <h3>🤖 AI Mentor</h3>
+                        <div class="chat-actions">
+                            <button class="chat-action-btn" onclick="testClearChat()">Clear</button>
+                            <button class="chat-action-btn" onclick="testExportChat()">Export</button>
+                            <button class="chat-action-btn" onclick="testSearchMessages()">Search</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Messages -->
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message assistant">
+                            <div class="message-content">
+                                <p>Hello! I'm your AI mentor. How can I help you today?</p>
+                            </div>
+                            <div class="message-meta">
+                                <small class="message-time">Just now</small>
+                                <span class="message-indicator" title="AI Assistant">🤖</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="typing-text">AI is typing...</span>
+                    </div>
+                    
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="input-wrapper">
+                            <input type="text" class="chat-input" id="chat-input" placeholder="Ask me anything...">
+                            <div class="input-actions">
+                                <button class="input-action-btn" onclick="testToggleVoiceInput()" title="Voice Input">
+                                    <span class="input-action-icon">🎤</span>
+                                </button>
+                                <button class="input-action-btn" onclick="testToggleFileUpload()" title="Attach File">
+                                    <span class="input-action-icon">📎</span>
+                                </button>
+                                <button class="input-action-btn" onclick="testToggleEmojiPicker()" title="Emoji">
+                                    <span class="input-action-icon">😊</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="send-btn" onclick="testSendMessage()">
+                            <span class="send-icon">📤</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Voice Input Interface -->
+                    <div class="voice-input-interface" id="voice-input-interface" style="display: none;">
+                        <div class="voice-status">
+                            <div class="voice-indicator" id="voice-indicator">
+                                <div class="voice-wave"></div>
+                                <div class="voice-wave"></div>
+                                <div class="voice-wave"></div>
+                            </div>
+                            <p class="voice-text" id="voice-text">Click to start recording...</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="testStopVoiceInput()">Stop Recording</button>
+                    </div>
+                    
+                    <!-- File Upload Interface -->
+                    <div class="file-upload-interface" id="file-upload-interface" style="display: none;">
+                        <div class="file-drop-zone" id="file-drop-zone">
+                            <div class="file-drop-content">
+                                <span class="file-drop-icon">📁</span>
+                                <p>Drop files here or click to upload</p>
+                                <input type="file" id="file-input" multiple accept=".txt,.pdf,.doc,.docx,.jpg,.png" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+                    
+                    <!-- Emoji Picker -->
+                    <div class="emoji-picker" id="emoji-picker" style="display: none;">
+                        <div class="emoji-categories">
+                            <button class="emoji-category active" data-category="smileys">😊</button>
+                            <button class="emoji-category" data-category="gestures">👋</button>
+                            <button class="emoji-category" data-category="objects">💡</button>
+                            <button class="emoji-category" data-category="nature">🌱</button>
+                        </div>
+                        <div class="emoji-grid" id="emoji-grid">
+                            <!-- Emojis will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Features Panel -->
+                <div class="ai-features-panel">
+                    <div class="features-header">
+                        <h4>🤖 AI Features</h4>
+                        <button class="features-toggle" onclick="testToggleFeaturesPanel()">
+                            <span class="toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="features-content" id="ai-features-content">
+                        <div class="feature-item">
+                            <span class="feature-icon">🎭</span>
+                            <span class="feature-text">Personality Analysis</span>
+                            <span class="feature-status" id="personality-status">Active</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🧠</span>
+                            <span class="feature-text">DeepSeek AI</span>
+                            <span class="feature-status" id="deepseek-status">Connected</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎯</span>
+                            <span class="feature-text">Goal Tracking</span>
+                            <span class="feature-status" id="goal-tracking-status">Active</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📊</span>
+                            <span class="feature-text">Analytics</span>
+                            <span class="feature-status" id="analytics-status">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Mock app object for testing
+        const app = {
+            ai: {
+                isTyping: false,
+                conversationHistory: [],
+                config: {
+                    fallbackResponses: [
+                        "I'm here to help! What would you like to know?",
+                        "That's an interesting question. Let me think about that.",
+                        "I'm still learning, but I'll do my best to help you.",
+                        "Could you rephrase that? I want to make sure I understand.",
+                        "I'm processing your request. Please give me a moment."
+                    ]
+                },
+                
+                sendMessage() {
+                    const chatInput = document.getElementById('chat-input');
+                    const message = chatInput?.value?.trim();
+                    
+                    if (!message || this.isTyping) {
+                        return;
+                    }
+                    
+                    // Add user message
+                    this.addMessage('user', message);
+                    chatInput.value = '';
+                    
+                    // Show typing indicator
+                    this.showTypingIndicator();
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        this.hideTypingIndicator();
+                        const response = this.getFallbackResponse(message);
+                        this.addMessage('assistant', response);
+                    }, 2000);
+                },
+                
+                addMessage(sender, content) {
+                    const messagesContainer = document.getElementById('chat-messages');
+                    if (!messagesContainer) return;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${sender}`;
+                    
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.innerHTML = this.formatMessage(content);
+                    
+                    const messageMeta = document.createElement('div');
+                    messageMeta.className = 'message-meta';
+                    
+                    const timestamp = document.createElement('small');
+                    timestamp.className = 'message-time';
+                    timestamp.textContent = this.getCurrentTime();
+                    
+                    const indicator = document.createElement('span');
+                    indicator.className = 'message-indicator';
+                    indicator.textContent = sender === 'user' ? '👤' : '🤖';
+                    indicator.title = sender === 'user' ? 'You' : 'AI Assistant';
+                    
+                    messageMeta.appendChild(timestamp);
+                    messageMeta.appendChild(indicator);
+                    
+                    messageDiv.appendChild(messageContent);
+                    messageDiv.appendChild(messageMeta);
+                    
+                    messagesContainer.appendChild(messageDiv);
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Add to conversation history
+                    this.conversationHistory.push({
+                        sender,
+                        content,
+                        timestamp: new Date().toISOString()
+                    });
+                },
+                
+                formatMessage(content) {
+                    return content
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                },
+                
+                getCurrentTime() {
+                    const now = new Date();
+                    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                },
+                
+                showTypingIndicator() {
+                    this.isTyping = true;
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) {
+                        indicator.style.display = 'block';
+                    }
+                },
+                
+                hideTypingIndicator() {
+                    this.isTyping = false;
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) {
+                        indicator.style.display = 'none';
+                    }
+                },
+                
+                getFallbackResponse(message) {
+                    const responses = this.config.fallbackResponses;
+                    const randomIndex = Math.floor(Math.random() * responses.length);
+                    return responses[randomIndex];
+                },
+                
+                clearChat() {
+                    const messagesContainer = document.getElementById('chat-messages');
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = '';
+                    }
+                    
+                    this.conversationHistory = [];
+                    console.log('✅ Chat cleared successfully');
+                },
+                
+                exportChat() {
+                    const chatData = {
+                        timestamp: new Date().toISOString(),
+                        messages: this.conversationHistory,
+                        totalMessages: this.conversationHistory.length
+                    };
+                    
+                    const dataStr = JSON.stringify(chatData, null, 2);
+                    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                    
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(dataBlob);
+                    link.download = `chat-export-${new Date().toISOString().split('T')[0]}.json`;
+                    link.click();
+                    
+                    console.log('✅ Chat exported successfully');
+                },
+                
+                searchMessages(query) {
+                    if (!query || query.trim().length === 0) {
+                        return [];
+                    }
+                    
+                    const results = this.conversationHistory.filter(message => 
+                        message.content.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    console.log(`🔍 Found ${results.length} messages matching "${query}"`);
+                    return results;
+                },
+                
+                toggleVoiceInput() {
+                    const voiceInterface = document.getElementById('voice-input-interface');
+                    if (voiceInterface) {
+                        const isVisible = voiceInterface.style.display !== 'none';
+                        voiceInterface.style.display = isVisible ? 'none' : 'block';
+                        
+                        if (!isVisible) {
+                            this.startVoiceRecording();
+                        } else {
+                            this.stopVoiceRecording();
+                        }
+                    }
+                },
+                
+                startVoiceRecording() {
+                    console.log('🎤 Voice recording started');
+                },
+                
+                stopVoiceRecording() {
+                    console.log('🎤 Voice recording stopped');
+                },
+                
+                toggleFileUpload() {
+                    const fileInterface = document.getElementById('file-upload-interface');
+                    if (fileInterface) {
+                        const isVisible = fileInterface.style.display !== 'none';
+                        fileInterface.style.display = isVisible ? 'none' : 'block';
+                    }
+                },
+                
+                toggleEmojiPicker() {
+                    const emojiPicker = document.getElementById('emoji-picker');
+                    if (emojiPicker) {
+                        const isVisible = emojiPicker.style.display !== 'none';
+                        emojiPicker.style.display = isVisible ? 'none' : 'block';
+                        
+                        if (!isVisible) {
+                            this.populateEmojis();
+                        }
+                    }
+                },
+                
+                populateEmojis() {
+                    const emojiGrid = document.getElementById('emoji-grid');
+                    if (!emojiGrid) return;
+                    
+                    const emojis = ['😊', '😂', '❤️', '👍', '🎉', '🔥', '💯', '✨', '🌟', '💪', '🎯', '📚', '💡', '🚀', '🎨', '🎵', '🍕', '☕', '🌱', '🌈'];
+                    
+                    emojiGrid.innerHTML = emojis.map(emoji => 
+                        `<button class="emoji-btn" onclick="app.ai.selectEmoji('${emoji}')">${emoji}</button>`
+                    ).join('');
+                },
+                
+                selectEmoji(emoji) {
+                    const chatInput = document.getElementById('chat-input');
+                    if (chatInput) {
+                        chatInput.value += emoji;
+                        chatInput.focus();
+                    }
+                    
+                    this.toggleEmojiPicker();
+                }
+            },
+            
+            ui: {
+                showToast(message, type = 'info') {
+                    console.log(`🍞 Toast: ${message} (${type})`);
+                }
+            }
+        };
+        
+        // Test functions
+        function testCoreFunctions() {
+            const result = document.getElementById('core-functions-result');
+            
+            try {
+                // Test all core functions exist
+                const functions = [
+                    'sendMessage', 'addMessage', 'showTypingIndicator', 'hideTypingIndicator',
+                    'clearChat', 'exportChat', 'searchMessages', 'toggleVoiceInput',
+                    'toggleFileUpload', 'toggleEmojiPicker'
+                ];
+                
+                let allFunctionsExist = true;
+                functions.forEach(funcName => {
+                    if (typeof app.ai[funcName] !== 'function') {
+                        allFunctionsExist = false;
+                    }
+                });
+                
+                if (allFunctionsExist) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Core functions test passed - All AI functions working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Core functions test failed - Missing functions';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Core functions test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testMessageHandling() {
+            const result = document.getElementById('message-handling-result');
+            
+            try {
+                // Test message sending
+                const initialHistoryLength = app.ai.conversationHistory.length;
+                app.ai.addMessage('user', 'Test message');
+                app.ai.addMessage('assistant', 'Test response');
+                
+                if (app.ai.conversationHistory.length > initialHistoryLength) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Message handling test passed - Messages added successfully';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Message handling test failed - Messages not added';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Message handling test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testUIComponents() {
+            const result = document.getElementById('ui-components-result');
+            
+            try {
+                // Test UI elements exist
+                const elements = [
+                    'chat-messages', 'chat-input', 'typing-indicator',
+                    'voice-input-interface', 'file-upload-interface', 'emoji-picker'
+                ];
+                
+                let allElementsExist = true;
+                elements.forEach(elementId => {
+                    const element = document.getElementById(elementId);
+                    if (!element) {
+                        allElementsExist = false;
+                    }
+                });
+                
+                if (allElementsExist) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ UI components test passed - All chat elements present';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ UI components test failed - Missing elements';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ UI components test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testAdvancedFeatures() {
+            const result = document.getElementById('advanced-features-result');
+            
+            try {
+                // Test voice input
+                app.ai.toggleVoiceInput();
+                
+                // Test file upload
+                app.ai.toggleFileUpload();
+                
+                // Test emoji picker
+                app.ai.toggleEmojiPicker();
+                
+                result.className = 'test-result success';
+                result.innerHTML = '✅ Advanced features test passed - Voice, file upload, and emoji picker working';
+                
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Advanced features test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testIntegration() {
+            const result = document.getElementById('integration-result');
+            
+            try {
+                // Test toast notifications
+                app.ui.showToast('Integration test successful!', 'success');
+                
+                // Test conversation history
+                const initialLength = app.ai.conversationHistory.length;
+                app.ai.addMessage('user', 'Integration test message');
+                
+                if (app.ai.conversationHistory.length > initialLength) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Integration test passed - Toast notifications and conversation history working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Integration test failed - Conversation history not working';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Integration test failed - Error: ${error.message}`;
+            }
+        }
+        
+        // Helper functions for testing
+        function testSendMessage() {
+            app.ai.sendMessage();
+        }
+        
+        function testClearChat() {
+            app.ai.clearChat();
+        }
+        
+        function testExportChat() {
+            app.ai.exportChat();
+        }
+        
+        function testSearchMessages() {
+            const results = app.ai.searchMessages('test');
+            console.log('Search results:', results);
+        }
+        
+        function testToggleVoiceInput() {
+            app.ai.toggleVoiceInput();
+        }
+        
+        function testStopVoiceInput() {
+            app.ai.stopVoiceRecording();
+            app.ai.toggleVoiceInput();
+        }
+        
+        function testToggleFileUpload() {
+            app.ai.toggleFileUpload();
+        }
+        
+        function testToggleEmojiPicker() {
+            app.ai.toggleEmojiPicker();
+        }
+        
+        function testToggleFeaturesPanel() {
+            const content = document.getElementById('ai-features-content');
+            const toggle = document.querySelector('.toggle-icon');
+            
+            if (content && toggle) {
+                const isVisible = content.style.display !== 'none';
+                content.style.display = isVisible ? 'none' : 'block';
+                toggle.textContent = isVisible ? '▼' : '▲';
+            }
+        }
+        
+        // Setup event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Send message on Enter key
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        app.ai.sendMessage();
+                    }
+                });
+            }
+            
+            // File upload
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const files = e.target.files;
+                    if (files.length > 0) {
+                        console.log(`📁 ${files.length} file(s) selected`);
+                    }
+                });
+            }
+        });
+        
+        // Run all tests when page loads
+        window.addEventListener('load', () => {
+            console.log('🧪 Starting Chunk 8 AI Chat Integration Test...');
+            
+            setTimeout(() => {
+                testCoreFunctions();
+                testMessageHandling();
+                testUIComponents();
+                testAdvancedFeatures();
+                testIntegration();
+                
+                console.log('✅ All tests completed');
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Fix Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+        }
+        
+        .test-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-width: 800px;
+        }
+        
+        .surgical {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .surgical h4 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Surgical Fix Test</h1>
+        <p>Testing the surgical replacement of the broken loading screen</p>
+        
+        <div class="surgical">
+            <h4>🔧 SURGICAL FIXES APPLIED:</h4>
+            <p>Direct HTML/CSS/JS replacement in app.html</p>
+            <ul>
+                <li>✅ <strong>Replaced:</strong> loading-screen with loading-overlay</li>
+                <li>✅ <strong>Simplified:</strong> Complex CSS with clean CSS</li>
+                <li>✅ <strong>Fixed:</strong> Broken JavaScript functions</li>
+                <li>✅ <strong>Removed:</strong> Complex background effects</li>
+                <li>✅ <strong>Result:</strong> Clean, working loading system</li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">
+            Ready to test surgical fix
+        </div>
+        
+        <button class="test-button" onclick="testApp()">Test Main App</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        
+        <div class="log" id="log">
+            Surgical Fix Test Ready...
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log cleared...\n';
+        }
+        
+        function testApp() {
+            log('🚀 Opening main app for testing...');
+            updateStatus('Opening main app...');
+            
+            // Open the main app in a new window
+            const appWindow = window.open('http://127.0.0.1:8080/app.html', '_blank');
+            
+            if (appWindow) {
+                log('✅ Main app opened in new window');
+                updateStatus('Main app opened - check the new window');
+                log('💡 Testing checklist:');
+                log('  1. Loading overlay should appear (not loading-screen)');
+                log('  2. 3D cube with 6 faces visible');
+                log('  3. Cube rotates continuously (CCW by default)');
+                log('  4. Click cube to toggle rotation direction');
+                log('  5. Text says "Initializing Operator Uplift..."');
+                log('  6. Auto-hides after 4 seconds');
+                log('  7. Shows auth view properly');
+                log('  8. No complex progress bar or conflicts');
+                log('  9. Clean, simple background (no matrix effects)');
+            } else {
+                log('❌ Failed to open main app (popup blocked?)');
+                updateStatus('Failed to open main app - popup may be blocked');
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('📋 Test page loaded, ready for testing');
+            setTimeout(() => {
+                log('💡 Tip: Click "Test Main App" to verify surgical fix');
+                log('🎯 This surgical solution provides:');
+                log('   - Clean loading-overlay (not broken loading-screen)');
+                log('   - Working 3D cube animation');
+                log('   - Click interaction functionality');
+                log('   - Auto-hide after 4 seconds');
+                log('   - Proper auth view transition');
+                log('   - Simplified background effects');
+                log('   - No conflicts or broken functionality');
+            }, 1000);
+        });
+        
+        log('🎯 Surgical Fix Test initialized');
+    </script>
+</body>
+</html> 

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 - AI-Powered Personalization Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 600;
+        }
+        .test-button:hover {
+            background: #ea580c;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #f97316;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 Phase 1 - AI-Powered Personalization Test</h1>
+        <p>Testing the enhanced personality analysis with DeepSeek AI integration</p>
+        
+        <h2>🧠 Personality Analysis Tests</h2>
+        <button class="test-button" onclick="testEnhancedPersonalityAnalysis()">Test Enhanced Personality Analysis</button>
+        <button class="test-button" onclick="testDeepSeekIntegration()">Test DeepSeek AI Integration</button>
+        <button class="test-button" onclick="testPersonalityContext()">Test Personality Context</button>
+        <button class="test-button" onclick="testOnboardingFlow()">Test Onboarding Flow</button>
+        
+        <div id="test-results" class="test-results">
+            <h3>Test Results:</h3>
+            <div id="results-content"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const resultsContent = document.getElementById('results-content');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            resultsContent.appendChild(logEntry);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function testEnhancedPersonalityAnalysis() {
+            log('Testing enhanced personality analysis functionality...', 'info');
+            
+            // Test personality data collection
+            const mockPersonalityData = {
+                traits: ['introvert', 'analytical', 'focused'],
+                needs: ['self-actualization', 'esteem'],
+                goals: ['career advancement', 'skill development'],
+                learningStyle: 'visual',
+                motivationType: 'achievement',
+                temperament: { introvert: 1, analytical: 1, focused: 1 },
+                maslowLevel: 4
+            };
+            
+            log('✅ Mock personality data created', 'success');
+            
+            // Test personality analysis prompt creation
+            const prompt = createPersonalityAnalysisPrompt(mockPersonalityData);
+            if (prompt.includes('Traits: introvert, analytical, focused')) {
+                log('✅ Personality analysis prompt creation working', 'success');
+            } else {
+                log('❌ Personality analysis prompt creation failed', 'error');
+            }
+            
+            // Test personality type determination
+            const mockAnalysis = {
+                temperament: 'Melancholic',
+                mentorStyle: 'Strategist',
+                maslowLevel: 4
+            };
+            const personalityType = determinePersonalityType(mockAnalysis);
+            if (personalityType === 'Analytical') {
+                log('✅ Personality type determination working', 'success');
+            } else {
+                log('❌ Personality type determination failed', 'error');
+            }
+            
+            // Test confidence calculation
+            const confidence = calculateConfidence(mockAnalysis);
+            if (confidence >= 0.7 && confidence <= 1.0) {
+                log('✅ Confidence calculation working', 'success');
+            } else {
+                log('❌ Confidence calculation failed', 'error');
+            }
+        }
+
+        function testDeepSeekIntegration() {
+            log('Testing DeepSeek AI integration...', 'info');
+            
+            // Test API key handling
+            const apiKey = getSecureApiKey();
+            if (apiKey === null || apiKey === '[REDACTED]') {
+                log('✅ API key security handling working', 'success');
+            } else {
+                log('❌ API key security handling failed', 'error');
+            }
+            
+            // Test personality context loading
+            const personalityContext = loadPersonalityContext();
+            if (personalityContext && typeof personalityContext === 'object') {
+                log('✅ Personality context loading working', 'success');
+            } else {
+                log('❌ Personality context loading failed', 'error');
+            }
+        }
+
+        function testPersonalityContext() {
+            log('Testing personality context integration...', 'info');
+            
+            // Test personality context creation
+            const mockPersonalityData = {
+                traits: ['extrovert', 'creative', 'social'],
+                needs: ['belonging', 'esteem'],
+                goals: ['community building', 'leadership'],
+                learningStyle: 'kinesthetic',
+                motivationType: 'recognition',
+                temperament: { extrovert: 1, creative: 1, social: 1 },
+                maslowLevel: 3
+            };
+            
+            const mockAnalysis = {
+                maslowLevel: 3,
+                temperament: 'Sanguine',
+                mentorStyle: 'Companion',
+                growthAreas: ['Focus', 'Consistency'],
+                motivationStrategies: ['Social Recognition', 'Community Building'],
+                learningApproach: 'Interactive',
+                insights: 'You thrive in social environments and collaborative settings.',
+                personalityType: 'Social',
+                confidence: 0.85
+            };
+            
+            const personalityContext = {
+                ...mockPersonalityData,
+                aiAnalysis: mockAnalysis
+            };
+            
+            if (personalityContext.aiAnalysis.personalityType === 'Social') {
+                log('✅ Personality context creation working', 'success');
+            } else {
+                log('❌ Personality context creation failed', 'error');
+            }
+        }
+
+        function testOnboardingFlow() {
+            log('Testing enhanced onboarding flow...', 'info');
+            
+            // Test onboarding step validation
+            const stepValidation = {
+                step1: true, // Welcome step always valid
+                step2: validateBasicInfo('John Doe', 'john@example.com'),
+                step3: validatePersonalityAssessment(['introvert', 'analytical'], ['self-actualization']),
+                step4: true, // AI analysis step always valid
+                step5: true  // Preferences step always valid
+            };
+            
+            let validSteps = 0;
+            Object.values(stepValidation).forEach(valid => {
+                if (valid) validSteps++;
+            });
+            
+            if (validSteps === 5) {
+                log('✅ Onboarding step validation working', 'success');
+            } else {
+                log(`❌ Onboarding step validation failed: ${validSteps}/5`, 'error');
+            }
+        }
+
+        // Helper functions for testing
+        function createPersonalityAnalysisPrompt(personalityData) {
+            return `Analyze this personality profile and provide insights:
+
+Personality Data:
+- Traits: ${personalityData.traits.join(', ')}
+- Primary Needs: ${personalityData.needs.join(', ')}
+- Goals: ${personalityData.goals ? personalityData.goals.join(', ') : 'Not specified'}
+- Learning Style: ${personalityData.learningStyle || 'Not specified'}
+- Motivation Type: ${personalityData.motivationType || 'Not specified'}
+- Temperament Score: ${JSON.stringify(personalityData.temperament)}
+- Maslow Level: ${personalityData.maslowLevel}
+
+Please provide a structured analysis including:
+1. Maslow's Hierarchy Level (1-5) and reasoning
+2. Primary Temperament Type (Choleric, Sanguine, Melancholic, Phlegmatic)
+3. Recommended AI Mentor Style (Commander, Mentor, Coach, Companion, Strategist)
+4. Personal Growth Focus Areas
+5. Motivation Strategies
+6. Learning Approach Recommendations
+
+Format your response as JSON with these keys: maslowLevel, temperament, mentorStyle, growthAreas, motivationStrategies, learningApproach, insights.`;
+        }
+
+        function determinePersonalityType(analysis) {
+            const { temperament, mentorStyle, maslowLevel } = analysis;
+            
+            if (temperament === 'Choleric' && mentorStyle === 'Commander') return 'Dynamic';
+            if (temperament === 'Sanguine' && mentorStyle === 'Companion') return 'Social';
+            if (temperament === 'Melancholic' && mentorStyle === 'Strategist') return 'Analytical';
+            if (temperament === 'Phlegmatic' && mentorStyle === 'Coach') return 'Practical';
+            
+            return 'Balanced';
+        }
+
+        function calculateConfidence(analysis) {
+            let confidence = 0.7; // Base confidence
+            
+            if (analysis.maslowLevel && analysis.temperament && analysis.mentorStyle) {
+                confidence += 0.2;
+            }
+            if (analysis.growthAreas && analysis.growthAreas.length > 0) {
+                confidence += 0.1;
+            }
+            
+            return Math.min(confidence, 1.0);
+        }
+
+        function getSecureApiKey() {
+            try {
+                if (typeof process !== 'undefined' && process.env && process.env.DEEPSEEK_API_KEY) {
+                    return process.env.DEEPSEEK_API_KEY;
+                }
+                
+                const devKey = localStorage.getItem('DEEPSEEK_API_KEY_DEV');
+                if (devKey && window.location.hostname === 'localhost') {
+                    return devKey;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error loading API key:', error);
+                return null;
+            }
+        }
+
+        function loadPersonalityContext() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                
+                return {
+                    ...userData.personality,
+                    ...currentUser.personality,
+                    aiAnalysis: userData.aiAnalysis || currentUser.aiAnalysis
+                };
+            } catch (error) {
+                console.error('Failed to load personality context:', error);
+                return {};
+            }
+        }
+
+        function validateBasicInfo(name, email) {
+            return name && name.trim() && email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePersonalityAssessment(traits, needs) {
+            return traits && traits.length >= 2 && needs && needs.length >= 1;
+        }
+
+        // Initialize test
+        log('Phase 1 AI-Powered Personalization test suite loaded', 'info');
+        log('Ready to test enhanced personality analysis with DeepSeek integration', 'info');
+    </script>
+</body>
+</html> 

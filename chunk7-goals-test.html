@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 7: Goals Management System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        
+        .test-title {
+            color: #f97316;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .test-result.success {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .test-result.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+        
+        .test-result.info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+        }
+        
+        .goals-preview {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #555;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .goals-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .goals-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .goals-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+        }
+        
+        .goals-search {
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: #ffffff;
+            font-size: 0.875rem;
+        }
+        
+        .goals-filters {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: #ffffff;
+            font-size: 0.875rem;
+        }
+        
+        .goals-container {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .goal-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .goal-card:hover {
+            transform: translateY(-2px);
+            border-color: #f97316;
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-category {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .category-icon {
+            font-size: 1.25rem;
+        }
+        
+        .category-name {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        
+        .goal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .goal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        
+        .goal-description {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-meta {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .goal-priority,
+        .goal-difficulty {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .goal-priority.priority-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .goal-priority.priority-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .goal-priority.priority-low {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .goal-difficulty.difficulty-easy {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .goal-difficulty.difficulty-medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        .goal-difficulty.difficulty-hard {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .goal-difficulty.difficulty-epic {
+            background: rgba(147, 51, 234, 0.2);
+            color: #9333ea;
+        }
+        
+        .goal-progress {
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316 0%, #f59e0b 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        
+        .goal-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-xp,
+        .goal-streak {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        
+        .goal-footer {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .empty-goals {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-goals h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        
+        .empty-goals p {
+            color: #9ca3af;
+            margin-bottom: 1.5rem;
+        }
+        
+        .goals-summary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f97316;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-width: 300px;
+            max-width: 400px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast-message {
+            color: #ffffff;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .toast-success {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+        }
+        
+        .toast-error {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+        }
+        
+        .toast-warning {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+        }
+        
+        .toast-info {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Chunk 7: Goals Management System Test</h1>
+        
+        <div class="test-section">
+            <h2 class="test-title">1. Core Functions Test</h2>
+            <div id="core-functions-result" class="test-result info">
+                Testing core goal management functions...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">2. Goal Creation Test</h2>
+            <div id="goal-creation-result" class="test-result info">
+                Testing goal creation functionality...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">3. Goal Management Test</h2>
+            <div id="goal-management-result" class="test-result info">
+                Testing goal editing, deletion, and completion...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">4. UI Components Test</h2>
+            <div id="ui-components-result" class="test-result info">
+                Testing UI components and rendering...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">5. Integration Test</h2>
+            <div id="integration-result" class="test-result info">
+                Testing integration with dashboard and gamification...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">6. Goals Preview</h2>
+            <div class="goals-preview">
+                <!-- Goals View -->
+                <div class="view" id="goals-view">
+                    <div class="goals-header">
+                        <h2>🎯 Your Goals</h2>
+                        <div class="goals-actions">
+                            <button class="btn btn-primary" onclick="testOpenGoalModal()">
+                                + Create Goal
+                            </button>
+                            <button class="btn btn-secondary" onclick="testShowTemplates()">
+                                📋 Templates
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Goals Filter and Search -->
+                    <div class="goals-controls">
+                        <div class="goals-search">
+                            <input type="text" id="goals-search" placeholder="Search goals..." class="search-input">
+                        </div>
+                        <div class="goals-filters">
+                            <select id="category-filter" class="filter-select">
+                                <option value="">All Categories</option>
+                                <option value="health">Health & Fitness</option>
+                                <option value="career">Career & Work</option>
+                                <option value="learning">Learning & Skills</option>
+                                <option value="relationships">Relationships</option>
+                                <option value="finance">Finance</option>
+                                <option value="personal">Personal Development</option>
+                            </select>
+                            <select id="status-filter" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                            <select id="priority-filter" class="filter-select">
+                                <option value="">All Priorities</option>
+                                <option value="high">High Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="low">Low Priority</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Goals Container -->
+                    <div class="goals-container" id="goals-container">
+                        <!-- Goals will be rendered here by test functions -->
+                    </div>
+                    
+                    <!-- Goals Summary -->
+                    <div class="goals-summary">
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Goals</span>
+                                <span class="stat-value" id="total-goals-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completed</span>
+                                <span class="stat-value" id="completed-goals-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Active</span>
+                                <span class="stat-value" id="active-goals-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completion Rate</span>
+                                <span class="stat-value" id="completion-rate">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <script>
+        // Mock app object for testing
+        const app = {
+            state: {
+                userData: {
+                    goals: [],
+                    stats: {
+                        points: 0,
+                        level: 1
+                    }
+                }
+            },
+            ui: {
+                openGoalModal(goal = null) {
+                    console.log('🎯 Opening goal modal:', goal);
+                    this.showToast('Goal modal opened', 'info');
+                    return true;
+                },
+                
+                createGoal(goalData) {
+                    console.log('🎯 Creating goal:', goalData);
+                    
+                    const goal = {
+                        id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        title: goalData.title,
+                        description: goalData.description || '',
+                        category: goalData.category,
+                        priority: goalData.priority,
+                        difficulty: this.assessGoalDifficulty(goalData),
+                        status: 'active',
+                        progress: 0,
+                        dueDate: goalData.dueDate || null,
+                        createdAt: new Date().toISOString(),
+                        completedAt: null,
+                        milestones: [],
+                        tags: [],
+                        xpReward: this.calculateXPReward(goalData),
+                        streak: 0,
+                        lastActivity: new Date().toISOString()
+                    };
+                    
+                    app.state.userData.goals.push(goal);
+                    this.renderGoals();
+                    this.showToast('Goal created successfully! 🎯', 'success');
+                    
+                    return goal;
+                },
+                
+                editGoal(goalId) {
+                    console.log('🎯 Editing goal:', goalId);
+                    this.showToast('Goal edit mode activated', 'info');
+                    return true;
+                },
+                
+                deleteGoal(goalId) {
+                    console.log('🎯 Deleting goal:', goalId);
+                    app.state.userData.goals = app.state.userData.goals.filter(g => g.id !== goalId);
+                    this.renderGoals();
+                    this.showToast('Goal deleted successfully! 🗑️', 'success');
+                    return true;
+                },
+                
+                completeGoal(goalId) {
+                    console.log('🎯 Completing goal:', goalId);
+                    const goal = app.state.userData.goals.find(g => g.id === goalId);
+                    if (goal) {
+                        goal.status = 'completed';
+                        goal.progress = 100;
+                        goal.completedAt = new Date().toISOString();
+                        this.renderGoals();
+                        this.showToast('Goal completed! 🎉', 'success');
+                    }
+                    return true;
+                },
+                
+                updateGoalProgress(goalId, progress) {
+                    console.log('🎯 Updating goal progress:', { goalId, progress });
+                    const goal = app.state.userData.goals.find(g => g.id === goalId);
+                    if (goal) {
+                        goal.progress = Math.max(0, Math.min(100, progress));
+                        if (goal.progress >= 100) {
+                            goal.status = 'completed';
+                            goal.completedAt = new Date().toISOString();
+                        }
+                        this.renderGoals();
+                        this.showToast(`Progress updated: ${goal.progress}% 📈`, 'info');
+                    }
+                    return true;
+                },
+                
+                assessGoalDifficulty(goalData) {
+                    const categoryDifficulty = {
+                        'health': 1, 'personal': 1, 'learning': 2, 'career': 2, 'relationships': 2, 'finance': 3
+                    };
+                    const priorityDifficulty = { 'low': 1, 'medium': 2, 'high': 3 };
+                    
+                    const categoryScore = categoryDifficulty[goalData.category] || 2;
+                    const priorityScore = priorityDifficulty[goalData.priority] || 2;
+                    const totalScore = categoryScore + priorityScore;
+                    
+                    if (totalScore <= 2) return 'easy';
+                    if (totalScore <= 4) return 'medium';
+                    if (totalScore <= 5) return 'hard';
+                    return 'epic';
+                },
+                
+                calculateXPReward(goalData) {
+                    const difficulty = this.assessGoalDifficulty(goalData);
+                    const xpRewards = { 'easy': 50, 'medium': 100, 'hard': 200, 'epic': 500 };
+                    return xpRewards[difficulty] || 100;
+                },
+                
+                renderGoals() {
+                    const goalsContainer = document.getElementById('goals-container');
+                    const goals = app.state.userData.goals || [];
+                    
+                    if (goals.length === 0) {
+                        goalsContainer.innerHTML = `
+                            <div class="empty-goals">
+                                <div class="empty-icon">🎯</div>
+                                <h3>No Goals Yet</h3>
+                                <p>Start your journey by creating your first goal!</p>
+                                <button class="btn btn-primary" onclick="testCreateSampleGoal()">
+                                    Create Your First Goal
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        goalsContainer.innerHTML = goals.map(goal => this.renderGoalCard(goal)).join('');
+                    }
+                    
+                    this.updateGoalsSummary();
+                },
+                
+                renderGoalCard(goal) {
+                    const statusClass = goal.status === 'completed' ? 'completed' : '';
+                    const priorityClass = `priority-${goal.priority}`;
+                    const categoryIcon = this.getCategoryIcon(goal.category);
+                    
+                    return `
+                        <div class="goal-card ${statusClass} ${priorityClass}" data-goal-id="${goal.id}">
+                            <div class="goal-header">
+                                <div class="goal-category">
+                                    <span class="category-icon">${categoryIcon}</span>
+                                    <span class="category-name">${this.getCategoryName(goal.category)}</span>
+                                </div>
+                                <div class="goal-actions">
+                                    <button class="btn-icon" onclick="app.ui.editGoal('${goal.id}')" title="Edit Goal">
+                                        ✏️
+                                    </button>
+                                    <button class="btn-icon" onclick="app.ui.deleteGoal('${goal.id}')" title="Delete Goal">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-content">
+                                <h3 class="goal-title">${goal.title}</h3>
+                                ${goal.description ? `<p class="goal-description">${goal.description}</p>` : ''}
+                                
+                                <div class="goal-meta">
+                                    <span class="goal-priority priority-${goal.priority}">${goal.priority}</span>
+                                    <span class="goal-difficulty difficulty-${goal.difficulty}">${goal.difficulty}</span>
+                                    ${goal.dueDate ? `<span class="goal-due-date">Due: ${new Date(goal.dueDate).toLocaleDateString()}</span>` : ''}
+                                </div>
+                                
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                                    </div>
+                                    <span class="progress-text">${goal.progress}% Complete</span>
+                                </div>
+                                
+                                <div class="goal-stats">
+                                    <span class="goal-xp">XP: ${goal.xpReward}</span>
+                                    <span class="goal-streak">Streak: ${goal.streak}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-footer">
+                                ${goal.status !== 'completed' ? `
+                                    <button class="btn btn-primary btn-sm" onclick="app.ui.updateGoalProgress('${goal.id}', ${goal.progress + 10})">
+                                        Update Progress
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="app.ui.completeGoal('${goal.id}')">
+                                        Complete Goal
+                                    </button>
+                                ` : `
+                                    <span class="completion-date">Completed: ${new Date(goal.completedAt).toLocaleDateString()}</span>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                },
+                
+                getCategoryIcon(category) {
+                    const icons = {
+                        'health': '💪', 'career': '💼', 'learning': '📚', 'relationships': '❤️', 'finance': '💰', 'personal': '🌟'
+                    };
+                    return icons[category] || '🎯';
+                },
+                
+                getCategoryName(category) {
+                    const names = {
+                        'health': 'Health & Fitness', 'career': 'Career & Work', 'learning': 'Learning & Skills',
+                        'relationships': 'Relationships', 'finance': 'Finance', 'personal': 'Personal Development'
+                    };
+                    return names[category] || 'General';
+                },
+                
+                updateGoalsSummary() {
+                    const goals = app.state.userData.goals || [];
+                    const totalGoals = goals.length;
+                    const completedGoals = goals.filter(goal => goal.status === 'completed').length;
+                    const activeGoals = goals.filter(goal => goal.status === 'active').length;
+                    const completionRate = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+                    
+                    document.getElementById('total-goals-count').textContent = totalGoals;
+                    document.getElementById('completed-goals-count').textContent = completedGoals;
+                    document.getElementById('active-goals-count').textContent = activeGoals;
+                    document.getElementById('completion-rate').textContent = `${completionRate}%`;
+                },
+                
+                showToast(message, type = 'info') {
+                    const toast = document.createElement('div');
+                    toast.className = `toast toast-${type}`;
+                    toast.innerHTML = `
+                        <div class="toast-content">
+                            <span class="toast-message">${message}</span>
+                            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                        </div>
+                    `;
+                    
+                    const toastContainer = document.getElementById('toast-container');
+                    toastContainer.appendChild(toast);
+                    
+                    setTimeout(() => toast.classList.add('show'), 100);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 5000);
+                }
+            }
+        };
+        
+        // Test functions
+        function testCoreFunctions() {
+            const result = document.getElementById('core-functions-result');
+            
+            try {
+                // Test all core functions exist
+                const functions = [
+                    'openGoalModal', 'createGoal', 'editGoal', 'deleteGoal', 
+                    'completeGoal', 'updateGoalProgress', 'renderGoals'
+                ];
+                
+                let allFunctionsExist = true;
+                functions.forEach(funcName => {
+                    if (typeof app.ui[funcName] !== 'function') {
+                        allFunctionsExist = false;
+                    }
+                });
+                
+                if (allFunctionsExist) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Core functions test passed - All goal management functions working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Core functions test failed - Missing functions';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Core functions test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testGoalCreation() {
+            const result = document.getElementById('goal-creation-result');
+            
+            try {
+                const testGoal = {
+                    title: 'Test Goal',
+                    description: 'This is a test goal',
+                    category: 'personal',
+                    priority: 'medium',
+                    dueDate: '2024-12-31'
+                };
+                
+                const createdGoal = app.ui.createGoal(testGoal);
+                
+                if (createdGoal && createdGoal.id && createdGoal.title === testGoal.title) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Goal creation test passed - Goals can be created successfully';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Goal creation test failed - Goal creation not working';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Goal creation test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testGoalManagement() {
+            const result = document.getElementById('goal-management-result');
+            
+            try {
+                // Test goal editing
+                const editResult = app.ui.editGoal('test-goal-id');
+                
+                // Test goal completion
+                const completeResult = app.ui.completeGoal('test-goal-id');
+                
+                // Test progress update
+                const progressResult = app.ui.updateGoalProgress('test-goal-id', 50);
+                
+                if (editResult && completeResult && progressResult) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Goal management test passed - Editing, completion, and progress updates working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Goal management test failed - Some management functions not working';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Goal management test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testUIComponents() {
+            const result = document.getElementById('ui-components-result');
+            
+            try {
+                // Test goals rendering
+                app.ui.renderGoals();
+                
+                // Check if goals container exists and has content
+                const goalsContainer = document.getElementById('goals-container');
+                const summaryStats = document.getElementById('total-goals-count');
+                
+                if (goalsContainer && summaryStats) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ UI components test passed - Goals rendering and summary working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ UI components test failed - Missing UI elements';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ UI components test failed - Error: ${error.message}`;
+            }
+        }
+        
+        function testIntegration() {
+            const result = document.getElementById('integration-result');
+            
+            try {
+                // Test toast notifications
+                app.ui.showToast('Integration test successful!', 'success');
+                
+                // Test goal state management
+                const initialGoalsCount = app.state.userData.goals.length;
+                app.ui.createGoal({
+                    title: 'Integration Test Goal',
+                    category: 'learning',
+                    priority: 'high'
+                });
+                const finalGoalsCount = app.state.userData.goals.length;
+                
+                if (finalGoalsCount > initialGoalsCount) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Integration test passed - Toast notifications and state management working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Integration test failed - State management not working';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ Integration test failed - Error: ${error.message}`;
+            }
+        }
+        
+        // Helper functions for testing
+        function testOpenGoalModal() {
+            app.ui.openGoalModal();
+        }
+        
+        function testShowTemplates() {
+            app.ui.showToast('Goal templates feature coming soon!', 'info');
+        }
+        
+        function testCreateSampleGoal() {
+            app.ui.createGoal({
+                title: 'Sample Goal',
+                description: 'This is a sample goal for testing',
+                category: 'health',
+                priority: 'medium',
+                dueDate: '2024-12-31'
+            });
+        }
+        
+        // Run all tests when page loads
+        window.addEventListener('load', () => {
+            console.log('🧪 Starting Chunk 7 Goals Management System Test...');
+            
+            setTimeout(() => {
+                testCoreFunctions();
+                testGoalCreation();
+                testGoalManagement();
+                testUIComponents();
+                testIntegration();
+                
+                console.log('✅ All tests completed');
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

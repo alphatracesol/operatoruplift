@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Screen Test</title>
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --text-primary: #ffffff;
+            --accent-color: #f97316;
+            --accent-light: #fb923c;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Loading Screen Animations */
+        @keyframes loadingCubeRotate {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            25% { transform: rotateX(-90deg) rotateY(0deg); }
+            50% { transform: rotateX(-90deg) rotateY(-90deg); }
+            75% { transform: rotateX(0deg) rotateY(-90deg); }
+            100% { transform: rotateX(0deg) rotateY(0deg); }
+        }
+        
+        @keyframes loadingCubeRotateClockwise {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            25% { transform: rotateX(90deg) rotateY(0deg); }
+            50% { transform: rotateX(90deg) rotateY(90deg); }
+            75% { transform: rotateX(0deg) rotateY(90deg); }
+            100% { transform: rotateX(0deg) rotateY(0deg); }
+        }
+        
+        @keyframes loadingShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Loading Screen Styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        #loading-screen:not(.active) {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loading-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        #loading-cube {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: loadingCubeRotate 3s linear infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        #loading-cube.clockwise {
+            animation: loadingCubeRotateClockwise 3s linear infinite;
+        }
+        
+        .loading-cube-face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: rgba(249, 115, 22, 0.1);
+            border: 2px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .loading-cube-face svg {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 0 10px var(--accent-color));
+        }
+        
+        .loading-cube-face-front { transform: rotateY(0deg) translateZ(40px); }
+        .loading-cube-face-back { transform: rotateY(180deg) translateZ(40px); }
+        .loading-cube-face-right { transform: rotateY(90deg) translateZ(40px); }
+        .loading-cube-face-left { transform: rotateY(-90deg) translateZ(40px); }
+        .loading-cube-face-top { transform: rotateX(90deg) translateZ(40px); }
+        .loading-cube-face-bottom { transform: rotateX(-90deg) translateZ(40px); }
+        
+        #loading-text {
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: none;
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        #loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-light) 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #loading-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loadingShimmer 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="active">
+        <div class="loading-container">
+            <div id="loading-cube" title="Click to change rotation direction">
+                <div class="loading-cube-face loading-cube-face-front">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-back">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-right">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-left">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-top">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-bottom">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                        <g>
+                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="loading-text">
+                <h2 id="loading-text">Initializing Operator Uplift</h2>
+                <div class="loading-bar">
+                    <div id="loading-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple loading screen functionality
+        console.log('🧪 Testing Simple Loading Screen...');
+        
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingCube = document.getElementById('loading-cube');
+        const loadingText = document.getElementById('loading-text');
+        const loadingProgress = document.getElementById('loading-progress');
+        
+        // Interactive cube
+        let isClockwise = false;
+        loadingCube.addEventListener('click', () => {
+            isClockwise = !isClockwise;
+            if (isClockwise) {
+                loadingCube.classList.add('clockwise');
+                console.log('🔄 Cube rotation: Clockwise');
+            } else {
+                loadingCube.classList.remove('clockwise');
+                console.log('🔄 Cube rotation: Counter-clockwise');
+            }
+        });
+        
+        // Loading states
+        const loadingStates = [
+            'Initializing Operator Uplift',
+            'Loading Core Systems',
+            'Initializing AI Integration',
+            'Preparing Dashboard',
+            'Ready to Launch',
+            'Welcome to Operator Uplift!'
+        ];
+        
+        let currentState = 0;
+        let progress = 0;
+        
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 3 + 1;
+            
+            // Update text
+            if (currentState < loadingStates.length - 1 && progress >= (currentState + 1) * 20) {
+                currentState++;
+                loadingText.textContent = loadingStates[currentState];
+                console.log(`📝 Loading: ${loadingStates[currentState]}`);
+            }
+            
+            // Update progress
+            loadingProgress.style.width = Math.min(progress, 100) + '%';
+            
+            if (progress >= 100) {
+                clearInterval(loadingInterval);
+                console.log('✅ Loading complete!');
+                
+                // Hide loading screen after 1 second
+                setTimeout(() => {
+                    loadingScreen.classList.remove('active');
+                    console.log('🎉 Loading screen hidden!');
+                }, 1000);
+            }
+        }, 100);
+        
+        console.log('✅ Simple loading screen initialized');
+    </script>
+</body>
+</html> 

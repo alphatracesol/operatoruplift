@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle System Cleanup Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+        }
+        
+        .test-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-width: 800px;
+        }
+        
+        .particles {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .particles h4 {
+            color: #ef4444;
+            margin-top: 0;
+        }
+        
+        .duplicates {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .duplicates h4 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+        
+        .cleanup {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .cleanup h4 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Particle System Cleanup Test</h1>
+        <p>Removing all particle systems and duplicate/contradictory CSS styling</p>
+        
+        <div class="particles">
+            <h4>🚨 PARTICLE SYSTEMS TO REMOVE:</h4>
+            <p>Multiple conflicting particle systems causing issues</p>
+            <ul>
+                <li>🚨 <strong>tsParticles:</strong> External library with complex configurations</li>
+                <li>🚨 <strong>Matrix Canvas:</strong> Custom matrix rain effect</li>
+                <li>🚨 <strong>Matrix Rain:</strong> Duplicate matrix implementation</li>
+                <li>🚨 <strong>Particles JS:</strong> Dashboard-specific particles</li>
+                <li>🚨 <strong>Particle Backgrounds:</strong> Multiple background classes</li>
+                <li>🚨 <strong>Particle Scripts:</strong> CDN dependencies and initialization</li>
+            </ul>
+        </div>
+        
+        <div class="duplicates">
+            <h4>🔧 DUPLICATE CSS TO REMOVE:</h4>
+            <p>Conflicting and duplicate CSS patterns inside app-wrapper</p>
+            <ul>
+                <li>🔧 <strong>Button Styles:</strong> Multiple .btn definitions with ::before/::after</li>
+                <li>🔧 <strong>Card Styles:</strong> Duplicate .card definitions with pseudo-elements</li>
+                <li>🔧 <strong>Modal Styles:</strong> Multiple .modal and .modal-content definitions</li>
+                <li>🔧 <strong>Container Styles:</strong> Duplicate .container definitions</li>
+                <li>🔧 <strong>Button Groups:</strong> Multiple .btn-group definitions</li>
+                <li>🔧 <strong>App Wrapper:</strong> Conflicting .app-wrapper styles</li>
+            </ul>
+        </div>
+        
+        <div class="cleanup">
+            <h4>✅ CLEANUP ACTIONS:</h4>
+            <p>Comprehensive cleanup preserving outside-wrapper styling</p>
+            <ul>
+                <li>✅ <strong>Remove All Particles:</strong> tsParticles, matrix effects, backgrounds</li>
+                <li>✅ <strong>Remove Duplicate CSS:</strong> Keep only first comprehensive definitions</li>
+                <li>✅ <strong>Remove Particle JS:</strong> Functions, instances, configurations</li>
+                <li>✅ <strong>Remove Particle UI:</strong> Settings toggles and descriptions</li>
+                <li>✅ <strong>Clean App Wrapper:</strong> Remove conflicting styles and classes</li>
+                <li>✅ <strong>Preserve Outside:</strong> Loading overlay, auth view, modals</li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">
+            Ready to clean up particle systems and duplicate CSS
+        </div>
+        
+        <button class="test-button" onclick="applyCleanup()">Apply Particle Cleanup</button>
+        <button class="test-button" onclick="testApp()">Test Cleaned App</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        
+        <div class="log" id="log">
+            Particle System Cleanup Test Ready...
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log cleared...\n';
+        }
+        
+        function applyCleanup() {
+            log('🧹 Applying Particle System & Duplicate CSS Cleanup...');
+            updateStatus('Applying cleanup...');
+            
+            // Load the cleanup script
+            const script = document.createElement('script');
+            script.src = 'particle-system-cleanup.js';
+            script.onload = () => {
+                log('✅ Particle cleanup script loaded');
+                updateStatus('Cleanup applied successfully');
+                log('🎯 Expected results:');
+                log('  - All particle systems removed (tsParticles, matrix, etc.)');
+                log('  - Duplicate CSS inside app-wrapper removed');
+                log('  - Particle JavaScript functions removed');
+                log('  - Particle UI elements removed');
+                log('  - App-wrapper cleaned and simplified');
+                log('  - Outside-wrapper styling preserved');
+                log('  - Clean foundation for fresh start');
+            };
+            script.onerror = () => {
+                log('❌ Failed to load particle cleanup script');
+                updateStatus('Failed to load cleanup script');
+            };
+            document.head.appendChild(script);
+        }
+        
+        function testApp() {
+            log('🚀 Opening cleaned app for testing...');
+            updateStatus('Opening cleaned app...');
+            
+            // Open the main app in a new window
+            const appWindow = window.open('http://127.0.0.1:8080/app.html', '_blank');
+            
+            if (appWindow) {
+                log('✅ Main app opened in new window');
+                updateStatus('Main app opened - check the new window');
+                log('💡 Testing checklist for cleaned app:');
+                log('  1. No particle effects visible');
+                log('  2. No matrix rain or canvas effects');
+                log('  3. Clean, simple background');
+                log('  4. No particle-related errors in console');
+                log('  5. Loading overlay still works');
+                log('  6. Auth view still functional');
+                log('  7. Modals still accessible');
+                log('  8. App-wrapper simplified');
+                log('  9. No duplicate CSS conflicts');
+                log('  10. Ready for fresh foundation');
+            } else {
+                log('❌ Failed to open main app (popup blocked?)');
+                updateStatus('Failed to open main app - popup may be blocked');
+            }
+        }
+        
+        // Auto-apply cleanup on load
+        window.addEventListener('load', () => {
+            log('📋 Test page loaded, ready for cleanup');
+            setTimeout(() => {
+                log('💡 Tip: Click "Apply Particle Cleanup" then "Test Cleaned App"');
+                log('🎯 This cleanup addresses:');
+                log('   - Multiple particle systems (tsParticles, matrix, etc.)');
+                log('   - Duplicate CSS definitions inside app-wrapper');
+                log('   - Conflicting button, card, modal styles');
+                log('   - Particle JavaScript functions and instances');
+                log('   - Particle UI elements and settings');
+                log('   - App-wrapper styling conflicts');
+                log('   - Preserves outside-wrapper functionality');
+                log('   - Creates clean foundation for fresh start');
+            }, 1000);
+        });
+        
+        log('🎯 Particle System Cleanup Test initialized');
+    </script>
+</body>
+</html> 

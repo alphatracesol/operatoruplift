@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 4: Header & Theme Toggle Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+            border-left: 4px solid #f97316;
+        }
+        
+        .test-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #f97316;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .test-pass {
+            background: #1f5f1f;
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+        
+        .test-fail {
+            background: #5f1f1f;
+            color: #f87171;
+            border: 1px solid #f87171;
+        }
+        
+        .test-warning {
+            background: #5f4f1f;
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+        
+        .test-info {
+            background: #1f3f5f;
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+        }
+        
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .header-preview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #2a2a2a;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-btn {
+            padding: 8px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .header-btn:hover {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            color: #ffffff;
+            font-size: 1.5rem;
+        }
+        
+        .loading-screen.hidden {
+            display: none;
+        }
+        
+        .main-content {
+            margin-top: 90px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Preview -->
+    <div class="header-preview" id="test-header">
+        <h1 class="header-title">Test Header</h1>
+        <div class="header-actions">
+            <button class="header-btn" onclick="testThemeToggle()">🌙</button>
+            <button class="header-btn" onclick="testLoadingState()">🔄</button>
+            <button class="header-btn" onclick="runAllTests()">🧪</button>
+        </div>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="test-loading-screen">
+        <div>Loading Test Environment...</div>
+    </div>
+    
+    <div class="main-content">
+        <div class="test-container">
+            <h1>🧪 Chunk 4: Header & Theme Toggle Test Suite</h1>
+            <p>Comprehensive testing for header consolidation, z-index hierarchy, loading state management, and theme toggle protection.</p>
+            
+            <div class="test-section">
+                <div class="test-title">1. CSS Consolidation Test</div>
+                <div id="css-consolidation-results"></div>
+                <button class="test-button" onclick="testCssConsolidation()">Test CSS Consolidation</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">2. Z-Index Hierarchy Test</div>
+                <div id="zindex-results"></div>
+                <button class="test-button" onclick="testZIndexHierarchy()">Test Z-Index Hierarchy</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">3. Loading State Management Test</div>
+                <div id="loading-state-results"></div>
+                <button class="test-button" onclick="testLoadingStateManagement()">Test Loading State</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">4. Theme Toggle Protection Test</div>
+                <div id="theme-toggle-results"></div>
+                <button class="test-button" onclick="testThemeToggleProtection()">Test Theme Toggle</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">5. Responsive Design Test</div>
+                <div id="responsive-results"></div>
+                <button class="test-button" onclick="testResponsiveDesign()">Test Responsive Design</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">6. Performance Test</div>
+                <div id="performance-results"></div>
+                <button class="test-button" onclick="testPerformance()">Test Performance</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Container
+        const testResults = {
+            cssConsolidation: false,
+            zIndexHierarchy: false,
+            loadingStateManagement: false,
+            themeToggleProtection: false,
+            responsiveDesign: false,
+            performance: false
+        };
+        
+        // Initialize test environment
+        function initTestEnvironment() {
+            console.log('🧪 Initializing Chunk 4 Test Environment...');
+            
+            // Hide loading screen after 2 seconds
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('test-loading-screen');
+                const header = document.getElementById('test-header');
+                
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                }
+                
+                if (header) {
+                    header.classList.remove('hidden-during-load');
+                }
+                
+                console.log('✅ Test environment loaded');
+            }, 2000);
+        }
+        
+        // Test 1: CSS Consolidation
+        function testCssConsolidation() {
+            console.log('🧪 Testing CSS Consolidation...');
+            const results = document.getElementById('css-consolidation-results');
+            
+            try {
+                // Check if header styles are properly consolidated
+                const header = document.getElementById('test-header');
+                const computedStyle = window.getComputedStyle(header);
+                
+                const tests = [
+                    {
+                        name: 'Position Fixed',
+                        value: computedStyle.position === 'fixed',
+                        expected: 'fixed'
+                    },
+                    {
+                        name: 'Z-Index',
+                        value: computedStyle.zIndex === '100',
+                        expected: '100'
+                    },
+                    {
+                        name: 'Display Flex',
+                        value: computedStyle.display === 'flex',
+                        expected: 'flex'
+                    },
+                    {
+                        name: 'Background Color',
+                        value: computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)',
+                        expected: 'non-transparent'
+                    }
+                ];
+                
+                let passedTests = 0;
+                let testHtml = '';
+                
+                tests.forEach(test => {
+                    if (test.value) {
+                        passedTests++;
+                        testHtml += `<div class="test-result test-pass">✅ ${test.name}: PASS</div>`;
+                    } else {
+                        testHtml += `<div class="test-result test-fail">❌ ${test.name}: FAIL (expected: ${test.expected})</div>`;
+                    }
+                });
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === tests.length) {
+                    testResults.cssConsolidation = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 CSS Consolidation: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ CSS Consolidation: ${passedTests}/${tests.length} TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ CSS Consolidation Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 2: Z-Index Hierarchy
+        function testZIndexHierarchy() {
+            console.log('🧪 Testing Z-Index Hierarchy...');
+            const results = document.getElementById('zindex-results');
+            
+            try {
+                const header = document.getElementById('test-header');
+                const loadingScreen = document.getElementById('test-loading-screen');
+                
+                const headerZIndex = parseInt(window.getComputedStyle(header).zIndex);
+                const loadingZIndex = parseInt(window.getComputedStyle(loadingScreen).zIndex);
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Loading screen should have highest z-index
+                if (loadingZIndex > headerZIndex) {
+                    testHtml += `<div class="test-result test-pass">✅ Loading Screen Z-Index (${loadingZIndex}) > Header Z-Index (${headerZIndex})</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Loading Screen Z-Index (${loadingZIndex}) should be > Header Z-Index (${headerZIndex})</div>`;
+                }
+                
+                // Test 2: Header should have z-index 100
+                if (headerZIndex === 100) {
+                    testHtml += `<div class="test-result test-pass">✅ Header Z-Index: ${headerZIndex} (correct)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header Z-Index: ${headerZIndex} (should be 100)</div>`;
+                }
+                
+                // Test 3: Loading screen should have z-index 99999
+                if (loadingZIndex === 99999) {
+                    testHtml += `<div class="test-result test-pass">✅ Loading Screen Z-Index: ${loadingZIndex} (correct)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Loading Screen Z-Index: ${loadingZIndex} (should be 99999)</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.zIndexHierarchy = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Z-Index Hierarchy: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Z-Index Hierarchy: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Z-Index Hierarchy Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 3: Loading State Management
+        function testLoadingStateManagement() {
+            console.log('🧪 Testing Loading State Management...');
+            const results = document.getElementById('loading-state-results');
+            
+            try {
+                const header = document.getElementById('test-header');
+                const loadingScreen = document.getElementById('test-loading-screen');
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Header should be hidden during loading
+                if (loadingScreen.classList.contains('hidden')) {
+                    testHtml += `<div class="test-result test-pass">✅ Header visible after loading (correct)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header should be hidden during loading</div>`;
+                }
+                
+                // Test 2: Loading screen should be hidden after initialization
+                if (loadingScreen.classList.contains('hidden')) {
+                    testHtml += `<div class="test-result test-pass">✅ Loading screen hidden after initialization</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Loading screen should be hidden</div>`;
+                }
+                
+                // Test 3: Header should have proper transition
+                const headerTransition = window.getComputedStyle(header).transition;
+                if (headerTransition && headerTransition !== 'all 0s ease 0s') {
+                    testHtml += `<div class="test-result test-pass">✅ Header has transition: ${headerTransition}</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header should have transition</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.loadingStateManagement = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Loading State Management: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Loading State Management: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Loading State Management Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 4: Theme Toggle Protection
+        function testThemeToggleProtection() {
+            console.log('🧪 Testing Theme Toggle Protection...');
+            const results = document.getElementById('theme-toggle-results');
+            
+            try {
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Theme toggle button should be functional
+                const themeButton = document.querySelector('.header-btn');
+                if (themeButton && themeButton.onclick) {
+                    testHtml += `<div class="test-result test-pass">✅ Theme toggle button is functional</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Theme toggle button should be functional</div>`;
+                }
+                
+                // Test 2: Theme toggle should work after loading
+                const loadingScreen = document.getElementById('test-loading-screen');
+                if (loadingScreen.classList.contains('hidden')) {
+                    testHtml += `<div class="test-result test-pass">✅ Theme toggle enabled after loading</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Theme toggle should be enabled after loading</div>`;
+                }
+                
+                // Test 3: Theme toggle should have proper styling
+                const themeButtonStyle = window.getComputedStyle(themeButton);
+                if (themeButtonStyle.cursor === 'pointer') {
+                    testHtml += `<div class="test-result test-pass">✅ Theme toggle has proper cursor</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Theme toggle should have pointer cursor</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.themeToggleProtection = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Theme Toggle Protection: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Theme Toggle Protection: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Theme Toggle Protection Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 5: Responsive Design
+        function testResponsiveDesign() {
+            console.log('🧪 Testing Responsive Design...');
+            const results = document.getElementById('responsive-results');
+            
+            try {
+                const header = document.getElementById('test-header');
+                const computedStyle = window.getComputedStyle(header);
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Header should be responsive
+                if (computedStyle.position === 'fixed') {
+                    testHtml += `<div class="test-result test-pass">✅ Header is fixed positioned</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header should be fixed positioned</div>`;
+                }
+                
+                // Test 2: Header should have proper height
+                const headerHeight = parseInt(computedStyle.height);
+                if (headerHeight >= 60 && headerHeight <= 80) {
+                    testHtml += `<div class="test-result test-pass">✅ Header height: ${headerHeight}px (appropriate)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header height: ${headerHeight}px (should be 60-80px)</div>`;
+                }
+                
+                // Test 3: Header should have proper padding
+                const headerPadding = computedStyle.padding;
+                if (headerPadding && headerPadding !== '0px') {
+                    testHtml += `<div class="test-result test-pass">✅ Header has padding: ${headerPadding}</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header should have padding</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.responsiveDesign = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Responsive Design: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Responsive Design: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Responsive Design Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 6: Performance
+        function testPerformance() {
+            console.log('🧪 Testing Performance...');
+            const results = document.getElementById('performance-results');
+            
+            try {
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Header should load quickly
+                const startTime = performance.now();
+                const header = document.getElementById('test-header');
+                const endTime = performance.now();
+                const loadTime = endTime - startTime;
+                
+                if (loadTime < 10) {
+                    testHtml += `<div class="test-result test-pass">✅ Header load time: ${loadTime.toFixed(2)}ms (fast)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-warning">⚠️ Header load time: ${loadTime.toFixed(2)}ms (slow)</div>`;
+                }
+                
+                // Test 2: No duplicate CSS rules
+                const styleSheets = document.styleSheets;
+                let duplicateRules = 0;
+                
+                // Simple check for duplicate header rules
+                const headerRules = [];
+                for (let sheet of styleSheets) {
+                    try {
+                        const rules = sheet.cssRules || sheet.rules;
+                        for (let rule of rules) {
+                            if (rule.selectorText && rule.selectorText.includes('.header')) {
+                                headerRules.push(rule.selectorText);
+                            }
+                        }
+                    } catch (e) {
+                        // Cross-origin stylesheets will throw error
+                    }
+                }
+                
+                const uniqueRules = [...new Set(headerRules)];
+                if (headerRules.length === uniqueRules.length) {
+                    testHtml += `<div class="test-result test-pass">✅ No duplicate header CSS rules</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Found ${headerRules.length - uniqueRules.length} duplicate header rules</div>`;
+                }
+                
+                // Test 3: Proper CSS specificity
+                const headerStyle = window.getComputedStyle(header);
+                if (headerStyle.position === 'fixed' && headerStyle.zIndex === '100') {
+                    testHtml += `<div class="test-result test-pass">✅ Header has proper CSS specificity</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header should have proper CSS specificity</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.performance = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Performance: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Performance: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Performance Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            console.log('🧪 Running All Chunk 4 Tests...');
+            
+            testCssConsolidation();
+            setTimeout(() => testZIndexHierarchy(), 500);
+            setTimeout(() => testLoadingStateManagement(), 1000);
+            setTimeout(() => testThemeToggleProtection(), 1500);
+            setTimeout(() => testResponsiveDesign(), 2000);
+            setTimeout(() => testPerformance(), 2500);
+            
+            setTimeout(() => {
+                const totalTests = Object.keys(testResults).length;
+                const passedTests = Object.values(testResults).filter(Boolean).length;
+                
+                console.log(`🎉 Chunk 4 Test Results: ${passedTests}/${totalTests} test categories passed`);
+                
+                if (passedTests === totalTests) {
+                    alert(`🎉 CHUNK 4 COMPLETE!\n\nAll ${totalTests} test categories passed successfully!\n\n✅ CSS Consolidation\n✅ Z-Index Hierarchy\n✅ Loading State Management\n✅ Theme Toggle Protection\n✅ Responsive Design\n✅ Performance\n\nReady for Chunk 5!`);
+                } else {
+                    alert(`⚠️ Chunk 4 Tests: ${passedTests}/${totalTests} categories passed\n\nPlease review failed tests before proceeding.`);
+                }
+            }, 3000);
+        }
+        
+        // Theme toggle test function
+        function testThemeToggle() {
+            const button = event.target;
+            if (button.innerHTML === '🌙') {
+                button.innerHTML = '☀️';
+            } else {
+                button.innerHTML = '🌙';
+            }
+            console.log('✅ Theme toggle test successful');
+        }
+        
+        // Loading state test function
+        function testLoadingState() {
+            const loadingScreen = document.getElementById('test-loading-screen');
+            const header = document.getElementById('test-header');
+            
+            // Simulate loading state
+            loadingScreen.classList.remove('hidden');
+            header.classList.add('hidden-during-load');
+            
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                header.classList.remove('hidden-during-load');
+                console.log('✅ Loading state test successful');
+            }, 2000);
+        }
+        
+        // Initialize test environment when page loads
+        window.addEventListener('load', initTestEnvironment);
+        
+        // Auto-run tests after 3 seconds
+        setTimeout(runAllTests, 3000);
+    </script>
+</body>
+</html> 

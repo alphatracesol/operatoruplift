@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Particle Removal Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+        }
+        
+        .test-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-width: 800px;
+        }
+        
+        .removal {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .removal h4 {
+            color: #ef4444;
+            margin-top: 0;
+        }
+        
+        .preserve {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .preserve h4 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+        
+        .scope {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem;
+            max-width: 600px;
+        }
+        
+        .scope h4 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Surgical Particle Removal Test</h1>
+        <p>Precise removal of particle systems while preserving matrix canvas and scoping styles</p>
+        
+        <div class="removal">
+            <h4>🔪 PARTICLE SYSTEMS TO REMOVE:</h4>
+            <p>All particle systems and initialization scripts</p>
+            <ul>
+                <li>🔪 <strong>tsParticles CDN:</strong> External library script</li>
+                <li>🔪 <strong>Particle Elements:</strong> #tsparticles, #particles-js</li>
+                <li>🔪 <strong>Particle CSS:</strong> #tsparticles, .particles-background</li>
+                <li>🔪 <strong>Particle JavaScript:</strong> initParticles(), toggleParticles()</li>
+                <li>🔪 <strong>Particle Instances:</strong> app.state.particlesInstance</li>
+                <li>🔪 <strong>Particle UI:</strong> Settings toggles and descriptions</li>
+            </ul>
+        </div>
+        
+        <div class="preserve">
+            <h4>🛡️ MATRIX CANVAS TO PRESERVE:</h4>
+            <p>Matrix canvas for login page background</p>
+            <ul>
+                <li>🛡️ <strong>Matrix Canvas:</strong> #matrix-canvas element</li>
+                <li>🛡️ <strong>Matrix Rain:</strong> #matrix-rain element</li>
+                <li>🛡️ <strong>Matrix Functions:</strong> initMatrixCanvas(), initMatrixRain()</li>
+                <li>🛡️ <strong>Matrix Toggle:</strong> toggleMatrixRain() function</li>
+                <li>🛡️ <strong>Matrix CSS:</strong> .matrix-rain styles</li>
+                <li>🛡️ <strong>Matrix UI:</strong> Matrix rain toggle button</li>
+            </ul>
+        </div>
+        
+        <div class="scope">
+            <h4>🎯 STYLES TO SCOPE TO APP-WRAPPER:</h4>
+            <p>Button, card, and modal styles inside app-wrapper only</p>
+            <ul>
+                <li>🎯 <strong>Button Effects:</strong> .btn::before, .btn::after, hover effects</li>
+                <li>🎯 <strong>Card Effects:</strong> .card::before, .card::after, hover effects</li>
+                <li>🎯 <strong>Modal System:</strong> .modal-overlay, .modal.active, .modal-content</li>
+                <li>🎯 <strong>Modal Close:</strong> .modal-close button styling</li>
+                <li>🎯 <strong>Scoped Selectors:</strong> .app-wrapper .btn, .app-wrapper .card</li>
+                <li>🎯 <strong>Outside Protection:</strong> Loading overlay, auth view preserved</li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">
+            Ready to perform surgical particle removal
+        </div>
+        
+        <button class="test-button" onclick="applySurgicalRemoval()">Apply Surgical Removal</button>
+        <button class="test-button" onclick="testApp()">Test Cleaned App</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        
+        <div class="log" id="log">
+            Surgical Particle Removal Test Ready...
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log cleared...\n';
+        }
+        
+        function applySurgicalRemoval() {
+            log('🔪 Applying Surgical Particle System Removal...');
+            updateStatus('Applying surgical removal...');
+            
+            // Load the surgical removal script
+            const script = document.createElement('script');
+            script.src = 'surgical-particle-removal.js';
+            script.onload = () => {
+                log('✅ Surgical removal script loaded');
+                updateStatus('Surgical removal applied successfully');
+                log('🎯 Expected results:');
+                log('  - All particle systems removed (tsParticles, particles-js)');
+                log('  - Matrix canvas preserved for login page');
+                log('  - Button, card, modal styles scoped to app-wrapper only');
+                log('  - Outside-wrapper styling preserved');
+                log('  - App-wrapper cleaned and simplified');
+                log('  - Clean, focused functionality');
+            };
+            script.onerror = () => {
+                log('❌ Failed to load surgical removal script');
+                updateStatus('Failed to load removal script');
+            };
+            document.head.appendChild(script);
+        }
+        
+        function testApp() {
+            log('🚀 Opening surgically cleaned app for testing...');
+            updateStatus('Opening cleaned app...');
+            
+            // Open the main app in a new window
+            const appWindow = window.open('http://127.0.0.1:8080/app.html', '_blank');
+            
+            if (appWindow) {
+                log('✅ Main app opened in new window');
+                updateStatus('Main app opened - check the new window');
+                log('💡 Testing checklist for surgically cleaned app:');
+                log('  1. No particle effects visible');
+                log('  2. Matrix canvas still works on login page');
+                log('  3. Button effects only work inside app-wrapper');
+                log('  4. Card effects only work inside app-wrapper');
+                log('  5. Modal system only works inside app-wrapper');
+                log('  6. Loading overlay still works (outside wrapper)');
+                log('  7. Auth view still functional (outside wrapper)');
+                log('  8. No particle-related errors in console');
+                log('  9. Clean, focused functionality');
+                log('  10. Ready for development');
+            } else {
+                log('❌ Failed to open main app (popup blocked?)');
+                updateStatus('Failed to open main app - popup may be blocked');
+            }
+        }
+        
+        // Auto-apply removal on load
+        window.addEventListener('load', () => {
+            log('📋 Test page loaded, ready for surgical removal');
+            setTimeout(() => {
+                log('💡 Tip: Click "Apply Surgical Removal" then "Test Cleaned App"');
+                log('🎯 This surgical removal:');
+                log('   - Removes ALL particle systems (tsParticles, particles-js)');
+                log('   - Preserves matrix canvas for login page');
+                log('   - Scopes button/card/modal styles to app-wrapper only');
+                log('   - Preserves outside-wrapper functionality');
+                log('   - Creates clean, focused foundation');
+            }, 1000);
+        });
+        
+        log('🎯 Surgical Particle Removal Test initialized');
+    </script>
+</body>
+</html> 

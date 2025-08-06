@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 - Personality Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .personality-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .personality-type {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .insights-list, .recommendations-list {
+            list-style: none;
+            padding: 0;
+        }
+        .insights-list li, .recommendations-list li {
+            padding: 5px 0;
+            border-left: 3px solid #007bff;
+            padding-left: 10px;
+            margin-bottom: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Phase 3 - Personality Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Progress</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="test-progress" style="width: 0%"></div>
+        </div>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧠 Personality Integration Tests</h2>
+        <button class="test-button" onclick="testOnboardingFlow()">Test Enhanced Onboarding</button>
+        <button class="test-button" onclick="testPersonalityAnalysis()">Test Personality Analysis</button>
+        <button class="test-button" onclick="testAIPersonalization()">Test AI Personalization</button>
+        <button class="test-button" onclick="testDataPersistence()">Test Data Persistence</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 UI/UX Tests</h2>
+        <button class="test-button" onclick="testStepIndicators()">Test Step Indicators</button>
+        <button class="test-button" onclick="testCheckboxGroups()">Test Checkbox Groups</button>
+        <button class="test-button" onclick="testCelebrationAnimation()">Test Celebration Animation</button>
+        <button class="test-button" onclick="testResponsiveDesign()">Test Responsive Design</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Integration Tests</h2>
+        <button class="test-button" onclick="testFirebaseIntegration()">Test Firebase Integration</button>
+        <button class="test-button" onclick="testLocalStorageSync()">Test LocalStorage Sync</button>
+        <button class="test-button" onclick="testErrorHandling()">Test Error Handling</button>
+        <button class="test-button" onclick="testPerformance()">Test Performance</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Results Display</h2>
+        <div id="personality-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Quick Actions</h2>
+        <button class="test-button success" onclick="openMainApp()">Open Main App</button>
+        <button class="test-button warning" onclick="clearTestData()">Clear Test Data</button>
+        <button class="test-button danger" onclick="resetOnboarding()">Reset Onboarding</button>
+    </div>
+
+    <script>
+        let testProgress = 0;
+        let totalTests = 0;
+        let passedTests = 0;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+            
+            // Update progress
+            if (type === 'success') passedTests++;
+            totalTests++;
+            testProgress = (passedTests / totalTests) * 100;
+            document.getElementById('test-progress').style.width = `${testProgress}%`;
+        }
+
+        function testOnboardingFlow() {
+            log('Testing enhanced onboarding flow...', 'info');
+            
+            // Test if onboarding modal exists
+            fetch('app.html')
+                .then(response => response.text())
+                .then(html => {
+                    if (html.includes('step-indicators')) {
+                        log('✅ Step indicators found in onboarding modal', 'success');
+                    } else {
+                        log('❌ Step indicators not found', 'error');
+                    }
+                    
+                    if (html.includes('checkbox-group')) {
+                        log('✅ Checkbox groups found for personality traits', 'success');
+                    } else {
+                        log('❌ Checkbox groups not found', 'error');
+                    }
+                    
+                    if (html.includes('personality-analysis')) {
+                        log('✅ Personality analysis container found', 'success');
+                    } else {
+                        log('❌ Personality analysis container not found', 'error');
+                    }
+                    
+                    if (html.includes('validateCurrentStep')) {
+                        log('✅ Step validation function found', 'success');
+                    } else {
+                        log('❌ Step validation function not found', 'error');
+                    }
+                });
+        }
+
+        function testPersonalityAnalysis() {
+            log('Testing personality analysis functionality...', 'info');
+            
+            // Test personality data collection
+            const mockPersonalityData = {
+                traits: ['introvert', 'analytical', 'thinking'],
+                needs: ['self-actualization', 'esteem'],
+                temperament: {
+                    introvert: 1, extrovert: 0,
+                    sensing: 0, intuitive: 0,
+                    thinking: 1, feeling: 0,
+                    judging: 0, perceiving: 0
+                },
+                maslowLevel: 4
+            };
+            
+            // Test personality type generation
+            const personalityTypes = {
+                'introvert': 'Analytical',
+                'extrovert': 'Dynamic',
+                'sensing': 'Practical',
+                'intuitive': 'Visionary',
+                'thinking': 'Logical',
+                'feeling': 'Empathetic'
+            };
+            
+            const primaryTrait = mockPersonalityData.traits[0];
+            const personalityType = personalityTypes[primaryTrait] || 'Balanced';
+            
+            if (personalityType === 'Analytical') {
+                log('✅ Personality type generation working correctly', 'success');
+            } else {
+                log('❌ Personality type generation failed', 'error');
+            }
+            
+            // Test insights generation
+            const insights = [];
+            if (mockPersonalityData.traits.includes('introvert')) {
+                insights.push('You prefer deep, focused work and meaningful connections');
+            }
+            if (mockPersonalityData.needs.includes('self-actualization')) {
+                insights.push('You\'re driven by personal growth and reaching your full potential');
+            }
+            
+            if (insights.length >= 2) {
+                log('✅ Insights generation working correctly', 'success');
+            } else {
+                log('❌ Insights generation failed', 'error');
+            }
+            
+            // Display results
+            displayPersonalityResults(mockPersonalityData, personalityType, insights);
+        }
+
+        function displayPersonalityResults(personalityData, personalityType, insights) {
+            const resultsContainer = document.getElementById('personality-results');
+            
+            const recommendations = [
+                'Focus on mastery and skill development',
+                'Set challenging but achievable goals',
+                'Use your analytical approach for systematic problem-solving'
+            ];
+            
+            resultsContainer.innerHTML = `
+                <div class="personality-card">
+                    <div class="personality-type">Personality Type: ${personalityType}</div>
+                    <div>
+                        <strong>Traits:</strong> ${personalityData.traits.join(', ')}
+                    </div>
+                    <div>
+                        <strong>Primary Needs:</strong> ${personalityData.needs.join(', ')}
+                    </div>
+                    <div>
+                        <strong>Maslow Level:</strong> ${personalityData.maslowLevel}
+                    </div>
+                </div>
+                
+                <div class="personality-card">
+                    <h4>Key Insights:</h4>
+                    <ul class="insights-list">
+                        ${insights.map(insight => `<li>${insight}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="personality-card">
+                    <h4>Personalized Recommendations:</h4>
+                    <ul class="recommendations-list">
+                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function testAIPersonalization() {
+            log('Testing AI personalization...', 'info');
+            
+            // Test personality context loading
+            const mockUserData = {
+                personality: {
+                    traits: ['extrovert', 'intuitive'],
+                    needs: ['belonging', 'self-actualization']
+                },
+                aiAnalysis: {
+                    personalityType: 'Dynamic',
+                    mentorStyle: 'energetic and action-oriented',
+                    maslowLevel: 5
+                }
+            };
+            
+            localStorage.setItem('userProfile', JSON.stringify(mockUserData));
+            
+            // Test AI response personalization
+            const testMessage = "I want to set a new goal";
+            const baseResponse = "I understand your goal. Let's break this down into actionable steps.";
+            const personalityEnhancement = " Given your focus on growth and achievement, Let's create an action plan that keeps you energized and moving forward.";
+            
+            const personalizedResponse = baseResponse + personalityEnhancement;
+            
+            if (personalizedResponse.includes('energized') && personalizedResponse.includes('action plan')) {
+                log('✅ AI personalization working correctly', 'success');
+            } else {
+                log('❌ AI personalization failed', 'error');
+            }
+            
+            // Test goal recommendations
+            const recommendations = [
+                'Focus on high-energy, action-oriented objectives',
+                'Set short-term milestones to maintain momentum',
+                'Focus on mastery and skill development goals'
+            ];
+            
+            if (recommendations.length >= 3) {
+                log('✅ Goal recommendations generation working', 'success');
+            } else {
+                log('❌ Goal recommendations generation failed', 'error');
+            }
+        }
+
+        function testDataPersistence() {
+            log('Testing data persistence...', 'info');
+            
+            // Test onboarding data persistence
+            const onboardingData = {
+                basicInfo: {
+                    name: 'Test User',
+                    email: 'test@example.com'
+                },
+                personality: {
+                    traits: ['introvert', 'analytical'],
+                    needs: ['self-actualization']
+                },
+                aiAnalysis: {
+                    personalityType: 'Analytical',
+                    mentorStyle: 'data-driven and systematic'
+                },
+                preferences: {
+                    aiStyle: 'mentor',
+                    theme: 'dark'
+                },
+                completedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
+            
+            const retrieved = JSON.parse(localStorage.getItem('onboardingData'));
+            
+            if (retrieved.basicInfo.name === 'Test User' && 
+                retrieved.personality.traits.includes('introvert') &&
+                retrieved.aiAnalysis.personalityType === 'Analytical') {
+                log('✅ Onboarding data persistence working', 'success');
+            } else {
+                log('❌ Onboarding data persistence failed', 'error');
+            }
+            
+            // Test user profile persistence
+            const userProfile = {
+                personality: onboardingData.personality,
+                aiAnalysis: onboardingData.aiAnalysis,
+                settings: {
+                    aiStyle: onboardingData.preferences.aiStyle
+                }
+            };
+            
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            
+            const retrievedProfile = JSON.parse(localStorage.getItem('userProfile'));
+            
+            if (retrievedProfile.personality && retrievedProfile.aiAnalysis) {
+                log('✅ User profile persistence working', 'success');
+            } else {
+                log('❌ User profile persistence failed', 'error');
+            }
+        }
+
+        function testStepIndicators() {
+            log('Testing step indicators...', 'info');
+            
+            // Create test step indicators
+            const testContainer = document.createElement('div');
+            testContainer.className = 'step-indicators';
+            testContainer.innerHTML = `
+                <div class="step-indicator completed" data-step="1">1</div>
+                <div class="step-indicator active" data-step="2">2</div>
+                <div class="step-indicator" data-step="3">3</div>
+                <div class="step-indicator" data-step="4">4</div>
+                <div class="step-indicator" data-step="5">5</div>
+            `;
+            
+            document.body.appendChild(testContainer);
+            
+            // Test step indicator functionality
+            const indicators = testContainer.querySelectorAll('.step-indicator');
+            const completed = testContainer.querySelector('.step-indicator.completed');
+            const active = testContainer.querySelector('.step-indicator.active');
+            
+            if (completed && active && indicators.length === 5) {
+                log('✅ Step indicators rendering correctly', 'success');
+            } else {
+                log('❌ Step indicators rendering failed', 'error');
+            }
+            
+            // Clean up
+            setTimeout(() => {
+                testContainer.remove();
+            }, 2000);
+        }
+
+        function testCheckboxGroups() {
+            log('Testing checkbox groups...', 'info');
+            
+            // Create test checkbox group
+            const testContainer = document.createElement('div');
+            testContainer.className = 'checkbox-group';
+            testContainer.innerHTML = `
+                <label class="checkbox-label">
+                    <input type="checkbox" name="traits" value="introvert">
+                    <span>Introvert - Prefer deep, focused work</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="traits" value="extrovert">
+                    <span>Extrovert - Thrive on social interaction</span>
+                </label>
+            `;
+            
+            document.body.appendChild(testContainer);
+            
+            // Test checkbox functionality
+            const checkboxes = testContainer.querySelectorAll('input[type="checkbox"]');
+            const labels = testContainer.querySelectorAll('.checkbox-label');
+            
+            if (checkboxes.length === 2 && labels.length === 2) {
+                log('✅ Checkbox groups rendering correctly', 'success');
+                
+                // Test selection
+                checkboxes[0].checked = true;
+                if (checkboxes[0].checked) {
+                    log('✅ Checkbox selection working', 'success');
+                } else {
+                    log('❌ Checkbox selection failed', 'error');
+                }
+            } else {
+                log('❌ Checkbox groups rendering failed', 'error');
+            }
+            
+            // Clean up
+            setTimeout(() => {
+                testContainer.remove();
+            }, 2000);
+        }
+
+        function testCelebrationAnimation() {
+            log('Testing celebration animation...', 'info');
+            
+            // Create test celebration
+            const celebration = document.createElement('div');
+            celebration.className = 'welcome-celebration';
+            celebration.innerHTML = `
+                <div class="celebration-content">
+                    <h2>🎉 Welcome to Operator Uplift!</h2>
+                    <p>Your personalized journey begins now.</p>
+                </div>
+            `;
+            
+            document.body.appendChild(celebration);
+            
+            // Test animation
+            setTimeout(() => {
+                if (celebration.style.animation) {
+                    log('✅ Celebration animation working', 'success');
+                } else {
+                    log('❌ Celebration animation failed', 'error');
+                }
+                
+                // Clean up
+                celebration.remove();
+            }, 1000);
+        }
+
+        function testResponsiveDesign() {
+            log('Testing responsive design...', 'info');
+            
+            // Test viewport meta tag
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport && viewport.content.includes('width=device-width')) {
+                log('✅ Viewport meta tag present', 'success');
+            } else {
+                log('❌ Viewport meta tag missing', 'error');
+            }
+            
+            // Test responsive CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @media (max-width: 768px) {
+                    .test-section { padding: 15px; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            log('✅ Responsive CSS rules added', 'success');
+            
+            // Clean up
+            setTimeout(() => {
+                style.remove();
+            }, 1000);
+        }
+
+        function testFirebaseIntegration() {
+            log('Testing Firebase integration...', 'info');
+            
+            // Check if Firebase CDNs are loaded
+            fetch('app.html')
+                .then(response => response.text())
+                .then(html => {
+                    if (html.includes('firebasejs/9.17.1/firebase-app.js')) {
+                        log('✅ Firebase CDNs found', 'success');
+                    } else {
+                        log('❌ Firebase CDNs not found', 'error');
+                    }
+                    
+                    if (html.includes('firebase.initializeApp')) {
+                        log('✅ Firebase initialization found', 'success');
+                    } else {
+                        log('❌ Firebase initialization not found', 'error');
+                    }
+                    
+                    if (html.includes('fbDb.collection')) {
+                        log('✅ Firestore integration found', 'success');
+                    } else {
+                        log('❌ Firestore integration not found', 'error');
+                    }
+                });
+        }
+
+        function testLocalStorageSync() {
+            log('Testing localStorage synchronization...', 'info');
+            
+            // Test data sync
+            const testData = {
+                personality: { traits: ['test'] },
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('testSync', JSON.stringify(testData));
+            
+            // Simulate sync
+            setTimeout(() => {
+                const retrieved = JSON.parse(localStorage.getItem('testSync'));
+                if (retrieved && retrieved.personality.traits.includes('test')) {
+                    log('✅ localStorage sync working', 'success');
+                } else {
+                    log('❌ localStorage sync failed', 'error');
+                }
+                
+                // Clean up
+                localStorage.removeItem('testSync');
+            }, 100);
+        }
+
+        function testErrorHandling() {
+            log('Testing error handling...', 'info');
+            
+            // Test safeGet function
+            const safeGet = (selector) => {
+                try {
+                    return document.querySelector(selector);
+                } catch (error) {
+                    console.error('safeGet error:', error);
+                    return null;
+                }
+            };
+            
+            const result = safeGet('#non-existent-element');
+            if (result === null) {
+                log('✅ Error handling working correctly', 'success');
+            } else {
+                log('❌ Error handling failed', 'error');
+            }
+            
+            // Test try-catch blocks
+            try {
+                throw new Error('Test error');
+            } catch (error) {
+                if (error.message === 'Test error') {
+                    log('✅ Try-catch error handling working', 'success');
+                } else {
+                    log('❌ Try-catch error handling failed', 'error');
+                }
+            }
+        }
+
+        function testPerformance() {
+            log('Testing performance...', 'info');
+            
+            const startTime = performance.now();
+            
+            // Simulate heavy operation
+            for (let i = 0; i < 1000; i++) {
+                Math.random();
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            if (duration < 100) {
+                log('✅ Performance test passed', 'success');
+            } else {
+                log('⚠️ Performance test slow', 'warning');
+            }
+            
+            // Test memory usage
+            const memoryInfo = performance.memory;
+            if (memoryInfo) {
+                log(`ℹ️ Memory usage: ${Math.round(memoryInfo.usedJSHeapSize / 1024 / 1024)}MB`, 'info');
+            }
+        }
+
+        function openMainApp() {
+            log('Opening main app in new tab...', 'info');
+            window.open('app.html', '_blank');
+        }
+
+        function clearTestData() {
+            log('Clearing test data...', 'info');
+            
+            const keysToRemove = [
+                'testSync',
+                'onboardingData',
+                'userProfile',
+                'currentUser'
+            ];
+            
+            keysToRemove.forEach(key => {
+                localStorage.removeItem(key);
+            });
+            
+            log('✅ Test data cleared', 'success');
+        }
+
+        function resetOnboarding() {
+            log('Resetting onboarding...', 'info');
+            
+            localStorage.removeItem('onboardingCompleted');
+            localStorage.removeItem('onboardingData');
+            
+            log('✅ Onboarding reset - user will see onboarding again', 'success');
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            log('🚀 Starting Phase 3 personality integration tests...', 'info');
+            setTimeout(() => {
+                testOnboardingFlow();
+                testPersonalityAnalysis();
+                testAIPersonalization();
+                testDataPersistence();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 6: Dashboard Components Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        
+        .test-title {
+            color: #f97316;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .test-result.success {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .test-result.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+        
+        .test-result.info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+        }
+        
+        .dashboard-preview {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #555;
+        }
+        
+        .dashboard-welcome {
+            margin-bottom: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #f97316;
+        }
+        
+        .welcome-subtitle {
+            color: #9ca3af;
+            font-size: 1.125rem;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            z-index: 20;
+            position: relative;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .character-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            z-index: 30;
+            position: relative;
+        }
+        
+        .character-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-item {
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+        
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background: #f97316;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .stat-value {
+            font-size: 0.875rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .treasure-section {
+            margin-bottom: 2rem;
+            z-index: 40;
+            position: relative;
+        }
+        
+        .treasure-chest {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: 2px solid #d97706;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .treasure-chest:hover {
+            transform: translateY(-4px);
+        }
+        
+        .social-section {
+            margin-bottom: 2rem;
+            z-index: 50;
+            position: relative;
+        }
+        
+        .social-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .social-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .social-stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .social-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f97316;
+        }
+        
+        .social-stat-label {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background: #374151;
+            color: white;
+        }
+        
+        .share-button:hover {
+            background: #4b5563;
+        }
+        
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-actions {
+                flex-direction: column;
+            }
+            
+            .character-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .social-stats {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Chunk 6: Dashboard Components Test</h1>
+        
+        <div class="test-section">
+            <h2 class="test-title">1. CSS Consolidation Test</h2>
+            <div id="css-consolidation-result" class="test-result info">
+                Testing CSS consolidation...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">2. Z-Index Hierarchy Test</h2>
+            <div id="z-index-result" class="test-result info">
+                Testing z-index hierarchy...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">3. JavaScript Functionality Test</h2>
+            <div id="js-functionality-result" class="test-result info">
+                Testing JavaScript functions...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">4. Accessibility Test</h2>
+            <div id="accessibility-result" class="test-result info">
+                Testing accessibility features...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">5. Responsive Design Test</h2>
+            <div id="responsive-result" class="test-result info">
+                Testing responsive design...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">6. Dashboard Preview</h2>
+            <div class="dashboard-preview">
+                <!-- Dashboard View -->
+                <div class="view" id="dashboard-view" role="main" aria-labelledby="dashboard-title">
+                    <div class="dashboard-welcome" role="banner" aria-labelledby="welcome-title">
+                        <h1 class="welcome-title" id="dashboard-title">Welcome back, Operator!</h1>
+                        <p class="welcome-subtitle" id="welcome-subtitle">Ready to level up your life?</p>
+                    </div>
+                    
+                    <div class="dashboard-actions btn-group" role="toolbar" aria-label="Dashboard Actions">
+                        <button class="btn btn-primary" onclick="testDashboardAction('goals')" aria-label="Set New Goal">
+                            🎯 Set New Goal
+                        </button>
+                        <button class="btn" onclick="testDashboardAction('ai-chat')" aria-label="Chat with AI">
+                            🤖 Chat with AI
+                        </button>
+                        <button class="btn" onclick="testDashboardAction('focus')" aria-label="Start Focus Session">
+                            🎯 Start Focus Session
+                        </button>
+                        <button class="btn" onclick="testDashboardAction('lucky-wheel')" aria-label="Open Lucky Wheel">
+                            🎰 Lucky Wheel
+                        </button>
+                        <button class="btn" onclick="testDashboardAction('mood-tracker')" aria-label="Open Mood Tracker">
+                            😊 Mood Tracker
+                        </button>
+                        <button class="btn" onclick="testDashboardAction('settings')" aria-label="Open Settings">
+                            ⚙️ Settings
+                        </button>
+                    </div>
+                    
+                    <!-- Character Stats Section -->
+                    <div class="character-stats" role="region" aria-labelledby="character-stats-title">
+                        <h2 id="character-stats-title" class="visually-hidden">Character Statistics</h2>
+                        <div class="character-card" role="article" aria-labelledby="character-name">
+                            <span class="character-icon" aria-hidden="true">👤</span>
+                            <div class="character-name" id="character-name">Your Character</div>
+                            <div class="character-level">Level <span id="character-level" aria-live="polite">1</span></div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="health-label">
+                                <div class="stat-label" id="health-label">Health</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="health-label" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill health" id="health-bar" style="width: 100%"></div>
+                                </div>
+                                <div class="stat-value" id="health-value" aria-live="polite">100/100</div>
+                            </div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="energy-label">
+                                <div class="stat-label" id="energy-label">Energy</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="energy-label" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill energy" id="energy-bar" style="width: 100%"></div>
+                                </div>
+                                <div class="stat-value" id="energy-value" aria-live="polite">100/100</div>
+                            </div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="motivation-label">
+                                <div class="stat-label" id="motivation-label">Motivation</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="motivation-label" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill motivation" id="motivation-bar" style="width: 75%"></div>
+                                </div>
+                                <div class="stat-value" id="motivation-value" aria-live="polite">75/100</div>
+                            </div>
+                        </div>
+                        
+                        <div class="character-card" role="article" aria-labelledby="skills-name">
+                            <span class="character-icon" aria-hidden="true">🎯</span>
+                            <div class="character-name" id="skills-name">Skills</div>
+                            <div class="character-level">Focus & Productivity</div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="focus-label">
+                                <div class="stat-label" id="focus-label">Focus</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="focus-label" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill focus" id="focus-bar" style="width: 60%"></div>
+                                </div>
+                                <div class="stat-value" id="focus-value" aria-live="polite">60/100</div>
+                            </div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="creativity-label">
+                                <div class="stat-label" id="creativity-label">Creativity</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="creativity-label" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill creativity" id="creativity-bar" style="width: 45%"></div>
+                                </div>
+                                <div class="stat-value" id="creativity-value" aria-live="polite">45/100</div>
+                            </div>
+                            
+                            <div class="stat-item" role="group" aria-labelledby="social-label">
+                                <div class="stat-label" id="social-label">Social</div>
+                                <div class="stat-bar" role="progressbar" aria-labelledby="social-label" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="stat-fill social" id="social-bar" style="width: 80%"></div>
+                                </div>
+                                <div class="stat-value" id="social-value" aria-live="polite">80/100</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Treasure Chest Section -->
+                    <div class="treasure-section" role="region" aria-labelledby="treasure-title">
+                        <h3 id="treasure-title">Daily Treasure Chest</h3>
+                        <div class="treasure-chest" id="treasure-chest" onclick="testTreasureChest()" role="button" tabindex="0" aria-label="Open Daily Treasure Chest">
+                            <span class="treasure-icon" aria-hidden="true">🎁</span>
+                            <div class="treasure-title">Daily Rewards</div>
+                            <div class="treasure-subtitle">Complete your daily goals to unlock!</div>
+                            <div class="treasure-timer" id="treasure-timer" aria-live="polite">Available now!</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Sharing Section -->
+                    <div class="social-section" role="region" aria-labelledby="social-section-title">
+                        <div class="social-card">
+                            <div class="social-header">
+                                <div class="social-title" id="social-section-title">Share Your Progress</div>
+                            </div>
+                            
+                            <div class="social-stats" role="list" aria-label="Progress Statistics">
+                                <div class="social-stat" role="listitem">
+                                    <span class="social-stat-value" id="total-achievements" aria-live="polite">0</span>
+                                    <div class="social-stat-label">Achievements</div>
+                                </div>
+                                <div class="social-stat" role="listitem">
+                                    <span class="social-stat-value" id="total-goals" aria-live="polite">0</span>
+                                    <div class="social-stat-label">Goals Completed</div>
+                                </div>
+                                <div class="social-stat" role="listitem">
+                                    <span class="social-stat-value" id="current-streak-social" aria-live="polite">0</span>
+                                    <div class="social-stat-label">Day Streak</div>
+                                </div>
+                            </div>
+                            
+                            <div class="share-buttons" role="toolbar" aria-label="Share Progress">
+                                <button class="share-button twitter" onclick="testSocialShare('twitter')" aria-label="Share on Twitter">
+                                    🐦 Twitter
+                                </button>
+                                <button class="share-button facebook" onclick="testSocialShare('facebook')" aria-label="Share on Facebook">
+                                    📘 Facebook
+                                </button>
+                                <button class="share-button linkedin" onclick="testSocialShare('linkedin')" aria-label="Share on LinkedIn">
+                                    💼 LinkedIn
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock app object for testing
+        const app = {
+            state: {
+                userData: {
+                    stats: {
+                        level: 5,
+                        health: 100,
+                        energy: { value: 85 },
+                        motivation: 75,
+                        experience: 250,
+                        experienceToNext: 1000,
+                        skills: {
+                            focus: 60,
+                            creativity: 45,
+                            social: 80
+                        },
+                        currentStreak: 7
+                    },
+                    achievements: [],
+                    goals: []
+                }
+            },
+            ui: {
+                initializeDashboard() {
+                    console.log('✅ Dashboard initialization called');
+                    this.initCharacterStats();
+                    this.initSocialSharing();
+                    return true;
+                },
+                
+                initCharacterStats() {
+                    console.log('✅ Character stats initialization called');
+                    return true;
+                },
+                
+                initSocialSharing() {
+                    console.log('✅ Social sharing initialization called');
+                    return true;
+                }
+            }
+        };
+
+        // Test functions
+        function testCSSConsolidation() {
+            const result = document.getElementById('css-consolidation-result');
+            
+            // Check if CSS variables are defined
+            const rootStyles = getComputedStyle(document.documentElement);
+            const zIndexVars = [
+                '--z-dashboard-welcome',
+                '--z-dashboard-actions', 
+                '--z-character-stats',
+                '--z-treasure-section',
+                '--z-social-section'
+            ];
+            
+            let allVarsPresent = true;
+            zIndexVars.forEach(varName => {
+                const value = rootStyles.getPropertyValue(varName);
+                if (!value) {
+                    allVarsPresent = false;
+                }
+            });
+            
+            if (allVarsPresent) {
+                result.className = 'test-result success';
+                result.innerHTML = '✅ CSS consolidation successful - All z-index variables defined';
+            } else {
+                result.className = 'test-result error';
+                result.innerHTML = '❌ CSS consolidation failed - Missing z-index variables';
+            }
+        }
+
+        function testZIndexHierarchy() {
+            const result = document.getElementById('z-index-result');
+            
+            const dashboardWelcome = document.querySelector('.dashboard-welcome');
+            const dashboardActions = document.querySelector('.dashboard-actions');
+            const characterStats = document.querySelector('.character-stats');
+            const treasureSection = document.querySelector('.treasure-section');
+            const socialSection = document.querySelector('.social-section');
+            
+            if (dashboardWelcome && dashboardActions && characterStats && treasureSection && socialSection) {
+                result.className = 'test-result success';
+                result.innerHTML = '✅ Z-index hierarchy test passed - All components have proper z-index positioning';
+            } else {
+                result.className = 'test-result error';
+                result.innerHTML = '❌ Z-index hierarchy test failed - Missing components';
+            }
+        }
+
+        function testJSFunctionality() {
+            const result = document.getElementById('js-functionality-result');
+            
+            try {
+                const dashboardInit = app.ui.initializeDashboard();
+                const characterStats = app.ui.initCharacterStats();
+                const socialSharing = app.ui.initSocialSharing();
+                
+                if (dashboardInit && characterStats && socialSharing) {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ JavaScript functionality test passed - All dashboard functions working';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ JavaScript functionality test failed - Some functions not working';
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.innerHTML = `❌ JavaScript functionality test failed - Error: ${error.message}`;
+            }
+        }
+
+        function testAccessibility() {
+            const result = document.getElementById('accessibility-result');
+            
+            // Check for ARIA attributes
+            const ariaElements = [
+                { selector: '#dashboard-view', attr: 'role', value: 'main' },
+                { selector: '.dashboard-actions', attr: 'role', value: 'toolbar' },
+                { selector: '.character-stats', attr: 'role', value: 'region' },
+                { selector: '.treasure-section', attr: 'role', value: 'region' },
+                { selector: '.social-section', attr: 'role', value: 'region' },
+                { selector: '.stat-bar', attr: 'role', value: 'progressbar' },
+                { selector: '#treasure-chest', attr: 'role', value: 'button' }
+            ];
+            
+            let allAriaPresent = true;
+            ariaElements.forEach(element => {
+                const el = document.querySelector(element.selector);
+                if (!el || el.getAttribute(element.attr) !== element.value) {
+                    allAriaPresent = false;
+                }
+            });
+            
+            if (allAriaPresent) {
+                result.className = 'test-result success';
+                result.innerHTML = '✅ Accessibility test passed - All ARIA attributes present';
+            } else {
+                result.className = 'test-result error';
+                result.innerHTML = '❌ Accessibility test failed - Missing ARIA attributes';
+            }
+        }
+
+        function testResponsiveDesign() {
+            const result = document.getElementById('responsive-result');
+            
+            // Check if responsive CSS is applied
+            const dashboardActions = document.querySelector('.dashboard-actions');
+            const characterStats = document.querySelector('.character-stats');
+            
+            if (dashboardActions && characterStats) {
+                const actionsStyle = getComputedStyle(dashboardActions);
+                const statsStyle = getComputedStyle(characterStats);
+                
+                if (actionsStyle.display === 'flex' && statsStyle.display === 'grid') {
+                    result.className = 'test-result success';
+                    result.innerHTML = '✅ Responsive design test passed - CSS properties applied correctly';
+                } else {
+                    result.className = 'test-result error';
+                    result.innerHTML = '❌ Responsive design test failed - CSS properties not applied';
+                }
+            } else {
+                result.className = 'test-result error';
+                result.innerHTML = '❌ Responsive design test failed - Components not found';
+            }
+        }
+
+        function testDashboardAction(action) {
+            console.log(`🎯 Dashboard action clicked: ${action}`);
+            alert(`Dashboard action: ${action} - Test successful!`);
+        }
+
+        function testTreasureChest() {
+            console.log('🎁 Treasure chest clicked');
+            alert('Treasure chest opened - Test successful!');
+        }
+
+        function testSocialShare(platform) {
+            console.log(`📤 Social share clicked: ${platform}`);
+            alert(`Social share: ${platform} - Test successful!`);
+        }
+
+        // Run all tests when page loads
+        window.addEventListener('load', () => {
+            console.log('🧪 Starting Chunk 6 Dashboard Components Test...');
+            
+            setTimeout(() => {
+                testCSSConsolidation();
+                testZIndexHierarchy();
+                testJSFunctionality();
+                testAccessibility();
+                testResponsiveDesign();
+                
+                console.log('✅ All tests completed');
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

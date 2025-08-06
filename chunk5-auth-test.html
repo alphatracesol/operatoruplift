@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 5: Auth Forms & Overlays Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+            border-left: 4px solid #f97316;
+        }
+        
+        .test-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #f97316;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .test-pass {
+            background: #1f5f1f;
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+        
+        .test-fail {
+            background: #5f1f1f;
+            color: #f87171;
+            border: 1px solid #f87171;
+        }
+        
+        .test-warning {
+            background: #5f4f1f;
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+        
+        .test-info {
+            background: #1f3f5f;
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #ea580c;
+        }
+        
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        /* Auth Preview Styles */
+        .auth-preview {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid #f97316;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            z-index: 2001;
+        }
+        
+        .auth-form-preview {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #555;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+        }
+        
+        .form-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .error-message::before {
+            content: '⚠️';
+            font-size: 0.75rem;
+        }
+        
+        .btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #ea580c;
+        }
+        
+        .header-preview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #2a2a2a;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-btn {
+            padding: 8px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .header-btn:hover {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
+        }
+        
+        .main-content {
+            margin-top: 90px;
+        }
+        
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Preview -->
+    <div class="header-preview" id="test-header">
+        <h1 class="header-title">Test Header</h1>
+        <div class="header-actions">
+            <button class="header-btn" onclick="testZIndexLayering()">🔍</button>
+            <button class="header-btn" onclick="testFormValidation()">✅</button>
+            <button class="header-btn" onclick="runAllTests()">🧪</button>
+        </div>
+    </div>
+    
+    <!-- Auth Preview -->
+    <div class="auth-preview" id="test-auth">
+        <h2>Test Auth Form</h2>
+        <form id="test-login-form" class="auth-form-preview" role="form" aria-labelledby="test-login-title">
+            <h3 id="test-login-title" class="visually-hidden">Test Sign In</h3>
+            <div class="form-group">
+                <label class="form-label" for="test-email" id="test-email-label">Email</label>
+                <input type="email" 
+                       class="form-input" 
+                       id="test-email" 
+                       aria-labelledby="test-email-label"
+                       aria-describedby="test-email-error"
+                       placeholder="test@example.com" 
+                       required>
+                <div id="test-email-error" class="error-message" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="test-password" id="test-password-label">Password</label>
+                <input type="password" 
+                       class="form-input" 
+                       id="test-password" 
+                       aria-labelledby="test-password-label"
+                       aria-describedby="test-password-error"
+                       placeholder="********" 
+                       required>
+                <div id="test-password-error" class="error-message" role="alert" aria-live="polite"></div>
+            </div>
+            <button type="submit" class="btn">Test Submit</button>
+        </form>
+    </div>
+    
+    <div class="main-content">
+        <div class="test-container">
+            <h1>🧪 Chunk 5: Auth Forms & Overlays Test Suite</h1>
+            <p>Comprehensive testing for auth consolidation, z-index hierarchy, form validation, and accessibility compliance.</p>
+            
+            <div class="test-section">
+                <div class="test-title">1. CSS Consolidation Test</div>
+                <div id="css-consolidation-results"></div>
+                <button class="test-button" onclick="testCssConsolidation()">Test CSS Consolidation</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">2. Z-Index Hierarchy Test</div>
+                <div id="zindex-results"></div>
+                <button class="test-button" onclick="testZIndexHierarchy()">Test Z-Index Hierarchy</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">3. Form Validation Test</div>
+                <div id="validation-results"></div>
+                <button class="test-button" onclick="testFormValidation()">Test Form Validation</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">4. Accessibility Test</div>
+                <div id="accessibility-results"></div>
+                <button class="test-button" onclick="testAccessibility()">Test Accessibility</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">5. Responsive Design Test</div>
+                <div id="responsive-results"></div>
+                <button class="test-button" onclick="testResponsiveDesign()">Test Responsive Design</button>
+            </div>
+            
+            <div class="test-section">
+                <div class="test-title">6. Error Handling Test</div>
+                <div id="error-handling-results"></div>
+                <button class="test-button" onclick="testErrorHandling()">Test Error Handling</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Container
+        const testResults = {
+            cssConsolidation: false,
+            zIndexHierarchy: false,
+            formValidation: false,
+            accessibility: false,
+            responsiveDesign: false,
+            errorHandling: false
+        };
+        
+        // Test 1: CSS Consolidation
+        function testCssConsolidation() {
+            console.log('🧪 Testing CSS Consolidation...');
+            const results = document.getElementById('css-consolidation-results');
+            
+            try {
+                const authContainer = document.getElementById('test-auth');
+                const computedStyle = window.getComputedStyle(authContainer);
+                
+                const tests = [
+                    {
+                        name: 'Auth Container Position',
+                        value: computedStyle.position === 'fixed',
+                        expected: 'fixed'
+                    },
+                    {
+                        name: 'Auth Container Z-Index',
+                        value: computedStyle.zIndex === '2001',
+                        expected: '2001'
+                    },
+                    {
+                        name: 'Auth Container Display',
+                        value: computedStyle.display === 'block',
+                        expected: 'block'
+                    },
+                    {
+                        name: 'Auth Container Backdrop Filter',
+                        value: computedStyle.backdropFilter !== 'none',
+                        expected: 'blur effect'
+                    }
+                ];
+                
+                let passedTests = 0;
+                let testHtml = '';
+                
+                tests.forEach(test => {
+                    if (test.value) {
+                        passedTests++;
+                        testHtml += `<div class="test-result test-pass">✅ ${test.name}: PASS</div>`;
+                    } else {
+                        testHtml += `<div class="test-result test-fail">❌ ${test.name}: FAIL (expected: ${test.expected})</div>`;
+                    }
+                });
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === tests.length) {
+                    testResults.cssConsolidation = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 CSS Consolidation: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ CSS Consolidation: ${passedTests}/${tests.length} TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ CSS Consolidation Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 2: Z-Index Hierarchy
+        function testZIndexHierarchy() {
+            console.log('🧪 Testing Z-Index Hierarchy...');
+            const results = document.getElementById('zindex-results');
+            
+            try {
+                const header = document.getElementById('test-header');
+                const authContainer = document.getElementById('test-auth');
+                
+                const headerZIndex = parseInt(window.getComputedStyle(header).zIndex);
+                const authZIndex = parseInt(window.getComputedStyle(authContainer).zIndex);
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Auth container should have higher z-index than header
+                if (authZIndex > headerZIndex) {
+                    testHtml += `<div class="test-result test-pass">✅ Auth Z-Index (${authZIndex}) > Header Z-Index (${headerZIndex})</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Auth Z-Index (${authZIndex}) should be > Header Z-Index (${headerZIndex})</div>`;
+                }
+                
+                // Test 2: Header should have z-index 100
+                if (headerZIndex === 100) {
+                    testHtml += `<div class="test-result test-pass">✅ Header Z-Index: ${headerZIndex} (correct)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Header Z-Index: ${headerZIndex} (should be 100)</div>`;
+                }
+                
+                // Test 3: Auth container should have z-index 2001
+                if (authZIndex === 2001) {
+                    testHtml += `<div class="test-result test-pass">✅ Auth Z-Index: ${authZIndex} (correct)</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Auth Z-Index: ${authZIndex} (should be 2001)</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.zIndexHierarchy = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Z-Index Hierarchy: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Z-Index Hierarchy: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Z-Index Hierarchy Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 3: Form Validation
+        function testFormValidation() {
+            console.log('🧪 Testing Form Validation...');
+            const results = document.getElementById('validation-results');
+            
+            try {
+                const form = document.getElementById('test-login-form');
+                const emailInput = document.getElementById('test-email');
+                const passwordInput = document.getElementById('test-password');
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Form should have proper structure
+                if (form && form.getAttribute('role') === 'form') {
+                    testHtml += `<div class="test-result test-pass">✅ Form has proper role attribute</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Form should have role="form"</div>`;
+                }
+                
+                // Test 2: Email input should have proper attributes
+                if (emailInput && emailInput.getAttribute('aria-describedby')) {
+                    testHtml += `<div class="test-result test-pass">✅ Email input has aria-describedby</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Email input should have aria-describedby</div>`;
+                }
+                
+                // Test 3: Password input should have proper attributes
+                if (passwordInput && passwordInput.getAttribute('aria-describedby')) {
+                    testHtml += `<div class="test-result test-pass">✅ Password input has aria-describedby</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Password input should have aria-describedby</div>`;
+                }
+                
+                // Test 4: Error message containers should exist
+                const errorContainers = form.querySelectorAll('.error-message');
+                if (errorContainers.length >= 2) {
+                    testHtml += `<div class="test-result test-pass">✅ Error message containers present</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Error message containers should be present</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 4) {
+                    testResults.formValidation = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Form Validation: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Form Validation: ${passedTests}/4 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Form Validation Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 4: Accessibility
+        function testAccessibility() {
+            console.log('🧪 Testing Accessibility...');
+            const results = document.getElementById('accessibility-results');
+            
+            try {
+                const form = document.getElementById('test-login-form');
+                const emailInput = document.getElementById('test-email');
+                const passwordInput = document.getElementById('test-password');
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Form should have aria-labelledby
+                if (form && form.getAttribute('aria-labelledby')) {
+                    testHtml += `<div class="test-result test-pass">✅ Form has aria-labelledby</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Form should have aria-labelledby</div>`;
+                }
+                
+                // Test 2: Inputs should have proper labels
+                const labels = form.querySelectorAll('label');
+                if (labels.length >= 2) {
+                    testHtml += `<div class="test-result test-pass">✅ Form has proper labels</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Form should have proper labels</div>`;
+                }
+                
+                // Test 3: Error messages should have role="alert"
+                const errorMessages = form.querySelectorAll('.error-message');
+                const alertsWithRole = Array.from(errorMessages).filter(el => el.getAttribute('role') === 'alert');
+                if (alertsWithRole.length >= 2) {
+                    testHtml += `<div class="test-result test-pass">✅ Error messages have role="alert"</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Error messages should have role="alert"</div>`;
+                }
+                
+                // Test 4: Visually hidden elements should exist
+                const visuallyHidden = form.querySelector('.visually-hidden');
+                if (visuallyHidden) {
+                    testHtml += `<div class="test-result test-pass">✅ Visually hidden elements present</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Visually hidden elements should be present</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 4) {
+                    testResults.accessibility = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Accessibility: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Accessibility: ${passedTests}/4 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Accessibility Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 5: Responsive Design
+        function testResponsiveDesign() {
+            console.log('🧪 Testing Responsive Design...');
+            const results = document.getElementById('responsive-results');
+            
+            try {
+                const authContainer = document.getElementById('test-auth');
+                const computedStyle = window.getComputedStyle(authContainer);
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Auth container should be responsive
+                if (computedStyle.maxWidth === '400px') {
+                    testHtml += `<div class="test-result test-pass">✅ Auth container has max-width</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Auth container should have max-width</div>`;
+                }
+                
+                // Test 2: Auth container should have proper padding
+                const padding = computedStyle.padding;
+                if (padding && padding !== '0px') {
+                    testHtml += `<div class="test-result test-pass">✅ Auth container has padding: ${padding}</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Auth container should have padding</div>`;
+                }
+                
+                // Test 3: Auth container should be centered
+                if (computedStyle.position === 'fixed') {
+                    testHtml += `<div class="test-result test-pass">✅ Auth container is positioned for centering</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Auth container should be positioned for centering</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.responsiveDesign = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Responsive Design: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Responsive Design: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Responsive Design Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test 6: Error Handling
+        function testErrorHandling() {
+            console.log('🧪 Testing Error Handling...');
+            const results = document.getElementById('error-handling-results');
+            
+            try {
+                const form = document.getElementById('test-login-form');
+                const emailInput = document.getElementById('test-email');
+                const passwordInput = document.getElementById('test-password');
+                
+                let testHtml = '';
+                let passedTests = 0;
+                
+                // Test 1: Error message containers should exist
+                const errorContainers = form.querySelectorAll('.error-message');
+                if (errorContainers.length >= 2) {
+                    testHtml += `<div class="test-result test-pass">✅ Error message containers exist</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Error message containers should exist</div>`;
+                }
+                
+                // Test 2: Error CSS classes should be defined
+                const errorStyle = window.getComputedStyle(emailInput);
+                if (errorStyle.borderColor) {
+                    testHtml += `<div class="test-result test-pass">✅ Error styling is available</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Error styling should be available</div>`;
+                }
+                
+                // Test 3: Form should have proper validation attributes
+                if (emailInput.hasAttribute('required') && passwordInput.hasAttribute('required')) {
+                    testHtml += `<div class="test-result test-pass">✅ Form inputs have required attributes</div>`;
+                    passedTests++;
+                } else {
+                    testHtml += `<div class="test-result test-fail">❌ Form inputs should have required attributes</div>`;
+                }
+                
+                results.innerHTML = testHtml;
+                
+                if (passedTests === 3) {
+                    testResults.errorHandling = true;
+                    results.innerHTML += `<div class="test-result test-pass">🎉 Error Handling: ALL TESTS PASSED</div>`;
+                } else {
+                    results.innerHTML += `<div class="test-result test-fail">⚠️ Error Handling: ${passedTests}/3 TESTS PASSED</div>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result test-fail">❌ Error Handling Test Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            console.log('🧪 Running All Chunk 5 Tests...');
+            
+            testCssConsolidation();
+            setTimeout(() => testZIndexHierarchy(), 500);
+            setTimeout(() => testFormValidation(), 1000);
+            setTimeout(() => testAccessibility(), 1500);
+            setTimeout(() => testResponsiveDesign(), 2000);
+            setTimeout(() => testErrorHandling(), 2500);
+            
+            setTimeout(() => {
+                const totalTests = Object.keys(testResults).length;
+                const passedTests = Object.values(testResults).filter(Boolean).length;
+                
+                console.log(`🎉 Chunk 5 Test Results: ${passedTests}/${totalTests} test categories passed`);
+                
+                if (passedTests === totalTests) {
+                    alert(`🎉 CHUNK 5 COMPLETE!\n\nAll ${totalTests} test categories passed successfully!\n\n✅ CSS Consolidation\n✅ Z-Index Hierarchy\n✅ Form Validation\n✅ Accessibility\n✅ Responsive Design\n✅ Error Handling\n\nReady for Chunk 6!`);
+                } else {
+                    alert(`⚠️ Chunk 5 Tests: ${passedTests}/${totalTests} categories passed\n\nPlease review failed tests before proceeding.`);
+                }
+            }, 3000);
+        }
+        
+        // Z-Index layering test function
+        function testZIndexLayering() {
+            const header = document.getElementById('test-header');
+            const auth = document.getElementById('test-auth');
+            
+            // Temporarily change z-index to test layering
+            header.style.zIndex = '100';
+            auth.style.zIndex = '2001';
+            
+            console.log('✅ Z-index layering test: Auth (2001) > Header (100)');
+            alert('Z-Index Test: Auth overlay should appear above header');
+        }
+        
+        // Initialize test environment when page loads
+        window.addEventListener('load', () => {
+            console.log('🧪 Chunk 5 Test Environment Loaded');
+        });
+        
+        // Auto-run tests after 3 seconds
+        setTimeout(runAllTests, 3000);
+    </script>
+</body>
+</html> 

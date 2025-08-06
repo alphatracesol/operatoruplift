@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift - UI Fix</title>
+    <style>
+        /* ===== COMPREHENSIVE UI FIX ===== */
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* CSS Variables */
+        :root {
+            /* Colors */
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f97316;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --glass-blur: blur(20px);
+            
+            /* Dark Theme */
+            --dark-bg: #0a0a0a;
+            --dark-surface: #1a1a1a;
+            --dark-card: #2a2a2a;
+            --dark-text: #ffffff;
+            --dark-text-secondary: #b0b0b0;
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            
+            /* Z-Index Scale - FIXED PRIORITY LAYERING */
+            --z-background: 0;
+            --z-base: 1;
+            --z-content: 10;
+            --z-header: 100;
+            --z-sidebar: 200;
+            --z-modal-backdrop: 1000;
+            --z-modal: 1100;
+            --z-tooltip: 1200;
+            --z-notification: 1300;
+            --z-loading: 1400;
+        }
+        
+        /* Background Effects */
+        #tsparticles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: var(--z-background);
+            pointer-events: none;
+        }
+        
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: var(--z-background);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        /* App Layout */
+        .app-wrapper {
+            position: relative;
+            z-index: var(--z-base);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header - FIXED POSITIONING */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            z-index: var(--z-header);
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-text);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .header-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-sm);
+            color: var(--dark-text);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-size: 1.2rem;
+        }
+        
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile Navigation Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-sm);
+            color: var(--dark-text);
+            cursor: pointer;
+            z-index: var(--z-header);
+            font-size: 1.2rem;
+        }
+        
+        /* Sidebar - FIXED POSITIONING */
+        .sidebar {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 70px);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-right: 1px solid var(--glass-border);
+            z-index: var(--z-sidebar);
+            overflow-y: auto;
+            transition: transform var(--transition-normal);
+        }
+        
+        .sidebar-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .sidebar-nav {
+            padding: var(--spacing-lg);
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            color: var(--dark-text);
+            text-decoration: none;
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 70px;
+            flex: 1;
+            padding: var(--spacing-xl);
+            z-index: var(--z-content);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Views - FIXED DISPLAY */
+        .view {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all var(--transition-normal);
+        }
+        
+        .view.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Authentication View - PRIORITY 1 */
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 70px);
+            padding: var(--spacing-xl);
+        }
+        
+        .auth-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .auth-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            background: linear-gradient(135deg, var(--accent), #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .auth-card p {
+            color: var(--dark-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .auth-form {
+            text-align: left;
+        }
+        
+        .auth-form h3 {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            color: var(--dark-text);
+            font-size: 1rem;
+            transition: var(--transition-normal);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-input::placeholder {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            color: var(--dark-text);
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ea580c, #dc2626);
+            transform: translateY(-2px);
+        }
+        
+        /* Dashboard */
+        .dashboard-welcome {
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: var(--spacing-sm);
+            background: linear-gradient(135deg, var(--accent), #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .welcome-subtitle {
+            color: var(--dark-text-secondary);
+            font-size: 1.25rem;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+            flex-wrap: wrap;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            transition: var(--transition-normal);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .stat-label {
+            color: var(--dark-text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* Modal System - FIXED Z-INDEX */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: var(--z-modal-backdrop);
+            display: none;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        
+        .modal-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: var(--z-modal);
+            display: none;
+            opacity: 0;
+            transition: all var(--transition-normal);
+        }
+        
+        .modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            transition: var(--transition-normal);
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Mobile Responsive - FIXED SCALING */
+        @media (max-width: 768px) {
+            .mobile-nav-toggle {
+                display: block;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                max-width: 80vw;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: var(--spacing-md);
+            }
+            
+            .header {
+                padding: 0 var(--spacing-md);
+            }
+            
+            .header-title {
+                font-size: 1.25rem;
+            }
+            
+            .auth-container {
+                padding: var(--spacing-md);
+            }
+            
+            .auth-card {
+                padding: var(--spacing-xl);
+            }
+            
+            .dashboard-actions {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: var(--spacing-xl);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-actions {
+                gap: var(--spacing-xs);
+            }
+            
+            .header-btn {
+                padding: var(--spacing-xs);
+                font-size: 1rem;
+            }
+            
+            .auth-card {
+                padding: var(--spacing-lg);
+            }
+            
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .flex-col {
+            flex-direction: column;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-center {
+            justify-content: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .w-full {
+            width: 100%;
+        }
+        
+        .h-full {
+            height: 100%;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div id="tsparticles"></div>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobile-nav-toggle">
+        ☰
+    </button>
+    
+    <!-- App Wrapper -->
+    <div class="app-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title" id="current-view-title">Operator Uplift</h1>
+            <div class="header-actions">
+                <button class="header-btn" onclick="showModal('lucky-wheel-modal')">
+                    🎰
+                </button>
+                <button class="header-btn" onclick="showModal('mood-tracking-modal')">
+                    😊
+                </button>
+                <button class="header-btn" onclick="showModal('settings-modal')">
+                    ⚙️
+                </button>
+                <button class="header-btn" id="theme-toggle">🌙</button>
+                <button class="header-btn" id="logout-btn" onclick="logout()">🚪</button>
+            </div>
+        </header>
+        
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Navigation</h3>
+            </div>
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    📊 Dashboard
+                </a>
+                <a href="#" class="nav-item" data-view="goals">
+                    🎯 Goals
+                </a>
+                <a href="#" class="nav-item" data-view="ai-chat">
+                    🤖 AI Mentor
+                </a>
+                <a href="#" class="nav-item" data-view="habits">
+                    🔄 Habits
+                </a>
+                <a href="#" class="nav-item" data-view="focus">
+                    🎯 Focus
+                </a>
+                <a href="#" class="nav-item" data-view="analytics">
+                    📈 Analytics
+                </a>
+                <a href="#" class="nav-item" data-view="community">
+                    👥 Community
+                </a>
+                <a href="#" class="nav-item" data-view="settings">
+                    ⚙️ Settings
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Modal Overlay -->
+        <div class="modal-overlay" id="modal-overlay"></div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Authentication View - PRIORITY 1 -->
+                <div class="view active" id="auth-view">
+                    <div class="auth-container">
+                        <div class="auth-card">
+                            <h2>Welcome to Operator Uplift</h2>
+                            <p>Transform your ambitions into epic quests with AI-powered goal setting</p>
+                            
+                            <!-- Login Form -->
+                            <form id="login-form" class="auth-form">
+                                <h3>Sign In</h3>
+                                <div class="form-group">
+                                    <label class="form-label" for="login-email">Email</label>
+                                    <input type="email" class="form-input" id="login-email" placeholder="Enter your email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="login-password">Password</label>
+                                    <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">Sign In</button>
+                                <p class="text-center" style="margin-top: var(--spacing-lg);">
+                                    Don't have an account? 
+                                    <a href="#" onclick="showRegister()" style="color: var(--accent);">Sign Up</a>
+                                </p>
+                            </form>
+                            
+                            <!-- Register Form -->
+                            <form id="register-form" class="auth-form hidden">
+                                <h3>Create Account</h3>
+                                <div class="form-group">
+                                    <label class="form-label" for="register-name">Full Name</label>
+                                    <input type="text" class="form-input" id="register-name" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="register-email">Email</label>
+                                    <input type="email" class="form-input" id="register-email" placeholder="Enter your email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="register-password">Password</label>
+                                    <input type="password" class="form-input" id="register-password" placeholder="Create a password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">Create Account</button>
+                                <p class="text-center" style="margin-top: var(--spacing-lg);">
+                                    Already have an account? 
+                                    <a href="#" onclick="showLogin()" style="color: var(--accent);">Sign In</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard View -->
+                <div class="view" id="dashboard-view">
+                    <div class="dashboard-welcome">
+                        <h1 class="welcome-title">Welcome back, Operator!</h1>
+                        <p class="welcome-subtitle">Ready to level up your life today?</p>
+                    </div>
+                    
+                    <div class="dashboard-actions">
+                        <button class="btn btn-primary" onclick="showView('goals')">
+                            🎯 Set New Goal
+                        </button>
+                        <button class="btn" onclick="showView('ai-chat')">
+                            🤖 Chat with AI
+                        </button>
+                        <button class="btn" onclick="showView('focus')">
+                            🎯 Start Focus Session
+                        </button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Active Goals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">85%</div>
+                            <div class="stat-label">Focus Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">2,450</div>
+                            <div class="stat-label">Total Points</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Goals View -->
+                <div class="view" id="goals-view">
+                    <h2>🎯 Your Goals</h2>
+                    <p>Track your progress and achieve your dreams</p>
+                </div>
+                
+                <!-- AI Chat View -->
+                <div class="view" id="ai-chat-view">
+                    <h2>🤖 AI Mentor</h2>
+                    <p>Get personalized guidance and motivation</p>
+                </div>
+                
+                <!-- Other Views -->
+                <div class="view" id="habits-view">
+                    <h2>🔄 Habits</h2>
+                    <p>Build positive habits for lasting change</p>
+                </div>
+                
+                <div class="view" id="focus-view">
+                    <h2>🎯 Focus</h2>
+                    <p>Deep work sessions for maximum productivity</p>
+                </div>
+                
+                <div class="view" id="analytics-view">
+                    <h2>📈 Analytics</h2>
+                    <p>Track your progress and insights</p>
+                </div>
+                
+                <div class="view" id="community-view">
+                    <h2>👥 Community</h2>
+                    <p>Connect with like-minded operators</p>
+                </div>
+                
+                <div class="view" id="settings-view">
+                    <h2>⚙️ Settings</h2>
+                    <p>Customize your experience</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="lucky-wheel-modal">
+        <button class="modal-close" onclick="hideModal('lucky-wheel-modal')">×</button>
+        <h3>🎰 Lucky Wheel</h3>
+        <p>Spin to win rewards and boost your progress!</p>
+    </div>
+    
+    <div class="modal" id="mood-tracking-modal">
+        <button class="modal-close" onclick="hideModal('mood-tracking-modal')">×</button>
+        <h3>😊 Mood Tracking</h3>
+        <p>Track your mood and emotional journey</p>
+    </div>
+    
+    <div class="modal" id="settings-modal">
+        <button class="modal-close" onclick="hideModal('settings-modal')">×</button>
+        <h3>⚙️ Settings</h3>
+        <p>Customize your Operator Uplift experience</p>
+    </div>
+    
+    <script>
+        // UI Management
+        const UI = {
+            // Show/Hide Views
+            showView(viewName) {
+                // Hide all views
+                document.querySelectorAll('.view').forEach(view => {
+                    view.classList.remove('active');
+                });
+                
+                // Show target view
+                const targetView = document.getElementById(`${viewName}-view`);
+                if (targetView) {
+                    targetView.classList.add('active');
+                }
+                
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeNav = document.querySelector(`[data-view="${viewName}"]`);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+                
+                // Update header title
+                const titleMap = {
+                    'dashboard': 'Dashboard',
+                    'goals': 'Goals',
+                    'ai-chat': 'AI Mentor',
+                    'habits': 'Habits',
+                    'focus': 'Focus',
+                    'analytics': 'Analytics',
+                    'community': 'Community',
+                    'settings': 'Settings'
+                };
+                
+                const titleElement = document.getElementById('current-view-title');
+                if (titleElement && titleMap[viewName]) {
+                    titleElement.textContent = titleMap[viewName];
+                }
+                
+                // Hide mobile sidebar
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            },
+            
+            // Show/Hide Modals
+            showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                const overlay = document.getElementById('modal-overlay');
+                
+                if (modal && overlay) {
+                    overlay.classList.add('active');
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            },
+            
+            hideModal(modalId) {
+                const modal = document.getElementById(modalId);
+                const overlay = document.getElementById('modal-overlay');
+                
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+                
+                if (overlay) {
+                    overlay.classList.remove('active');
+                }
+                
+                document.body.style.overflow = '';
+            },
+            
+            // Toggle Mobile Sidebar
+            toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('active');
+                }
+            }
+        };
+        
+        // Authentication
+        const Auth = {
+            showLogin() {
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+            },
+            
+            showRegister() {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            },
+            
+            login(email, password) {
+                // Mock login - in real app, this would call your auth system
+                console.log('Logging in:', email);
+                
+                // Show dashboard
+                UI.showView('dashboard');
+                
+                // Hide auth view
+                document.getElementById('auth-view').classList.remove('active');
+            },
+            
+            register(name, email, password) {
+                // Mock registration
+                console.log('Registering:', name, email);
+                
+                // Show dashboard
+                UI.showView('dashboard');
+                
+                // Hide auth view
+                document.getElementById('auth-view').classList.remove('active');
+            },
+            
+            logout() {
+                // Show auth view
+                document.getElementById('auth-view').classList.add('active');
+                UI.showView('auth');
+            }
+        };
+        
+        // Global Functions
+        function showView(viewName) {
+            UI.showView(viewName);
+        }
+        
+        function showModal(modalId) {
+            UI.showModal(modalId);
+        }
+        
+        function hideModal(modalId) {
+            UI.hideModal(modalId);
+        }
+        
+        function showLogin() {
+            Auth.showLogin();
+        }
+        
+        function showRegister() {
+            Auth.showRegister();
+        }
+        
+        function logout() {
+            Auth.logout();
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile navigation toggle
+            const mobileToggle = document.getElementById('mobile-nav-toggle');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', UI.toggleSidebar);
+            }
+            
+            // Navigation items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const viewName = this.getAttribute('data-view');
+                    if (viewName) {
+                        UI.showView(viewName);
+                    }
+                });
+            });
+            
+            // Login form
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('login-email').value;
+                    const password = document.getElementById('login-password').value;
+                    Auth.login(email, password);
+                });
+            }
+            
+            // Register form
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('register-name').value;
+                    const email = document.getElementById('register-email').value;
+                    const password = document.getElementById('register-password').value;
+                    Auth.register(name, email, password);
+                });
+            }
+            
+            // Modal overlay click to close
+            const modalOverlay = document.getElementById('modal-overlay');
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', function() {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    html.setAttribute('data-theme', newTheme);
+                    this.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+                });
+            }
+            
+            console.log('🎯 UI Fix loaded successfully!');
+        });
+    </script>
+</body>
+</html> 

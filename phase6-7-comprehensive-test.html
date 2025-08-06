@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6-7: Comprehensive Test Runner</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-header h1 {
+            color: #f97316;
+            margin-bottom: 10px;
+        }
+        .test-results {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+        }
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.running {
+            background: #1e40af;
+            color: #93c5fd;
+        }
+        .status.success {
+            background: #059669;
+            color: #6ee7b7;
+        }
+        .status.error {
+            background: #dc2626;
+            color: #fca5a5;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .demo-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🚀 Phase 6-7: Comprehensive Test Runner</h1>
+            <p>Testing Operator Uplift App - Performance & Aesthetics</p>
+        </div>
+        
+        <div id="status" class="status running">⏳ Loading app and preparing tests...</div>
+        
+        <div style="text-align: center;">
+            <button id="runPhase6" class="test-button" onclick="runPhase6Tests()">🧪 Phase 6: Performance Tests</button>
+            <button id="runPhase7" class="test-button" onclick="runPhase7Tests()">🎨 Phase 7: Aesthetic Tests</button>
+            <button id="runAll" class="test-button" onclick="runAllTests()">🚀 Run All Tests</button>
+        </div>
+        
+        <div class="demo-section">
+            <h3>🎨 Aesthetic Demo Elements</h3>
+            <button class="demo-button" onclick="testCelebration()">🎉 Test Celebration</button>
+            <button class="demo-button" onclick="testGlassmorphism()">🔮 Test Glassmorphism</button>
+            <button class="demo-button" onclick="testGradients()">🌈 Test Gradients</button>
+            <button class="demo-button" onclick="testAnimations()">✨ Test Animations</button>
+            <button class="demo-button" onclick="testStoryProgression()">📖 Test Story</button>
+        </div>
+        
+        <div id="testResults" class="test-results">Test results will appear here...</div>
+    </div>
+
+    <script>
+        // Test Configuration
+        const TEST_CONFIG = {
+            timeout: 5000,
+            retries: 3,
+            debug: true
+        };
+
+        // Test Results Storage
+        const testResults = {
+            phase6: { passed: 0, failed: 0, total: 0, details: [] },
+            phase7: { passed: 0, failed: 0, total: 0, details: [] },
+            overall: { passed: 0, failed: 0, total: 0 }
+        };
+
+        // Utility Functions
+        function logTest(phase, testName, passed, details = '') {
+            const status = passed ? '✅ PASS' : '❌ FAIL';
+            const message = `${status}: ${testName}`;
+            console.log(message);
+            if (details) console.log(`   Details: ${details}`);
+            
+            testResults[phase].total++;
+            if (passed) {
+                testResults[phase].passed++;
+                testResults.overall.passed++;
+            } else {
+                testResults[phase].failed++;
+                testResults.overall.failed++;
+            }
+            testResults.overall.total++;
+            
+            testResults[phase].details.push({
+                name: testName,
+                passed,
+                details,
+                timestamp: new Date().toISOString()
+            });
+            
+            updateTestDisplay();
+        }
+
+        function updateTestDisplay() {
+            const resultsDiv = document.getElementById('testResults');
+            const statusDiv = document.getElementById('status');
+            
+            let output = `=== COMPREHENSIVE TEST RESULTS ===\n`;
+            output += `Phase 6 (Performance): ${testResults.phase6.passed}/${testResults.phase6.total} passed\n`;
+            output += `Phase 7 (Aesthetics): ${testResults.phase7.passed}/${testResults.phase7.total} passed\n`;
+            output += `Overall: ${testResults.overall.passed}/${testResults.overall.total} passed\n`;
+            output += `📊 Success Rate: ${testResults.overall.total > 0 ? ((testResults.overall.passed / testResults.overall.total) * 100).toFixed(1) : 0}%\n\n`;
+            
+            output += `=== PHASE 6 DETAILS ===\n`;
+            testResults.phase6.details.forEach(test => {
+                const status = test.passed ? '✅' : '❌';
+                output += `${status} ${test.name}\n`;
+                if (test.details) output += `   ${test.details}\n`;
+            });
+            
+            output += `\n=== PHASE 7 DETAILS ===\n`;
+            testResults.phase7.details.forEach(test => {
+                const status = test.passed ? '✅' : '❌';
+                output += `${status} ${test.name}\n`;
+                if (test.details) output += `   ${test.details}\n`;
+            });
+            
+            resultsDiv.textContent = output;
+            
+            // Update status
+            if (testResults.overall.failed > 0) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Tests completed with ${testResults.overall.failed} failures`;
+            } else if (testResults.overall.total > 0) {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = `✅ All ${testResults.overall.total} tests passed!`;
+            }
+        }
+
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message);
+            }
+        }
+
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(`${message}: Expected ${expected}, got ${actual}`);
+            }
+        }
+
+        function assertExists(value, message) {
+            if (value === null || value === undefined) {
+                throw new Error(message);
+            }
+        }
+
+        // Phase 6: Performance Tests
+        function testPhase6Performance() {
+            console.log('\n🧪 Testing Phase 6: Performance Optimizations...');
+            
+            try {
+                // Test app object exists
+                assertExists(window.app, 'App object should exist');
+                logTest('phase6', 'App Object Exists', true);
+                
+                // Test memory manager
+                const memoryManager = window.app.memoryManager;
+                assertExists(memoryManager, 'Memory manager should exist');
+                memoryManager.init();
+                logTest('phase6', 'Memory Manager Init', true);
+                
+                // Test safe interval creation
+                const intervalId = memoryManager.safeSetInterval(() => {}, 1000);
+                assertExists(intervalId, 'Interval ID should be returned');
+                logTest('phase6', 'Safe Interval Creation', true);
+                
+                // Test performance optimizations
+                const mobileGestures = window.app.mobileGestures;
+                const throttledFn = mobileGestures.throttle(() => {}, 100);
+                assertExists(throttledFn, 'Throttle function should return a function');
+                logTest('phase6', 'Throttle Utility', true);
+                
+                // Test celebrations system
+                const celebrations = window.app.celebrations;
+                celebrations.init();
+                logTest('phase6', 'Celebrations Init', true);
+                
+                // Test performance benchmarks
+                const startTime = performance.now();
+                for (let i = 0; i < 50; i++) {
+                    memoryManager.safeSetInterval(() => {}, 1000);
+                }
+                const endTime = performance.now();
+                const intervalTime = endTime - startTime;
+                
+                assert(intervalTime < 50, `Interval creation should be fast: ${intervalTime}ms`);
+                logTest('phase6', 'Performance Benchmark', true, `${intervalTime.toFixed(2)}ms`);
+                
+            } catch (error) {
+                logTest('phase6', 'Performance Tests', false, error.message);
+            }
+        }
+
+        // Phase 7: Aesthetic Tests
+        function testPhase7Aesthetics() {
+            console.log('\n🎨 Testing Phase 7: Aesthetic Enhancements...');
+            
+            try {
+                // Test glassmorphism styles
+                const glassElements = document.querySelectorAll('.glass, .glass-button, .glass-card');
+                assert(glassElements.length > 0, 'Glassmorphism elements should exist');
+                logTest('phase7', 'Glassmorphism Elements', true, `${glassElements.length} elements found`);
+                
+                // Test gradient styles
+                const gradientElements = document.querySelectorAll('.gradient-bg, .gradient-text');
+                assert(gradientElements.length > 0, 'Gradient elements should exist');
+                logTest('phase7', 'Gradient Elements', true, `${gradientElements.length} elements found`);
+                
+                // Test animation styles
+                const animatedElements = document.querySelectorAll('.animate-fade-in, .animate-bounce-in, .hover-lift');
+                assert(animatedElements.length > 0, 'Animated elements should exist');
+                logTest('phase7', 'Animation Elements', true, `${animatedElements.length} elements found`);
+                
+                // Test story system
+                const storyProgress = document.querySelector('.story-progress');
+                assertExists(storyProgress, 'Story progress should exist');
+                logTest('phase7', 'Story System', true);
+                
+                // Test theme system
+                const themeToggle = document.querySelector('.theme-toggle');
+                assertExists(themeToggle, 'Theme toggle should exist');
+                logTest('phase7', 'Theme System', true);
+                
+                // Test CSS custom properties
+                const computedStyle = getComputedStyle(document.documentElement);
+                const glassBlur = computedStyle.getPropertyValue('--glass-blur');
+                assert(glassBlur !== '', 'CSS custom properties should be defined');
+                logTest('phase7', 'CSS Custom Properties', true);
+                
+            } catch (error) {
+                logTest('phase7', 'Aesthetic Tests', false, error.message);
+            }
+        }
+
+        // Demo Functions
+        function testCelebration() {
+            if (window.app && window.app.celebrations) {
+                window.app.celebrations.celebrate('both');
+                logTest('phase7', 'Celebration Demo', true, 'Fireworks and confetti triggered');
+            } else {
+                logTest('phase7', 'Celebration Demo', false, 'Celebrations system not available');
+            }
+        }
+
+        function testGlassmorphism() {
+            const testElement = document.createElement('div');
+            testElement.className = 'glass';
+            testElement.style.cssText = 'width: 200px; height: 100px; margin: 20px;';
+            testElement.textContent = 'Glassmorphism Test';
+            document.body.appendChild(testElement);
+            
+            setTimeout(() => {
+                testElement.remove();
+            }, 3000);
+            
+            logTest('phase7', 'Glassmorphism Demo', true, 'Glass element created and removed');
+        }
+
+        function testGradients() {
+            const testElement = document.createElement('div');
+            testElement.className = 'gradient-bg';
+            testElement.style.cssText = 'width: 200px; height: 100px; margin: 20px; border-radius: 12px;';
+            testElement.textContent = 'Gradient Test';
+            document.body.appendChild(testElement);
+            
+            setTimeout(() => {
+                testElement.remove();
+            }, 3000);
+            
+            logTest('phase7', 'Gradient Demo', true, 'Gradient element created and removed');
+        }
+
+        function testAnimations() {
+            const testElement = document.createElement('div');
+            testElement.className = 'animate-bounce-in';
+            testElement.style.cssText = 'width: 200px; height: 100px; margin: 20px; background: #f97316; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;';
+            testElement.textContent = 'Animation Test';
+            document.body.appendChild(testElement);
+            
+            setTimeout(() => {
+                testElement.remove();
+            }, 3000);
+            
+            logTest('phase7', 'Animation Demo', true, 'Animated element created and removed');
+        }
+
+        function testStoryProgression() {
+            const storyProgress = document.querySelector('.story-progress-fill');
+            if (storyProgress) {
+                const currentWidth = parseFloat(storyProgress.style.width) || 0;
+                const newWidth = Math.min(100, currentWidth + 20);
+                storyProgress.style.width = `${newWidth}%`;
+                logTest('phase7', 'Story Progression Demo', true, `Progress: ${newWidth}%`);
+            } else {
+                logTest('phase7', 'Story Progression Demo', false, 'Story progress not found');
+            }
+        }
+
+        // Main Test Runners
+        function runPhase6Tests() {
+            document.getElementById('status').className = 'status running';
+            document.getElementById('status').textContent = '🧪 Running Phase 6 performance tests...';
+            setTimeout(testPhase6Performance, 100);
+        }
+
+        function runPhase7Tests() {
+            document.getElementById('status').className = 'status running';
+            document.getElementById('status').textContent = '🎨 Running Phase 7 aesthetic tests...';
+            setTimeout(testPhase7Aesthetics, 100);
+        }
+
+        function runAllTests() {
+            document.getElementById('status').className = 'status running';
+            document.getElementById('status').textContent = '🚀 Running all tests...';
+            
+            // Reset test results
+            testResults.phase6 = { passed: 0, failed: 0, total: 0, details: [] };
+            testResults.phase7 = { passed: 0, failed: 0, total: 0, details: [] };
+            testResults.overall = { passed: 0, failed: 0, total: 0 };
+            
+            setTimeout(() => {
+                testPhase6Performance();
+                setTimeout(testPhase7Aesthetics, 1000);
+            }, 100);
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            document.getElementById('status').className = 'status success';
+            document.getElementById('status').textContent = '✅ Ready to run tests!';
+        });
+    </script>
+</body>
+</html> 
