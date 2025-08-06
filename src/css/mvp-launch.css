@@ -1,0 +1,202 @@
+/* CSS for MVP Launch Page */
+
+/* Import base styles */
+@import './index.css';
+
+/* MVP Launch specific styles */
+.mvp-launch {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.mvp-launch h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.mvp-launch .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-muted-color);
+    margin-bottom: 3rem;
+}
+
+.countdown-container {
+    background: var(--card-bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 2rem 0;
+    backdrop-filter: blur(12px);
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.countdown-number {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.countdown-label {
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.5rem;
+}
+
+.launched {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--success-color);
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.feature-card {
+    background: var(--card-bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 1rem;
+    padding: 2rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--text-muted-color);
+    line-height: 1.6;
+}
+
+.cta-section {
+    margin: 4rem 0;
+    padding: 3rem;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
+    border-radius: 1rem;
+    color: white;
+}
+
+.cta-section h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+    background: white;
+    color: var(--accent-color);
+    font-weight: 700;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.cta-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cta-buttons .btn-outline {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.cta-buttons .btn-outline:hover {
+    background: white;
+    color: var(--accent-color);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .mvp-launch {
+        padding: 1rem;
+    }
+    
+    .mvp-launch h1 {
+        font-size: 2rem;
+    }
+    
+    .countdown {
+        gap: 1rem;
+    }
+    
+    .countdown-item {
+        min-width: 60px;
+    }
+    
+    .countdown-number {
+        font-size: 1.8rem;
+    }
+    
+    .countdown-label {
+        font-size: 0.8rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-section {
+        padding: 2rem 1rem;
+    }
+    
+    .cta-section h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
