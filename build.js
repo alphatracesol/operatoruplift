@@ -1,102 +1,55 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
-console.log('🚀 Starting Operator Uplift build process...');
+console.log('🔨 Building Operator Uplift...');
 
-// Step 1: Skip webpack build for now (static HTML app)
-console.log('📦 Skipping webpack build - using static files only...');
-console.log('✅ Static build mode enabled');
+// Check if we're in a build scenario or static scenario
+const isStaticBuild = process.env.NETLIFY_BUILD_TYPE === 'static' || !process.env.NETLIFY_BUILD_TYPE;
 
-// Step 2: Create build directory
-console.log('📁 Creating build directory...');
-const buildDir = path.join(__dirname, 'build');
-if (!fs.existsSync(buildDir)) {
-  fs.mkdirSync(buildDir, { recursive: true });
-}
-
-// Step 3: Copy static files
-console.log('📋 Copying static files...');
-const filesToCopy = [
-  'app.html',
-  'index.html',
-  'MVP Launch Page.html',
-  'press-release.html',
-  '404.html',
-  '500.html',
-  'manifest.json',
-  'sw.js',
-  'favicon.ico',
-  'apple-touch-icon.png',
-  '_redirects',
-  'netlify.toml'
-];
-
-const dirsToCopy = [
-  'assets',
-  'css',
-  'js',
-  'pages',
-  'src',
-  'tests',
-  'utils',
-  'config'
-];
-
-// Copy individual files
-filesToCopy.forEach(file => {
-  const sourcePath = path.join(__dirname, file);
-  const destPath = path.join(buildDir, file);
-  
-  if (fs.existsSync(sourcePath)) {
-    fs.copyFileSync(sourcePath, destPath);
-    console.log(`✅ Copied ${file}`);
-  } else {
-    console.log(`⚠️  File not found: ${file}`);
-  }
-});
-
-// Copy directories
-dirsToCopy.forEach(dir => {
-  const sourcePath = path.join(__dirname, dir);
-  const destPath = path.join(buildDir, dir);
-  
-  if (fs.existsSync(sourcePath)) {
-    copyDirectorySync(sourcePath, destPath);
-    console.log(`✅ Copied directory: ${dir}`);
-  } else {
-    console.log(`⚠️  Directory not found: ${dir}`);
-  }
-});
-
-// Step 4: Install function dependencies
-console.log('🔧 Installing function dependencies...');
-try {
-  execSync('cd netlify/functions && npm install', { stdio: 'inherit' });
-  console.log('✅ Function dependencies installed');
-} catch (error) {
-  console.error('❌ Function dependency installation failed:', error.message);
-  process.exit(1);
-}
-
-console.log('🎉 Build completed successfully!');
-
-// Helper function to copy directories recursively
-function copyDirectorySync(source, destination) {
-  if (!fs.existsSync(destination)) {
-    fs.mkdirSync(destination, { recursive: true });
-  }
-  
-  const files = fs.readdirSync(source);
-  
-  files.forEach(file => {
-    const sourcePath = path.join(source, file);
-    const destPath = path.join(destination, file);
+if (isStaticBuild) {
+    console.log('📁 Static HTML deployment detected');
+    console.log('✅ No build required - serving from root directory');
     
-    if (fs.statSync(sourcePath).isDirectory()) {
-      copyDirectorySync(sourcePath, destPath);
-    } else {
-      fs.copyFileSync(sourcePath, destPath);
+    // Ensure essential files exist
+    const essentialFiles = ['app.html', 'sw.js', 'firebase-config.js'];
+    const missingFiles = essentialFiles.filter(file => !fs.existsSync(file));
+    
+    if (missingFiles.length > 0) {
+        console.error('❌ Missing essential files:', missingFiles);
+        process.exit(1);
     }
-  });
-} 
+    
+    console.log('✅ All essential files present');
+    console.log('🚀 Ready for static deployment');
+} else {
+    console.log('🔨 Build-based deployment detected');
+    
+    // Create build directory if it doesn't exist
+    const buildDir = 'build';
+    if (!fs.existsSync(buildDir)) {
+        fs.mkdirSync(buildDir, { recursive: true });
+    }
+    
+    // Copy essential files to build directory
+    const filesToCopy = [
+        'app.html',
+        'sw.js', 
+        'firebase-config.js',
+        'manifest.json',
+        'favicon.ico',
+        '_redirects'
+    ];
+    
+    filesToCopy.forEach(file => {
+        if (fs.existsSync(file)) {
+            fs.copyFileSync(file, path.join(buildDir, file));
+            console.log(`📋 Copied ${file} to build directory`);
+        }
+    });
+    
+    console.log('✅ Build completed successfully');
+}
+
+console.log('🎉 Build process finished'); 
