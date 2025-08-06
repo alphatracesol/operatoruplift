@@ -1,21 +1,21 @@
 [build]
-  # Primary configuration for static HTML deployment
+  # Static HTML deployment - no build required
   publish = "."
-  command = "npm run build:static"
+  command = "echo 'Static deployment - no build required'"
   functions = "netlify/functions"
 
-# Environment-specific configurations
+# Force all environments to use static deployment
 [context.production]
   publish = "."
-  command = "npm run build:static"
+  command = "echo 'Production static deployment'"
 
 [context.deploy-preview]
   publish = "."
-  command = "npm run build:static"
+  command = "echo 'Preview static deployment'"
 
 [context.branch-deploy]
   publish = "."
-  command = "npm run build:static"
+  command = "echo 'Branch static deployment'"
 
 [build.environment]
   NODE_VERSION = "20"
