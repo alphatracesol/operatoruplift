@@ -12,7 +12,8 @@ const STATIC_FILES = [
     'sw.js',
     'netlify.toml',
     '_redirects',
-    '_headers'
+    '_headers',
+    'MVP Launch Page.html'
 ];
 
 const BUILD_FILES = [
