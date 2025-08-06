@@ -7,7 +7,7 @@
     <meta name="description" content="Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity">
     
     <!-- Enhanced Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob: https://images.pexels.com https://placehold.co; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net https://capig.madgicx.ai https://www.googletagmanager.com https://connect.facebook.net https://api-inference.huggingface.co; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob: https://images.pexels.com https://placehold.co; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net https://capig.madgicx.ai https://api-inference.huggingface.co; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
 
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -12742,14 +12742,6 @@
                 
                 trackEmptyStateAction(type, actionType) {
                     // Track user interaction with empty states
-                    if (window.gtag) {
-                        gtag('event', 'empty_state_action', {
-                            'event_category': 'engagement',
-                            'event_label': `${type}_${actionType}`,
-                            'value': 1
-                        });
-                    }
-                    
                     console.log(`📊 Empty state action tracked: ${type} - ${actionType}`);
                 },
                 
@@ -12900,14 +12892,6 @@
                 
                 trackDataExport(format, size) {
                     // Track export for analytics
-                    if (window.gtag) {
-                        gtag('event', 'data_export', {
-                            'event_category': 'data_management',
-                            'event_label': format,
-                            'value': size
-                        });
-                    }
-                    
                     console.log(`📊 Data export tracked: ${format} - ${size} bytes`);
                 },
                 
