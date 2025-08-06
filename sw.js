@@ -103,13 +103,13 @@ async function cacheFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
         console.log('🚫 POST request detected in cacheFirst, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
         console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     const cache = await caches.open(STATIC_CACHE);
@@ -121,7 +121,7 @@ async function cacheFirst(request) {
     }
     
     try {
-        const networkResponse = await fetch(request);
+        const networkResponse = await fetch(request, { redirect: 'follow' });
         // Triple-check method before caching
         if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
             cache.put(request, networkResponse.clone());
@@ -137,19 +137,19 @@ async function networkFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
         console.log('🚫 POST request detected in networkFirst, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
         console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     const cache = await caches.open(API_CACHE);
     
     try {
-        const networkResponse = await fetch(request);
+        const networkResponse = await fetch(request, { redirect: 'follow' });
         // Triple-check method before caching
         if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
             cache.put(request, networkResponse.clone());
@@ -172,19 +172,19 @@ async function staleWhileRevalidate(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
         console.log('🚫 POST request detected in staleWhileRevalidate, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
         console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
-        return fetch(request);
+        return fetch(request, { redirect: 'follow' });
     }
     
     const cache = await caches.open(DYNAMIC_CACHE);
     const cachedResponse = await cache.match(request);
     
-    const fetchPromise = fetch(request).then(networkResponse => {
+    const fetchPromise = fetch(request, { redirect: 'follow' }).then(networkResponse => {
         // Triple-check method before caching
         if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
             cache.put(request, networkResponse.clone());
@@ -199,7 +199,7 @@ async function staleWhileRevalidate(request) {
 
 async function networkOnly(request) {
     try {
-        return await fetch(request);
+        return await fetch(request, { redirect: 'follow' });
     } catch (error) {
         console.error('❌ Network failed:', error);
         return new Response('Offline', { status: 503 });
