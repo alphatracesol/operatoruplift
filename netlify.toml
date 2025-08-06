@@ -1,7 +1,6 @@
 [build]
-  publish = "build"
+  publish = "."
   functions = "netlify/functions"
-  command = "npm run build:netlify"
 
 [functions]
   directory = "netlify/functions"
@@ -10,7 +9,7 @@
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/app.html"
   status = 200
 
 # Security headers
