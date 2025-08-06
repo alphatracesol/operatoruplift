@@ -12,7 +12,8 @@ const STATIC_FILES = [
     'sw.js',
     'netlify.toml',
     '_redirects',
-    '_headers'
+    '_headers',
+    'firebase-config.js'
 ];
 
 const BUILD_FILES = [
