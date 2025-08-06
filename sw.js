@@ -234,6 +234,11 @@ function getCacheStrategy(url) {
         return 'network-first';
     }
     
+    // MVP Launch Page - use network-first to avoid caching redirect issues
+    if (url.pathname.includes('MVP Launch Page') || url.pathname.includes('mvp')) {
+        return 'network-first';
+    }
+    
     // HTML pages
     if (url.pathname.endsWith('.html') || url.pathname === '/') {
         return 'stale-while-revalidate';
