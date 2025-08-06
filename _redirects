@@ -1,4 +1,8 @@
 # SPA Routing - Handle all routes
+# Allow direct access to specific pages
+/MVP Launch Page.html    /MVP Launch Page.html   200
+/mvp    /MVP Launch Page.html   200
+/app    /app.html   200
 /*    /app.html   200
 
 # API Routes
