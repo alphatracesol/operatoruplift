@@ -1,10 +1,10 @@
 // Enhanced Service Worker for Operator Uplift
-// Version: 2.1 - Fixed POST Request Caching
+// Version: 2.2 - Fixed Redirect Mode for MVP Launch Page
 
-const CACHE_NAME = 'operator-uplift-v2.1';
-const STATIC_CACHE = 'static-v2.1';
-const DYNAMIC_CACHE = 'dynamic-v2.1';
-const API_CACHE = 'api-v2.1';
+const CACHE_NAME = 'operator-uplift-v2.2';
+const STATIC_CACHE = 'static-v2.2';
+const DYNAMIC_CACHE = 'dynamic-v2.2';
+const API_CACHE = 'api-v2.2';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
