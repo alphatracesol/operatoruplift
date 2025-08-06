@@ -10,7 +10,7 @@
     "test:auth": "jest --testNamePattern='Authentication'",
     "test:dashboard": "jest --testNamePattern='Dashboard'",
     "test:ai": "jest --testNamePattern='AI'",
-    "build:netlify": "echo 'No build step required for static site'",
+    "build:netlify": "echo 'Static site ready for deployment'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "validate": "npm run lint && npm run test"

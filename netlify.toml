@@ -1,6 +1,7 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # No build command needed for static HTML deployment
 
 [functions]
   directory = "netlify/functions"
