@@ -29,6 +29,7 @@ index.html            # Landing page (SEO optimized)
 login.html            # Authentication page
 dashboard.html        # Dashboard page
 press-release.html    # Marketing page
+MVP Launch Page.html  # MVP launch page
 ```
 
 ### 📦 **Asset Directories**

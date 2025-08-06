@@ -1,11 +1,5 @@
-# Home page
-/    /index.html    200
-
-# App routes
-/app    /app.html    200
-
-# MVP Launch Page - direct access
-/mvp    /MVP Launch Page.html    200
+# SPA Routing - Handle all routes
+/*    /app.html   200
 
 # API Routes
 /api/*    /.netlify/functions/:splat    200
@@ -14,5 +8,5 @@
 /manifest.json    /manifest.json    200
 /sw.js    /sw.js    200
 
-# SPA Routing - Handle all other routes (but not specific files)
-/*    /app.html   200
+# Fallback for 404
+/*    /app.html    404

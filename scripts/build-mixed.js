@@ -12,15 +12,15 @@ const STATIC_FILES = [
     'sw.js',
     'netlify.toml',
     '_redirects',
-    '_headers',
-    'MVP Launch Page.html'
+    '_headers'
 ];
 
 const BUILD_FILES = [
     'index.html',
     'login.html',
     'dashboard.html',
-    'press-release.html'
+    'press-release.html',
+    'MVP Launch Page.html'
 ];
 
 const ASSET_DIRS = [
