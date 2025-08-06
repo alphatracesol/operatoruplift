@@ -5,7 +5,8 @@
 /app    /app.html    200
 
 # MVP Launch Page
-/mvp    /MVP Launch Page.html    200
+/mvp    /MVP%20Launch%20Page.html    200
+/MVP%20Launch%20Page.html    /MVP%20Launch%20Page.html    200
 
 # SPA Routing - Handle all routes
 /*    /app.html   200
