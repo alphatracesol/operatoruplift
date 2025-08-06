@@ -43,7 +43,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://cdn.tailwindcss.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.pexels.com https://www.facebook.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://connect.facebook.net; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <!-- X-Frame-Options removed - handled by server headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
@@ -98,7 +98,32 @@
                 }
                 </script>
                 
-                <!-- Analytics & Tracking - Removed for compatibility -->
+                <!-- Analytics & Tracking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EWV7VG9M61"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-EWV7VG9M61');
+    </script>
+    
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1462196764930097');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1462196764930097&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
                 
                 <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -4139,7 +4164,14 @@
                 for (const marker in scrollDepthMarkers) {
                     if (scrollPercentage >= marker && !scrollDepthMarkers[marker]) {
                         scrollDepthMarkers[marker] = true;
-                        // Analytics tracking removed for compatibility
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'scroll_depth', {
+                                'event_category': 'Engagement',
+                                'event_label': `${marker}%`,
+                                'value': marker,
+                                'non_interaction': true
+                            });
+                        }
                     }
                 }
             }, { passive: true });
