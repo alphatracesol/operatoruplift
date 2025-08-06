@@ -58,7 +58,7 @@ if (fs.existsSync('assets')) {
 }
 
 // Copy any other directories that might be needed
-const directories = ['css', 'js', 'images', 'fonts'];
+const directories = ['css', 'js', 'images', 'fonts', 'src'];
 directories.forEach(dir => {
     if (fs.existsSync(dir)) {
         console.log(`📋 Copying ${dir} directory...`);
