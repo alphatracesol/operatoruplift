@@ -12,6 +12,7 @@
     "test:ai": "jest --testNamePattern='AI'",
     "build:netlify": "echo 'Static site ready for deployment'",
     "build:mixed": "node scripts/build-mixed.js",
+    "build": "npm run build:mixed",
     "build:landing": "echo 'Building landing pages...' && npm run optimize:html && npm run optimize:css",
     "build:static": "echo 'Static app.html ready for deployment'",
     "optimize:html": "echo 'Optimizing HTML files...'",

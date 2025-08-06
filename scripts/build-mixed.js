@@ -86,34 +86,44 @@ function copyDirIfExists(source, dest) {
 
 // Main build process
 async function buildMixed() {
+    console.log('\n📁 Creating build directory...');
+    
+    // Create build directory if it doesn't exist
+    const buildDir = 'build';
+    if (!fs.existsSync(buildDir)) {
+        fs.mkdirSync(buildDir, { recursive: true });
+        console.log(`✅ Created build directory: ${buildDir}`);
+    }
+    
     console.log('\n📁 Processing static files...');
     
-    // Copy static files (no processing needed)
+    // Copy static files to build directory
     STATIC_FILES.forEach(file => {
-        copyIfExists(file, file);
+        copyIfExists(file, path.join(buildDir, file));
     });
     
     console.log('\n🏗️  Processing build files...');
     
-    // Copy build files (these would normally be processed, but for now just copy)
+    // Copy build files to build directory
     BUILD_FILES.forEach(file => {
-        copyIfExists(file, file);
+        copyIfExists(file, path.join(buildDir, file));
     });
     
     console.log('\n📦 Processing asset directories...');
     
-    // Copy asset directories
+    // Copy asset directories to build directory
     ASSET_DIRS.forEach(dir => {
-        copyDirIfExists(dir, dir);
+        copyDirIfExists(dir, path.join(buildDir, dir));
     });
     
-    // Copy other important directories
-    copyDirIfExists('netlify', 'netlify');
-    copyDirIfExists('tests', 'tests');
-    copyDirIfExists('docs', 'docs');
+    // Copy other important directories to build directory
+    copyDirIfExists('netlify', path.join(buildDir, 'netlify'));
+    copyDirIfExists('tests', path.join(buildDir, 'tests'));
+    copyDirIfExists('docs', path.join(buildDir, 'docs'));
     
     console.log('\n✅ Mixed deployment build completed!');
     console.log('\n📋 Summary:');
+    console.log(`   - Build directory: ${buildDir}`);
     console.log(`   - Static files: ${STATIC_FILES.length} files`);
     console.log(`   - Build files: ${BUILD_FILES.length} files`);
     console.log(`   - Asset directories: ${ASSET_DIRS.length} directories`);

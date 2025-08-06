@@ -74,7 +74,7 @@ npm run optimize:css     # Optimize CSS files
 
 ```toml
 [build]
-  publish = "."                    # Publish from root directory
+  publish = "build"                # Publish from build directory
   functions = "netlify/functions"  # Netlify functions directory
   command = "npm run build:mixed"  # Mixed build command
 
@@ -116,11 +116,13 @@ npm run optimize:css     # Optimize CSS files
 
 ### **2. Build Script Execution**
 ```
-1. Process static files (app.html, manifest.json, etc.)
-2. Process build files (index.html, login.html, etc.)
-3. Copy asset directories (assets/, css/, js/, etc.)
-4. Validate deployment readiness
-5. Output build summary
+1. Create build directory
+2. Process static files (app.html, manifest.json, etc.)
+3. Process build files (index.html, login.html, etc.)
+4. Copy asset directories (assets/, css/, js/, etc.)
+5. Copy supporting directories (netlify/, tests/, docs/, etc.)
+6. Validate deployment readiness
+7. Output build summary
 ```
 
 ## 🎯 **Benefits of Mixed Deployment**
