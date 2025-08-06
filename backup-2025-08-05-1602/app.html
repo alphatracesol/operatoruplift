@@ -7,7 +7,7 @@
     <meta name="description" content="Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity">
     
     <!-- Enhanced Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-*.cloudfunctions.net; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -36,71 +36,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- CDN Scripts with Lazy Loading -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
     
     <!-- Firebase CDNs -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
-    
-    <!-- Firebase Configuration -->
-    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
     
     <style>
         /* ===== MODERN UI CHUNK 1: GLASS MORPHISM & ADVANCED CSS VARIABLES ===== */
         
-        /* CSS Custom Properties for Advanced Theming - ORANGE/BLACK THEME */
+        /* CSS Custom Properties for Advanced Theming */
         :root {
-            /* Primary Orange/Black Color Palette */
-            --primary-color: #0a0a0a;
-            --primary-dark: #000000;
-            --secondary-color: #1a1a1a;
-            --secondary-dark: #0f0f0f;
+            /* Color Palette */
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --error-color: #f87171;
+            --info-color: #60a5fa;
             
-            /* Accent colors will be defined in theme classes */
-            --accent-color: #f97316;
-            --accent-light: #fb923c;
-            --accent-dark: #ea580c;
-            --accent-glow: rgba(249, 115, 22, 0.6);
-            --accent-glow-strong: rgba(249, 115, 22, 0.8);
-            
-            /* Status Colors */
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #f97316;
-            
-                    /* Glass Morphism Colors - Theme Aware */
-        --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
+            /* Glass Morphism Colors */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --glass-blur: blur(10px);
             
-            /* Dark Theme Colors - Pure Black/Orange */
-            --dark-bg: #000000;
-            --dark-surface: #0a0a0a;
-            --dark-card: #1a1a1a;
+            /* Dark Theme Colors - Darker Grey Palette */
+            --dark-bg: #0a0a0a;
+            --dark-surface: #1a1a1a;
+            --dark-card: #2a2a2a;
             --dark-text: #ffffff;
-            --dark-text-secondary: #a3a3a3;
+            --dark-text-secondary: #b0b0b0;
             
-            /* Light Theme Colors - White/Orange */
-            --light-bg: #ffffff;
-            --light-surface: #f8fafc;
+            /* Light Theme Colors */
+            --light-bg: #f8fafc;
+            --light-surface: #ffffff;
             --light-card: #f1f5f9;
-            --light-text: #000000;
-            --light-text-secondary: #374151;
-            
-            /* Custom Theme Support */
-            --custom-accent: #f97316;
-            --custom-bg: #000000;
-            --custom-surface: #0a0a0a;
-            --custom-text: #ffffff;
+            --light-text: #1e293b;
+            --light-text-secondary: #64748b;
             
             /* Transitions */
             --transition-fast: 0.2s ease;
@@ -128,23 +107,19 @@
             --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
             
-            /* Z-Index Scale - FIXED PRIORITY LAYERING */
-            --z-background: 0;
-            --z-base: 1;
-            --z-content: 10;
-            --z-header: 100;
-            --z-sidebar: 200;
-            --z-modal-backdrop: 1000;
-            --z-modal: 1100;
-            --z-tooltip: 1200;
-            --z-notification: 1300;
-            --z-loading: 1400;
-            --z-auth-overlay: 20000;
+            /* Z-Index Scale */
+            --z-dropdown: 1000;
+            --z-sticky: 1020;
+            --z-fixed: 1030;
+            --z-modal-backdrop: 1040;
+            --z-modal: 1050;
+            --z-popover: 1060;
+            --z-tooltip: 1070;
             
-            /* Legacy Support - Removed to prevent conflicts */
-            /* --accent: #f97316; */
-            /* --accent-hover: #ea580c; */
-            /* --accent-light: #fed7aa; */
+            /* Legacy Support */
+            --accent: #f97316;
+            --accent-hover: #ea580c;
+            --accent-light: #fed7aa;
         }
         
         /* Theme Classes */
@@ -159,21 +134,6 @@
             --card-glass: rgba(42, 42, 42, 0.8);
             --shadow: var(--shadow-md);
             --shadow-lg: var(--shadow-xl);
-                    --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            
-            /* Dark theme accent colors */
-            --accent-color: #f97316;
-            --accent-light: #fb923c;
-            --accent-dark: #ea580c;
-            --accent-glow: rgba(249, 115, 22, 0.6);
-            --accent-glow-strong: rgba(249, 115, 22, 0.8);
-            --accent-hover: #ea580c;
-            
-            /* Auth card variables for dark theme */
-            --auth-card-bg: rgba(0, 0, 0, 0.3);
-            --auth-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
         
         [data-theme="light"] {
@@ -187,21 +147,6 @@
             --card-glass: rgba(241, 245, 249, 0.8);
             --shadow: var(--shadow-sm);
             --shadow-lg: var(--shadow-lg);
-                    --glass-bg: rgba(0, 0, 0, 0.05);
-        --glass-border: rgba(0, 0, 0, 0.1);
-        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            
-            /* Light theme accent colors */
-            --accent-color: #ea580c;
-            --accent-light: #f97316;
-            --accent-dark: #dc2626;
-            --accent-glow: rgba(234, 88, 12, 0.4);
-            --accent-glow-strong: rgba(234, 88, 12, 0.6);
-            --accent-hover: #dc2626;
-            
-            /* Auth card variables for light theme */
-            --auth-card-bg: rgba(255, 255, 255, 0.12);
-            --auth-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
         /* Global Styles */
@@ -222,7 +167,6 @@
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
-            min-height: 100vh;
         }
         
         /* Background Effects */
@@ -232,7 +176,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: var(--z-background);
+            z-index: 1;
             pointer-events: none;
         }
         
@@ -242,7 +186,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: var(--z-background);
+            z-index: 0;
             opacity: 0.1;
             pointer-events: none;
         }
@@ -250,10 +194,8 @@
         /* App Wrapper */
         .app-wrapper {
             position: relative;
-            z-index: var(--z-base);
+            z-index: 10;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
         
         /* Container */
@@ -477,92 +419,75 @@
         
         /* ===== BUTTON GRADIENTS ===== */
         .btn-primary {
-            background: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
             border: none;
             color: white;
             position: relative;
             overflow: hidden;
-            transition: all var(--transition-normal);
         }
         
         .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .btn-primary:hover::before {
-            left: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         }
         
         .btn-primary:hover {
-            background: var(--accent-hover);
+            background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 6px 12px var(--accent-glow);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
         }
         
         .btn-secondary {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            transition: all var(--transition-normal);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
         }
         
         .btn-secondary:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--accent-color);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(31, 41, 55, 0.3);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
         
         .btn-success {
-            background: var(--success-color);
+            background: linear-gradient(135deg, var(--success-color) 0%, #22c55e 100%);
             border: none;
             color: white;
-            transition: all var(--transition-normal);
         }
         
         .btn-success:hover {
-            background: #22c55e;
+            background: linear-gradient(135deg, #22c55e 0%, var(--success-color) 100%);
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
         }
         
         .btn-warning {
-            background: var(--warning-color);
+            background: linear-gradient(135deg, var(--warning-color) 0%, #f59e0b 100%);
             border: none;
             color: white;
-            transition: all var(--transition-normal);
         }
         
         .btn-warning:hover {
-            background: #f59e0b;
+            background: linear-gradient(135deg, #f59e0b 0%, var(--warning-color) 100%);
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
         }
         
         .btn-error {
-            background: var(--error-color);
+            background: linear-gradient(135deg, var(--error-color) 0%, #dc2626 100%);
             border: none;
             color: white;
-            transition: all var(--transition-normal);
         }
         
         .btn-error:hover {
-            background: #dc2626;
+            background: linear-gradient(135deg, #dc2626 0%, var(--error-color) 100%);
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 10px 25px rgba(248, 113, 113, 0.3);
         }
         
         .btn-ghost {
             background: transparent;
-            border: 1px solid var(--glass-border);
-            color: var(--dark-text);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
         }
         
         .btn-ghost:hover {
@@ -581,7 +506,7 @@
             background: var(--accent-color);
             color: white;
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 15px var(--accent-glow);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
         }
         
         /* Button Sizes */
@@ -746,107 +671,14 @@
             letter-spacing: 0.5px;
         }
         
-        /* ===== OPERATOR LOGO ===== */
-        .operator-logo-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            perspective: 1000px;
-            width: 60px;
-            height: 60px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .welcome-title {
-            color: var(--text-primary);
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 20px var(--accent-color);
-            filter: drop-shadow(0 0 10px var(--accent-glow));
-        }
-        
-        .mini-cube {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: translateZ(-30px) rotateX(0deg) rotateY(0deg);
-            will-change: transform;
-            cursor: grab;
-        }
-        
-        .mini-cube:active {
-            cursor: grabbing;
-        }
-        
-        .mini-cube-face {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(249, 115, 22, 0.1);
-            border: 2px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            box-sizing: border-box;
-            box-shadow: 0 0 6px rgba(249, 115, 22, 0.1);
-            transform-origin: center center;
-            will-change: transform;
-        }
-        
-        .mini-cube-face:hover {
-            background: rgba(249, 115, 22, 0.15);
-            border-color: rgba(249, 115, 22, 0.8);
-            box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
-        }
-        
-        .mini-cube-face-front { transform: rotateY(0deg) translateZ(30px); }
-        .mini-cube-face-back { transform: rotateY(180deg) translateZ(30px); }
-        .mini-cube-face-right { transform: rotateY(90deg) translateZ(30px); }
-        .mini-cube-face-left { transform: rotateY(-90deg) translateZ(30px); }
-        .mini-cube-face-top { transform: rotateX(90deg) translateZ(30px); }
-        .mini-cube-face-bottom { transform: rotateX(-90deg) translateZ(30px); }
-        
-        .mini-cube-logo {
-            width: 40px;
-            height: 40px;
-            filter: drop-shadow(0 0 10px var(--accent-color));
-            transition: all 0.3s ease;
-        }
-        
-        .mini-cube-face:hover .mini-cube-logo {
-            filter: drop-shadow(0 0 15px var(--accent-color));
-            transform: scale(1.1);
-        }
-        
-        @keyframes miniCubeRotate {
-            0% { transform: rotateX(0deg) rotateY(0deg); }
-            25% { transform: rotateX(90deg) rotateY(0deg); }
-            50% { transform: rotateX(90deg) rotateY(90deg); }
-            75% { transform: rotateX(0deg) rotateY(90deg); }
-            100% { transform: rotateX(0deg) rotateY(0deg); }
-        }
-        
-        /* Mini Cube Interactive Animation */
-        .mini-cube-auto-rotate {
-            animation: miniCubeRotate 8s linear infinite;
-        }
-        
         /* ===== GLASS MORPHISM COMPONENTS ===== */
         .glass-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--accent-color);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius-xl);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 8px 32px var(--glass-shadow);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: var(--glass-shadow);
             transition: all var(--transition-normal);
             position: relative;
             overflow: hidden;
@@ -859,11 +691,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--accent-color) 0%, transparent 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
             opacity: 0;
             transition: opacity var(--transition-normal);
             pointer-events: none;
-            z-index: 1;
         }
         
         .glass-card:hover::before {
@@ -871,18 +702,17 @@
         }
         
         .glass-card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 16px 48px var(--accent-glow);
-            border-color: var(--accent-color);
-            background: var(--bg-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         
         .glass-button {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-lg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             color: var(--text-primary);
             padding: var(--spacing-md) var(--spacing-lg);
             font-weight: 500;
@@ -899,7 +729,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left var(--transition-slow);
         }
         
@@ -908,20 +738,17 @@
         }
         
         .glass-button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 32px var(--accent-glow);
-            border-color: var(--accent-color);
-            background: var(--glass-bg);
-            outline: 2px solid var(--accent-glow);
-            outline-offset: 2px;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
         }
         
         .glass-input {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-md);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             color: var(--text-primary);
             padding: var(--spacing-md);
             transition: all var(--transition-normal);
@@ -930,17 +757,16 @@
         .glass-input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-            background: var(--glass-bg);
+            box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
         }
         
         .glass-modal {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-2xl);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 16px 48px var(--glass-shadow);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: var(--glass-shadow);
             padding: var(--spacing-xl);
             max-width: 500px;
             width: 90%;
@@ -1107,7 +933,7 @@
         .form-input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
             transform: translateY(-1px);
         }
         
@@ -1141,7 +967,7 @@
         
         .input-accent:focus {
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         }
         
         /* ===== MODERN NAVIGATION ===== */
@@ -1274,7 +1100,7 @@
         }
         
         .alert-info {
-            background: linear-gradient(135deg, var(--info-color) 0%, #fb923c 100%);
+            background: linear-gradient(135deg, var(--info-color) 0%, #3b82f6 100%);
             color: white;
             border-color: var(--info-color);
         }
@@ -1600,12 +1426,12 @@
             animation: shimmer 2s infinite;
         }
         
-        .stat-fill.health { background: var(--accent-color); }
-        .stat-fill.energy { background: var(--accent-color); }
-        .stat-fill.motivation { background: var(--accent-color); }
-        .stat-fill.focus { background: var(--accent-color); }
-        .stat-fill.creativity { background: var(--accent-color); }
-        .stat-fill.social { background: var(--accent-color); }
+        .stat-fill.health { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+        .stat-fill.energy { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+        .stat-fill.motivation { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+        .stat-fill.focus { background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); }
+        .stat-fill.creativity { background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%); }
+        .stat-fill.social { background: linear-gradient(90deg, #ec4899 0%, #db2777 100%); }
         
         .stat-label {
             font-size: 0.75rem;
@@ -1925,23 +1751,23 @@
         }
         
         .share-button.twitter {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
         }
         
         .share-button.facebook {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #4267b2 0%, #365899 100%);
         }
         
         .share-button.linkedin {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #0077b5 0%, #005885 100%);
         }
         
         .share-button.whatsapp {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
         }
         
         .share-button.telegram {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
         }
         
         .share-button.email {
@@ -1987,110 +1813,7 @@
             font-style: italic;
         }
         
-        /* ===== LUCKY WHEEL SYSTEM - ENHANCED 100x ===== */
-        .lucky-wheel-modal {
-            max-width: 900px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .wheel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-lg);
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--accent-color);
-        }
-        
-        .wheel-stats {
-            display: flex;
-            gap: var(--spacing-md);
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-        
-        .stat-icon {
-            font-size: 1.5rem;
-        }
-        
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .wheel-config {
-            margin-bottom: var(--spacing-lg);
-        }
-        
-        .config-tabs {
-            display: flex;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-md);
-        }
-        
-        .config-tab {
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition-normal);
-        }
-        
-        .config-tab.active {
-            background: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-        
-        .config-tab:hover {
-            background: var(--accent-hover);
-            color: white;
-        }
-        
-        .wheel-info {
-            display: flex;
-            justify-content: space-around;
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border-radius: var(--radius-lg);
-        }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-        
-        .info-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-        
-        .info-value {
-            font-weight: 600;
-            color: var(--accent-color);
-        }
-        
+        /* ===== LUCKY WHEEL SYSTEM ===== */
         .lucky-wheel-container {
             display: flex;
             flex-direction: column;
@@ -2145,14 +1868,14 @@
             filter: brightness(1.1);
         }
         
-        .wheel-segment:nth-child(1) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(0deg); }
-        .wheel-segment:nth-child(2) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(45deg); }
-        .wheel-segment:nth-child(3) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(90deg); }
-        .wheel-segment:nth-child(4) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(135deg); }
-        .wheel-segment:nth-child(5) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(180deg); }
-        .wheel-segment:nth-child(6) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(225deg); }
-        .wheel-segment:nth-child(7) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(270deg); }
-        .wheel-segment:nth-child(8) { background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%); transform: rotate(315deg); }
+        .wheel-segment:nth-child(1) { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); transform: rotate(0deg); }
+        .wheel-segment:nth-child(2) { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); transform: rotate(45deg); }
+        .wheel-segment:nth-child(3) { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transform: rotate(90deg); }
+        .wheel-segment:nth-child(4) { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transform: rotate(135deg); }
+        .wheel-segment:nth-child(5) { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); transform: rotate(180deg); }
+        .wheel-segment:nth-child(6) { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); transform: rotate(225deg); }
+        .wheel-segment:nth-child(7) { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); transform: rotate(270deg); }
+        .wheel-segment:nth-child(8) { background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%); transform: rotate(315deg); }
         
         .wheel-pointer {
             position: absolute;
@@ -2241,43 +1964,22 @@
             color: var(--accent-color);
         }
         
-        .spin-controls {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-            width: 100%;
-            max-width: 400px;
-        }
-        
         .wheel-spin-button {
-            background: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
             border: none;
             color: white;
-            padding: var(--spacing-lg) var(--spacing-xl);
+            padding: var(--spacing-md) var(--spacing-xl);
             border-radius: var(--radius-lg);
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all var(--transition-normal);
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-xs);
-        }
-        
-        .spin-text {
-            font-size: 1.2rem;
-        }
-        
-        .spin-cost {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            margin-top: var(--spacing-lg);
         }
         
         .wheel-spin-button:hover {
-            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
         }
         
         .wheel-spin-button:disabled {
@@ -2286,64 +1988,6 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-        }
-        
-        .spin-options {
-            display: flex;
-            gap: var(--spacing-sm);
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .spin-option {
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 1px solid var(--accent-color);
-            border-radius: var(--radius-md);
-            color: var(--accent-color);
-            cursor: pointer;
-            transition: all var(--transition-normal);
-            font-size: 0.9rem;
-        }
-        
-        .spin-option:hover {
-            background: var(--accent-color);
-            color: white;
-        }
-        
-        .spin-option:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .luck-meter {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 20px;
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-        
-        .luck-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-color), #e67e22);
-            width: 50%;
-            transition: width var(--transition-normal);
-        }
-        
-        .luck-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            font-weight: 600;
         }
         
         /* ===== MOOD TRACKING SYSTEM ===== */
@@ -3080,152 +2724,6 @@
             margin-top: 60px; /* Account for fixed header */
         }
         
-        /* Hide main content when auth is active */
-        .main-content[style*="display: none"] {
-            display: none !important;
-        }
-        
-        /* ===== LOADING SCREEN ===== */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        
-        .loading-screen:not(.active) {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .loading-container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-        }
-        
-        .loading-cube {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: loadingCubeRotate 3s linear infinite;
-        }
-        
-        .loading-cube-face {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: rgba(249, 115, 22, 0.1);
-            border: 2px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-        }
-        
-        .loading-cube-face svg {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 10px var(--accent-color));
-        }
-        
-        .loading-cube-face-front { transform: rotateY(0deg) translateZ(40px); }
-        .loading-cube-face-back { transform: rotateY(180deg) translateZ(40px); }
-        .loading-cube-face-right { transform: rotateY(90deg) translateZ(40px); }
-        .loading-cube-face-left { transform: rotateY(-90deg) translateZ(40px); }
-        .loading-cube-face-top { transform: rotateX(90deg) translateZ(40px); }
-        .loading-cube-face-bottom { transform: rotateX(-90deg) translateZ(40px); }
-        
-        @keyframes loadingCubeRotate {
-            0% { transform: rotateX(0deg) rotateY(0deg); }
-            25% { transform: rotateX(90deg) rotateY(0deg); }
-            50% { transform: rotateX(90deg) rotateY(90deg); }
-            75% { transform: rotateX(0deg) rotateY(90deg); }
-            100% { transform: rotateX(0deg) rotateY(0deg); }
-        }
-        
-        .loading-text h2 {
-            color: var(--text-primary);
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin: 0;
-            text-shadow: 0 0 20px var(--accent-color);
-        }
-        
-        .loading-text p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            margin: 0.5rem 0 1rem 0;
-        }
-        
-        .loading-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .loading-progress {
-            height: 100%;
-            background: var(--accent-color);
-            border-radius: 2px;
-            animation: loadingProgress 3s ease-in-out infinite;
-        }
-        
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-        
-        /* Matrix Rain Effect */
-        .matrix-rain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        /* Auth container above matrix rain */
-        .auth-container {
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Particles Background */
-        .particles-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 0;
-            opacity: 0.4;
-            pointer-events: none;
-        }
-        
-        /* Main content above particles */
-        .main-content {
-            position: relative;
-            z-index: 1;
-        }
-        
         /* Navigation Mobile Optimization */
         .nav-container {
             position: fixed;
@@ -3320,7 +2818,6 @@
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
-            box-shadow: 0 0 15px var(--accent-glow);
         }
         
         /* Card Mobile Optimization */
@@ -3797,8 +3294,8 @@
             top: 0;
             width: 280px;
             height: 100vh;
-            background: var(--dark-surface);
-            border-right: 1px solid var(--glass-border);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
             padding: 1rem;
             overflow-y: auto;
             z-index: 100;
@@ -3872,8 +3369,8 @@
             left: 280px;
             right: 0;
             height: 70px;
-            background: var(--dark-surface);
-            border-bottom: 1px solid var(--glass-border);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
             padding: 0 2rem;
             display: flex;
             align-items: center;
@@ -3901,40 +3398,13 @@
             min-height: calc(100vh - 70px);
         }
         
-        /* Views - FIXED DISPLAY */
+        /* Views */
         .view {
             display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all var(--transition-normal);
         }
         
         .view.active {
             display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Auth view takes full priority - FULL SCREEN OVERLAY */
-        #auth-view {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: var(--z-auth-overlay);
-            background: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #auth-view.active {
-            display: flex;
-        }
-        
-        #auth-view:not(.active) {
-            display: none;
         }
         
         /* Dashboard */
@@ -3946,7 +3416,10 @@
             font-size: 2rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
-            color: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent), #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .welcome-subtitle {
@@ -4077,9 +3550,9 @@
         }
         
         .message-indicator.model {
-            background: var(--accent-glow);
-            border-color: var(--accent-glow-strong);
-            color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #3b82f6;
         }
         
         /* DeepSeek AI Status Indicators */
@@ -4088,11 +3561,11 @@
             align-items: center;
             gap: 8px;
             padding: 8px 12px;
-            background: var(--accent-glow);
-            border: 1px solid var(--accent-glow-strong);
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 8px;
             font-size: 12px;
-            color: var(--accent-color);
+            color: #3b82f6;
         }
         
         .ai-status.connected {
@@ -4567,7 +4040,7 @@
         
         .message-indicator.personality {
             background: rgba(168, 85, 247, 0.1);
-            color: var(--accent-color);
+            color: #a855f7;
         }
         
         /* Modals */
@@ -4688,8 +4161,8 @@
         }
         
         .toast.info {
-            background: var(--accent-color);
-            border-left-color: var(--accent-dark);
+            background: #3b82f6;
+            border-left-color: #2563eb;
         }
         
         .toast.warning {
@@ -4740,7 +4213,7 @@
         }
         
         .essence-amount {
-            color: var(--accent-color);
+            color: #fbbf24;
             font-size: 1.3rem;
         }
         
@@ -4902,7 +4375,7 @@
             position: fixed;
             top: 1rem;
             left: 1rem;
-            z-index: 150;
+            z-index: 200;
             background: var(--accent);
             border: none;
             color: white;
@@ -4919,8 +4392,6 @@
             
             .sidebar {
                 transform: translateX(-100%);
-                width: 280px;
-                max-width: 80vw;
             }
             
             .sidebar.active {
@@ -5010,8 +4481,6 @@
             padding: var(--spacing-xl);
             max-width: 500px;
             width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
             margin: 2rem auto;
             position: relative;
             z-index: var(--z-modal);
@@ -5074,53 +4543,30 @@
             color: var(--accent-color);
         }
         
-                 /* Authentication Container - Simplified */
+                 /* Authentication */
          .auth-container {
-             width: 100%;
-             height: 100%;
              display: flex;
              align-items: center;
              justify-content: center;
+             min-height: calc(100vh - 70px);
              padding: 2rem;
          }
          
          .auth-card {
-             background: var(--auth-card-bg);
-             backdrop-filter: blur(10px);
-             -webkit-backdrop-filter: blur(10px);
-             border: 1px solid var(--accent-color);
+             background: var(--card-glass);
+             border: 1px solid var(--border);
              border-radius: 1rem;
              padding: 2.5rem;
              max-width: 400px;
              width: 100%;
              text-align: center;
-             box-shadow: var(--auth-card-shadow);
-             position: relative;
-             overflow: hidden;
-         }
-         
-         .auth-card::before {
-             content: '';
-             position: absolute;
-             top: 0;
-             left: -100%;
-             width: 100%;
-             height: 100%;
-             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-             transition: left 0.5s;
-             z-index: 1;
-         }
-         
-         .auth-card:hover::before {
-             left: 100%;
+             backdrop-filter: blur(10px);
+             -webkit-backdrop-filter: blur(10px);
          }
          
          .auth-card h2 {
-             margin-bottom: 2rem;
-             color: var(--text-primary);
-             text-align: center;
-             font-size: 2rem;
-             font-weight: 600;
+             margin-bottom: 0.5rem;
+             color: var(--accent);
          }
          
          .auth-card p {
@@ -5130,31 +4576,6 @@
          
          .auth-form {
              text-align: left;
-         }
-         
-         .form-actions {
-             display: flex;
-             flex-direction: column;
-             align-items: center;
-             gap: 1rem;
-             margin-bottom: 1.5rem;
-         }
-         
-         .form-actions button {
-             width: 100%;
-             max-width: 200px;
-         }
-         
-         .forgot-password {
-             color: var(--accent-color);
-             text-decoration: none;
-             font-size: 0.875rem;
-             transition: color var(--transition-normal);
-         }
-         
-         .forgot-password:hover {
-             color: var(--accent-light);
-             text-decoration: underline;
          }
          
          .auth-form h3 {
@@ -5169,7 +4590,7 @@
          }
          
          .auth-switch a {
-             color: var(--accent-color);
+             color: var(--accent);
              text-decoration: none;
          }
          
@@ -5821,7 +5242,7 @@
          }
          
          .level-up-celebration .celebration-content {
-             background: var(--accent-color);
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
              color: white;
              padding: 2rem;
              border-radius: 12px;
@@ -5874,7 +5295,7 @@
              position: fixed;
              top: 20px;
              left: 20px;
-             background: var(--accent-color);
+             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
              color: #333;
              padding: 1rem;
              border-radius: 8px;
@@ -5925,13 +5346,13 @@
              content: '';
              display: block;
              height: 100%;
-             background: var(--accent-color);
+             background: linear-gradient(90deg, var(--accent), #28a745);
              transition: width 0.3s ease;
          }
          
          /* Gamification Header */
          .gamification-header {
-             background: var(--accent-color);
+             background: linear-gradient(135deg, var(--accent) 0%, #667eea 100%);
              color: white;
              padding: 1.5rem;
              border-radius: 12px;
@@ -5968,7 +5389,7 @@
          
          .experience-bar {
              height: 100%;
-             background: var(--accent-color);
+             background: linear-gradient(90deg, #fff, #ffd700);
              transition: width 0.3s ease;
          }
          
@@ -7154,91 +6575,8 @@
             gap: var(--spacing-sm);
         }
 
-        /* Responsive Design - FIXED MOBILE SCALING */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 var(--spacing-md);
-            }
-            
-            .header {
-                padding: 0 var(--spacing-md);
-            }
-            
-            .header-title {
-                font-size: 1.25rem;
-            }
-            
-            .header-actions {
-                gap: var(--spacing-xs);
-            }
-            
-            .header-btn {
-                padding: var(--spacing-xs);
-                font-size: 1rem;
-            }
-            
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                max-width: 80vw;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: var(--spacing-md);
-            }
-            
-            .mobile-nav-toggle {
-                display: block;
-            }
-            
-            .dashboard-actions {
-                flex-direction: column;
-                gap: var(--spacing-sm);
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
-            }
-            
-            .character-stats {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
-            }
-            
-            .goals-list {
-                grid-template-columns: 1fr;
-            }
-            
-            .chat-container {
-                height: calc(100vh - 300px);
-            }
-            
-            .modal {
-                width: 95%;
-                margin: var(--spacing-md);
-                padding: var(--spacing-lg);
-            }
-            
-            .auth-container {
-                padding: var(--spacing-md);
-                /* Ensure full screen on mobile */
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-            }
-            
-            .auth-card {
-                padding: var(--spacing-lg);
-            }
-            
             .analytics-container {
                 padding: var(--spacing-md);
             }
@@ -7271,34 +6609,6 @@
 
             .habits-summary {
                 grid-template-columns: 1fr;
-            }
-            
-            .welcome-title {
-                font-size: 2rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header-actions {
-                gap: var(--spacing-xs);
-            }
-            
-            .header-btn {
-                padding: var(--spacing-xs);
-                font-size: 0.9rem;
-            }
-            
-            .auth-card {
-                padding: var(--spacing-md);
-            }
-            
-            .welcome-title {
-                font-size: 1.75rem;
-            }
-            
-            .modal {
-                width: 98%;
-                padding: var(--spacing-md);
             }
         }
 
@@ -7340,7 +6650,7 @@
                 <button class="header-btn" onclick="app.ui.showModal('settings-modal')">
                     ⚙️
                 </button>
-                <button class="header-btn" id="theme-toggle" onclick="app.toggleTheme()">🌙</button>
+                <button class="header-btn" id="theme-toggle">🌙</button>
                 <button class="header-btn" id="logout-btn" onclick="app.auth.logout()">🚪</button>
             </div>
         </header>
@@ -7353,150 +6663,30 @@
             <span id="auth-status">Checking...</span>
         </div>
         
-        <!-- Authentication View - FULL SCREEN OVERLAY (Outside Main Content) -->
-        <div class="view active" id="auth-view">
-                    <!-- Loading Screen -->
-        <div id="loading-screen" class="loading-screen active">
-            <div class="loading-container">
-                <div class="loading-cube" id="loading-cube">
-                    <div class="loading-cube-face loading-cube-face-front">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="loading-cube-face loading-cube-face-back">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="loading-cube-face loading-cube-face-right">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="loading-cube-face loading-cube-face-left">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="loading-cube-face loading-cube-face-top">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="loading-cube-face loading-cube-face-bottom">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                            <g>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-                <div class="loading-text">
-                    <h2>Operator Uplift</h2>
-                    <p>Initializing...</p>
-                    <div class="loading-bar">
-                        <div class="loading-progress"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Matrix Rain Background -->
-        <canvas id="matrix-rain" class="matrix-rain"></canvas>
-        
-        <!-- Background Music -->
-        <audio id="background-music" loop preload="auto">
-            <source src="music.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Views will be rendered here -->
+                
+                <!-- Authentication View -->
+                <div class="view" id="auth-view">
                     <div class="auth-container">
                         <div class="auth-card">
-                    <!-- 3D Cube Logo -->
-                    <div class="operator-logo-container">
-                        <div class="mini-cube" id="mini-cube">
-                            <div class="mini-cube-face mini-cube-face-front">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                            <div class="mini-cube-face mini-cube-face-back">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                            <div class="mini-cube-face mini-cube-face-right">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                            <div class="mini-cube-face mini-cube-face-left">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                            <div class="mini-cube-face mini-cube-face-top">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                            <div class="mini-cube-face mini-cube-face-bottom">
-                                <svg class="mini-cube-logo" alt="Cube Face Logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                                    <g>
-                                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                                    </g>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <h2 class="welcome-title">Welcome to Operator Uplift</h2>
+                            <h2>Welcome to Operator Uplift</h2>
+                            <p>Transform your ambitions into epic quests</p>
                             
                             <!-- Login Form -->
                             <form id="login-form" class="auth-form">
+                                <h3>Sign In</h3>
                                 <div class="form-group">
                                     <label class="form-label" for="login-email">Email</label>
-                            <input type="email" class="form-input" id="login-email" placeholder="yourname@email.com" required>
+                                    <input type="email" class="form-input" id="login-email" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="login-password">Password</label>
-                            <input type="password" class="form-input" id="login-password" placeholder="********" required>
+                                    <input type="password" class="form-input" id="login-password" required>
                                 </div>
-                        <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">Sign In</button>
-                            <a href="#" class="forgot-password" onclick="app.auth.showForgotPassword()">Forgot Password?</a>
-                        </div>
                                 <p class="auth-switch">
                                     Don't have an account? 
                                     <a href="#" onclick="app.auth.showRegister()">Sign Up</a>
@@ -7508,15 +6698,15 @@
                                 <h3>Create Account</h3>
                                 <div class="form-group">
                                     <label class="form-label" for="register-name">Full Name</label>
-                            <input type="text" class="form-input" id="register-name" placeholder="Your Full Name" required>
+                                    <input type="text" class="form-input" id="register-name" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="register-email">Email</label>
-                            <input type="email" class="form-input" id="register-email" placeholder="yourname@email.com" required>
+                                    <input type="email" class="form-input" id="register-email" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="register-password">Password</label>
-                            <input type="password" class="form-input" id="register-password" placeholder="********" required>
+                                    <input type="password" class="form-input" id="register-password" required>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Create Account</button>
                                 <p class="auth-switch">
@@ -7527,13 +6717,6 @@
                         </div>
                     </div>
                 </div>
-        
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Particles Background for Dashboard -->
-            <div id="particles-js" class="particles-background"></div>
-            <div class="container">
-                <!-- Views will be rendered here -->
                 
                 <!-- Dashboard View -->
                 <div class="view" id="dashboard-view">
@@ -7754,6 +6937,105 @@
                 </button>
             </div>
         </nav>
+        
+
+             
+             <!-- Dashboard View -->
+             <div class="view" id="dashboard-view">
+                <div class="dashboard-welcome">
+                    <h1 class="welcome-title">Welcome back, Operator!</h1>
+                    <p class="welcome-subtitle">Ready to level up your life?</p>
+                </div>
+                
+                <div class="dashboard-actions">
+                    <button class="btn btn-primary" onclick="app.ui.showView('goals')">
+                        🎯 Set New Goal
+                    </button>
+                    <button class="btn" onclick="app.ui.showView('ai-chat')">
+                        🤖 Chat with AI
+                    </button>
+                    <button class="btn" onclick="app.ui.showView('focus')">
+                        🎯 Start Focus Session
+                    </button>
+                    <button class="btn" onclick="app.ui.showModal('lucky-wheel-modal')">
+                        🎰 Lucky Wheel
+                    </button>
+                    <button class="btn" onclick="app.ui.showModal('mood-tracking-modal')">
+                        😊 Mood Tracker
+                    </button>
+                    <button class="btn" onclick="app.ui.showModal('settings-modal')">
+                        ⚙️ Settings
+                    </button>
+                </div>
+                
+                <!-- Character Stats Section -->
+                <div class="character-stats">
+                    <div class="character-card">
+                        <span class="character-icon">👤</span>
+                        <div class="character-name">Your Character</div>
+                        <div class="character-level">Level <span id="character-level">1</span></div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Health</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill health" id="health-bar" style="width: 100%"></div>
+                            </div>
+                            <div class="stat-value" id="health-value">100/100</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Energy</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill energy" id="energy-bar" style="width: 100%"></div>
+                            </div>
+                            <div class="stat-value" id="energy-value">100/100</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Motivation</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill motivation" id="motivation-bar" style="width: 75%"></div>
+                            </div>
+                            <div class="stat-value" id="motivation-value">75/100</div>
+                        </div>
+                        
+                        <div class="character-progress">
+                            <div class="progress-label">Experience to Next Level</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="exp-progress" style="width: 25%"></div>
+                            </div>
+                            <div class="progress-text" id="exp-text">250 / 1000 XP</div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-card">
+                        <span class="character-icon">🎯</span>
+                        <div class="character-name">Skills</div>
+                        <div class="character-level">Focus & Productivity</div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Focus</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill focus" id="focus-bar" style="width: 60%"></div>
+                            </div>
+                            <div class="stat-value" id="focus-value">60/100</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Creativity</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill creativity" id="creativity-bar" style="width: 45%"></div>
+                            </div>
+                            <div class="stat-value" id="creativity-value">45/100</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Social</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill social" id="social-bar" style="width: 80%"></div>
+                            </div>
+                            <div class="stat-value" id="social-value">80/100</div>
+                        </div>
                         
                         <div class="character-progress">
                             <div class="progress-label">Skill Points</div>
@@ -7884,92 +7166,25 @@
                 </div>
             </div>
             
-            <!-- Lucky Wheel Modal - Enhanced 100x -->
+            <!-- Lucky Wheel Modal -->
             <div class="modal" id="lucky-wheel-modal">
-                <div class="modal-content lucky-wheel-modal">
+                <div class="modal-content">
                     <button class="modal-close" onclick="app.ui.hideModal('lucky-wheel-modal')">&times;</button>
-                    
-                    <!-- Header with Stats -->
-                    <div class="wheel-header">
                     <h2>🎰 Lucky Wheel</h2>
-                        <div class="wheel-stats">
-                            <div class="stat-item">
-                                <span class="stat-icon">🎯</span>
-                                <span class="stat-value" id="total-spins">0</span>
-                                <span class="stat-label">Total Spins</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">💎</span>
-                                <span class="stat-value" id="total-rewards">0</span>
-                                <span class="stat-label">Total Rewards</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">🔥</span>
-                                <span class="stat-value" id="streak-count">0</span>
-                                <span class="stat-label">Streak</span>
-                            </div>
-                        </div>
-                    </div>
+                    <p>Spin the wheel to win amazing rewards!</p>
                     
-                    <!-- Wheel Configuration -->
-                    <div class="wheel-config">
-                        <div class="config-tabs">
-                            <button class="config-tab active" onclick="app.luckyWheel.switchWheel('standard')">Standard</button>
-                            <button class="config-tab" onclick="app.luckyWheel.switchWheel('premium')">Premium</button>
-                            <button class="config-tab" onclick="app.luckyWheel.switchWheel('legendary')">Legendary</button>
-                            <button class="config-tab" onclick="app.luckyWheel.switchWheel('custom')">Custom</button>
-                        </div>
-                        
-                        <div class="wheel-info">
-                            <div class="info-item">
-                                <span class="info-label">Cost:</span>
-                                <span class="info-value" id="wheel-cost">10 Points</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Cooldown:</span>
-                                <span class="info-value" id="wheel-cooldown">1 hour</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Luck Bonus:</span>
-                                <span class="info-value" id="luck-bonus">+0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Main Wheel Container -->
                     <div class="lucky-wheel-container">
                         <div class="wheel-container">
                             <div class="wheel-pointer"></div>
                             <div class="wheel" id="lucky-wheel">
-                                <!-- Standard Wheel Segments -->
-                                <div class="wheel-segment standard" data-reward="xp" data-value="10">🎯 +10 XP</div>
-                                <div class="wheel-segment standard" data-reward="points" data-value="25">⭐ +25 Points</div>
-                                <div class="wheel-segment standard" data-reward="gem" data-value="1">💎 +1 Gem</div>
-                                <div class="wheel-segment standard" data-reward="points" data-value="50">🎁 +50 Points</div>
-                                <div class="wheel-segment standard" data-reward="energy" data-value="2">🔥 +2 Energy</div>
-                                <div class="wheel-segment standard" data-reward="xp" data-value="100">🌟 +100 XP</div>
-                                <div class="wheel-segment standard" data-reward="motivation" data-value="5">💪 +5 Motivation</div>
-                                <div class="wheel-segment standard" data-reward="points" data-value="75">🎪 +75 Points</div>
-                                
-                                <!-- Premium Wheel Segments -->
-                                <div class="wheel-segment premium" data-reward="xp" data-value="50" style="display: none;">🚀 +50 XP</div>
-                                <div class="wheel-segment premium" data-reward="points" data-value="100" style="display: none;">💫 +100 Points</div>
-                                <div class="wheel-segment premium" data-reward="gem" data-value="3" style="display: none;">💎 +3 Gems</div>
-                                <div class="wheel-segment premium" data-reward="energy" data-value="5" style="display: none;">⚡ +5 Energy</div>
-                                <div class="wheel-segment premium" data-reward="motivation" data-value="10" style="display: none;">💪 +10 Motivation</div>
-                                <div class="wheel-segment premium" data-reward="xp" data-value="200" style="display: none;">🌟 +200 XP</div>
-                                <div class="wheel-segment premium" data-reward="points" data-value="150" style="display: none;">🎪 +150 Points</div>
-                                <div class="wheel-segment premium" data-reward="special" data-value="1" style="display: none;">🎭 Special Item</div>
-                                
-                                <!-- Legendary Wheel Segments -->
-                                <div class="wheel-segment legendary" data-reward="xp" data-value="100" style="display: none;">🏆 +100 XP</div>
-                                <div class="wheel-segment legendary" data-reward="points" data-value="250" style="display: none;">👑 +250 Points</div>
-                                <div class="wheel-segment legendary" data-reward="gem" data-value="5" style="display: none;">💎 +5 Gems</div>
-                                <div class="wheel-segment legendary" data-reward="energy" data-value="10" style="display: none;">⚡ +10 Energy</div>
-                                <div class="wheel-segment legendary" data-reward="motivation" data-value="20" style="display: none;">💪 +20 Motivation</div>
-                                <div class="wheel-segment legendary" data-reward="xp" data-value="500" style="display: none;">🌟 +500 XP</div>
-                                <div class="wheel-segment legendary" data-reward="points" data-value="400" style="display: none;">🎪 +400 Points</div>
-                                <div class="wheel-segment legendary" data-reward="legendary" data-value="1" style="display: none;">🏅 Legendary Item</div>
+                                <div class="wheel-segment">🎯 +10 XP</div>
+                                <div class="wheel-segment">⭐ +25 Points</div>
+                                <div class="wheel-segment">💎 +1 Gem</div>
+                                <div class="wheel-segment">🎁 +50 Points</div>
+                                <div class="wheel-segment">🔥 +2 Energy</div>
+                                <div class="wheel-segment">🌟 +100 XP</div>
+                                <div class="wheel-segment">💪 +5 Motivation</div>
+                                <div class="wheel-segment">🎪 +75 Points</div>
                             </div>
                             <div class="wheel-center" id="wheel-center">SPIN</div>
                             
@@ -7978,76 +7193,17 @@
                                 <div class="cooldown-timer" id="cooldown-timer">00:00</div>
                                 <div>Next spin available in:</div>
                             </div>
-                            
-                            <!-- Luck Meter -->
-                            <div class="luck-meter">
-                                <div class="luck-fill" id="luck-fill"></div>
-                                <div class="luck-label">Luck: <span id="luck-value">50%</span></div>
-                            </div>
                         </div>
                         
-                        <!-- Spin Controls -->
-                        <div class="spin-controls">
                         <button class="wheel-spin-button" id="spin-button" onclick="app.luckyWheel.spin()">
-                                <span class="spin-text">Spin the Wheel!</span>
-                                <span class="spin-cost">Cost: <span id="spin-cost-display">10</span> Points</span>
+                            Spin the Wheel! (Cost: 10 Points)
                         </button>
                         
-                            <div class="spin-options">
-                                <button class="spin-option" onclick="app.luckyWheel.useLuckBoost()" id="luck-boost-btn">
-                                    🍀 Luck Boost (5 Gems)
-                                </button>
-                                <button class="spin-option" onclick="app.luckyWheel.useDoubleSpin()" id="double-spin-btn">
-                                    🔄 Double Spin (20 Points)
-                                </button>
-                                <button class="spin-option" onclick="app.luckyWheel.useGuaranteedWin()" id="guaranteed-win-btn">
-                                    🎯 Guaranteed Win (50 Points)
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Result Display -->
                         <div class="wheel-result" id="wheel-result" style="display: none;">
-                            <div class="result-animation" id="result-animation">
                             <span class="wheel-result-icon" id="result-icon">🎯</span>
-                            </div>
-                            <div class="result-content">
                             <div class="wheel-result-title" id="result-title">Congratulations!</div>
                             <div class="wheel-result-description" id="result-description">You won an amazing reward!</div>
                             <div class="wheel-result-reward" id="result-reward">+10 XP</div>
-                                <div class="result-bonuses" id="result-bonuses"></div>
-                            </div>
-                            <div class="result-actions">
-                                <button class="result-action" onclick="app.luckyWheel.claimReward()">Claim Reward</button>
-                                <button class="result-action" onclick="app.luckyWheel.shareResult()">Share Result</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- History and Statistics -->
-                    <div class="wheel-history">
-                        <h3>🎯 Spin History</h3>
-                        <div class="history-list" id="spin-history">
-                            <!-- Spin history will be populated here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Achievements -->
-                    <div class="wheel-achievements">
-                        <h3>🏆 Achievements</h3>
-                        <div class="achievements-grid" id="wheel-achievements">
-                            <!-- Achievements will be populated here -->
-                        </div>
-                    </div>
-                    
-                    <!-- DeepSeek AI Integration -->
-                    <div class="wheel-ai-section">
-                        <h3>🤖 AI Wheel Analysis</h3>
-                        <div class="ai-analysis" id="wheel-ai-analysis">
-                            <p>DeepSeek AI will analyze your spinning patterns and provide personalized recommendations!</p>
-                            <button class="ai-analysis-btn" onclick="app.luckyWheel.getAIAnalysis()">
-                                Get AI Analysis
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -8195,43 +7351,6 @@
                                     <div class="toggle-switch" id="particles-toggle" onclick="app.settings.toggleParticles()"></div>
                                 </div>
                             </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Custom Accent Color</div>
-                                    <div class="settings-description">Choose your preferred accent color</div>
-                                </div>
-                                <div class="settings-control">
-                                    <input type="color" id="custom-accent-color" value="#f97316" onchange="app.settings.changeAccentColor(this.value)" style="width: 50px; height: 30px; border: none; border-radius: 4px; cursor: pointer;">
-                                </div>
-                            </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Matrix Rain</div>
-                                    <div class="settings-description">Show matrix rain effect on login</div>
-                                </div>
-                                <div class="settings-control">
-                                    <div class="toggle-switch" id="matrix-rain-toggle" onclick="app.settings.toggleMatrixRain()"></div>
-                                </div>
-                            </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Background Music</div>
-                                    <div class="settings-description">Play background music on login screen</div>
-                                </div>
-                                <div class="settings-control">
-                                    <div class="toggle-switch" id="background-music-toggle" onclick="app.settings.toggleBackgroundMusic()"></div>
-                                </div>
-                            </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Music Volume</div>
-                                    <div class="settings-description">Adjust background music volume</div>
-                                </div>
-                                <div class="settings-control">
-                                    <input type="range" id="music-volume-slider" min="0" max="100" value="10" onchange="app.settings.changeMusicVolume(this.value)" style="width: 150px;">
-                                    <span id="music-volume-display">10%</span>
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- AI Settings -->
@@ -8300,29 +7419,6 @@
                                 <div class="settings-label">
                                     <div class="settings-title">Achievement Alerts</div>
                                     <div class="settings-description">Get notified when you unlock achievements</div>
-                                </div>
-                                <div class="settings-control">
-                                    <div class="toggle-switch" id="achievement-alerts-toggle" onclick="app.settings.toggleAchievementAlerts()"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- User Preferences -->
-                        <div class="settings-section" id="user-preferences">
-                            <h3>👤 User Preferences</h3>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Daily Reminders</div>
-                                    <div class="settings-description">Receive daily goal reminders</div>
-                                </div>
-                                <div class="settings-control">
-                                    <div class="toggle-switch" id="daily-reminders-toggle" onclick="app.settings.toggleDailyReminders()"></div>
-                                </div>
-                            </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Achievement Alerts</div>
-                                    <div class="settings-description">Show achievement notifications</div>
                                 </div>
                                 <div class="settings-control">
                                     <div class="toggle-switch" id="achievement-alerts-toggle" onclick="app.settings.toggleAchievementAlerts()"></div>
@@ -9062,89 +8158,6 @@
                 }
             },
             
-            // Data Management with save/load functionality
-            data: {
-                // User data properties
-                xp: 0,
-                points: 0,
-                gems: 0,
-                energy: 100,
-                motivation: 50,
-                level: 1,
-                streak: 0,
-                goals: [],
-                achievements: [],
-                settings: {},
-                chatHistory: [],
-                moodHistory: [],
-                focusSessions: [],
-                analytics: {},
-                
-                // Save data to localStorage
-                save() {
-                    try {
-                        const dataToSave = {
-                            xp: this.xp,
-                            points: this.points,
-                            gems: this.gems,
-                            energy: this.energy,
-                            motivation: this.motivation,
-                            level: this.level,
-                            streak: this.streak,
-                            goals: this.goals,
-                            achievements: this.achievements,
-                            settings: this.settings,
-                            chatHistory: this.chatHistory,
-                            moodHistory: this.moodHistory,
-                            focusSessions: this.focusSessions,
-                            analytics: this.analytics,
-                            lastSaved: Date.now()
-                        };
-                        
-                        localStorage.setItem('appData', JSON.stringify(dataToSave));
-                        // Data saved successfully
-                    } catch (error) {
-                        console.error('❌ Failed to save data:', error);
-                    }
-                },
-                
-                // Load data from localStorage
-                load() {
-                    try {
-                        const savedData = localStorage.getItem('appData');
-                        if (savedData) {
-                            const data = JSON.parse(savedData);
-                            
-                            this.xp = data.xp || 0;
-                            this.points = data.points || 0;
-                            this.gems = data.gems || 0;
-                            this.energy = data.energy || 100;
-                            this.motivation = data.motivation || 50;
-                            this.level = data.level || 1;
-                            this.streak = data.streak || 0;
-                            this.goals = data.goals || [];
-                            this.achievements = data.achievements || [];
-                            this.settings = data.settings || {};
-                            this.chatHistory = data.chatHistory || [];
-                            this.moodHistory = data.moodHistory || [];
-                            this.focusSessions = data.focusSessions || [];
-                            this.analytics = data.analytics || {};
-                            
-                            // Data loaded successfully
-                        }
-                    } catch (error) {
-                        console.error('❌ Failed to load data:', error);
-                    }
-                },
-                
-                // Initialize data
-                init() {
-                    this.load();
-                    // Auto-save every 30 seconds
-                    setInterval(() => this.save(), 30000);
-                }
-            },
-            
             // Optimized Memory Manager with debounced cleanup
             memoryManager: {
                 maxIntervals: 10,
@@ -9166,7 +8179,7 @@
                     this.startCleanup();
                     // Remove console.log for production
                     if (process.env.NODE_ENV === 'development') {
-                        // Memory manager initialized
+                        console.log('✅ Memory manager initialized');
                     }
                 },
                 
@@ -9221,7 +8234,7 @@
                     app.state.performanceMetrics.lastCleanup = Date.now();
                     // Remove console.log for production
                     if (process.env.NODE_ENV === 'development') {
-                        // Memory cleanup completed
+                        console.log('🧹 Memory cleanup completed');
                     }
                 },
                 
@@ -9714,15 +8727,17 @@
                         
                         this.confettiCanvas.style.opacity = '1';
                         
-                        // Use canvas-confetti library
-                        if (typeof confetti !== 'undefined') {
-                            confetti({
-                                particleCount: 100,
-                                spread: 70,
-                                origin: { y: 0.6 }
-                            });
-                        } else {
-                            console.warn('Confetti library not loaded');
+                        // Use throttled creation for better performance
+                        const createConfetti = (index) => {
+                            const x = Math.random() * window.innerWidth;
+                            const y = -10;
+                            this.confetti.push(new Confetti(x, y));
+                            this.animateConfetti();
+                        };
+                        
+                        // Create confetti with staggered timing
+                        for (let i = 0; i < 100; i++) {
+                            setTimeout(() => createConfetti(i), i * 20);
                         }
                         
                         setTimeout(() => {
@@ -9759,7 +8774,7 @@
                     
                     // Remove console.log for production
                     if (process.env.NODE_ENV === 'development') {
-                        // Mobile gestures initialized
+                        console.log('📱 Mobile gestures initialized');
                     }
                     
                     this.addTouchSupport();
@@ -9940,7 +8955,7 @@
                  */
                 handleTouchStart(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Touch start detected
+                        console.log('Touch start detected', e.touches.length, 'touches');
                     }
                     
                     // Store touch data for gesture recognition
@@ -9964,7 +8979,7 @@
                 
                 handleTouchMove(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Touch move detected
+                        console.log('Touch move detected', e.touches.length, 'touches');
                     }
                     
                     // Update current touch position
@@ -9987,7 +9002,7 @@
                 
                 handleTouchEnd(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Touch end detected
+                        console.log('Touch end detected');
                     }
                     
                     // Remove visual feedback
@@ -10030,7 +9045,7 @@
                 
                 handleTouchCancel(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Touch cancel detected
+                        console.log('Touch cancel detected');
                     }
                     
                     // Remove visual feedback
@@ -10099,21 +9114,21 @@
                 // Optimized gesture event handlers
                 handleGestureStart(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Gesture start detected
+                        console.log('Gesture start detected');
                     }
                     // Add custom gesture start logic
                 },
                 
                 handleGestureChange(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Gesture change detected
+                        console.log('Gesture change detected');
                     }
                     // Add custom gesture change logic
                 },
                 
                 handleGestureEnd(e) {
                     if (process.env.NODE_ENV === 'development') {
-                        // Gesture end detected
+                        console.log('Gesture end detected');
                     }
                     // Add custom gesture end logic
                 },
@@ -10151,7 +9166,7 @@
                     
                     // Swipe event handlers
                     handleSwipeLeft() {
-                        // Swipe left detected
+                        console.log('Swipe left detected');
                         // Navigate to previous view or close modal
                         const activeModal = document.querySelector('.modal.active');
                         if (activeModal) {
@@ -10160,7 +9175,7 @@
                     },
                     
                     handleSwipeRight() {
-                        // Swipe right detected
+                        console.log('Swipe right detected');
                         // Navigate to next view or open menu
                         const navMenu = document.querySelector('.nav-menu');
                         if (navMenu) {
@@ -10169,18 +9184,18 @@
                     },
                     
                     handleSwipeUp() {
-                        // Swipe up detected
+                        console.log('Swipe up detected');
                         // Scroll up or show more content
                     },
                     
                     handleSwipeDown() {
-                        // Swipe down detected
+                        console.log('Swipe down detected');
                         // Scroll down or hide content
                     },
                     
                     // Pinch event handlers
                     handlePinch(scale) {
-                        // Pinch detected
+                        console.log('Pinch detected with scale:', scale);
                         // Zoom in/out or adjust UI scale
                         if (scale > 1.2) {
                             document.body.style.transform = `scale(${Math.min(scale, 1.5)})`;
@@ -10191,7 +9206,7 @@
                     
                     // Long press event handlers
                     handleLongPress(e) {
-                        // Long press detected
+                        console.log('Long press detected');
                         // Show context menu or additional options
                         this.showContextMenu(e);
                     },
@@ -10240,14 +9255,14 @@
                     
                     // Gradient Presets
                     gradients: {
-                                        primary: 'var(--accent-color)',
-                secondary: 'var(--bg-secondary)',
-                accent: 'var(--accent-color)',
-                success: 'var(--success-color)',
-                warning: 'var(--warning-color)',
-                error: 'var(--error-color)',
-                dark: 'var(--bg-primary)',
-                light: 'var(--bg-secondary)'
+                        primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        secondary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        accent: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                        success: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                        warning: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                        error: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                        dark: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                        light: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
                     },
                     
                     // Animation Settings
@@ -10277,7 +9292,7 @@
                         ],
                         colors: {
                             disappointment: '#6b7280',
-                            awakening: '#f97316',
+                            awakening: '#3b82f6',
                             discovery: '#8b5cf6',
                             transformation: '#f59e0b',
                             empowerment: '#10b981',
@@ -10318,7 +9333,63 @@
                                     inset 0 1px 0 rgba(255, 255, 255, 0.3);
                             }
                             
-                            /* Glass card styles removed to prevent conflicts with theme variables */
+                            .glass-card {
+                                background: rgba(42, 42, 42, 0.8);
+                                backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                -webkit-backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                border-radius: 20px;
+                                padding: 24px;
+                                margin: 16px;
+                                box-shadow: 
+                                    0 8px 32px rgba(0, 0, 0, 0.2),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                            }
+                            
+                            .glass-button {
+                                background: ${app.aestheticConfig.gradients.primary};
+                                border: none;
+                                border-radius: 12px;
+                                padding: 12px 24px;
+                                color: white;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all ${app.aestheticConfig.animations.duration.normal} ${app.aestheticConfig.animations.easing.smooth};
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            
+                            .glass-button::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: -100%;
+                                width: 100%;
+                                height: 100%;
+                                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                                transition: left 0.5s;
+                            }
+                            
+                            .glass-button:hover::before {
+                                left: 100%;
+                            }
+                            
+                            .glass-button:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+                            }
+                            
+                            .glass-modal {
+                                background: rgba(0, 0, 0, 0.8);
+                                backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                -webkit-backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                border-radius: 24px;
+                                padding: 32px;
+                                box-shadow: 
+                                    0 20px 60px rgba(0, 0, 0, 0.3),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                            }
                         `;
                         document.head.appendChild(style);
                     },
@@ -10571,7 +9642,7 @@
                     
                     init() {
                         this.createStoryStyles();
-                        // Story progression removed as requested
+                        this.setupStoryProgression();
                         this.applyStoryTheme();
                     },
                     
@@ -10613,12 +9684,80 @@
                                 filter: brightness(1.3) saturate(1.2) contrast(1.1);
                             }
                             
-                            /* Story Progress CSS removed as requested */
+                            .story-progress {
+                                position: fixed;
+                                top: 20px;
+                                right: 20px;
+                                background: rgba(0, 0, 0, 0.8);
+                                backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                border-radius: 12px;
+                                padding: 16px;
+                                z-index: 1000;
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                            }
+                            
+                            .story-progress-bar {
+                                width: 200px;
+                                height: 8px;
+                                background: rgba(255, 255, 255, 0.1);
+                                border-radius: 4px;
+                                overflow: hidden;
+                                margin-top: 8px;
+                            }
+                            
+                            .story-progress-fill {
+                                height: 100%;
+                                background: ${app.aestheticConfig.gradients.primary};
+                                transition: width ${app.aestheticConfig.animations.duration.slow} ${app.aestheticConfig.animations.easing.smooth};
+                            }
                         `;
                         document.head.appendChild(style);
                     },
                     
-                    // Story Progress removed as requested
+                    setupStoryProgression() {
+                        // Create story progress indicator
+                        this.createStoryProgress();
+                        
+                        // Setup story phase transitions
+                        this.setupPhaseTransitions();
+                    },
+                    
+                    createStoryProgress() {
+                        const progressContainer = document.createElement('div');
+                        progressContainer.className = 'story-progress';
+                        progressContainer.innerHTML = `
+                            <div style="color: white; font-size: 14px; font-weight: 600;">Story Progress</div>
+                            <div class="story-progress-bar">
+                                <div class="story-progress-fill" style="width: 0%"></div>
+                            </div>
+                        `;
+                        document.body.appendChild(progressContainer);
+                    },
+                    
+                    setupPhaseTransitions() {
+                        // Simulate story progression based on user interactions
+                        let progress = 0;
+                        const progressFill = document.querySelector('.story-progress-fill');
+                        
+                        // Update progress based on various triggers
+                        const updateProgress = (increment) => {
+                            progress = Math.min(100, progress + increment);
+                            if (progressFill) {
+                                progressFill.style.width = `${progress}%`;
+                            }
+                            
+                            // Determine current story phase
+                            const phaseIndex = Math.floor((progress / 100) * app.aestheticConfig.story.phases.length);
+                            this.setStoryPhase(phaseIndex);
+                        };
+                        
+                        // Trigger progress on various events
+                        document.addEventListener('click', () => updateProgress(2));
+                        document.addEventListener('scroll', () => updateProgress(0.5));
+                        
+                        // Simulate automatic progression
+                        setInterval(() => updateProgress(0.1), 5000);
+                    },
                     
                     setStoryPhase(phaseIndex) {
                         if (phaseIndex !== this.currentPhase && phaseIndex < app.aestheticConfig.story.phases.length) {
@@ -10685,12 +9824,71 @@
                                 --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
                             }
                             
-                            /* Removed duplicate theme toggle styles - using main header button */
+                            .theme-toggle {
+                                position: fixed;
+                                top: 20px;
+                                left: 20px;
+                                background: rgba(0, 0, 0, 0.8);
+                                backdrop-filter: ${app.aestheticConfig.glassBlur};
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                border-radius: 50%;
+                                width: 50px;
+                                height: 50px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: pointer;
+                                z-index: 1000;
+                                transition: all ${app.aestheticConfig.animations.duration.normal} ${app.aestheticConfig.animations.easing.smooth};
+                            }
+                            
+                            .theme-toggle:hover {
+                                transform: scale(1.1);
+                                box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+                            }
+                            
+                            .theme-toggle svg {
+                                width: 24px;
+                                height: 24px;
+                                fill: white;
+                            }
                         `;
                         document.head.appendChild(style);
                     },
                     
-                    /* Removed duplicate theme toggle functions - using main app theme system */
+                    setupThemeToggle() {
+                        const toggle = document.createElement('div');
+                        toggle.className = 'theme-toggle';
+                        toggle.innerHTML = `
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+                            </svg>
+                        `;
+                        
+                        toggle.addEventListener('click', () => {
+                            this.toggleTheme();
+                        });
+                        
+                        document.body.appendChild(toggle);
+                    },
+                    
+                    toggleTheme() {
+                        this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                        this.applyTheme();
+                        
+                        // Update toggle icon
+                        const toggle = document.querySelector('.theme-toggle svg');
+                        if (this.currentTheme === 'light') {
+                            toggle.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+                        } else {
+                            toggle.innerHTML = '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>';
+                        }
+                    },
+                    
+                    applyTheme() {
+                        document.documentElement.setAttribute('data-theme', this.currentTheme);
+                        localStorage.setItem('theme', this.currentTheme);
+                    }
                 },
                 
                 // Main Aesthetic Enhancement System
@@ -12683,7 +11881,7 @@
             // Initialization
                                                  init() {
                     try {
-                    this.loadTheme();
+                    this.setTheme(this.state.theme);
                 this.setupMockUser();
                 this.auth.init();
                     this.ui.init();
@@ -12692,10 +11890,7 @@
                     this.setupErrorHandling();
                     this.setupPerformanceMonitoring();
                     this.setupLazyLoading();
-                    // Load goals if module exists
-                    if (this.goals && typeof this.goals.loadFromLocalStorage === 'function') {
                     this.goals.loadFromLocalStorage();
-                    }
                 this.ai.init();
                 this.gamification.init();
                 this.mobileGestures.init();
@@ -12704,14 +11899,6 @@
                 this.utils.initEmptyStates();
                 this.utils.initDataBackup();
                 this.registerServiceWorker();
-                this.initMiniCubeInteraction();
-                
-                            // Enable test mode for development
-            this.enableTestMode();
-            
-            // Initialize loading screen and music
-            this.initLoadingScreen();
-            
                     this.state.isInitialized = true;
                 console.log('✅ App initialized successfully');
                     } catch (error) {
@@ -12728,26 +11915,8 @@
                     
                     const toggle = this.utils.safeGet('theme-toggle');
                     if (toggle) {
-                        if (theme === 'dark') {
-                            toggle.innerHTML = '🌙';
-                        } else {
-                            toggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-                        }
+                        toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
                     }
-                    
-                    // Force a repaint to ensure theme changes are applied
-                    document.body.style.display = 'none';
-                    document.body.offsetHeight; // Trigger reflow
-                    document.body.style.display = '';
-                    
-                    console.log(`✅ Theme changed to: ${theme}`);
-                },
-                
-                loadTheme() {
-                    const savedTheme = localStorage.getItem('theme') || 'dark';
-                    this.state.theme = savedTheme;
-                    this.setTheme(savedTheme);
-                    console.log(`✅ Theme loaded: ${savedTheme}`);
                 },
                 
             // Mock User Setup (for development)
@@ -12760,183 +11929,6 @@
                     };
                     localStorage.setItem('mockUser', JSON.stringify(mockUser));
                 }
-            },
-            
-            // Testing Dashboard - Bypass Auth
-            enableTestMode() {
-                console.log('🧪 Enabling Test Mode...');
-                
-                // Add test mode button to auth card
-                const authCard = document.querySelector('.auth-card');
-                if (authCard) {
-                    const testButton = document.createElement('button');
-                    testButton.className = 'btn btn-secondary test-mode-btn';
-                    testButton.textContent = '🧪 Test Dashboard';
-                    testButton.style.marginTop = '1rem';
-                    testButton.onclick = () => this.enterTestMode();
-                    
-                    authCard.appendChild(testButton);
-                }
-                
-                console.log('✅ Test mode enabled - Test Dashboard button added');
-            },
-            
-            enterTestMode() {
-                console.log('🚀 Entering Test Mode...');
-                
-                // Set test user
-                const testUser = {
-                    uid: 'test-123',
-                    email: 'test@operatoruplift.com',
-                    displayName: 'Test Operator'
-                };
-                localStorage.setItem('mockUser', JSON.stringify(testUser));
-                
-                // Hide auth view and show dashboard
-                const authView = document.getElementById('auth-view');
-                const dashboardView = document.getElementById('dashboard-view');
-                
-                if (authView) authView.classList.remove('active');
-                if (dashboardView) dashboardView.classList.add('active');
-                
-                // Initialize dashboard
-                this.initDashboard();
-                
-                console.log('✅ Test Mode Active - Dashboard loaded');
-            },
-            
-            // Loading Screen and Music Initialization
-            initLoadingScreen() {
-                console.log('🚀 Initializing Loading Screen...');
-                
-                const loadingScreen = document.getElementById('loading-screen');
-                const music = document.getElementById('background-music');
-                
-                if (loadingScreen && music) {
-                    // Start music with loading screen
-                    music.volume = 0.05; // 5% volume
-                    music.play().catch(e => {
-                        console.log('Music autoplay blocked, will play on user interaction');
-                    });
-                    
-                    // Show loading screen for 3-5 seconds
-                    setTimeout(() => {
-                        this.hideLoadingScreen();
-                    }, 4000); // 4 seconds
-                    
-                    console.log('✅ Loading screen initialized with music');
-                }
-            },
-            
-            hideLoadingScreen() {
-                const loadingScreen = document.getElementById('loading-screen');
-                const authView = document.getElementById('auth-view');
-                
-                if (loadingScreen) {
-                    loadingScreen.classList.remove('active');
-                    
-                    // Show auth view after loading
-                    if (authView) {
-                        authView.classList.add('active');
-                    }
-                    
-                    console.log('✅ Loading screen hidden, auth view shown');
-                }
-            },
-            
-            // Theme Toggle Function
-            toggleTheme() {
-                const currentTheme = this.state.theme;
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                this.setTheme(newTheme);
-            },
-            
-            // Mini Cube Interactive Logic - Proper 3D Implementation
-            initMiniCubeInteraction() {
-                const miniCube = document.getElementById('mini-cube');
-                if (!miniCube) return;
-                
-                let isDragging = false;
-                let previousX = 0, previousY = 0;
-                let rotationX = 0, rotationY = 0;
-                let velocityX = 0, velocityY = 0;
-                const friction = 0.95;
-                let autoRotateEnabled = true;
-                const autoRotateSpeed = 0.1;
-                let animationId;
-
-                const startDrag = (x, y) => {
-                    isDragging = true;
-                    previousX = x;
-                    previousY = y;
-                    velocityX = 0;
-                    velocityY = 0;
-                };
-
-                const drag = (x, y) => {
-                    if (isDragging) {
-                        const deltaX = x - previousX;
-                        const deltaY = y - previousY;
-                        rotationY += deltaX * 0.5;
-                        rotationX -= deltaY * 0.5;
-                        velocityY = deltaX * 0.5;
-                        velocityX = -deltaY * 0.5;
-                        previousX = x;
-                        previousY = y;
-                    }
-                };
-
-                const endDrag = () => {
-                    isDragging = false;
-                };
-
-                // Mouse events
-                miniCube.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-                window.addEventListener('mousemove', e => drag(e.clientX, e.clientY));
-                window.addEventListener('mouseup', endDrag);
-                window.addEventListener('mouseleave', endDrag);
-
-                // Touch events
-                miniCube.addEventListener('touchstart', e => {
-                    e.preventDefault();
-                    startDrag(e.touches[0].clientX, e.touches[0].clientY);
-                }, { passive: false });
-                
-                window.addEventListener('touchmove', e => {
-                    if (isDragging) {
-                        e.preventDefault();
-                        drag(e.touches[0].clientX, e.touches[0].clientY);
-                    }
-                }, { passive: false });
-                
-                window.addEventListener('touchend', endDrag);
-
-                                function animateMiniCube() {
-                    if (!isDragging) {
-                        if (Math.abs(velocityX) > 0.01 || Math.abs(velocityY) > 0.01) {
-                            velocityX *= friction;
-                            velocityY *= friction;
-                            rotationX += velocityX;
-                            rotationY += velocityY;
-                        } else if (autoRotateEnabled) {
-                            // Auto-spin on both X and Y axes for more dynamic movement
-                            rotationY += autoRotateSpeed;
-                            rotationX += autoRotateSpeed * 0.3;
-                        }
-                    }
-                
-                    // Add subtle floating animation
-                    const time = Date.now() * 0.001;
-                    const floatY = Math.sin(time * 0.8) * 2;
-                
-                    miniCube.style.transform = `translateZ(-30px) translateY(${floatY}px) rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
-                    animationId = requestAnimationFrame(animateMiniCube);
-                }
-
-                // Start animation
-                animateMiniCube();
-                
-                console.log('✅ Mini cube 3D interaction initialized');
             },
 
                             // Background Effects
@@ -13184,28 +12176,6 @@
                         const targetView = app.utils.safeGet(`${viewName}-view`);
                  if (targetView) {
                      targetView.classList.add('active');
-                     
-                                      // Special handling for auth view
-                 if (viewName === 'auth') {
-                     const mainContent = document.querySelector('.main-content');
-                     if (mainContent) {
-                         mainContent.style.display = 'none';
-                     }
-                     
-                     // Ensure auth view is visible and on top
-                     const authView = document.getElementById('auth-view');
-                     if (authView) {
-                         authView.classList.add('active');
-                     }
-                 } else {
-                     // Only show main content if user is authenticated
-                     if (app.state.isAuthenticated) {
-                         const mainContent = document.querySelector('.main-content');
-                         if (mainContent) {
-                             mainContent.style.display = 'block';
-                         }
-                     }
-                 }
                  }
                  
                  // Update navigation
@@ -13324,7 +12294,7 @@
                  if (toggle) {
                         app.utils.safeAddEventListener(toggle, 'click', () => {
                          const newTheme = app.state.theme === 'dark' ? 'light' : 'dark';
-                         this.setTheme(newTheme);
+                         app.setTheme(newTheme);
                         });
                     }
                 },
@@ -13468,28 +12438,10 @@
                 },
 
                 setupAuthState() {
-                    // Initialize auth state - Always show login first for better UX
-                    this.updateAuthState(false);
+                    // Initialize auth state
+                    this.updateAuthState();
                     
-                    // Force auth view to be active and take full priority
-                    const authView = document.getElementById('auth-view');
-                    if (authView) {
-                        authView.classList.add('active');
-                        
-                        // Hide main content when auth is active
-                        const mainContent = document.querySelector('.main-content');
-                        if (mainContent) {
-                            mainContent.style.display = 'none';
-                        }
-                        
-                        console.log('🔐 Auth view activated as full-screen overlay');
-                    } else {
-                        console.error('❌ Auth view not found!');
-                    }
-                    
-                    app.ui.showView('auth');
-                    
-                    // Check for existing user session in background
+                    // Check for existing user session
                     const mockUser = localStorage.getItem('mockUser');
                     if (mockUser) {
                         try {
@@ -13504,11 +12456,17 @@
                                     streak: 0
                                 }
                             };
-                            // Don't auto-login, let user choose
+                            this.updateAuthState(true);
+                            app.ui.showView('dashboard');
                         } catch (error) {
                             console.error('Failed to parse mock user:', error);
                             localStorage.removeItem('mockUser');
+                            this.updateAuthState(false);
+                            app.ui.showView('auth');
                         }
+                    } else {
+                        this.updateAuthState(false);
+                        app.ui.showView('auth');
                     }
                 },
                 
@@ -13562,17 +12520,6 @@
                             // Check if user needs onboarding
                             const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
                             
-                            // Hide auth view and show main content
-                            const authView = document.getElementById('auth-view');
-                            if (authView) {
-                                authView.classList.remove('active');
-                            }
-                            
-                            const mainContent = document.querySelector('.main-content');
-                            if (mainContent) {
-                                mainContent.style.display = 'block';
-                            }
-                            
                             if (!hasCompletedOnboarding) {
                                 app.onboarding.show();
                             } else {
@@ -13613,17 +12560,6 @@
                         
                         localStorage.setItem('mockUser', JSON.stringify(user));
                         
-                        // Hide auth view and show main content
-                        const authView = document.getElementById('auth-view');
-                        if (authView) {
-                            authView.classList.remove('active');
-                        }
-                        
-                        const mainContent = document.querySelector('.main-content');
-                        if (mainContent) {
-                            mainContent.style.display = 'block';
-                        }
-                        
                         // New users should always go through onboarding
                         app.onboarding.show();
                         
@@ -13640,18 +12576,6 @@
                     app.state.userData = null;
                     localStorage.removeItem('mockUser');
                     this.updateAuthState(false);
-                    
-                    // Show auth view and hide main content
-                    const authView = document.getElementById('auth-view');
-                    if (authView) {
-                        authView.classList.add('active');
-                    }
-                    
-                    const mainContent = document.querySelector('.main-content');
-                    if (mainContent) {
-                        mainContent.style.display = 'none';
-                    }
-                    
                     app.ui.showView('auth');
                     app.utils.showToast('Logged out successfully', 'info');
                 },
@@ -13670,12 +12594,6 @@
                     
                     if (loginForm) loginForm.classList.add('hidden');
                     if (registerForm) registerForm.classList.remove('hidden');
-                },
-
-                showForgotPassword() {
-                    app.utils.showToast('Password reset link sent to your email!', 'info');
-                    // In a real app, this would trigger password reset flow
-                    console.log('🔐 Password reset requested');
                 }
             },
 
@@ -15147,11 +14065,11 @@ Format your response as JSON:
                         goals: { name: 'Goal Achievement', icon: '🎯', color: '#f97316' },
                         consistency: { name: 'Consistency', icon: '🔥', color: '#dc2626' },
                         progression: { name: 'Progression', icon: '⭐', color: '#fbbf24' },
-                        ai: { name: 'AI Interaction', icon: '🤖', color: '#f97316' },
+                        ai: { name: 'AI Interaction', icon: '🤖', color: '#3b82f6' },
                         wellness: { name: 'Wellness', icon: '😊', color: '#10b981' },
                         personalization: { name: 'Personalization', icon: '🧠', color: '#8b5cf6' },
                         engagement: { name: 'Engagement', icon: '🎰', color: '#ec4899' },
-                        economy: { name: 'Economy', icon: '💎', color: 'var(--accent-color)' }
+                        economy: { name: 'Economy', icon: '💎', color: '#06b6d4' }
                     }
                 },
                 
@@ -15251,83 +14169,106 @@ Format your response as JSON:
                     categories: {
                         boosts: { name: 'Boosts', icon: '⚡', color: '#f97316' },
                         protection: { name: 'Protection', icon: '🛡️', color: '#dc2626' },
-                        ai: { name: 'AI Features', icon: '🤖', color: '#f97316' },
+                        ai: { name: 'AI Features', icon: '🤖', color: '#3b82f6' },
                         personalization: { name: 'Personalization', icon: '🧠', color: '#8b5cf6' },
                         cosmetics: { name: 'Cosmetics', icon: '🎨', color: '#ec4899' }
                     }
                 },
                 
-                /** @type {Object} Enhanced Lucky Wheel System - 100x Features */
+                /** @type {Object} Daily Lucky Wheel system */
                 luckyWheel: {
+                    /** @type {boolean} Whether user can spin today */
+                    canSpin: true,
+                    /** @type {number} Last spin timestamp */
+                    lastSpinTime: null,
+                    /** @type {number} Cooldown duration in milliseconds (24 hours) */
+                    cooldownDuration: 86400000,
                     /** @type {boolean} Whether wheel is currently spinning */
                     isSpinning: false,
-                    /** @type {number} Cooldown end timestamp */
-                    cooldownEnd: null,
-                    /** @type {string} Current wheel type */
-                    currentWheel: 'standard',
-                    /** @type {number} Total spins count */
-                    totalSpins: 0,
-                    /** @type {number} Total rewards value */
-                    totalRewards: 0,
-                    /** @type {number} Current streak count */
-                    streakCount: 0,
-                    /** @type {number} Current luck level (0-100) */
-                    luckLevel: 50,
-                    /** @type {Array} Spin history */
-                    spinHistory: [],
-                    /** @type {Array} Achievements */
-                    achievements: [],
-                    /** @type {boolean} Guaranteed win flag */
-                    guaranteedWin: false,
+                    /** @type {number} Cost to spin the wheel */
+                    spinCost: 10,
                     
-                    /** @type {Object} Wheel configurations */
-                    wheelConfigs: {
-                        standard: {
-                            cost: 10,
-                            cooldown: 3600000, // 1 hour
-                            luckBonus: 0,
-                            segments: [
-                                { icon: '🎯', reward: '+10 XP', value: 10, type: 'xp' },
-                                { icon: '⭐', reward: '+25 Points', value: 25, type: 'points' },
-                                { icon: '💎', reward: '+1 Gem', value: 1, type: 'gem' },
-                                { icon: '🎁', reward: '+50 Points', value: 50, type: 'points' },
-                                { icon: '🔥', reward: '+2 Energy', value: 2, type: 'energy' },
-                                { icon: '🌟', reward: '+100 XP', value: 100, type: 'xp' },
-                                { icon: '💪', reward: '+5 Motivation', value: 5, type: 'motivation' },
-                                { icon: '🎪', reward: '+75 Points', value: 75, type: 'points' }
-                            ]
+                    /** @type {Array} Wheel prizes */
+                    prizes: [
+                        {
+                            id: 'essence_small',
+                            name: 'Small Essence Pack',
+                            description: '10 essence points',
+                            icon: '💎',
+                            probability: 0.4,
+                            reward: { essence: 10 }
                         },
-                        premium: {
-                            cost: 25,
-                            cooldown: 1800000, // 30 minutes
-                            luckBonus: 10,
-                            segments: [
-                                { icon: '🚀', reward: '+50 XP', value: 50, type: 'xp' },
-                                { icon: '💫', reward: '+100 Points', value: 100, type: 'points' },
-                                { icon: '💎', reward: '+3 Gems', value: 3, type: 'gem' },
-                                { icon: '⚡', reward: '+5 Energy', value: 5, type: 'energy' },
-                                { icon: '💪', reward: '+10 Motivation', value: 10, type: 'motivation' },
-                                { icon: '🌟', reward: '+200 XP', value: 200, type: 'xp' },
-                                { icon: '🎪', reward: '+150 Points', value: 150, type: 'points' },
-                                { icon: '🎭', reward: 'Special Item', value: 100, type: 'special' }
-                            ]
+                        {
+                            id: 'essence_medium',
+                            name: 'Medium Essence Pack',
+                            description: '25 essence points',
+                            icon: '💎',
+                            probability: 0.25,
+                            reward: { essence: 25 }
                         },
-                        legendary: {
-                            cost: 50,
-                            cooldown: 900000, // 15 minutes
-                            luckBonus: 25,
-                            segments: [
-                                { icon: '🏆', reward: '+100 XP', value: 100, type: 'xp' },
-                                { icon: '👑', reward: '+250 Points', value: 250, type: 'points' },
-                                { icon: '💎', reward: '+5 Gems', value: 5, type: 'gem' },
-                                { icon: '⚡', reward: '+10 Energy', value: 10, type: 'energy' },
-                                { icon: '💪', reward: '+20 Motivation', value: 20, type: 'motivation' },
-                                { icon: '🌟', reward: '+500 XP', value: 500, type: 'xp' },
-                                { icon: '🎪', reward: '+400 Points', value: 400, type: 'points' },
-                                { icon: '🏅', reward: 'Legendary Item', value: 500, type: 'legendary' }
-                            ]
+                        {
+                            id: 'essence_large',
+                            name: 'Large Essence Pack',
+                            description: '50 essence points',
+                            icon: '💎',
+                            probability: 0.1,
+                            reward: { essence: 50 }
+                        },
+                        {
+                            id: 'experience_boost',
+                            name: 'Experience Boost',
+                            description: '2x experience for 1 hour',
+                            icon: '⭐',
+                            probability: 0.15,
+                            reward: { expMultiplier: 2, duration: 3600000 }
+                        },
+                        {
+                            id: 'focus_boost',
+                            name: 'Focus Boost',
+                            description: '+20 focus for 2 hours',
+                            icon: '🎯',
+                            probability: 0.2,
+                            reward: { focus: 20, duration: 7200000 }
+                        },
+                        {
+                            id: 'motivation_boost',
+                            name: 'Motivation Boost',
+                            description: '+25 motivation for 4 hours',
+                            icon: '⚡',
+                            probability: 0.15,
+                            reward: { motivation: 25, duration: 14400000 }
+                        },
+                        {
+                            id: 'ai_credit',
+                            name: 'AI Credit',
+                            description: '1 AI credit for premium features',
+                            icon: '🤖',
+                            probability: 0.1,
+                            reward: { aiCredits: 1 }
+                        },
+                        {
+                            id: 'goal_insurance',
+                            name: 'Goal Insurance',
+                            description: 'Protect one goal from failure',
+                            icon: '🛡️',
+                            probability: 0.05,
+                            reward: { goalProtection: true }
+                        },
+                        {
+                            id: 'jackpot',
+                            name: 'Jackpot!',
+                            description: '100 essence points + all boosts',
+                            icon: '🎰',
+                            probability: 0.01,
+                            reward: { 
+                                essence: 100, 
+                                expMultiplier: 3, 
+                                focus: 30, 
+                                motivation: 40,
+                                duration: 7200000 
+                            }
                         }
-                    },
+                    ],
                     
                     /** @type {Object} Wheel configuration */
                     config: {
@@ -15718,7 +14659,7 @@ Format your response as JSON:
                 },
                 
                 createPersonalityAnalysisPrompt(personalityData) {
-                    return `Analyze [${JSON.stringify(personalityData)}] using Maslow's hierarchy of needs and temperament theory.
+                    return `Analyze this personality profile and provide insights:
 
 Personality Data:
 - Traits: ${personalityData.traits.join(', ')}
@@ -16091,11 +15032,6 @@ Format your response as JSON:
                         
                         // Save to localStorage or Firestore
                         localStorage.setItem('userProfile', JSON.stringify(app.state.userData));
-                
-                // Also save to app.data for consistency
-                if (app.data) {
-                    app.data.save();
-                }
                         
                         if (app.auth.fbDb && app.state.currentUser) {
                             app.auth.fbDb.collection('users').doc(app.state.currentUser.uid).update({
@@ -16351,23 +15287,6 @@ Format your response as JSON:
                 
                 loadLuckyWheel() {
                     try {
-                        // Ensure luckyWheel is properly initialized
-                        if (!this.luckyWheel) {
-                            this.luckyWheel = {
-                                lastSpinTime: null,
-                                canSpin: true,
-                                cooldownDuration: 24 * 60 * 60 * 1000, // 24 hours
-                                spinCost: 50,
-                                prizes: [
-                                    { name: 'Small Essence Boost', probability: 0.4, reward: { essence: 25 } },
-                                    { name: 'Medium Essence Boost', probability: 0.3, reward: { essence: 50 } },
-                                    { name: 'Large Essence Boost', probability: 0.2, reward: { essence: 100 } },
-                                    { name: 'Experience Multiplier', probability: 0.08, reward: { expMultiplier: 2, duration: 3600000 } },
-                                    { name: 'Focus Boost', probability: 0.02, reward: { focus: 50, duration: 1800000 } }
-                                ]
-                            };
-                        }
-                        
                         const saved = localStorage.getItem('luckyWheel');
                         if (saved) {
                             const data = JSON.parse(saved);
@@ -17241,11 +16160,11 @@ Join me on my journey to level up my life! 🚀`;
                 moodData: {
                     excited: { icon: '🤩', label: 'Excited', color: '#10b981' },
                     happy: { icon: '😊', label: 'Happy', color: '#f59e0b' },
-                    calm: { icon: '😌', label: 'Calm', color: '#f97316' },
+                    calm: { icon: '😌', label: 'Calm', color: '#3b82f6' },
                     neutral: { icon: '😐', label: 'Neutral', color: '#6b7280' },
                     tired: { icon: '😴', label: 'Tired', color: '#8b5cf6' },
                     stressed: { icon: '😰', label: 'Stressed', color: '#ef4444' },
-                    sad: { icon: '😢', label: 'Sad', color: 'var(--accent-color)' },
+                    sad: { icon: '😢', label: 'Sad', color: '#06b6d4' },
                     angry: { icon: '😠', label: 'Angry', color: '#dc2626' }
                 },
                 
@@ -17793,15 +16712,15 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Tasks Completed',
                                 data: [],
-                                borderColor: 'var(--accent-color)',
-                                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
                                 tension: 0.4,
                                 fill: true
                             }, {
                                 label: 'Points Earned',
                                 data: [],
-                                borderColor: '#e67e22',
-                                backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                                borderColor: '#f093fb',
+                                backgroundColor: 'rgba(240, 147, 251, 0.1)',
                                 tension: 0.4,
                                 fill: true,
                                 yAxisID: 'y1'
@@ -17855,11 +16774,11 @@ Format your response as JSON:
                             datasets: [{
                                 data: [],
                                 backgroundColor: [
-                                    'var(--accent-color)',
-                                    '#e67e22',
-                                    '#f97316',
-                                    '#ea580c',
-                                    '#dc2626'
+                                    '#667eea',
+                                    '#764ba2',
+                                    '#f093fb',
+                                    '#4ade80',
+                                    '#fbbf24'
                                 ],
                                 borderWidth: 2,
                                 borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-primary')
@@ -17891,14 +16810,14 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Task Velocity',
                                 data: [],
-                                backgroundColor: 'rgba(249, 115, 22, 0.8)',
-                                borderColor: 'var(--accent-color)',
+                                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                                borderColor: '#667eea',
                                 borderWidth: 1
                             }, {
                                 label: 'Completion Rate (%)',
                                 data: [],
-                                backgroundColor: 'rgba(230, 126, 34, 0.8)',
-                                borderColor: '#e67e22',
+                                backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                                borderColor: '#f093fb',
                                 borderWidth: 1,
                                 yAxisID: 'y1'
                             }]
@@ -17956,8 +16875,8 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Activity Level',
                                 data: activityData,
-                                backgroundColor: 'rgba(249, 115, 22, 0.6)',
-                                borderColor: 'var(--accent-color)',
+                                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                                borderColor: '#667eea',
                                 borderWidth: 1
                             }]
                         },
@@ -17997,8 +16916,8 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Focus Duration (minutes)',
                                 data: [],
-                                borderColor: 'var(--accent-color)',
-                                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                                borderColor: '#4ade80',
+                                backgroundColor: 'rgba(74, 222, 128, 0.1)',
                                 tension: 0.4,
                                 fill: true
                             }]
@@ -18042,10 +16961,10 @@ Format your response as JSON:
                             datasets: [{
                                 data: [],
                                 backgroundColor: [
-                                    'var(--accent-color)',
-                                    '#e67e22',
-                                    '#f97316',
-                                    '#ea580c'
+                                    '#667eea',
+                                    '#764ba2',
+                                    '#f093fb',
+                                    '#4ade80'
                                 ],
                                 borderWidth: 2,
                                 borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-primary')
@@ -18077,12 +16996,12 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Your Profile',
                                 data: [75, 60, 45, 80, 65, 70],
-                                borderColor: 'var(--accent-color)',
-                                backgroundColor: 'rgba(249, 115, 22, 0.2)',
-                                pointBackgroundColor: 'var(--accent-color)',
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                                pointBackgroundColor: '#667eea',
                                 pointBorderColor: '#fff',
                                 pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'var(--accent-color)'
+                                pointHoverBorderColor: '#667eea'
                             }]
                         },
                         options: {
@@ -18123,14 +17042,14 @@ Format your response as JSON:
                             datasets: [{
                                 label: 'Current Streak',
                                 data: [],
-                                backgroundColor: 'rgba(249, 115, 22, 0.8)',
-                                borderColor: 'var(--accent-color)',
+                                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                                borderColor: '#667eea',
                                 borderWidth: 1
                             }, {
                                 label: 'Best Streak',
                                 data: [],
-                                backgroundColor: 'rgba(230, 126, 34, 0.8)',
-                                borderColor: '#e67e22',
+                                backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                                borderColor: '#f093fb',
                                 borderWidth: 1
                             }]
                         },
@@ -18311,10 +17230,6 @@ Format your response as JSON:
                     theme: 'dark',
                     animations: true,
                     particles: true,
-                    matrixRain: true,
-                    backgroundMusic: true,
-                    musicVolume: 5,
-                    customAccentColor: '#f97316',
                     aiProvider: 'deepseek',
                     aiStyle: 'mentor',
                     personalityAnalysis: true,
@@ -18347,15 +17262,6 @@ Format your response as JSON:
                     // Apply theme
                     document.documentElement.setAttribute('data-theme', this.config.theme);
                     
-                    // Apply custom accent color
-                    if (this.config.customAccentColor) {
-                        document.documentElement.style.setProperty('--accent-color', this.config.customAccentColor);
-                        document.documentElement.style.setProperty('--accent-light', this.config.customAccentColor + 'cc');
-                        document.documentElement.style.setProperty('--accent-glow', this.config.customAccentColor + '99');
-                        document.documentElement.style.setProperty('--glass-bg', this.config.customAccentColor + '1a');
-                        document.documentElement.style.setProperty('--glass-border', this.config.customAccentColor + '33');
-                    }
-                    
                     // Apply animations
                     if (!this.config.animations) {
                         document.body.style.setProperty('--transition-fast', '0s');
@@ -18367,26 +17273,6 @@ Format your response as JSON:
                     if (!this.config.particles && app.particlesInstance) {
                         app.particlesInstance.destroy();
                     }
-                    
-                    // Apply matrix rain
-                    const matrixCanvas = document.getElementById('matrix-rain');
-                    if (matrixCanvas) {
-                        matrixCanvas.style.display = this.config.matrixRain ? 'block' : 'none';
-                    }
-                    
-                    // Apply background music
-                    const backgroundMusic = document.getElementById('background-music');
-                    if (backgroundMusic) {
-                        backgroundMusic.volume = this.config.musicVolume / 100;
-                        if (this.config.backgroundMusic) {
-                            // Try to play music (may fail due to autoplay policies)
-                            backgroundMusic.play().catch(error => {
-                                console.log('Music autoplay blocked:', error);
-                            });
-                        } else {
-                            backgroundMusic.pause();
-                        }
-                    }
                 },
                 
                 updateSettingsUI() {
@@ -18397,8 +17283,6 @@ Format your response as JSON:
                     // Update toggles
                     this.updateToggle('animations-toggle', this.config.animations);
                     this.updateToggle('particles-toggle', this.config.particles);
-                    this.updateToggle('matrix-rain-toggle', this.config.matrixRain);
-                    this.updateToggle('background-music-toggle', this.config.backgroundMusic);
                     this.updateToggle('personality-analysis-toggle', this.config.personalityAnalysis);
                     this.updateToggle('push-notifications-toggle', this.config.pushNotifications);
                     this.updateToggle('daily-reminders-toggle', this.config.dailyReminders);
@@ -18406,22 +17290,12 @@ Format your response as JSON:
                     this.updateToggle('data-collection-toggle', this.config.dataCollection);
                     this.updateToggle('analytics-toggle', this.config.analytics);
                     
-                    // Update custom accent color
-                    const accentColorInput = app.utils.safeGet('#custom-accent-color');
-                    if (accentColorInput) accentColorInput.value = this.config.customAccentColor;
-                    
                     // Update selects
                     const aiProviderSelect = app.utils.safeGet('#ai-provider-select');
                     if (aiProviderSelect) aiProviderSelect.value = this.config.aiProvider;
                     
                     const aiStyleSelect = app.utils.safeGet('#ai-style-select');
                     if (aiStyleSelect) aiStyleSelect.value = this.config.aiStyle;
-                    
-                    // Update music volume
-                    const musicVolumeSlider = app.utils.safeGet('#music-volume-slider');
-                    const musicVolumeDisplay = app.utils.safeGet('#music-volume-display');
-                    if (musicVolumeSlider) musicVolumeSlider.value = this.config.musicVolume;
-                    if (musicVolumeDisplay) musicVolumeDisplay.textContent = `${this.config.musicVolume}%`;
                 },
                 
                 updateToggle(toggleId, isActive) {
@@ -18456,37 +17330,6 @@ Format your response as JSON:
                     this.applySettings();
                     this.updateSettingsUI();
                     app.utils.showToast(`Particles ${this.config.particles ? 'enabled' : 'disabled'}`, 'success');
-                },
-                
-                toggleMatrixRain() {
-                    this.config.matrixRain = !this.config.matrixRain;
-                    this.saveSettings();
-                    this.applySettings();
-                    this.updateSettingsUI();
-                    app.utils.showToast(`Matrix rain ${this.config.matrixRain ? 'enabled' : 'disabled'}`, 'success');
-                },
-                
-                toggleBackgroundMusic() {
-                    this.config.backgroundMusic = !this.config.backgroundMusic;
-                    this.saveSettings();
-                    this.applySettings();
-                    this.updateSettingsUI();
-                    app.utils.showToast(`Background music ${this.config.backgroundMusic ? 'enabled' : 'disabled'}`, 'success');
-                },
-                
-                changeMusicVolume(volume) {
-                    this.config.musicVolume = parseInt(volume);
-                    this.saveSettings();
-                    this.applySettings();
-                    this.updateSettingsUI();
-                    app.utils.showToast(`Music volume set to ${volume}%`, 'success');
-                },
-                
-                changeAccentColor(color) {
-                    this.config.customAccentColor = color;
-                    this.saveSettings();
-                    this.applySettings();
-                    app.utils.showToast(`Accent color changed to ${color}`, 'success');
                 },
                 
                 changeAIProvider(provider) {
@@ -18706,11 +17549,11 @@ Format your response as JSON:
                                         <div class="ai-analytics">
                                             <div class="ai-provider-stats">
                                                 <h4>Provider Usage</h4>
-                                                <canvas class="provider-chart" id="ai-provider-chart"></canvas>
+                                                <div class="provider-chart" id="ai-provider-chart"></div>
                                             </div>
                                             <div class="ai-performance">
                                                 <h4>Response Times</h4>
-                                                <canvas class="performance-chart" id="ai-performance-chart"></canvas>
+                                                <div class="performance-chart" id="ai-performance-chart"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -18719,8 +17562,8 @@ Format your response as JSON:
                                     <div class="analytics-section">
                                         <h3>👥 User Engagement</h3>
                                         <div class="engagement-charts">
-                                                                        <canvas class="engagement-chart" id="daily-activity-chart"></canvas>
-                            <canvas class="engagement-chart" id="feature-usage-chart"></canvas>
+                                            <div class="engagement-chart" id="daily-activity-chart"></div>
+                                            <div class="engagement-chart" id="feature-usage-chart"></div>
                                         </div>
                                     </div>
                                     
@@ -18792,8 +17635,28 @@ Format your response as JSON:
                 
                 async fetchUserMetrics() {
                     try {
-                        // Use local data instead of API calls for now
-                        return this.getFallbackUserMetrics();
+                        // Get current user ID if available
+                        const userId = app.state.currentUser?.uid;
+                        const timeRange = document.getElementById('time-range')?.value || '24h';
+                        
+                        // Call real backend API
+                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(userId && app.state.currentUser?.token ? {
+                                    'Authorization': `Bearer ${app.state.currentUser.token}`
+                                } : {})
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`API error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        return data.data?.userMetrics || this.getFallbackUserMetrics();
+                        
                     } catch (error) {
                         console.error('❌ Failed to fetch user metrics:', error);
                         return this.getFallbackUserMetrics();
@@ -18802,8 +17665,28 @@ Format your response as JSON:
                 
                 async fetchAIUsage() {
                     try {
-                        // Use local data instead of API calls for now
-                        return this.getFallbackAIUsage();
+                        // Get current user ID if available
+                        const userId = app.state.currentUser?.uid;
+                        const timeRange = document.getElementById('time-range')?.value || '24h';
+                        
+                        // Call real backend API
+                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(userId && app.state.currentUser?.token ? {
+                                    'Authorization': `Bearer ${app.state.currentUser.token}`
+                                } : {})
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`API error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        return data.data?.aiUsage || this.getFallbackAIUsage();
+                        
                     } catch (error) {
                         console.error('❌ Failed to fetch AI usage:', error);
                         return this.getFallbackAIUsage();
@@ -18841,21 +17724,52 @@ Format your response as JSON:
                 
                 async fetchPerformanceData() {
                     try {
-                        // Use local data instead of API calls for now
-                        return this.getFallbackPerformanceData();
+                        // Get current user ID if available
+                        const userId = app.state.currentUser?.uid;
+                        const timeRange = document.getElementById('time-range')?.value || '24h';
+                        
+                        // Call real backend API
+                        const response = await fetch(`/netlify/functions/analytics?timeRange=${timeRange}${userId ? `&userId=${userId}` : ''}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(userId && app.state.currentUser?.token ? {
+                                    'Authorization': `Bearer ${app.state.currentUser.token}`
+                                } : {})
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`API error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        const backendPerformance = data.data?.performance;
+                        
+                        // Combine backend data with real-time client data
+                        const loadTime = performance.now() - performance.timing.navigationStart;
+                        const memory = performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0;
+                        
+                        return {
+                            loadTime: backendPerformance?.loadTime || Math.round(loadTime),
+                            memoryUsage: Math.round(memory), // Always use real-time memory
+                            errorRate: backendPerformance?.errorRate || Math.floor(Math.random() * 5),
+                            aiResponseTime: backendPerformance?.aiResponseTime || Math.floor(Math.random() * 2000) + 1000
+                        };
+                        
                     } catch (error) {
                         console.error('❌ Failed to fetch performance data:', error);
-                        return this.getFallbackPerformanceData();
-                    }
-                },
-                
-                getFallbackPerformanceData() {
+                        // Fallback to real-time client data
+                        const loadTime = performance.now() - performance.timing.navigationStart;
+                        const memory = performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0;
+                        
                         return {
-                        loadTime: Math.floor(Math.random() * 2000) + 1000,
-                        responseTime: Math.floor(Math.random() * 500) + 200,
-                        errorRate: Math.floor(Math.random() * 5) + 1,
-                        uptime: Math.floor(Math.random() * 10) + 95
-                    };
+                            loadTime: Math.round(loadTime),
+                            memoryUsage: Math.round(memory),
+                            errorRate: Math.floor(Math.random() * 5),
+                            aiResponseTime: Math.floor(Math.random() * 2000) + 1000
+                        };
+                    }
                 },
                 
                 updateMetricsDisplay() {
@@ -18886,44 +17800,20 @@ Format your response as JSON:
                 },
                 
                 initializeCharts() {
-                    // Initialize Chart.js charts with delay to ensure DOM is ready
-                    setTimeout(() => {
+                    // Initialize Chart.js charts
                     this.createAIProviderChart();
                     this.createPerformanceChart();
                     this.createEngagementCharts();
-                    }, 100);
                 },
                 
                 createAIProviderChart() {
                     const ctx = document.getElementById('ai-provider-chart');
-                    if (!ctx) {
-                        console.warn('AI provider chart canvas not found');
-                        return;
-                    }
-                    
-                    // Check if canvas context is available
-                    try {
-                        const context = ctx.getContext('2d');
-                        if (!context) {
-                            console.warn('AI provider chart canvas context not available');
-                            return;
-                        }
-                    } catch (error) {
-                        console.warn('AI provider chart canvas context error:', error);
-                        return;
-                    }
-                    
-                    // Check if Chart.js is loaded
-                    if (typeof Chart === 'undefined') {
-                        console.warn('Chart.js not loaded, skipping chart creation');
-                        return;
-                    }
+                    if (!ctx) return;
                     
                     const data = this.data.aiUsage.providers || {};
                     const labels = Object.keys(data);
                     const values = Object.values(data);
                     
-                    try {
                     this.charts.aiProvider = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
@@ -18953,41 +17843,16 @@ Format your response as JSON:
                             }
                         }
                     });
-                    } catch (error) {
-                        console.error('Failed to create AI provider chart:', error);
-                    }
                 },
                 
                 createPerformanceChart() {
                     const ctx = document.getElementById('ai-performance-chart');
-                    if (!ctx) {
-                        console.warn('Performance chart canvas not found');
-                        return;
-                    }
-                    
-                    // Check if canvas context is available
-                    try {
-                        const context = ctx.getContext('2d');
-                        if (!context) {
-                            console.warn('Performance chart canvas context not available');
-                            return;
-                        }
-                    } catch (error) {
-                        console.warn('Performance chart canvas context error:', error);
-                        return;
-                    }
-                    
-                    // Check if Chart.js is loaded
-                    if (typeof Chart === 'undefined') {
-                        console.warn('Chart.js not loaded, skipping performance chart');
-                        return;
-                    }
+                    if (!ctx) return;
                     
                     const data = this.data.aiUsage.responseTimes || {};
                     const labels = Object.keys(data);
                     const values = Object.values(data);
                     
-                    try {
                     this.charts.performance = new Chart(ctx, {
                         type: 'bar',
                         data: {
@@ -19031,29 +17896,12 @@ Format your response as JSON:
                             }
                         }
                     });
-                    } catch (error) {
-                        console.error('Failed to create performance chart:', error);
-                    }
                 },
                 
                 createEngagementCharts() {
-                    // Check if Chart.js is loaded
-                    if (typeof Chart === 'undefined') {
-                        console.warn('Chart.js not loaded, skipping engagement charts');
-                        return;
-                    }
-                    
                     // Daily activity chart
                     const dailyCtx = document.getElementById('daily-activity-chart');
                     if (dailyCtx) {
-                        try {
-                            // Check if canvas context is available
-                            const context = dailyCtx.getContext('2d');
-                            if (!context) {
-                                console.warn('Daily activity chart canvas context not available');
-                                return;
-                            }
-                            
                         this.charts.dailyActivity = new Chart(dailyCtx, {
                             type: 'line',
                             data: {
@@ -19087,22 +17935,11 @@ Format your response as JSON:
                                 }
                             }
                         });
-                        } catch (error) {
-                            console.error('Failed to create daily activity chart:', error);
-                        }
                     }
                     
                     // Feature usage chart
                     const featureCtx = document.getElementById('feature-usage-chart');
                     if (featureCtx) {
-                        try {
-                            // Check if canvas context is available
-                            const context = featureCtx.getContext('2d');
-                            if (!context) {
-                                console.warn('Feature usage chart canvas context not available');
-                                return;
-                            }
-                            
                         this.charts.featureUsage = new Chart(featureCtx, {
                             type: 'radar',
                             data: {
@@ -19133,9 +17970,6 @@ Format your response as JSON:
                                 }
                             }
                         });
-                        } catch (error) {
-                            console.error('Failed to create feature usage chart:', error);
-                        }
                     }
                 },
                 
@@ -19242,30 +18076,6 @@ Format your response as JSON:
                  * @description Sets up the complete application with all modules and features
                  * @returns {Promise<void>} Promise that resolves when initialization is complete
                  */
-                /**
-                 * Initialize enhanced onboarding system
-                 * Sets up the onboarding flow and user guidance
-                 */
-                initEnhancedOnboarding() {
-                    try {
-                        console.log('🎯 Initializing enhanced onboarding system...');
-                        
-                        // Check if user has completed onboarding
-                        const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
-                        
-                        if (!hasCompletedOnboarding) {
-                            // Show onboarding modal or redirect to onboarding flow
-                            console.log('📋 User needs onboarding - will show onboarding flow');
-                        } else {
-                            console.log('✅ User has completed onboarding');
-                        }
-                        
-                        console.log('✅ Enhanced onboarding system initialized');
-                    } catch (error) {
-                        console.error('❌ Failed to initialize enhanced onboarding:', error);
-                    }
-                },
-                
                 init() {
                 /**
                  * Initialize the main application
@@ -19320,28 +18130,13 @@ Format your response as JSON:
                     this.initBackgroundEffects();
                     
                     // Load data
-                    if (this.goals && typeof this.goals.loadFromLocalStorage === 'function') {
                     this.goals.loadFromLocalStorage();
-                    }
                     
-                    // Check authentication status - Always show auth first for better UX
-                    if (this.state.currentUser && this.state.isAuthenticated) {
+                    // Check authentication status
+                    if (this.state.currentUser) {
                         this.ui.showView('dashboard');
                     } else {
-                        // Force auth view to stay active
                         this.ui.showView('auth');
-                        
-                        // Ensure main content is hidden
-                        const mainContent = document.querySelector('.main-content');
-                        if (mainContent) {
-                            mainContent.style.display = 'none';
-                        }
-                        
-                        // Ensure auth view is visible
-                        const authView = document.getElementById('auth-view');
-                        if (authView) {
-                            authView.classList.add('active');
-                        }
                     }
                     
                     this.state.isInitialized = true;
@@ -19369,169 +18164,10 @@ Format your response as JSON:
             }
         };
 
-        // Browser-compatible process polyfill
-        if (typeof process === 'undefined') {
-            window.process = {
-                env: {
-                    NODE_ENV: window.location.hostname === 'localhost' ? 'development' : 'production'
-                }
-            };
-        }
-
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
-            
-            // Initialize Matrix Rain Effect
-            initMatrixRain();
-            
-            // Initialize Particles for Dashboard
-            initParticles();
-            
-            // Initialize Background Music
-            initBackgroundMusic();
         });
-        
-        // Matrix Rain Effect
-        function initMatrixRain() {
-            const canvas = document.getElementById('matrix-rain');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // Matrix rain characters: Japanese + Latin + Numbers
-            const matrix = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            const matrixArray = matrix.split("");
-            
-            const fontSize = 12;
-            const columns = canvas.width / fontSize;
-            // Matrix rain initialization complete
-        }
-        
-        // Background Music Initialization
-        function initBackgroundMusic() {
-            const backgroundMusic = document.getElementById('background-music');
-            if (!backgroundMusic) return;
-            
-            // Set initial volume to 10%
-            backgroundMusic.volume = 0.1;
-            
-            // Try to play music on user interaction
-            const playMusicOnInteraction = () => {
-                if (app.settings.config.backgroundMusic) {
-                    backgroundMusic.play().catch(error => {
-                        console.log('Music autoplay blocked:', error);
-                    });
-                }
-                // Remove event listeners after first interaction
-                document.removeEventListener('click', playMusicOnInteraction);
-                document.removeEventListener('keydown', playMusicOnInteraction);
-                document.removeEventListener('touchstart', playMusicOnInteraction);
-            };
-            
-            // Add event listeners for user interaction
-            document.addEventListener('click', playMusicOnInteraction);
-            document.addEventListener('keydown', playMusicOnInteraction);
-            document.addEventListener('touchstart', playMusicOnInteraction);
-            
-            console.log('✅ Background music initialized');
-        }
-        
-        // Resize handler for matrix rain
-        window.addEventListener('resize', () => {
-            const canvas = document.getElementById('matrix-rain');
-            if (canvas) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-        });
-        
-        // Particles Effect for Dashboard
-        function initParticles() {
-            if (typeof tsParticles !== 'undefined') {
-                tsParticles.load("particles-js", {
-                    particles: {
-                        number: {
-                            value: 80,
-                            density: {
-                                enable: true,
-                                value_area: 800
-                            }
-                        },
-                        color: {
-                            value: "#f97316"
-                        },
-                        shape: {
-                            type: "circle"
-                        },
-                        opacity: {
-                            value: 0.5,
-                            random: false
-                        },
-                        size: {
-                            value: 3,
-                            random: true
-                        },
-                        line_linked: {
-                            enable: true,
-                            distance: 150,
-                            color: "#f97316",
-                            opacity: 0.4,
-                            width: 1
-                        },
-                        move: {
-                            enable: true,
-                            speed: 2,
-                            direction: "none",
-                            random: false,
-                            straight: false,
-                            out_mode: "out",
-                            bounce: false
-                        }
-                    },
-                    interactivity: {
-                        detect_on: "canvas",
-                        events: {
-                            onhover: {
-                                enable: true,
-                                mode: "repulse"
-                            },
-                            onclick: {
-                                enable: true,
-                                mode: "push"
-                            },
-                            resize: true
-                        }
-                    },
-                    retina_detect: true
-                });
-            }
-        }
-        
-        // Debug function to force show auth overlay
-        window.forceShowAuth = function() {
-            const authView = document.getElementById('auth-view');
-            if (authView) {
-                authView.classList.add('active');
-                authView.style.position = 'fixed';
-                authView.style.top = '0';
-                authView.style.left = '0';
-                authView.style.width = '100%';
-                authView.style.height = '100vh';
-                authView.style.zIndex = '20000';
-                authView.style.background = 'var(--bg-primary)';
-                authView.style.display = 'block';
-                
-                const mainContent = document.querySelector('.main-content');
-                if (mainContent) {
-                    mainContent.style.display = 'none';
-                }
-                
-                console.log('🔐 Auth overlay forced to show');
-            }
-        };
      </script>
 </body>
 </html>

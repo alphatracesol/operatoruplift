@@ -1,0 +1,153 @@
+[build]
+  publish = "."
+  command = "echo 'No build step needed for static HTML app'"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# SPA Routing - Handle all routes
+[[redirects]]
+  from = "/*"
+  to = "/app.html"
+  status = 200
+
+# API Routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Function Routes
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Security Headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-*.cloudfunctions.net; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "same-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# PWA Manifest
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+# JavaScript Files
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "public, max-age=31536000"
+
+# CSS Files
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Content-Type = "text/css"
+    Cache-Control = "public, max-age=31536000"
+
+# HTML Files
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# Images
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.gif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Fonts
+[[headers]]
+  for = "*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.ttf"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Environment Variables
+[context.production.environment]
+  NODE_ENV = "production"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "preview"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+  HF_TOKEN = "your-huggingface-token"
+  CLAUDE_API_KEY = "your-claude-api-key"
+  GEMINI_API_KEY = "your-gemini-api-key"
+  PERPLEXITY_API_KEY = "your-perplexity-api-key"
+  XAI_API_KEY = "your-xai-api-key"
+  OPENROUTER_API_KEY = "your-openrouter-api-key"
+  FIREBASE_PROJECT_ID = "your-firebase-project-id"
+  FIREBASE_CLIENT_EMAIL = "your-firebase-client-email"
+  FIREBASE_PRIVATE_KEY = "your-firebase-private-key"

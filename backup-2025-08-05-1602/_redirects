@@ -1,0 +1,15 @@
+# SPA Routing - Handle all routes
+/*    /app.html   200
+
+# API Routes
+/api/*    /.netlify/functions/:splat    200
+
+# Function Routes
+/.netlify/functions/*    /.netlify/functions/:splat    200
+
+# PWA Routes
+/manifest.json    /manifest.json    200
+/sw.js    /sw.js    200
+
+# Fallback for 404
+/*    /app.html    404

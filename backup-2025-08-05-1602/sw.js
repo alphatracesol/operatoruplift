@@ -17,12 +17,12 @@ const STATIC_FILES = [
     '/apple-touch-icon.png',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
-    'https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js',
     'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
-
-      'https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js',
+    'https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js',
+    'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js',
+    'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js',
+    'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'
 ];
 
@@ -204,15 +204,8 @@ async function handleExternalRequest(request) {
         // Fallback to network
         const networkResponse = await fetch(request);
         if (networkResponse.ok) {
-            // Skip caching chrome-extension URLs
-            if (!request.url.startsWith('chrome-extension://')) {
-                try {
-                    const cache = await caches.open(DYNAMIC_CACHE);
-                    await cache.put(request, networkResponse.clone());
-                } catch (error) {
-                    console.warn('Failed to cache external request:', error);
-                }
-            }
+            const cache = await caches.open(DYNAMIC_CACHE);
+            cache.put(request, networkResponse.clone());
         }
         
         return networkResponse;
