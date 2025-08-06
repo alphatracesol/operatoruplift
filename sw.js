@@ -180,7 +180,7 @@ async function handleStaticRequest(request) {
         
         // Fallback to network
         const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
+        if (networkResponse.ok && networkResponse.status !== 206) {
             const cache = await caches.open(STATIC_CACHE);
             cache.put(request, networkResponse.clone());
         }
@@ -203,7 +203,7 @@ async function handleExternalRequest(request) {
         
         // Fallback to network
         const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
+        if (networkResponse.ok && networkResponse.status !== 206) {
             // Skip caching chrome-extension URLs
             if (!request.url.startsWith('chrome-extension://')) {
                 try {
