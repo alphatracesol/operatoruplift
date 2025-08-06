@@ -112,6 +112,15 @@ async function cacheFirst(request) {
         return fetch(request);
     }
     
+    // Skip caching for external resources that might be blocked by CSP
+    if (request.url.includes('unpkg.com') || 
+        request.url.includes('apis.google.com') || 
+        request.url.includes('facebook.com') ||
+        request.url.includes('google-analytics.com')) {
+        console.log('🚫 External resource detected, bypassing cache:', request.url);
+        return fetch(request);
+    }
+    
     const cache = await caches.open(STATIC_CACHE);
     const cachedResponse = await cache.match(request);
     
@@ -143,6 +152,15 @@ async function networkFirst(request) {
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
         console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
+        return fetch(request);
+    }
+    
+    // Skip caching for external resources that might be blocked by CSP
+    if (request.url.includes('unpkg.com') || 
+        request.url.includes('apis.google.com') || 
+        request.url.includes('facebook.com') ||
+        request.url.includes('google-analytics.com')) {
+        console.log('🚫 External resource detected, bypassing cache:', request.url);
         return fetch(request);
     }
     
@@ -178,6 +196,15 @@ async function staleWhileRevalidate(request) {
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
         console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
+        return fetch(request);
+    }
+    
+    // Skip caching for external resources that might be blocked by CSP
+    if (request.url.includes('unpkg.com') || 
+        request.url.includes('apis.google.com') || 
+        request.url.includes('facebook.com') ||
+        request.url.includes('google-analytics.com')) {
+        console.log('🚫 External resource detected, bypassing cache:', request.url);
         return fetch(request);
     }
     
