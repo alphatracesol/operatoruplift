@@ -8658,7 +8658,102 @@
                     </div>
 
                     <!-- Performance Section -->
-                    
+                    <div id="analytics-performance-view" class="analytics-view">
+                        <div class="analytics-grid">
+                            <div class="chart-card full-width">
+                                <h3>Task Velocity & Completion Rate</h3>
+                                <div class="chart-container">
+                                    <canvas id="velocity-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Daily Activity Heatmap</h3>
+                                <div class="chart-container">
+                                    <canvas id="heatmap-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Focus Session Duration</h3>
+                                <div class="chart-container">
+                                    <canvas id="focus-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights Section -->
+                    <div id="analytics-insights-view" class="analytics-view">
+                        <div class="analytics-grid">
+                            <div class="insights-card full-width">
+                                <h3>🤖 AI-Powered Insights</h3>
+                                <div id="analytics-insights-list" class="insights-list">
+                                    <div class="insight-item loading">
+                                        <div class="insight-icon">🤔</div>
+                                        <div class="insight-content">
+                                            <h4>Analyzing your data...</h4>
+                                            <p>Generating personalized insights based on your activity patterns.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h3>AI Usage Patterns</h3>
+                                <div class="chart-container">
+                                    <canvas id="ai-usage-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Personality Insights</h3>
+                                <div class="chart-container">
+                                    <canvas id="personality-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Habits Section -->
+                    <div id="analytics-habits-view" class="analytics-view">
+                        <div class="analytics-grid">
+                            <div class="chart-card full-width">
+                                <h3>Habit Tracking & Streaks</h3>
+                                <div class="chart-container">
+                                    <canvas id="habits-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="habits-summary">
+                                <div class="habit-card">
+                                    <h4>Current Streaks</h4>
+                                    <div id="current-streaks" class="streaks-list">
+                                        <!-- Streaks will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="habit-card">
+                                    <h4>Best Performances</h4>
+                                    <div id="best-performances" class="performances-list">
+                                        <!-- Best performances will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Community View -->
+            <div class="view" id="community-view">
+                <h2>Community</h2>
+                <p>Connect with other operators.</p>
+                <!-- Placeholder for community functionality -->
+            </div>
+            
+            <!-- Settings View -->
+            <div class="view" id="settings-view">
+                <h2>Settings</h2>
+                <p>Customize your experience.</p>
+                <!-- Placeholder for settings functionality -->
+            </div>
+        </main>
+    </div>
     
          <!-- Onboarding Modal -->
      <div class="modal" id="onboarding-modal">

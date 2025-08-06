@@ -48,14 +48,14 @@ def analyze_app_structure():
     else:
         print("✅ No duplicate IDs found")
     
-    # 2. Check for duplicate function definitions
+    # 2. Check for duplicate function definitions (excluding object properties)
     print("\n2️⃣ CHECKING FOR DUPLICATE FUNCTIONS...")
     function_patterns = [
         r'function\s+(\w+)\s*\(',
         r'const\s+(\w+)\s*=\s*function',
         r'let\s+(\w+)\s*=\s*function',
-        r'(\w+)\s*:\s*function\s*\(',
-        r'(\w+)\s*:\s*\([^)]*\)\s*=>'
+        r'(\w+)\s*:\s*function\s*\('
+        # Removed arrow function pattern as it catches legitimate object properties
     ]
     
     all_functions = []
