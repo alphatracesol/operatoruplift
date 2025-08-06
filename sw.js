@@ -3,10 +3,10 @@
  * Provides offline functionality, caching, and background sync
  */
 
-const CACHE_NAME = 'operator-uplift-v1.0.1';
-const STATIC_CACHE = 'static-v1.0.1';
-const DYNAMIC_CACHE = 'dynamic-v1.0.1';
-const API_CACHE = 'api-v1.0.1';
+const CACHE_NAME = 'operator-uplift-v1.0.2';
+const STATIC_CACHE = 'static-v1.0.2';
+const DYNAMIC_CACHE = 'dynamic-v1.0.2';
+const API_CACHE = 'api-v1.0.2';
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -18,6 +18,7 @@ const STATIC_FILES = [
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
     'https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js',
+    'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
 
       'https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js',
