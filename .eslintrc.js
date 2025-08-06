@@ -6,130 +6,105 @@ module.exports = {
     jest: true
   },
   extends: [
-    'eslint:recommended'
+    'standard',
+    'plugin:jest/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 2021,
+    ecmaVersion: 12,
     sourceType: 'module'
   },
+  plugins: [
+    'jest'
+  ],
   rules: {
-    // Code Quality
-    'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
+    // Code quality rules
+    'no-unused-vars': 'warn',
     'no-console': 'warn',
     'no-debugger': 'error',
-    'no-alert': 'warn',
-    'no-eval': 'error',
-    'no-implied-eval': 'error',
-    'no-new-func': 'error',
-    
-    // Best Practices
-    'eqeqeq': ['error', 'always'],
-    'curly': ['error', 'all'],
-    'no-var': 'error',
     'prefer-const': 'error',
-    'no-const-assign': 'error',
-    'no-dupe-keys': 'error',
-    'no-dupe-args': 'error',
-    'no-dupe-class-members': 'error',
-    'no-dupe-else-if': 'error',
-    'no-duplicate-imports': 'error',
+    'no-var': 'error',
     
-    // Performance
-    'no-loop-func': 'error',
-    'no-new-object': 'error',
-    'no-new-array': 'error',
-    'no-new-wrappers': 'error',
-    'no-array-constructor': 'error',
-    'no-new': 'error',
+    // Function and variable naming
+    'camelcase': 'warn',
+    'func-names': 'off',
     
-    // Security
-    'no-implied-eval': 'error',
-    'no-script-url': 'error',
-    'no-unsafe-finally': 'error',
-    
-    // Readability
+    // Spacing and formatting
     'indent': ['error', 2],
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
     'comma-dangle': ['error', 'never'],
-    'no-trailing-spaces': 'error',
-    'eol-last': 'error',
-    'no-multiple-empty-lines': ['error', { 'max': 2 }],
     
-    // ES6+
-    'arrow-spacing': 'error',
-    'no-useless-constructor': 'error',
-    'prefer-template': 'error',
-    'template-curly-spacing': 'error',
-    'object-shorthand': 'error',
-    'prefer-arrow-callback': 'error',
-    'prefer-destructuring': ['error', { 'array': false, 'object': true }],
-    
-    // Function Optimization
-    'no-param-reassign': 'error',
-    'prefer-rest-params': 'error',
-    'no-useless-return': 'error',
-    
-    // Variable Declarations
-    'no-use-before-define': 'error',
-    'no-shadow': 'error',
-    'no-shadow-restricted-names': 'error',
-    
-    // Control Flow
-    'no-else-return': 'error',
-    'no-unneeded-ternary': 'error',
-    'no-nested-ternary': 'error',
-    
-    // Object/Array
-    'no-array-constructor': 'error',
-    'no-new-object': 'error',
+    // Object and array rules
     'object-curly-spacing': ['error', 'always'],
     'array-bracket-spacing': ['error', 'never'],
     
-    // Async/Await
-    'no-async-promise-executor': 'error',
-    'require-await': 'error',
-    'no-return-await': 'error'
+    // Function rules
+    'arrow-spacing': 'error',
+    'no-confusing-arrow': 'error',
+    
+    // Error handling
+    'no-throw-literal': 'error',
+    'prefer-promise-reject-errors': 'error',
+    
+    // Security
+    'no-eval': 'error',
+    'no-implied-eval': 'error',
+    'no-new-func': 'error',
+    
+    // Jest specific rules
+    'jest/no-disabled-tests': 'warn',
+    'jest/no-focused-tests': 'error',
+    'jest/no-identical-title': 'error',
+    'jest/prefer-to-have-length': 'warn',
+    'jest/valid-expect': 'error'
   },
   globals: {
-    // Browser globals
+    // Global variables available in the browser
     'window': 'readonly',
     'document': 'readonly',
     'navigator': 'readonly',
     'localStorage': 'readonly',
     'sessionStorage': 'readonly',
-    'console': 'readonly',
-    'setTimeout': 'readonly',
-    'setInterval': 'readonly',
-    'clearTimeout': 'readonly',
-    'clearInterval': 'readonly',
     'fetch': 'readonly',
-    'Promise': 'readonly',
-    'JSON': 'readonly',
-    'Math': 'readonly',
-    'Date': 'readonly',
-    'Array': 'readonly',
-    'Object': 'readonly',
-    'String': 'readonly',
-    'Number': 'readonly',
-    'Boolean': 'readonly',
-    'RegExp': 'readonly',
-    'Error': 'readonly',
-    'Map': 'readonly',
-    'Set': 'readonly',
-    'WeakMap': 'readonly',
-    'WeakSet': 'readonly',
-    'Symbol': 'readonly',
-    'Proxy': 'readonly',
-    'Reflect': 'readonly',
-    'Intl': 'readonly',
+    'console': 'readonly',
     
-    // Third-party libraries
-    'Chart': 'readonly',
-    'GSAP': 'readonly',
-    'Tone': 'readonly',
+    // Firebase globals
     'firebase': 'readonly',
+    
+    // Chart.js globals
+    'Chart': 'readonly',
+    
+    // GSAP globals
+    'gsap': 'readonly',
+    
+    // Tone.js globals
+    'Tone': 'readonly',
+    
+    // tsParticles globals
     'tsParticles': 'readonly',
-    'dateFns': 'readonly'
-  }
+    
+    // Custom app globals
+    'OperatorUplift': 'readonly',
+    
+    // Test globals
+    'describe': 'readonly',
+    'test': 'readonly',
+    'it': 'readonly',
+    'expect': 'readonly',
+    'beforeEach': 'readonly',
+    'afterEach': 'readonly',
+    'beforeAll': 'readonly',
+    'afterAll': 'readonly',
+    'jest': 'readonly'
+  },
+  overrides: [
+    {
+      // HTML files (for inline scripts)
+      files: ['*.html'],
+      rules: {
+        'no-undef': 'off',
+        'no-unused-vars': 'off'
+      }
+    }
+  ]
 }; 

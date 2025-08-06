@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Integration Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a0a 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-result {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid;
+        }
+        .test-result.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-left-color: #22c55e;
+        }
+        .test-result.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+        }
+        .test-result.info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+        .test-result.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: #f59e0b;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🤖 AI Integration Test</h1>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        let testCount = 0;
+        let passedTests = 0;
+
+        function runTest(testName, testFunction) {
+            testCount++;
+            try {
+                const result = testFunction();
+                if (result) {
+                    passedTests++;
+                    addTestResult(`✅ ${testName}`, 'success');
+                } else {
+                    addTestResult(`❌ ${testName}`, 'error');
+                }
+            } catch (error) {
+                addTestResult(`❌ ${testName}: ${error.message}`, 'error');
+            }
+            updateProgress((testCount / 15) * 100);
+        }
+
+        // Start testing
+        addTestResult('🚀 Starting AI Integration Test...', 'info');
+
+        fetch('app.html')
+            .then(response => response.text())
+            .then(content => {
+                const lines = content.split('\n');
+                addTestResult(`📊 File size: ${lines.length} lines (Target: ~2000+ lines for Phase 4)`, 'info');
+
+                // Test 1: AI Configuration
+                runTest('AI Configuration Object', () => {
+                    return content.includes('AI_CONFIG') && 
+                           content.includes('apiEndpoint') && 
+                           content.includes('deepseek-chat');
+                });
+
+                // Test 2: AI Chat Interface
+                runTest('AI Chat Interface HTML', () => {
+                    return content.includes('ai-chat-container') && 
+                           content.includes('ai-chat-header') && 
+                           content.includes('ai-chat-messages') && 
+                           content.includes('ai-chat-input');
+                });
+
+                // Test 3: AI Functions
+                runTest('AI Core Functions', () => {
+                    return content.includes('initializeAIChat') && 
+                           content.includes('sendAiMessage') && 
+                           content.includes('callDeepSeekAI');
+                });
+
+                // Test 4: AI Analysis Functions
+                runTest('AI Analysis Functions', () => {
+                    return content.includes('aiAnalyzeGoals') && 
+                           content.includes('aiBreakdownGoal') && 
+                           content.includes('aiPersonalityAssessment') && 
+                           content.includes('aiProgressAnalysis');
+                });
+
+                // Test 5: AI API Integration
+                runTest('AI API Integration', () => {
+                    return content.includes('buildUserContext') && 
+                           content.includes('analyzeGoalsWithAI') && 
+                           content.includes('performGoalBreakdown');
+                });
+
+                // Test 6: AI Message System
+                runTest('AI Message System', () => {
+                    return content.includes('addAiMessage') && 
+                           content.includes('showAiTypingIndicator') && 
+                           content.includes('hideAiTypingIndicator');
+                });
+
+                // Test 7: AI Quick Actions
+                runTest('AI Quick Actions', () => {
+                    return content.includes('ai-quick-actions') && 
+                           content.includes('ai-action-btn') && 
+                           content.includes('Analyze My Goals') && 
+                           content.includes('Break Down a Goal');
+                });
+
+                // Test 8: AI CSS Styles
+                runTest('AI CSS Styles', () => {
+                    return content.includes('.ai-chat-container') && 
+                           content.includes('.ai-message') && 
+                           content.includes('.ai-avatar') && 
+                           content.includes('.typing-dots');
+                });
+
+                // Test 9: AI Responsive Design
+                runTest('AI Responsive Design', () => {
+                    return content.includes('@media (max-width: 768px)') && 
+                           content.includes('ai-chat-messages') && 
+                           content.includes('ai-quick-actions');
+                });
+
+                // Test 10: AI Event Listeners
+                runTest('AI Event Listeners', () => {
+                    return content.includes('setupAIChatEventListeners') && 
+                           content.includes('keypress') && 
+                           content.includes('Enter');
+                });
+
+                // Test 11: AI Global Functions
+                runTest('AI Global Functions', () => {
+                    return content.includes('window.aiAnalyzeGoals') && 
+                           content.includes('window.aiBreakdownGoal') && 
+                           content.includes('window.sendAiMessage');
+                });
+
+                // Test 12: AI View Integration
+                runTest('AI View Integration', () => {
+                    return content.includes('showView') && 
+                           content.includes('aiChat') && 
+                           content.includes('initializeAIChat');
+                });
+
+                // Test 13: AI Error Handling
+                runTest('AI Error Handling', () => {
+                    return content.includes('ai-message-error') && 
+                           content.includes('catch (error)') && 
+                           content.includes('console.error');
+                });
+
+                // Test 14: AI Animations
+                runTest('AI Animations', () => {
+                    return content.includes('messageSlideIn') && 
+                           content.includes('typingBounce') && 
+                           content.includes('@keyframes');
+                });
+
+                // Test 15: AI Completion Logging
+                runTest('AI Completion Logging', () => {
+                    return content.includes('Phase 4: AI Integration Complete') && 
+                           content.includes('AI Chat Interface') && 
+                           content.includes('Goal Breakdown');
+                });
+
+                // Final results
+                const successRate = Math.round((passedTests / testCount) * 100);
+                addTestResult(`📈 Test Results: ${passedTests}/${testCount} tests passed (${successRate}%)`, 'info');
+                
+                if (successRate >= 90) {
+                    addTestResult('🎉 Phase 4 AI Integration Test PASSED!', 'success');
+                } else if (successRate >= 70) {
+                    addTestResult('⚠️ Phase 4 AI Integration Test PARTIALLY PASSED - Some issues detected', 'warning');
+                } else {
+                    addTestResult('❌ Phase 4 AI Integration Test FAILED - Major issues detected', 'error');
+                }
+
+                addTestResult('🚀 Phase 4 AI Integration Test Complete', 'info');
+            })
+            .catch(error => {
+                addTestResult(`❌ Error loading app.html: ${error.message}`, 'error');
+            });
+
+        // Test external files
+        addTestResult('🔍 Checking external files...', 'info');
+        
+        fetch('manifest.json')
+            .then(response => response.json())
+            .then(data => {
+                addTestResult('✅ manifest.json: PWA configuration loaded', 'success');
+            })
+            .catch(error => {
+                addTestResult('❌ manifest.json: Not found or invalid', 'error');
+            });
+
+        fetch('netlify.toml')
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('[build]') && data.includes('functions')) {
+                    addTestResult('✅ netlify.toml: Deployment configuration loaded', 'success');
+                } else {
+                    addTestResult('⚠️ netlify.toml: Configuration may be incomplete', 'warning');
+                }
+            })
+            .catch(error => {
+                addTestResult('❌ netlify.toml: Not found', 'error');
+            });
+
+        fetch('sw.js')
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('serviceWorker') || data.includes('cache')) {
+                    addTestResult('✅ sw.js: Service Worker loaded', 'success');
+                } else {
+                    addTestResult('⚠️ sw.js: Service Worker may be incomplete', 'warning');
+                }
+            })
+            .catch(error => {
+                addTestResult('❌ sw.js: Not found', 'error');
+            });
+    </script>
+</body>
+</html>
+
+
+

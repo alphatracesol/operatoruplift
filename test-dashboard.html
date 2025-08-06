@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: #e5e7eb;
+            padding: 20px;
+        }
+        .test-result {
+            background: #1a1a1a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f97316;
+        }
+        .success { border-left-color: #10b981; }
+        .error { border-left-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Dashboard System Test</h1>
+    
+    <div id="testResults"></div>
+
+    <script>
+        function addTestResult(message, type = 'info') {
+            const results = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        // Test 1: Check if app.html exists and has dashboard content
+        fetch('app.html')
+            .then(response => response.text())
+            .then(content => {
+                if (content.includes('dashboardView') && content.includes('dashboard-header')) {
+                    addTestResult('✅ Dashboard HTML structure found', 'success');
+                } else {
+                    addTestResult('❌ Dashboard HTML structure missing', 'error');
+                }
+                
+                if (content.includes('dashboard-grid') && content.includes('dashboard-card')) {
+                    addTestResult('✅ Dashboard grid and cards found', 'success');
+                } else {
+                    addTestResult('❌ Dashboard grid and cards missing', 'error');
+                }
+                
+                if (content.includes('addGoalModal') && content.includes('addGoalForm')) {
+                    addTestResult('✅ Goal creation modal found', 'success');
+                } else {
+                    addTestResult('❌ Goal creation modal missing', 'error');
+                }
+                
+                if (content.includes('initializeDashboard') && content.includes('loadUserGoals')) {
+                    addTestResult('✅ Dashboard JavaScript functions found', 'success');
+                } else {
+                    addTestResult('❌ Dashboard JavaScript functions missing', 'error');
+                }
+                
+                if (content.includes('progress-stats') && content.includes('quick-actions')) {
+                    addTestResult('✅ Dashboard CSS styles found', 'success');
+                } else {
+                    addTestResult('❌ Dashboard CSS styles missing', 'error');
+                }
+                
+                const lineCount = content.split('\n').length;
+                addTestResult(`📊 File size: ${lineCount} lines (Target: ~1000 lines for Phase 3)`, 'info');
+                
+                if (lineCount < 2000) {
+                    addTestResult('✅ File size is reasonable for Phase 3', 'success');
+                } else {
+                    addTestResult('⚠️ File size is larger than expected', 'error');
+                }
+
+                // Check for specific dashboard features
+                const features = [
+                    'Progress Overview',
+                    'Quick Actions', 
+                    'Recent Goals',
+                    'Achievements',
+                    'Add Goal',
+                    'AI Chat',
+                    'Analytics',
+                    'Settings'
+                ];
+
+                features.forEach(feature => {
+                    if (content.includes(feature)) {
+                        addTestResult(`✅ ${feature} feature found`, 'success');
+                    } else {
+                        addTestResult(`❌ ${feature} feature missing`, 'error');
+                    }
+                });
+            })
+            .catch(error => {
+                addTestResult('❌ Could not read app.html: ' + error.message, 'error');
+            });
+
+        // Test 2: Check for required dashboard components
+        const requiredComponents = [
+            'dashboard-header',
+            'dashboard-grid', 
+            'progress-card',
+            'actions-card',
+            'goals-card',
+            'achievements-card',
+            'addGoalModal'
+        ];
+
+        requiredComponents.forEach(component => {
+            fetch('app.html')
+                .then(response => response.text())
+                .then(content => {
+                    if (content.includes(component)) {
+                        addTestResult(`✅ ${component} component found`, 'success');
+                    } else {
+                        addTestResult(`❌ ${component} component missing`, 'error');
+                    }
+                });
+        });
+
+        addTestResult('🚀 Phase 3 Dashboard System Test Complete', 'info');
+    </script>
+</body>
+</html>
+
+
+

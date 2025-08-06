@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: #e5e7eb;
+            padding: 20px;
+        }
+        .test-result {
+            background: #1a1a1a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f97316;
+        }
+        .success { border-left-color: #10b981; }
+        .error { border-left-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Authentication System Test</h1>
+    
+    <div id="testResults"></div>
+
+    <script>
+        function addTestResult(message, type = 'info') {
+            const results = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        // Test 1: Check if app.html exists and has auth content
+        fetch('app.html')
+            .then(response => response.text())
+            .then(content => {
+                if (content.includes('authView') && content.includes('loginForm')) {
+                    addTestResult('✅ Authentication HTML structure found', 'success');
+                } else {
+                    addTestResult('❌ Authentication HTML structure missing', 'error');
+                }
+                
+                if (content.includes('firebase.initializeApp')) {
+                    addTestResult('✅ Firebase configuration found', 'success');
+                } else {
+                    addTestResult('❌ Firebase configuration missing', 'error');
+                }
+                
+                if (content.includes('showLoginForm') && content.includes('showRegisterForm')) {
+                    addTestResult('✅ Form switching functions found', 'success');
+                } else {
+                    addTestResult('❌ Form switching functions missing', 'error');
+                }
+                
+                const lineCount = content.split('\n').length;
+                addTestResult(`📊 File size: ${lineCount} lines (Target: ~500 lines for Phase 2)`, 'info');
+                
+                if (lineCount < 1000) {
+                    addTestResult('✅ File size is reasonable for Phase 2', 'success');
+                } else {
+                    addTestResult('⚠️ File size is larger than expected', 'error');
+                }
+            })
+            .catch(error => {
+                addTestResult('❌ Could not read app.html: ' + error.message, 'error');
+            });
+
+        // Test 2: Check for required files
+        const requiredFiles = ['manifest.json', 'netlify.toml', 'sw.js'];
+        requiredFiles.forEach(file => {
+            fetch(file)
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult(`✅ ${file} found`, 'success');
+                    } else {
+                        addTestResult(`❌ ${file} missing`, 'error');
+                    }
+                })
+                .catch(() => {
+                    addTestResult(`❌ ${file} not accessible`, 'error');
+                });
+        });
+
+        addTestResult('🚀 Phase 2 Authentication System Test Complete', 'info');
+    </script>
+</body>
+</html>
+
+
+

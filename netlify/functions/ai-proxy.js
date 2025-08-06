@@ -186,6 +186,12 @@ exports.handler = async function(event, context) {
       case 'xai':
         response = await callXAI(messages);
         break;
+      case 'deepseek':
+        response = await callDeepSeek(messages);
+        break;
+      case 'deepseek-hf':
+        response = await callDeepSeekHuggingFace(messages);
+        break;
       default:
         return {
           statusCode: 400,
@@ -404,5 +410,89 @@ async function callXAI(messages, model = 'grok-beta', maxTokens = 1000, temperat
     provider: 'xai',
     content: data.choices[0].message.content,
     usage: data.usage
+  };
+}
+
+async function callDeepSeek(messages, model = 'deepseek-chat', maxTokens = 1000, temperature = 0.7) {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error('DeepSeek API key not configured');
+  }
+
+  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: messages,
+      max_tokens: maxTokens,
+      temperature: temperature
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return {
+    provider: 'deepseek',
+    content: data.choices[0].message.content,
+    usage: data.usage
+  };
+}
+
+async function callDeepSeekHuggingFace(messages, model = 'deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct', maxTokens = 1000, temperature = 0.7) {
+  const apiKey = process.env.HUGGINGFACE_API_KEY;
+  if (!apiKey) {
+    throw new Error('Hugging Face API key not configured');
+  }
+
+  // Convert chat messages to single prompt for Hugging Face
+  const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n') + '\nassistant:';
+
+  const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: maxTokens,
+        temperature: temperature,
+        do_sample: true,
+        return_full_text: false
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek Hugging Face API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  
+  // Handle Hugging Face response format
+  let content = '';
+  if (Array.isArray(data)) {
+    content = data[0]?.generated_text || data[0]?.text || '';
+  } else {
+    content = data.generated_text || data.text || '';
+  }
+
+  // Clean up the response to get only the assistant's part
+  const assistantResponse = content.split('assistant:').pop()?.trim() || content;
+
+  return {
+    provider: 'deepseek-hf',
+    content: assistantResponse,
+    usage: { total_tokens: content.length }
   };
 } 
