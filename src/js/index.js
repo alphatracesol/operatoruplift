@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize theme toggle
     initThemeToggle();
+    
+    // Initialize ripple effects
+    initRippleEffects();
+    
+    // Initialize icon animations
+    initIconAnimations();
 });
 
 function initCube() {
@@ -162,5 +168,46 @@ function initThemeToggle() {
         
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+    });
+}
+
+function initRippleEffects() {
+    // Add ripple effect to buttons
+    document.querySelectorAll('.cta-button, .btn-secondary').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+function initIconAnimations() {
+    // Icon animations on load
+    const icons = document.querySelectorAll('.feature-icon, .faq-icon');
+    icons.forEach((icon, index) => {
+        setTimeout(() => {
+            icon.style.opacity = '0';
+            icon.style.transform = 'scale(0.5)';
+            icon.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                icon.style.opacity = '1';
+                icon.style.transform = 'scale(1)';
+            }, 100);
+        }, index * 100);
     });
 }
