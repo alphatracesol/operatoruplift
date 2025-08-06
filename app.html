@@ -41,6 +41,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js" defer></script>
 
+
     
     <!-- Firebase CDNs -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -229,6 +230,7 @@
         }
         
         /* Background Effects */
+        
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -247,38 +249,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-        
-        /* PROTECT OUTSIDE-WRAPPER ELEMENTS WITH !important */
-        #loading-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            z-index: 99999 !important;
-            background: var(--bg-primary) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-direction: column !important;
-        }
-        
-        #auth-view {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100vh !important;
-            z-index: 20000 !important;
-            background: var(--bg-primary) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        
-        #auth-view.active {
-            display: flex !important;
         }
         
         /* Container */
@@ -354,8 +324,7 @@
             transition: all var(--transition-normal);
         }
         
-        /* Button effects - SCOPED TO APP-WRAPPER ONLY */
-        .app-wrapper .btn::before {
+        .btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -367,7 +336,7 @@
             z-index: 1;
         }
         
-        .app-wrapper .btn::after {
+        .btn::after {
             content: '';
             position: absolute;
             top: 0;
@@ -380,21 +349,21 @@
             z-index: 1;
         }
         
-        .app-wrapper .btn:hover {
+        .btn:hover {
             transform: translateY(-3px) scale(1.02);
             box-shadow: var(--shadow-xl);
             border-color: var(--accent-color);
         }
         
-        .app-wrapper .btn:hover::before {
+        .btn:hover::before {
             left: 100%;
         }
         
-        .app-wrapper .btn:hover::after {
+        .btn:hover::after {
             opacity: 1;
         }
         
-        .app-wrapper .btn:active {
+        .btn:active {
             transform: translateY(-1px) scale(0.98);
         }
         
@@ -655,8 +624,7 @@
             overflow: hidden;
         }
         
-        /* Card effects - SCOPED TO APP-WRAPPER ONLY */
-        .app-wrapper .card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -669,18 +637,18 @@
             pointer-events: none;
         }
         
-        .app-wrapper .card:hover::before {
+        .card:hover::before {
             opacity: 1;
         }
         
-        .app-wrapper .card:hover {
+        .card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl);
             border-color: var(--accent-color);
         }
         
-        /* Bento box shimmer effect - SCOPED TO APP-WRAPPER ONLY */
-        .app-wrapper .card::after {
+        /* Bento box shimmer effect */
+        .card::after {
             content: '';
             position: absolute;
             top: 0;
@@ -694,7 +662,7 @@
             transition: opacity var(--transition-normal);
         }
         
-        .app-wrapper .card:hover::after {
+        .card:hover::after {
             opacity: 1;
         }
         
@@ -3275,17 +3243,7 @@
         
         /* Auth container - CONSOLIDATED INTO MAIN AUTH DEFINITION */
         
-        /* Particles Background */
-        .particles-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 0;
-            opacity: 0.4;
-            pointer-events: none;
-        }
+
         
         /* Main content above particles */
         .main-content {
@@ -6278,8 +6236,8 @@
             to { transform: rotate(360deg); }
         }
         
-        /* ===== MODAL SYSTEM WITH PROPER OVERLAY - SCOPED TO APP-WRAPPER ONLY ===== */
-        .app-wrapper .modal-overlay {
+        /* ===== MODAL SYSTEM WITH PROPER OVERLAY ===== */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -6294,12 +6252,12 @@
             transition: opacity var(--transition-normal);
         }
         
-        .app-wrapper .modal-overlay.active {
+        .modal-overlay.active {
             display: block;
             opacity: 1;
         }
         
-        .app-wrapper .modal {
+        .modal {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -6323,7 +6281,7 @@
             transition: all var(--transition-normal);
         }
         
-        .app-wrapper .modal.active {
+        .modal.active {
             display: block;
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
@@ -8665,43 +8623,43 @@
     <!-- ===== WORKING LOADING OVERLAY - CLEAN AND SIMPLE ===== -->
     <div id="loading-overlay" class="loading-overlay">
         <div id="loading-cube" class="loading-cube">
-            <div class="loading-cube-face loading-cube-face-front">
+                <div class="loading-cube-face loading-cube-face-front">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </div>
-            <div class="loading-cube-face loading-cube-face-back">
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-back">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </div>
-            <div class="loading-cube-face loading-cube-face-right">
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-right">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </div>
-            <div class="loading-cube-face loading-cube-face-left">
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-left">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </div>
-            <div class="loading-cube-face loading-cube-face-top">
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-top">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </div>
-            <div class="loading-cube-face loading-cube-face-bottom">
+                    </svg>
+                </div>
+                <div class="loading-cube-face loading-cube-face-bottom">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M20 20L20 5M20 20L32.5 25M20 20L7.5 25" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
+                    </svg>
+                </div>
             </div>
-        </div>
         <p id="loading-text">Initializing Operator Uplift...</p>
     </div>
 
@@ -8889,6 +8847,7 @@
         
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Particles Background for Dashboard -->
             <div class="container">
                 <!-- Views will be rendered here -->
                 
@@ -9544,15 +9503,7 @@
                                     <div class="toggle-switch" id="animations-toggle" onclick="app.settings.toggleAnimations()"></div>
                                 </div>
                             </div>
-                            <div class="settings-item">
-                                <div class="settings-label">
-                                    <div class="settings-title">Particles</div>
-                                    <div class="settings-description">Show background particle effects</div>
-                                </div>
-                                <div class="settings-control">
-                                    <div class="toggle-switch" id="particles-toggle" onclick="app.settings.toggleParticles()"></div>
-                                </div>
-                            </div>
+
                             <div class="settings-item">
                                 <div class="settings-label">
                                     <div class="settings-title">Custom Accent Color</div>
@@ -10491,7 +10442,7 @@
                 isInitialized: false,
                 intervals: [],
                 eventListeners: [],
-                particlesInstance: null,
+
                 performanceMetrics: {
                     loadTime: 0,
                     memoryUsage: 0,
@@ -14165,14 +14116,7 @@
                     });
                     app.state.eventListeners = [];
                     
-                    // Stop particles
-                    if (app.state.particlesInstance) {
-                        try {
-                            app.state.particlesInstance.stop();
-                        } catch (e) {
-                            console.warn('Failed to stop particles:', e);
-                        }
-                    }
+
                 }
             },
 
@@ -14364,7 +14308,7 @@
                 }
                 
                 // ===== AUTO-HIDE AFTER 4 SECONDS =====
-                setTimeout(() => {
+                        setTimeout(() => {
                     this.hideLoadingScreen();
                 }, 4000);
                 
@@ -14393,9 +14337,9 @@
                         
                         console.log('✅ Loading overlay hidden, auth view shown');
                     }, 500);
-                } else {
+                        } else {
                     console.log('❌ Loading overlay not found for hiding');
-                }
+                        }
             },
             
 
@@ -21728,7 +21672,7 @@ Format your response as JSON:
                 config: {
                     theme: 'dark',
                     animations: true,
-                    particles: true,
+
                     matrixRain: true,
                     backgroundMusic: true,
                     musicVolume: 5,
@@ -21781,10 +21725,7 @@ Format your response as JSON:
                         document.body.style.setProperty('--transition-slow', '0s');
                     }
                     
-                    // Apply particles
-                    if (!this.config.particles && app.particlesInstance) {
-                        app.particlesInstance.destroy();
-                    }
+
                     
                     // Apply matrix rain
                     const matrixCanvas = document.getElementById('matrix-rain');
@@ -21814,7 +21755,7 @@ Format your response as JSON:
                     
                     // Update toggles
                     this.updateToggle('animations-toggle', this.config.animations);
-                    this.updateToggle('particles-toggle', this.config.particles);
+
                     this.updateToggle('matrix-rain-toggle', this.config.matrixRain);
                     this.updateToggle('background-music-toggle', this.config.backgroundMusic);
                     this.updateToggle('personality-analysis-toggle', this.config.personalityAnalysis);
@@ -21868,13 +21809,7 @@ Format your response as JSON:
                     app.utils.showToast(`Animations ${this.config.animations ? 'enabled' : 'disabled'}`, 'success');
                 },
                 
-                toggleParticles() {
-                    this.config.particles = !this.config.particles;
-                    this.saveSettings();
-                    this.applySettings();
-                    this.updateSettingsUI();
-                    app.utils.showToast(`Particles ${this.config.particles ? 'enabled' : 'disabled'}`, 'success');
-                },
+
                 
                 toggleMatrixRain() {
                     this.config.matrixRain = !this.config.matrixRain;
@@ -22808,8 +22743,7 @@ Format your response as JSON:
             // Initialize Matrix Rain Effect
             initMatrixRain();
             
-            // Initialize Particles for Dashboard
-            initParticles();
+
             
             // Initialize Background Music
             initBackgroundMusic();
