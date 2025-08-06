@@ -11,6 +11,11 @@
     "test:dashboard": "jest --testNamePattern='Dashboard'",
     "test:ai": "jest --testNamePattern='AI'",
     "build:netlify": "echo 'Static site ready for deployment'",
+    "build:mixed": "node scripts/build-mixed.js",
+    "build:landing": "echo 'Building landing pages...' && npm run optimize:html && npm run optimize:css",
+    "build:static": "echo 'Static app.html ready for deployment'",
+    "optimize:html": "echo 'Optimizing HTML files...'",
+    "optimize:css": "echo 'Optimizing CSS files...'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "validate": "npm run lint && npm run test"
