@@ -4,11 +4,11 @@
   "description": "AI-Powered Self-Progression Platform",
   "main": "app.html",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "node build.js",
+    "build:webpack": "webpack --config webpack.config.js",
     "build:static": "node build.js",
     "start": "echo 'Static HTML - serve from root'",
-    "dev": "echo 'Static HTML - serve from root'",
-    "build:webpack": "webpack --config webpack.config.js"
+    "dev": "echo 'Static HTML - serve from root'"
   },
   "keywords": [
     "ai",
