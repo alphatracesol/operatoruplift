@@ -4,11 +4,11 @@
   "description": "AI-Powered Self-Progression Platform",
   "main": "app.html",
   "scripts": {
-    "build": "node build.js",
+    "build": "webpack --config webpack.config.js",
+    "build:static": "node build.js",
     "start": "echo 'Static HTML - serve from root'",
     "dev": "echo 'Static HTML - serve from root'",
-    "build:static": "echo 'Static HTML - no build required'",
-    "build:webpack": "echo 'Webpack build not configured for this static app'"
+    "build:webpack": "webpack --config webpack.config.js"
   },
   "keywords": [
     "ai",
@@ -20,5 +20,13 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1"
   }
 }

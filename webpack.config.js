@@ -1,13 +1,14 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: 'production',
   entry: {
-    main: './assets/js/main.js',
-    auth: './assets/js/auth.js',
-    ai: './assets/js/ai.js',
-    ui: './assets/js/ui.js'
+    index: './src/js/index.js',
+    'press-release': './src/js/press-release.js',
+    'mvp-launch': './src/js/mvp-launch.js'
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -17,22 +18,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      },
-      {
         test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader'
-        ]
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
@@ -53,6 +40,78 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css'
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      filename: 'index.html',
+      chunks: ['index'],
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
+      }
+    }),
+    new HtmlWebpackPlugin({
+      template: './press-release.html',
+      filename: 'press-release.html',
+      chunks: ['press-release'],
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
+      }
+    }),
+    new HtmlWebpackPlugin({
+      template: './MVP Launch Page.html',
+      filename: 'mvp-launch.html',
+      chunks: ['mvp-launch'],
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
+      }
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'app.html', to: 'app.html' },
+        { from: 'sw.js', to: 'sw.js' },
+        { from: 'firebase-config.js', to: 'firebase-config.js' },
+        { from: 'manifest.json', to: 'manifest.json' },
+        { from: 'favicon.ico', to: 'favicon.ico' },
+        { from: '_redirects', to: '_redirects' },
+        { from: 'netlify.toml', to: 'netlify.toml' },
+        { from: '404.html', to: '404.html' },
+        { from: '500.html', to: '500.html' },
+        { from: 'assets', to: 'assets', noErrorOnMissing: true },
+        { from: 'css', to: 'css', noErrorOnMissing: true },
+        { from: 'js', to: 'js', noErrorOnMissing: true },
+        { from: 'images', to: 'images', noErrorOnMissing: true },
+        { from: 'fonts', to: 'fonts', noErrorOnMissing: true }
+      ]
     })
   ],
   optimization: {
@@ -67,21 +126,7 @@ module.exports = {
       }
     }
   },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'build')
-    },
-    compress: true,
-    port: 3000,
-    hot: true,
-    open: true
-  },
   resolve: {
-    extensions: ['.js', '.json']
-  },
-  externals: {
-    'firebase/auth': 'firebase.auth',
-    'firebase/firestore': 'firebase.firestore',
-    'firebase/app': 'firebase.app'
+    extensions: ['.js', '.css']
   }
 }; 
