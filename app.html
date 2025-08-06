@@ -7,7 +7,7 @@
     <meta name="description" content="Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity">
     
     <!-- Enhanced Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net https://capig.madgicx.ai; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
 
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -23,7 +23,7 @@
     <meta http-equiv="Sec-Fetch-User" content="?1">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
     <meta name="theme-color" content="#f97316">
     
     <!-- Favicon -->
@@ -14643,10 +14643,7 @@
                      
                                       // Special handling for auth view
                  if (viewName === 'auth') {
-                     const mainContent = document.querySelector('.main-content');
-                     if (mainContent) {
-                         mainContent.style.display = 'none';
-                     }
+                     // Don't hide main content - just ensure auth view is visible
                      
                      // Ensure auth view is visible and on top
                      const authView = document.getElementById('auth-view');
@@ -22693,10 +22690,10 @@ Format your response as JSON:
                         // Force auth view to stay active
                         this.ui.showView('auth');
                         
-                        // Ensure main content is hidden
+                        // Ensure main content is visible
                         const mainContent = document.querySelector('.main-content');
                         if (mainContent) {
-                            mainContent.style.display = 'none';
+                            mainContent.style.display = 'block';
                         }
                         
                         // Ensure auth view is visible
@@ -22707,6 +22704,9 @@ Format your response as JSON:
                     }
                     
                     this.state.isInitialized = true;
+                    
+                    // Ensure all layers are visible
+                    this.ensureLayersVisible();
                     
                     // Performance logging
                     const loadTime = Math.round(performance.now() - startTime);
@@ -22728,6 +22728,46 @@ Format your response as JSON:
                     </div>
                 `;
                 document.body.innerHTML = fallbackHTML;
+            },
+            
+            // Ensure all layers are visible and properly initialized
+            ensureLayersVisible() {
+                console.log('🔍 Ensuring all layers are visible...');
+                
+                // Ensure main content is visible
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.display = 'block';
+                    mainContent.style.visibility = 'visible';
+                    mainContent.style.opacity = '1';
+                    console.log('✅ Main content layer visible');
+                }
+                
+                // Ensure auth view is properly positioned
+                const authView = document.getElementById('auth-view');
+                if (authView) {
+                    authView.style.position = 'relative';
+                    authView.style.zIndex = '1000';
+                    console.log('✅ Auth view layer properly positioned');
+                }
+                
+                // Ensure loading overlay is hidden
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                    loadingOverlay.style.opacity = '0';
+                    console.log('✅ Loading overlay hidden');
+                }
+                
+                // Ensure matrix canvas is visible
+                const matrixCanvas = document.getElementById('matrix-rain');
+                if (matrixCanvas) {
+                    matrixCanvas.style.display = 'block';
+                    matrixCanvas.style.opacity = '0.5';
+                    console.log('✅ Matrix canvas visible');
+                }
+                
+                console.log('✅ All layers visibility check completed');
             }
         };
 
@@ -22740,18 +22780,31 @@ Format your response as JSON:
             };
         }
 
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            app.init();
-            
-            // Initialize Matrix Rain Effect
-            initMatrixRain();
-            
-
-            
-            // Initialize Background Music
-            initBackgroundMusic();
-        });
+                    // Initialize the app when DOM is loaded
+            document.addEventListener('DOMContentLoaded', () => {
+                // Handle manifest.json loading error gracefully
+                const manifestLink = document.querySelector('link[rel="manifest"]');
+                if (manifestLink) {
+                    manifestLink.addEventListener('error', (e) => {
+                        console.log('⚠️ Manifest.json not found - this is normal for local development');
+                    });
+                }
+                
+                app.init();
+                
+                // Initialize Matrix Rain Effect
+                initMatrixRain();
+                
+                // Initialize Background Music
+                initBackgroundMusic();
+                
+                // Ensure layers are visible after a short delay
+                setTimeout(() => {
+                    if (app && app.ensureLayersVisible) {
+                        app.ensureLayersVisible();
+                    }
+                }, 2000);
+            });
         
         // Matrix Rain Effect
         function initMatrixRain() {
@@ -22929,7 +22982,7 @@ Format your response as JSON:
                 
                 const mainContent = document.querySelector('.main-content');
                 if (mainContent) {
-                    mainContent.style.display = 'none';
+                    mainContent.style.display = 'block';
                 }
                 
                 console.log('🔐 Auth overlay forced to show');
