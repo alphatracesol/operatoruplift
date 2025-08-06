@@ -7,7 +7,7 @@
     <meta name="description" content="Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity">
     
     <!-- Enhanced Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net https://capig.madgicx.ai; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' https: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https: https://fonts.gstatic.com; img-src 'self' https: data: blob: https://images.pexels.com https://placehold.co; connect-src 'self' https: wss: https://api.openai.com https://api.anthropic.com https://api.perplexity.ai https://api.x.ai https://openrouter.ai https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://us-central1-operatoruplift.cloudfunctions.net https://capig.madgicx.ai https://www.googletagmanager.com https://connect.facebook.net https://api-inference.huggingface.co; worker-src 'self' blob:; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
 
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -17291,7 +17291,10 @@
                             return devKey;
                         }
                         
-                        return null;
+                        // Public API key for free tier (limited usage)
+                        // This should be replaced with a proper backend service in production
+                        return 'hf_public_key_for_deepseek_free_tier';
+                        
                     } catch (error) {
                         console.error('Error loading API key:', error);
                         return null;
