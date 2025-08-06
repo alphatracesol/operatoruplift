@@ -114,6 +114,7 @@ async function cacheFirst(request) {
     
     // Skip caching for external resources that might be blocked by CSP
     if (request.url.includes('unpkg.com') || 
+        request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
         request.url.includes('google-analytics.com')) {
@@ -157,6 +158,7 @@ async function networkFirst(request) {
     
     // Skip caching for external resources that might be blocked by CSP
     if (request.url.includes('unpkg.com') || 
+        request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
         request.url.includes('google-analytics.com')) {
@@ -201,6 +203,7 @@ async function staleWhileRevalidate(request) {
     
     // Skip caching for external resources that might be blocked by CSP
     if (request.url.includes('unpkg.com') || 
+        request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
         request.url.includes('google-analytics.com')) {

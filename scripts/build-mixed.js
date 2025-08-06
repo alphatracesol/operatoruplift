@@ -83,10 +83,45 @@ function copyDirIfExists(source, dest) {
     } else {
         console.log(`⚠️  Directory not found: ${source}`);
         return false;
-    }
-}
+                }
+        }
 
-// Main build process
+        // Function to process HTML file and inject environment variables
+        function processHtmlFile(source, dest) {
+            if (fileExists(source)) {
+                try {
+                    let content = fs.readFileSync(source, 'utf8');
+                    
+                    // Replace environment variable placeholders
+                    const envVars = {
+                        '%FIREBASE_API_KEY%': process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || '',
+                        '%FIREBASE_AUTH_DOMAIN%': process.env.FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+                        '%FIREBASE_PROJECT_ID%': process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || '',
+                        '%FIREBASE_STORAGE_BUCKET%': process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+                        '%FIREBASE_MESSAGING_SENDER_ID%': process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+                        '%FIREBASE_APP_ID%': process.env.FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID || '',
+                        '%FIREBASE_MEASUREMENT_ID%': process.env.FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID || ''
+                    };
+                    
+                    // Replace all placeholders
+                    Object.keys(envVars).forEach(placeholder => {
+                        content = content.replace(new RegExp(placeholder, 'g'), envVars[placeholder]);
+                    });
+                    
+                    fs.writeFileSync(dest, content);
+                    console.log(`✅ Processed and copied: ${source} -> ${dest}`);
+                    return true;
+                } catch (error) {
+                    console.log(`❌ Failed to process ${source}: ${error.message}`);
+                    return false;
+                }
+            } else {
+                console.log(`⚠️  File not found: ${source}`);
+                return false;
+            }
+        }
+
+        // Main build process
 async function buildMixed() {
     console.log('\n📁 Creating build directory...');
     
@@ -99,10 +134,15 @@ async function buildMixed() {
     
     console.log('\n📁 Processing static files...');
     
-    // Copy static files to build directory
-    STATIC_FILES.forEach(file => {
-        copyIfExists(file, path.join(buildDir, file));
-    });
+                // Copy static files to build directory
+            STATIC_FILES.forEach(file => {
+                if (file === 'app.html') {
+                    // Process app.html to inject environment variables
+                    processHtmlFile(file, path.join(buildDir, file));
+                } else {
+                    copyIfExists(file, path.join(buildDir, file));
+                }
+            });
     
     console.log('\n🏗️  Processing build files...');
     
