@@ -2,7 +2,7 @@
     "name": "Operator Uplift - AI-Powered Self-Progression",
     "short_name": "Operator Uplift",
     "description": "Transform your ambitions into epic quests with AI-powered goal setting and gamified productivity",
-    "start_url": "/Operator_Uplift_Complete.html",
+    "start_url": "/app.html",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#f97316",
@@ -12,31 +12,31 @@
     "categories": ["productivity", "lifestyle", "education"],
     "icons": [
         {
-            "src": "/android-chrome-192x192.png",
+            "src": "/assets/images/android-chrome-192x192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable any"
         },
         {
-            "src": "/android-chrome-512x512.png",
+            "src": "/assets/images/android-chrome-512x512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable any"
         },
         {
-            "src": "/apple-touch-icon.png",
+            "src": "/assets/images/apple-touch-icon.png",
             "sizes": "180x180",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/favicon-32x32.png",
+            "src": "/assets/images/favicon-32x32.png",
             "sizes": "32x32",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/favicon-16x16.png",
+            "src": "/assets/images/favicon-16x16.png",
             "sizes": "16x16",
             "type": "image/png",
             "purpose": "any"
@@ -47,10 +47,10 @@
             "name": "Dashboard",
             "short_name": "Dashboard",
             "description": "View your progress and goals",
-            "url": "/Operator_Uplift_Complete.html?view=dashboard",
+            "url": "/app.html?view=dashboard",
             "icons": [
                 {
-                    "src": "/android-chrome-192x192.png",
+                    "src": "/assets/images/android-chrome-192x192.png",
                     "sizes": "192x192"
                 }
             ]
@@ -59,10 +59,10 @@
             "name": "Add Goal",
             "short_name": "Add Goal",
             "description": "Create a new goal",
-            "url": "/Operator_Uplift_Complete.html?view=goals&action=add",
+            "url": "/app.html?view=goals&action=add",
             "icons": [
                 {
-                    "src": "/android-chrome-192x192.png",
+                    "src": "/assets/images/android-chrome-192x192.png",
                     "sizes": "192x192"
                 }
             ]
@@ -71,10 +71,10 @@
             "name": "AI Chat",
             "short_name": "AI Chat",
             "description": "Chat with your AI mentor",
-            "url": "/Operator_Uplift_Complete.html?view=ai-chat",
+            "url": "/app.html?view=ai-chat",
             "icons": [
                 {
-                    "src": "/android-chrome-192x192.png",
+                    "src": "/assets/images/android-chrome-192x192.png",
                     "sizes": "192x192"
                 }
             ]
@@ -93,7 +93,7 @@
     "protocol_handlers": [
         {
             "protocol": "web+operatoruplift",
-            "url": "/Operator_Uplift_Complete.html?action=%s"
+            "url": "/app.html?action=%s"
         }
     ]
 } 
