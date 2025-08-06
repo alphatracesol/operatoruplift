@@ -1,21 +1,21 @@
 [build]
-  # Static HTML deployment - no build required
-  publish = "."
-  command = "echo 'Static deployment - no build required'"
+  # Hybrid deployment: Build for webpack pages, static for SPA
+  publish = "build"
+  command = "npm run build"
   functions = "netlify/functions"
 
-# Force all environments to use static deployment
+# Production environment
 [context.production]
-  publish = "."
-  command = "echo 'Production static deployment'"
+  publish = "build"
+  command = "npm run build"
 
 [context.deploy-preview]
-  publish = "."
-  command = "echo 'Preview static deployment'"
+  publish = "build"
+  command = "npm run build"
 
 [context.branch-deploy]
-  publish = "."
-  command = "echo 'Branch static deployment'"
+  publish = "build"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -26,7 +26,35 @@
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
-# SPA Routing - Handle all routes
+# Hybrid Routing - Handle both SPA and static pages
+# SPA routes go to app.html
+[[redirects]]
+  from = "/dashboard"
+  to = "/app.html"
+  status = 200
+
+[[redirects]]
+  from = "/auth"
+  to = "/app.html"
+  status = 200
+
+# Static pages serve directly
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/press-release"
+  to = "/press-release.html"
+  status = 200
+
+[[redirects]]
+  from = "/mvp"
+  to = "/MVP Launch Page.html"
+  status = 200
+
+# Catch-all for SPA routes
 [[redirects]]
   from = "/*"
   to = "/app.html"
