@@ -1569,6 +1569,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 updateLoadingProgress(50);
                 console.log('📄 DOM loaded');
+                setupAuthEventListeners();
             });
 
             // Initialize loading sequence
@@ -1647,101 +1648,116 @@
             document.getElementById('forgotPasswordForm').classList.add('active');
         }
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ Login successful');
-            } catch (error) {
-                console.error('❌ Login error:', error.message);
-                showError('Login failed: ' + error.message);
-            }
-        });
-
-        // Register form handler
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
-            
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: name });
-                
-                // Create user profile in Firestore
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    name: name,
-                    email: email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    level: 1,
-                    experience: 0,
-                    goals: [],
-                    achievements: []
+        // Setup auth form event listeners when DOM is ready
+        function setupAuthEventListeners() {
+            // Login form handler
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+                    
+                    try {
+                        await auth.signInWithEmailAndPassword(email, password);
+                        console.log('✅ Login successful');
+                    } catch (error) {
+                        console.error('❌ Login error:', error.message);
+                        showError('Login failed: ' + error.message);
+                    }
                 });
-                
-                console.log('✅ Registration successful');
-            } catch (error) {
-                console.error('❌ Registration error:', error.message);
-                showError('Registration failed: ' + error.message);
             }
-        });
 
-        // Forgot password handler
-        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('resetEmail').value;
-            
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showSuccess('Password reset email sent!');
-                showLoginForm();
-            } catch (error) {
-                console.error('❌ Password reset error:', error.message);
-                showError('Password reset failed: ' + error.message);
+            // Register form handler
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('registerName').value;
+                    const email = document.getElementById('registerEmail').value;
+                    const password = document.getElementById('registerPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    if (password !== confirmPassword) {
+                        showError('Passwords do not match');
+                        return;
+                    }
+                    
+                    try {
+                        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                        await userCredential.user.updateProfile({ displayName: name });
+                        
+                        // Create user profile in Firestore
+                        await db.collection('users').doc(userCredential.user.uid).set({
+                            name: name,
+                            email: email,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            level: 1,
+                            experience: 0,
+                            goals: [],
+                            achievements: []
+                        });
+                        
+                        console.log('✅ Registration successful');
+                    } catch (error) {
+                        console.error('❌ Registration error:', error.message);
+                        showError('Registration failed: ' + error.message);
+                    }
+                });
             }
-        });
 
-        // Google sign-in handler
-        document.getElementById('googleSignIn').addEventListener('click', async () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            try {
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                
-                // Check if user exists in Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                
-                if (!userDoc.exists) {
-                    // Create new user profile
-                    await db.collection('users').doc(user.uid).set({
-                        name: user.displayName,
-                        email: user.email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        level: 1,
-                        experience: 0,
-                        goals: [],
-                        achievements: []
-                    });
-                }
-                
-                console.log('✅ Google sign-in successful');
-            } catch (error) {
-                console.error('❌ Google sign-in error:', error.message);
-                showError('Google sign-in failed: ' + error.message);
+            // Forgot password handler
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            if (forgotPasswordForm) {
+                forgotPasswordForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('resetEmail').value;
+                    
+                    try {
+                        await auth.sendPasswordResetEmail(email);
+                        showSuccess('Password reset email sent!');
+                        showLoginForm();
+                    } catch (error) {
+                        console.error('❌ Password reset error:', error.message);
+                        showError('Password reset failed: ' + error.message);
+                    }
+                });
             }
-        });
+
+            // Google sign-in handler
+            const googleSignInBtn = document.getElementById('googleSignIn');
+            if (googleSignInBtn) {
+                googleSignInBtn.addEventListener('click', async () => {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    
+                    try {
+                        const result = await auth.signInWithPopup(provider);
+                        const user = result.user;
+                        
+                        // Check if user exists in Firestore
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        
+                        if (!userDoc.exists) {
+                            // Create new user profile
+                            await db.collection('users').doc(user.uid).set({
+                                name: user.displayName,
+                                email: user.email,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                level: 1,
+                                experience: 0,
+                                goals: [],
+                                achievements: []
+                            });
+                        }
+                        
+                        console.log('✅ Google sign-in successful');
+                    } catch (error) {
+                        console.error('❌ Google sign-in error:', error.message);
+                        showError('Google sign-in failed: ' + error.message);
+                    }
+                });
+            }
+        }
 
         // User data initialization
         async function initializeUserData(user) {
@@ -3620,7 +3636,7 @@ Focus on actionable insights and encouragement.
 
         function initializeRealTimeCollaboration() {
             setupRealTimeListeners();
-            initializeCollaborationUI();
+            // initializeCollaborationUI(); // Temporarily disabled
         }
 
         function setupRealTimeListeners() {

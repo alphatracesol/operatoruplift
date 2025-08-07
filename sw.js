@@ -83,7 +83,11 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     const strategy = getCacheStrategy(url);
     
-    console.log(`📡 Fetch: ${url.pathname} (${strategy})`);
+    // Don't log sensitive URLs with API keys
+    const safePathname = url.pathname.includes('key=') ? 
+        url.pathname.split('key=')[0] + 'key=***' : 
+        url.pathname;
+    console.log(`📡 Fetch: ${safePathname} (${strategy})`);
     
     switch (strategy) {
         case 'cache-first':
