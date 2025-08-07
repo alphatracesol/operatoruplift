@@ -565,6 +565,13 @@
         .auth-forms {
             position: relative;
             margin-bottom: 30px;
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            display: grid;
+            gap: 20px;
         }
 
         .auth-form {
@@ -574,7 +581,6 @@
             border: 1px solid var(--border-glass);
             border-radius: 16px;
             padding: 30px;
-            box-shadow: var(--shadow-lg);
         }
 
         .auth-form.active {
@@ -622,7 +628,6 @@
         .form-group input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
         .form-group input::placeholder {
@@ -1194,19 +1199,18 @@
         <!-- Authentication View -->
         <div id="authView" class="view-container">
             <div class="auth-container">
-                <!-- Logo and Title -->
-                <div class="auth-header">
-                    <div class="auth-logo">
-                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/>
-                            <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/>
-                        </svg>
-                    </div>
-                    <h1 class="auth-title">Operator Uplift</h1>
-                </div>
-
                 <!-- Auth Forms Container -->
                 <div class="auth-forms">
+                    <!-- Logo and Title -->
+                    <div class="auth-header">
+                        <div class="auth-logo">
+                            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/>
+                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <h1 class="auth-title">Operator Uplift</h1>
+                    </div>
                     <!-- Login Form -->
                     <form id="loginForm" class="auth-form active">
                         
@@ -3815,17 +3819,21 @@ Focus on actionable insights and encouragement.
                     (completedGoals.length / categoryGoals.length) * 100 : 0;
             });
 
-            const bestCategory = Object.keys(categorySuccessRates).reduce((a, b) => 
-                categorySuccessRates[a] > categorySuccessRates[b] ? a : b
-            );
+            // Only proceed if there are categories with data
+            const categoriesWithData = Object.keys(categorySuccessRates).filter(cat => categorySuccessRates[cat] > 0);
+            if (categoriesWithData.length > 0) {
+                const bestCategory = categoriesWithData.reduce((a, b) => 
+                    categorySuccessRates[a] > categorySuccessRates[b] ? a : b
+                );
 
-            if (categorySuccessRates[bestCategory] > 70) {
-                advancedAnalytics.predictiveInsights.push({
-                    type: 'category_recommendation',
-                    category: bestCategory,
-                    successRate: categorySuccessRates[bestCategory],
-                    message: `You're most successful with ${bestCategory} goals`
-                });
+                if (categorySuccessRates[bestCategory] > 70) {
+                    advancedAnalytics.predictiveInsights.push({
+                        type: 'category_recommendation',
+                        category: bestCategory,
+                        successRate: categorySuccessRates[bestCategory],
+                        message: `You're most successful with ${bestCategory} goals`
+                    });
+                }
             }
 
             updateAdvancedAnalyticsUI();
