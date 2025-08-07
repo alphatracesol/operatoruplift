@@ -1632,8 +1632,17 @@
         }
 
         // Auth state observer
+        let authStateInitialized = false;
+        
         auth.onAuthStateChanged((user) => {
             console.log('🔄 Auth state changed:', user ? 'User logged in' : 'User logged out');
+            
+            // Don't trigger view changes on initial load
+            if (!authStateInitialized) {
+                authStateInitialized = true;
+                console.log('🔄 Auth state observer initialized');
+                return;
+            }
             
             if (user) {
                 console.log('✅ User authenticated:', user.email);
@@ -3978,8 +3987,35 @@ Focus on actionable insights and encouragement.
 
         function initializeGamificationExpansion() {
             loadGamificationData();
-            setupGamificationEventListeners();
+            // setupGamificationEventListeners(); // Temporarily disabled
             startDailyStreakTracking();
+        }
+
+        function setupGamificationEventListeners() {
+            // Add event listeners for gamification features
+            const luckyWheelBtn = document.getElementById('luckyWheelBtn');
+            if (luckyWheelBtn) {
+                luckyWheelBtn.addEventListener('click', () => {
+                    console.log('🎰 Lucky wheel clicked');
+                    // Lucky wheel functionality will be implemented later
+                });
+            }
+
+            const treasureChestBtn = document.getElementById('treasureChestBtn');
+            if (treasureChestBtn) {
+                treasureChestBtn.addEventListener('click', () => {
+                    console.log('💎 Treasure chest clicked');
+                    // Treasure chest functionality will be implemented later
+                });
+            }
+
+            const essenceShopBtn = document.getElementById('essenceShopBtn');
+            if (essenceShopBtn) {
+                essenceShopBtn.addEventListener('click', () => {
+                    console.log('🛍️ Essence shop clicked');
+                    // Essence shop functionality will be implemented later
+                });
+            }
         }
 
         async function loadGamificationData() {
