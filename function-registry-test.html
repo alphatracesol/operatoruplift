@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Registry Test</title>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a; 
+            color: #e5e7eb; 
+            padding: 20px; 
+        }
+        .test-result { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px; 
+            border-left: 4px solid; 
+        }
+        .success { 
+            background: rgba(16, 185, 129, 0.2); 
+            border-left-color: #10b981; 
+        }
+        .error { 
+            background: rgba(239, 68, 68, 0.2); 
+            border-left-color: #ef4444; 
+        }
+        .warning { 
+            background: rgba(245, 158, 11, 0.2); 
+            border-left-color: #f59e0b; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Function Registry Test</h1>
+    <div id="results"></div>
+
+    <script>
+        // Copy the Function Registry from app.html
+        window.FunctionRegistry = {
+            functions: new Map(),
+            callbacks: new Map(),
+            overrides: new Map(),
+            
+            register: function(name, func, module = 'unknown', priority = 0) {
+                if (this.functions.has(name)) {
+                    const existing = this.functions.get(name);
+                    console.warn(`⚠️ Function Registry: ${name} is being redefined`, {
+                        existing: { module: existing.module, priority: existing.priority },
+                        new: { module: module, priority: priority }
+                    });
+                    
+                    if (!this.overrides.has(name)) {
+                        this.overrides.set(name, []);
+                    }
+                    this.overrides.get(name).push({
+                        module: existing.module,
+                        priority: existing.priority,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                this.functions.set(name, {
+                    func: func,
+                    module: module,
+                    priority: priority,
+                    registeredAt: Date.now()
+                });
+                
+                console.log(`✅ Function Registry: Registered ${name} from ${module}`);
+                return true;
+            },
+            
+            get: function(name) {
+                const entry = this.functions.get(name);
+                if (entry) {
+                    return entry.func;
+                }
+                console.error(`❌ Function Registry: Function ${name} not found`);
+                return null;
+            },
+            
+            registerCallback: function(name, callback, module = 'unknown') {
+                if (!this.callbacks.has(name)) {
+                    this.callbacks.set(name, []);
+                }
+                this.callbacks.get(name).push({
+                    callback: callback,
+                    module: module,
+                    registeredAt: Date.now()
+                });
+                console.log(`✅ Function Registry: Registered callback for ${name} from ${module}`);
+            },
+            
+            executeCallbacks: function(name, ...args) {
+                const callbacks = this.callbacks.get(name);
+                if (callbacks) {
+                    callbacks.forEach(({ callback, module }) => {
+                        try {
+                            callback(...args);
+                        } catch (error) {
+                            console.error(`❌ Function Registry: Error in callback for ${name} from ${module}:`, error);
+                        }
+                    });
+                }
+            },
+            
+            getStats: function() {
+                return {
+                    totalFunctions: this.functions.size,
+                    totalCallbacks: this.callbacks.size,
+                    totalOverrides: this.overrides.size,
+                    overrides: Array.from(this.overrides.entries()).map(([name, overrides]) => ({
+                        name: name,
+                        count: overrides.length,
+                        overrides: overrides
+                    }))
+                };
+            }
+        };
+
+        // Test functions
+        function addResult(type, message) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            document.getElementById('results').appendChild(div);
+        }
+
+        // Test 1: Basic function registration
+        function testBasicRegistration() {
+            addResult('info', 'Testing basic function registration...');
+            
+            FunctionRegistry.register('testFunction', () => 'Hello World', 'test-module', 1);
+            const func = FunctionRegistry.get('testFunction');
+            
+            if (func && func() === 'Hello World') {
+                addResult('success', '✅ Basic function registration works');
+            } else {
+                addResult('error', '❌ Basic function registration failed');
+            }
+        }
+
+        // Test 2: Function override detection
+        function testOverrideDetection() {
+            addResult('info', 'Testing function override detection...');
+            
+            FunctionRegistry.register('overrideTest', () => 'First', 'module1', 1);
+            FunctionRegistry.register('overrideTest', () => 'Second', 'module2', 2);
+            
+            const stats = FunctionRegistry.getStats();
+            if (stats.totalOverrides > 0) {
+                addResult('warning', `⚠️ Function override detected: ${stats.overrides[0].name} overridden ${stats.overrides[0].count} times`);
+            } else {
+                addResult('error', '❌ Function override detection failed');
+            }
+        }
+
+        // Test 3: Callback system
+        function testCallbackSystem() {
+            addResult('info', 'Testing callback system...');
+            
+            let callbackExecuted = false;
+            FunctionRegistry.registerCallback('testEvent', () => { callbackExecuted = true; }, 'test-module');
+            FunctionRegistry.executeCallbacks('testEvent');
+            
+            if (callbackExecuted) {
+                addResult('success', '✅ Callback system works');
+            } else {
+                addResult('error', '❌ Callback system failed');
+            }
+        }
+
+        // Test 4: Error handling
+        function testErrorHandling() {
+            addResult('info', 'Testing error handling...');
+            
+            FunctionRegistry.registerCallback('errorTest', () => { throw new Error('Test error'); }, 'test-module');
+            
+            try {
+                FunctionRegistry.executeCallbacks('errorTest');
+                addResult('success', '✅ Error handling works (error was caught)');
+            } catch (error) {
+                addResult('error', '❌ Error handling failed');
+            }
+        }
+
+        // Test 5: Statistics
+        function testStatistics() {
+            addResult('info', 'Testing statistics...');
+            
+            const stats = FunctionRegistry.getStats();
+            if (stats.totalFunctions > 0 && stats.totalCallbacks > 0) {
+                addResult('success', `✅ Statistics work: ${stats.totalFunctions} functions, ${stats.totalCallbacks} callbacks`);
+            } else {
+                addResult('error', '❌ Statistics failed');
+            }
+        }
+
+        // Run all tests
+        function runTests() {
+            addResult('info', 'Starting Function Registry tests...');
+            testBasicRegistration();
+            testOverrideDetection();
+            testCallbackSystem();
+            testErrorHandling();
+            testStatistics();
+            addResult('success', 'All tests completed!');
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

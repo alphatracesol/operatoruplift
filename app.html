@@ -30,7 +30,7 @@
             background-color: #0a0a0a !important;
         }
         
-        /* --- ENHANCED GLOBAL STYLES & CSS VARIABLES --- */
+            /* --- ENHANCED GLOBAL STYLES & CSS VARIABLES --- */
         :root {
             /* === CORE COLOR PALETTE (from index.html) === */
             --primary-color: #f97316;
@@ -1650,6 +1650,194 @@
     </script>
     
     <script src="firebase-config.js"></script>
+    
+    <!-- Function Registry & Error Boundary System -->
+    <script>
+        // ========================================
+        // FUNCTION REGISTRY & ERROR BOUNDARY SYSTEM
+        // ========================================
+        // This system prevents function conflicts and provides error boundaries
+        // for the entire application.
+        
+        console.log('🛡️ Initializing Function Registry & Error Boundary System');
+        
+        // Global Function Registry
+        window.FunctionRegistry = {
+            functions: new Map(),
+            callbacks: new Map(),
+            overrides: new Map(),
+            
+            // Register a function with conflict detection
+            register: function(name, func, module = 'unknown', priority = 0) {
+                if (this.functions.has(name)) {
+                    const existing = this.functions.get(name);
+                    console.warn(`⚠️ Function Registry: ${name} is being redefined`, {
+                        existing: { module: existing.module, priority: existing.priority },
+                        new: { module: module, priority: priority }
+                    });
+                    
+                    // Track overrides for analysis
+                    if (!this.overrides.has(name)) {
+                        this.overrides.set(name, []);
+                    }
+                    this.overrides.get(name).push({
+                        module: existing.module,
+                        priority: existing.priority,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                this.functions.set(name, {
+                    func: func,
+                    module: module,
+                    priority: priority,
+                    registeredAt: Date.now()
+                });
+                
+                console.log(`✅ Function Registry: Registered ${name} from ${module}`);
+                return true;
+            },
+            
+            // Get a registered function
+            get: function(name) {
+                const entry = this.functions.get(name);
+                if (entry) {
+                    return entry.func;
+                }
+                console.error(`❌ Function Registry: Function ${name} not found`);
+                return null;
+            },
+            
+            // Register a callback (for event-driven functions)
+            registerCallback: function(name, callback, module = 'unknown') {
+                if (!this.callbacks.has(name)) {
+                    this.callbacks.set(name, []);
+                }
+                this.callbacks.get(name).push({
+                    callback: callback,
+                    module: module,
+                    registeredAt: Date.now()
+                });
+                console.log(`✅ Function Registry: Registered callback for ${name} from ${module}`);
+            },
+            
+            // Execute all callbacks for a given name
+            executeCallbacks: function(name, ...args) {
+                const callbacks = this.callbacks.get(name);
+                if (callbacks) {
+                    callbacks.forEach(({ callback, module }) => {
+                        try {
+                            callback(...args);
+                        } catch (error) {
+                            console.error(`❌ Function Registry: Error in callback for ${name} from ${module}:`, error);
+                        }
+                    });
+                }
+            },
+            
+            // Get registry statistics
+            getStats: function() {
+                return {
+                    totalFunctions: this.functions.size,
+                    totalCallbacks: this.callbacks.size,
+                    totalOverrides: this.overrides.size,
+                    overrides: Array.from(this.overrides.entries()).map(([name, overrides]) => ({
+                        name: name,
+                        count: overrides.length,
+                        overrides: overrides
+                    }))
+                };
+            }
+        };
+        
+        // Error Boundary System
+        window.ErrorBoundary = {
+            errors: [],
+            maxErrors: 50,
+            
+            // Capture and log errors
+            capture: function(error, context = 'unknown') {
+                const errorInfo = {
+                    message: error.message,
+                    stack: error.stack,
+                    context: context,
+                    timestamp: Date.now(),
+                    url: window.location.href
+                };
+                
+                this.errors.push(errorInfo);
+                
+                // Keep only the last maxErrors
+                if (this.errors.length > this.maxErrors) {
+                    this.errors.shift();
+                }
+                
+                console.error(`🚨 Error Boundary: ${error.message}`, errorInfo);
+                
+                // Show user-friendly error message
+                this.showUserError(error.message);
+            },
+            
+            // Show user-friendly error message
+            showUserError: function(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-boundary-message';
+                errorDiv.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(239, 68, 68, 0.9);
+                        color: white;
+                        padding: 15px;
+                        border-radius: 8px;
+                        z-index: 10000;
+                        max-width: 300px;
+                        font-family: 'Inter', sans-serif;
+                        font-size: 14px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    ">
+                        <strong>⚠️ Error Detected</strong><br>
+                        ${message}<br>
+                        <small>This has been logged for review.</small>
+                    </div>
+                `;
+                
+                document.body.appendChild(errorDiv);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 5000);
+            },
+            
+            // Get error statistics
+            getStats: function() {
+                return {
+                    totalErrors: this.errors.length,
+                    recentErrors: this.errors.slice(-10),
+                    errorTypes: this.errors.reduce((acc, error) => {
+                        acc[error.context] = (acc[error.context] || 0) + 1;
+                        return acc;
+                    }, {})
+                };
+            }
+        };
+        
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            ErrorBoundary.capture(event.error, 'global');
+        });
+        
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', (event) => {
+            ErrorBoundary.capture(new Error(event.reason), 'promise');
+        });
+        
+        console.log('✅ Function Registry & Error Boundary System initialized');
+    </script>
     
     <!-- Main Application Script -->
     <script>
