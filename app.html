@@ -28,31 +28,6 @@
         /* Immediate background fix to prevent white flash */
         html, body {
             background-color: #0a0a0a !important;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a0a 100%) !important;
-        }
-        
-        /* Hero gradient wrapper for dynamic background */
-        .hero-gradient-wrapper {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-gradient-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at top, rgba(249, 115, 22, 0.1) 0%, transparent 60%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        @media (prefers-contrast: high) {
-            .hero-gradient-wrapper::before {
-                opacity: 0.05;
-            }
         }
         
         /* --- GLOBAL STYLES & CSS VARIABLES --- */
@@ -76,10 +51,6 @@
             --border-color: rgba(255, 255, 255, 0.1);
             --border-color-light: rgba(255, 255, 255, 0.2);
             --glass-bg: rgba(255, 255, 255, 0.05);
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
-            --gradient-accent: linear-gradient(135deg, var(--accent-color), var(--accent-light));
-            --gradient-hero: linear-gradient(135deg, #0a0a0a 0%, #1f2937 50%, #374151 100%);
             --danger-color: #ef4444;
             --info-color: #3b82f6;
             --energy-color: #84cc16;
@@ -92,9 +63,6 @@
 
         [data-theme="dark"] {
             --bg-color: #0a0a0a;
-            --bg-gradient-start: #111827;
-            --bg-gradient-end: #0a0a0a;
-            --accent-gradient: var(--gradient-accent);
             --text-color: #e5e7eb;
             --text-muted-color: #9ca3af;
             --card-bg-glass: rgba(24, 24, 27, 0.4);
@@ -106,9 +74,6 @@
 
         [data-theme="light"] {
             --bg-color: #ffffff;
-            --bg-gradient-start: #f8fafc;
-            --bg-gradient-end: #ffffff;
-            --accent-gradient: var(--gradient-accent);
             --text-color: #1f2937;
             --text-muted-color: #6b7280;
             --card-bg-glass: rgba(255, 255, 255, 0.8);
@@ -519,7 +484,7 @@
 
         .experience-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+            background: var(--accent-color);
             border-radius: 8px;
             transition: width 0.3s ease;
         }
@@ -669,7 +634,7 @@
         .btn-primary {
             width: 100%;
             padding: 14px 24px;
-            background: var(--gradient-accent);
+            background: var(--accent-color);
             border: none;
             border-radius: 8px;
             color: white;
@@ -904,7 +869,7 @@
 
         .progress-fill {
             height: 100%;
-            background: var(--gradient-accent);
+            background: var(--accent-color);
             border-radius: 4px;
             transition: width 0.5s ease;
         }
@@ -2481,7 +2446,7 @@ Focus on actionable insights and encouragement.
                 display: flex;
                 flex-direction: column;
                 height: 100vh;
-                background: var(--bg-gradient);
+                background: var(--bg-color);
                 position: relative;
             }
 
@@ -2520,7 +2485,7 @@ Focus on actionable insights and encouragement.
             .ai-avatar {
                 width: 40px;
                 height: 40px;
-                background: var(--accent-gradient);
+                background: var(--accent-color);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -2574,7 +2539,7 @@ Focus on actionable insights and encouragement.
             }
 
             .ai-message-user .message-content {
-                background: var(--accent-gradient);
+                background: var(--accent-color);
                 color: white;
                 border: none;
             }
@@ -2609,7 +2574,7 @@ Focus on actionable insights and encouragement.
             }
 
             .ai-action-btn:hover {
-                background: var(--accent-gradient);
+                background: var(--accent-color);
                 color: white;
                 border-color: transparent;
                 transform: translateY(-2px);
@@ -2651,7 +2616,7 @@ Focus on actionable insights and encouragement.
             }
 
             .btn-send {
-                background: var(--accent-gradient);
+                background: var(--accent-color);
                 border: none;
                 border-radius: 50%;
                 width: 50px;
@@ -2754,7 +2719,7 @@ Focus on actionable insights and encouragement.
             .user-avatar {
                 width: 40px;
                 height: 40px;
-                background: var(--accent-gradient);
+                background: var(--accent-color);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
