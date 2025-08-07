@@ -1,10 +1,10 @@
 // Enhanced Service Worker for Operator Uplift
-// Version: 2.1 - Fixed POST Request Caching
+// Version: 2.2 - Fixed POST Request Caching and Removed Problematic URLs
 
-const CACHE_NAME = 'operator-uplift-v2.1';
-const STATIC_CACHE = 'static-v2.1';
-const DYNAMIC_CACHE = 'dynamic-v2.1';
-const API_CACHE = 'api-v2.1';
+const CACHE_NAME = 'operator-uplift-v2.2';
+const STATIC_CACHE = 'static-v2.2';
+const DYNAMIC_CACHE = 'dynamic-v2.2';
+const API_CACHE = 'api-v2.2';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
@@ -14,11 +14,9 @@ const CACHE_STRATEGIES = {
     'images': 'stale-while-revalidate'
 };
 
-// URLs to cache immediately
+// URLs to cache immediately (removed problematic URLs)
 const urlsToCache = [
     '/',
-    '/test.html',
-    '/Operator_Uplift_Complete.html',
     '/manifest.json',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
     'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
