@@ -117,6 +117,18 @@ function copyDirIfExists(source, dest) {
                         console.log('✅ Environment variables injected into HTML');
                     } else {
                         console.log('⚠️  firebase-config.js script tag not found in HTML');
+                        console.log('🔍 Searching for alternative patterns...');
+                        const alternativePatterns = [
+                            'firebase-config.js',
+                            'src="firebase-config.js"',
+                            '<script src="firebase-config.js">'
+                        ];
+                        alternativePatterns.forEach(pattern => {
+                            const index = content.indexOf(pattern);
+                            if (index !== -1) {
+                                console.log(`📍 Found pattern "${pattern}" at index ${index}`);
+                            }
+                        });
                     }
                     
                     fs.writeFileSync(dest, content);
