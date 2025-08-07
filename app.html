@@ -1804,10 +1804,20 @@
             const userData = OperatorUplift.userData;
             
             if (user && userData) {
-                // Update user info
-                document.getElementById('userName').textContent = userData.name || user.displayName || 'Operator';
-                document.getElementById('userLevel').textContent = userData.level || 1;
-                document.getElementById('userExperience').textContent = userData.experience || 0;
+                // Update user info with null checks
+                const userNameElement = document.getElementById('userName');
+                const userLevelElement = document.getElementById('userLevel');
+                const userExperienceElement = document.getElementById('userExperience');
+                
+                if (userNameElement) {
+                    userNameElement.textContent = userData.name || user.displayName || 'Operator';
+                }
+                if (userLevelElement) {
+                    userLevelElement.textContent = userData.level || 1;
+                }
+                if (userExperienceElement) {
+                    userExperienceElement.textContent = userData.experience || 0;
+                }
                 
                 // Update progress
                 updateProgressStats();
@@ -1818,9 +1828,22 @@
         function updateProgressStats() {
             const stats = dashboardData.stats;
             
-            document.getElementById('activeGoals').textContent = stats.activeGoals;
-            document.getElementById('completedGoals').textContent = stats.completedGoals;
-            document.getElementById('completionRate').textContent = stats.completionRate + '%';
+            // Add null checks for all elements
+            const activeGoalsElement = document.getElementById('activeGoals');
+            const completedGoalsElement = document.getElementById('completedGoals');
+            const completionRateElement = document.getElementById('completionRate');
+            const levelProgressElement = document.getElementById('levelProgress');
+            const levelProgressTextElement = document.getElementById('levelProgressText');
+            
+            if (activeGoalsElement) {
+                activeGoalsElement.textContent = stats.activeGoals;
+            }
+            if (completedGoalsElement) {
+                completedGoalsElement.textContent = stats.completedGoals;
+            }
+            if (completionRateElement) {
+                completionRateElement.textContent = stats.completionRate + '%';
+            }
             
             // Update level progress
             const currentLevel = stats.level;
@@ -1828,8 +1851,12 @@
             const xpForNextLevel = currentLevel * 100;
             const progressPercent = Math.min((currentXP / xpForNextLevel) * 100, 100);
             
-            document.getElementById('levelProgress').style.width = progressPercent + '%';
-            document.getElementById('levelProgressText').textContent = `${currentXP}/${xpForNextLevel} XP`;
+            if (levelProgressElement) {
+                levelProgressElement.style.width = progressPercent + '%';
+            }
+            if (levelProgressTextElement) {
+                levelProgressTextElement.textContent = `${currentXP}/${xpForNextLevel} XP`;
+            }
         }
 
         // Load user goals from Firestore

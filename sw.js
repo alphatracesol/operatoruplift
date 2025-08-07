@@ -115,7 +115,10 @@ async function cacheFirst(request) {
         request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com')) {
+        request.url.includes('google-analytics.com') ||
+        request.url.includes('firebase.googleapis.com') ||
+        request.url.includes('firebaseinstallations.googleapis.com') ||
+        request.url.includes('googletagmanager.com')) {
         console.log('🚫 External resource detected, bypassing cache:', request.url);
         return fetch(request);
     }
@@ -204,7 +207,10 @@ async function staleWhileRevalidate(request) {
         request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com')) {
+        request.url.includes('google-analytics.com') ||
+        request.url.includes('firebase.googleapis.com') ||
+        request.url.includes('firebaseinstallations.googleapis.com') ||
+        request.url.includes('googletagmanager.com')) {
         console.log('🚫 External resource detected, bypassing cache:', request.url);
         return fetch(request);
     }
