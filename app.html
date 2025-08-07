@@ -1552,15 +1552,24 @@
 
         // View management
         function showView(viewName) {
+            console.log('🔄 showView called with:', viewName);
+            
             // Hide all views
             const views = document.querySelectorAll('.view-container');
-            views.forEach(view => view.classList.remove('active'));
+            console.log('📋 Found views:', views.length);
+            views.forEach(view => {
+                view.classList.remove('active');
+                console.log('❌ Hidden view:', view.id);
+            });
             
             // Show target view
             const targetView = document.getElementById(`${viewName}View`);
             if (targetView) {
                 targetView.classList.add('active');
                 OperatorUplift.currentView = viewName;
+                console.log('✅ Activated view:', targetView.id);
+            } else {
+                console.error('❌ Target view not found:', `${viewName}View`);
             }
         }
 
@@ -1624,11 +1633,41 @@
 
         // Auth state observer
         auth.onAuthStateChanged((user) => {
+            console.log('🔄 Auth state changed:', user ? 'User logged in' : 'User logged out');
+            
             if (user) {
                 console.log('✅ User authenticated:', user.email);
                 OperatorUplift.currentUser = user;
-                showView('dashboard');
-                initializeUserData(user);
+                
+                // Show loading screen during transition
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.remove('hidden');
+                    loadingScreen.style.display = 'flex';
+                }
+                
+                // Force view transition with a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    console.log('🔄 Transitioning to dashboard...');
+                    showView('dashboard');
+                    console.log('✅ Dashboard view activated');
+                    
+                    // Hide loading screen after transition
+                    setTimeout(() => {
+                        if (loadingScreen) {
+                            loadingScreen.classList.add('hidden');
+                            setTimeout(() => {
+                                loadingScreen.style.display = 'none';
+                            }, 300);
+                        }
+                    }, 500);
+                }, 100);
+                
+                // Initialize user data after view transition
+                setTimeout(() => {
+                    console.log('🔄 Initializing user data...');
+                    initializeUserData(user);
+                }, 200);
             } else {
                 console.log('🔒 User signed out');
                 OperatorUplift.currentUser = null;
