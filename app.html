@@ -1633,10 +1633,19 @@
 
         // Auth state observer
         let authStateInitialized = false;
+        let lastAuthState = null;
         
         auth.onAuthStateChanged((user) => {
             console.log('🔄 Auth state changed:', user ? 'User logged in' : 'User logged out');
             console.log('🔍 Auth state initialized flag:', authStateInitialized);
+            console.log('🔍 Last auth state:', lastAuthState ? 'User logged in' : 'User logged out');
+            
+            // Check if this is actually a state change
+            const currentAuthState = !!user;
+            const authStateChanged = lastAuthState !== currentAuthState;
+            lastAuthState = currentAuthState;
+            
+            console.log('🔍 Auth state actually changed:', authStateChanged);
             
             // Don't trigger view changes on initial load
             if (!authStateInitialized) {
@@ -1650,6 +1659,12 @@
                     showView('dashboard');
                     initializeUserData(user);
                 }
+                return;
+            }
+            
+            // Only proceed if auth state actually changed
+            if (!authStateChanged) {
+                console.log('🔄 Auth state unchanged, skipping view transition');
                 return;
             }
             
@@ -1727,6 +1742,14 @@
                         const result = await auth.signInWithEmailAndPassword(email, password);
                         console.log('✅ Login successful for user:', result.user.email);
                         console.log('🔄 Auth state should change now...');
+                        
+                        // Force auth state observer to trigger
+                        setTimeout(() => {
+                            console.log('🔄 Manually triggering auth state check...');
+                            // Force a fresh auth state check
+                            auth.currentUser?.reload();
+                        }, 100);
+                        
                     } catch (error) {
                         console.error('❌ Login error:', error.message);
                         showError('Login failed: ' + error.message);

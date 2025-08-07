@@ -76,7 +76,12 @@ function sanitizeUrl(url) {
         /key=([^&]+)/g,
         /api_key=([^&]+)/g,
         /auth_token=([^&]+)/g,
-        /token=([^&]+)/g
+        /token=([^&]+)/g,
+        /access_token=([^&]+)/g,
+        /id_token=([^&]+)/g,
+        /refresh_token=([^&]+)/g,
+        /firebase_key=([^&]+)/g,
+        /firebase_token=([^&]+)/g
     ];
     
     let sanitized = url;
@@ -85,6 +90,9 @@ function sanitizeUrl(url) {
             return match.replace(key, '***');
         });
     });
+    
+    // Also sanitize any Firebase project IDs that might be sensitive
+    sanitized = sanitized.replace(/(projects\/[^\/]+)/g, 'projects/***');
     
     return sanitized;
 }
