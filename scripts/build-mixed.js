@@ -21,7 +21,10 @@ const BUILD_FILES = [
     'login.html',
     'dashboard.html',
     'press-release.html',
-    'MVP Launch Page.html'
+    'MVP Launch Page.html',
+    '404.html',
+    '500.html',
+    'ai-chat-interface.html'
 ];
 
 const ASSET_DIRS = [
@@ -88,7 +91,23 @@ function copyDirIfExists(source, dest) {
                     '*.test.js',
                     '*.spec.js',
                     '*.config.js',
-                    'src'  // Skip entire src directory (contains build-time files)
+                    'src',  // Skip entire src directory (contains build-time files)
+                    // Development and test files
+                    'app-clean.html',
+                    'app-fixed.html',
+                    'app-optimized.html',
+                    'error-logger.html',
+                    'final-fix-verification.html',
+                    'module-diagnostic.html',
+                    'phase2-error-logger.html',
+                    'phase2-fix-verification.html',
+                    'phase3-error-logger.html',
+                    'press-release-better.html',
+                    'ui-fix.html',
+                    'verify-functionality.html',
+                    'last working version.html',
+                    'last-working-version.html',
+                    'perfect-inline-spa.html'
                 ];
                 
                 const shouldSkip = skipFiles.some(skipFile => {
