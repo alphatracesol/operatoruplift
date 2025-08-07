@@ -68,6 +68,42 @@ function copyDirIfExists(source, dest) {
                 const sourcePath = path.join(source, file);
                 const destPath = path.join(dest, file);
                 
+                // Skip Node.js files and build artifacts
+                const skipFiles = [
+                    'node_modules',
+                    'package.json',
+                    'package-lock.json',
+                    'yarn.lock',
+                    '.git',
+                    '.gitignore',
+                    'README.md',
+                    'webpack.config.js',
+                    'postcss.config.js',
+                    'tailwind.config.js',
+                    'vite.config.js',
+                    'jest.config.js',
+                    '.eslintrc.js',
+                    '.prettierrc',
+                    'tsconfig.json',
+                    '*.test.js',
+                    '*.spec.js',
+                    '*.config.js',
+                    'src'  // Skip entire src directory (contains build-time files)
+                ];
+                
+                const shouldSkip = skipFiles.some(skipFile => {
+                    if (skipFile.includes('*')) {
+                        const pattern = skipFile.replace('*', '');
+                        return file.includes(pattern);
+                    }
+                    return file === skipFile;
+                });
+                
+                if (shouldSkip) {
+                    console.log(`⏭️  Skipping: ${sourcePath}`);
+                    return;
+                }
+                
                 if (fs.statSync(sourcePath).isDirectory()) {
                     copyDirIfExists(sourcePath, destPath);
                 } else {
@@ -83,8 +119,8 @@ function copyDirIfExists(source, dest) {
     } else {
         console.log(`⚠️  Directory not found: ${source}`);
         return false;
-                }
-        }
+    }
+}
 
         // Function to process HTML file and inject environment variables
         function processHtmlFile(source, dest) {
