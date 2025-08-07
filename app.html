@@ -97,7 +97,6 @@
             line-height: 1.6;
             overflow-x: hidden;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
         }
 
         /* Loading screen */
@@ -2090,8 +2089,12 @@
         // Enhanced user data initialization
         const originalInitializeUserData = initializeUserData;
         initializeUserData = async function(user) {
-            await originalInitializeUserData(user);
-            onUserDataLoaded();
+            try {
+                await originalInitializeUserData(user);
+                onUserDataLoaded();
+            } catch (error) {
+                console.error('❌ Error in enhanced user data initialization:', error);
+            }
         };
 
         // Make dashboard functions globally available
@@ -2967,10 +2970,20 @@ Focus on actionable insights and encouragement.
             const completedGoals = analyticsData.completionRates['completed'] || 0;
             const completionRate = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
             
-            document.getElementById('totalGoalsStat').textContent = totalGoals;
-            document.getElementById('completionRateStat').textContent = completionRate + '%';
-            document.getElementById('activeGoalsStat').textContent = 
-                (analyticsData.completionRates['active'] || 0);
+            // Add null checks for all analytics elements
+            const totalGoalsElement = document.getElementById('totalGoalsStat');
+            const completionRateElement = document.getElementById('completionRateStat');
+            const activeGoalsElement = document.getElementById('activeGoalsStat');
+            
+            if (totalGoalsElement) {
+                totalGoalsElement.textContent = totalGoals;
+            }
+            if (completionRateElement) {
+                completionRateElement.textContent = completionRate + '%';
+            }
+            if (activeGoalsElement) {
+                activeGoalsElement.textContent = (analyticsData.completionRates['active'] || 0);
+            }
         }
 
         // Settings & Preferences

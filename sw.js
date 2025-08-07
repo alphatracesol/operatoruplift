@@ -71,7 +71,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     // CRITICAL: Never cache POST requests - handle them immediately
     if (event.request.method === 'POST') {
-        console.log(`🚫 POST request detected, bypassing cache: ${event.request.url}`);
+        // Don't log sensitive URLs with API keys
+        const safeUrl = event.request.url.includes('key=') ? 
+            event.request.url.split('key=')[0] + 'key=***' : 
+            event.request.url;
+        console.log(`🚫 POST request detected, bypassing cache: ${safeUrl}`);
         event.respondWith(fetch(event.request));
         return;
     }
@@ -100,7 +104,11 @@ self.addEventListener('fetch', (event) => {
 async function cacheFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        console.log('🚫 POST request detected in cacheFirst, bypassing cache:', request.url);
+        // Don't log sensitive URLs with API keys
+        const safeUrl = request.url.includes('key=') ? 
+            request.url.split('key=')[0] + 'key=***' : 
+            request.url;
+        console.log('🚫 POST request detected in cacheFirst, bypassing cache:', safeUrl);
         return fetch(request);
     }
     
@@ -147,7 +155,11 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        console.log('🚫 POST request detected in networkFirst, bypassing cache:', request.url);
+        // Don't log sensitive URLs with API keys
+        const safeUrl = request.url.includes('key=') ? 
+            request.url.split('key=')[0] + 'key=***' : 
+            request.url;
+        console.log('🚫 POST request detected in networkFirst, bypassing cache:', safeUrl);
         return fetch(request);
     }
     
@@ -192,7 +204,11 @@ async function networkFirst(request) {
 async function staleWhileRevalidate(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        console.log('🚫 POST request detected in staleWhileRevalidate, bypassing cache:', request.url);
+        // Don't log sensitive URLs with API keys
+        const safeUrl = request.url.includes('key=') ? 
+            request.url.split('key=')[0] + 'key=***' : 
+            request.url;
+        console.log('🚫 POST request detected in staleWhileRevalidate, bypassing cache:', safeUrl);
         return fetch(request);
     }
     
