@@ -1634,18 +1634,27 @@
         // Auth state observer
         let authStateInitialized = false;
         let lastAuthState = null;
+        let lastUserEmail = null;
         
         auth.onAuthStateChanged((user) => {
             console.log('🔄 Auth state changed:', user ? 'User logged in' : 'User logged out');
             console.log('🔍 Auth state initialized flag:', authStateInitialized);
             console.log('🔍 Last auth state:', lastAuthState ? 'User logged in' : 'User logged out');
+            console.log('🔍 Current user email:', user?.email);
+            console.log('🔍 Last user email:', lastUserEmail);
             
-            // Check if this is actually a state change
+            // Check if this is actually a state change or a fresh login
             const currentAuthState = !!user;
+            const currentUserEmail = user?.email;
             const authStateChanged = lastAuthState !== currentAuthState;
-            lastAuthState = currentAuthState;
+            const userEmailChanged = lastUserEmail !== currentUserEmail;
             
             console.log('🔍 Auth state actually changed:', authStateChanged);
+            console.log('🔍 User email changed:', userEmailChanged);
+            
+            // Update tracking variables
+            lastAuthState = currentAuthState;
+            lastUserEmail = currentUserEmail;
             
             // Don't trigger view changes on initial load
             if (!authStateInitialized) {
@@ -1662,8 +1671,8 @@
                 return;
             }
             
-            // Only proceed if auth state actually changed
-            if (!authStateChanged) {
+            // Proceed if auth state changed OR if user email changed (fresh login)
+            if (!authStateChanged && !userEmailChanged) {
                 console.log('🔄 Auth state unchanged, skipping view transition');
                 return;
             }
@@ -1749,6 +1758,14 @@
                             // Force a fresh auth state check
                             auth.currentUser?.reload();
                         }, 100);
+                        
+                        // Also force view transition directly as backup
+                        setTimeout(() => {
+                            console.log('🔄 Force transitioning to dashboard as backup...');
+                            OperatorUplift.currentUser = result.user;
+                            showView('dashboard');
+                            initializeUserData(result.user);
+                        }, 500);
                         
                     } catch (error) {
                         console.error('❌ Login error:', error.message);
