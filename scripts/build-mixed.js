@@ -167,6 +167,14 @@ function copyDirIfExists(source, dest) {
                         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || ''
                     };
                     
+                    // Debug logging
+                    console.log('🔍 Environment variables check:');
+                    console.log('  FIREBASE_API_KEY:', process.env.FIREBASE_API_KEY ? 'SET' : 'NOT SET');
+                    console.log('  VITE_FIREBASE_API_KEY:', process.env.VITE_FIREBASE_API_KEY ? 'SET' : 'NOT SET');
+                    console.log('  FIREBASE_AUTH_DOMAIN:', process.env.FIREBASE_AUTH_DOMAIN ? 'SET' : 'NOT SET');
+                    console.log('  FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? 'SET' : 'NOT SET');
+                    console.log('  GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
+                    
                     // Create environment variables script
                     const envScript = `
     <script>
@@ -174,25 +182,32 @@ function copyDirIfExists(source, dest) {
         window.ENV = ${JSON.stringify(envVars)};
     </script>`;
                     
-                    // Insert environment variables script before firebase-config.js
-                    const firebaseScriptIndex = content.indexOf('<script src="firebase-config.js"></script>');
-                    if (firebaseScriptIndex !== -1) {
-                        content = content.slice(0, firebaseScriptIndex) + envScript + '\n    ' + content.slice(firebaseScriptIndex);
-                        console.log('✅ Environment variables injected into HTML');
+                    // First, try to replace existing window.ENV block
+                    const existingEnvPattern = /<script>\s*\/\/ Environment variables injected by build process\s*window\.ENV\s*=\s*\{[^}]*\};\s*<\/script>/s;
+                    if (existingEnvPattern.test(content)) {
+                        content = content.replace(existingEnvPattern, envScript.trim());
+                        console.log('✅ Replaced existing environment variables in HTML');
                     } else {
-                        console.log('⚠️  firebase-config.js script tag not found in HTML');
-                        console.log('🔍 Searching for alternative patterns...');
-                        const alternativePatterns = [
-                            'firebase-config.js',
-                            'src="firebase-config.js"',
-                            '<script src="firebase-config.js">'
-                        ];
-                        alternativePatterns.forEach(pattern => {
-                            const index = content.indexOf(pattern);
-                            if (index !== -1) {
-                                console.log(`📍 Found pattern "${pattern}" at index ${index}`);
-                            }
-                        });
+                        // Fallback: Insert environment variables script before firebase-config.js
+                        const firebaseScriptIndex = content.indexOf('<script src="firebase-config.js"></script>');
+                        if (firebaseScriptIndex !== -1) {
+                            content = content.slice(0, firebaseScriptIndex) + envScript + '\n    ' + content.slice(firebaseScriptIndex);
+                            console.log('✅ Environment variables injected into HTML');
+                        } else {
+                            console.log('⚠️  firebase-config.js script tag not found in HTML');
+                            console.log('🔍 Searching for alternative patterns...');
+                            const alternativePatterns = [
+                                'firebase-config.js',
+                                'src="firebase-config.js"',
+                                '<script src="firebase-config.js">'
+                            ];
+                            alternativePatterns.forEach(pattern => {
+                                const index = content.indexOf(pattern);
+                                if (index !== -1) {
+                                    console.log(`📍 Found pattern "${pattern}" at index ${index}`);
+                                }
+                            });
+                        }
                     }
                     
                     fs.writeFileSync(dest, content);
