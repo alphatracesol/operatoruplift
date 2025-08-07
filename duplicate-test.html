@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Duplicate Test</title>
+    <style>
+        body { font-family: Arial; background: #0a0a0a; color: #e5e7eb; padding: 20px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .error { background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; }
+        .warning { background: rgba(245, 158, 11, 0.2); border-left: 4px solid #f59e0b; }
+        .success { background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; }
+    </style>
+</head>
+<body>
+    <h1>Duplicate Analysis Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(type, message) {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        // Test 1: Check for duplicate function definitions
+        function testFunctionDuplicates() {
+            addResult('info', 'Testing function duplicates...');
+            
+            const functions = [
+                'updateLoadingProgress', 'hideLoadingScreen', 'showView', 'initializeFoundation',
+                'showLoginForm', 'showRegisterForm', 'showForgotPassword', 'setupAuthEventListeners',
+                'initializeUserData', 'showError', 'showSuccess', 'initializeDashboard',
+                'updateDashboardUI', 'updateProgressStats', 'loadUserGoals', 'updateGoalsList',
+                'loadUserAchievements', 'updateStats', 'showAddGoalModal', 'closeAddGoalModal',
+                'setupDashboardEventListeners', 'showAIChat', 'showAnalytics', 'showSettings',
+                'showAllGoals', 'showAllAchievements', 'showUserMenu', 'viewGoal', 'refreshProgress',
+                'formatDate', 'onUserDataLoaded', 'initializeAIChat', 'setupAIChatEventListeners',
+                'sendAiMessage', 'addAiMessage', 'showAiTypingIndicator', 'hideAiTypingIndicator',
+                'aiAnalyzeGoals', 'aiBreakdownGoal', 'aiPersonalityAssessment', 'aiProgressAnalysis',
+                'callDeepSeekAI', 'buildUserContext', 'analyzeGoalsWithAI', 'performGoalBreakdown',
+                'performPersonalityAssessment', 'analyzeProgressWithAI', 'initializeAnalytics',
+                'loadAnalyticsData', 'updateAnalyticsUI', 'updateAnalyticsCharts', 'updateAnalyticsStats',
+                'initializeSettings', 'loadUserSettings', 'updateSettingsUI', 'setupSettingsEventListeners',
+                'saveUserSettings', 'applyTheme', 'showGoalDetails', 'loadGoalDetails', 'updateGoalDetailsUI',
+                'updateGoalTasksList', 'toggleTask', 'addTaskToGoal', 'initializeAchievements',
+                'loadAchievements', 'updateAchievementsUI', 'checkAndAwardAchievements', 'showAchievementNotification',
+                'initializeExportImport', 'setupExportImportEventListeners', 'exportUserData', 'importUserData',
+                'initializeRealTimeCollaboration', 'setupRealTimeListeners', 'handleGoalUpdate',
+                'handleSharedGoalUpdate', 'showRealTimeNotification', 'initializeAdvancedAnalytics',
+                'calculateProductivityScore', 'analyzeGoalVelocity', 'generatePredictiveInsights',
+                'analyzeTimePatterns', 'updateAdvancedAnalyticsUI', 'initializeGamificationExpansion',
+                'setupGamificationEventListeners', 'loadGamificationData', 'awardExperience',
+                'showLevelUpNotification', 'startDailyStreakTracking', 'updateGamificationUI',
+                'initializeAIEnhancement', 'loadPersonalityProfile', 'createInitialPersonalityProfile',
+                'setupAdaptiveAI', 'analyzeUserBehavior', 'generateAdaptiveSuggestions', 'initializeConversationMemory'
+            ];
+            
+            const duplicates = [];
+            const seen = new Set();
+            
+            functions.forEach(func => {
+                if (seen.has(func)) {
+                    duplicates.push(func);
+                } else {
+                    seen.add(func);
+                }
+            });
+            
+            if (duplicates.length > 0) {
+                addResult('error', `Found ${duplicates.length} duplicate functions: ${duplicates.join(', ')}`);
+            } else {
+                addResult('success', 'No function duplicates found');
+            }
+        }
+
+        // Test 2: Check for function override conflicts
+        function testFunctionOverrides() {
+            addResult('info', 'Testing function overrides...');
+            
+            const overrides = [
+                { name: 'onUserDataLoaded', count: 3 },
+                { name: 'initializeUserData', count: 1 }
+            ];
+            
+            const conflicts = overrides.filter(o => o.count > 1);
+            
+            if (conflicts.length > 0) {
+                addResult('warning', `Found ${conflicts.length} function override conflicts`);
+                conflicts.forEach(c => {
+                    addResult('warning', `${c.name} is overridden ${c.count} times`);
+                });
+            } else {
+                addResult('success', 'No function override conflicts found');
+            }
+        }
+
+        // Test 3: Check for CSS class conflicts
+        function testCSSConflicts() {
+            addResult('info', 'Testing CSS class conflicts...');
+            
+            const cssClasses = [
+                'btn', 'btn-primary', 'btn-secondary', 'modal', 'modal-content', 'card', 'card-header',
+                'progress-bar', 'progress-fill', 'achievement', 'achievement-badge', 'goal-item',
+                'task-item', 'user-profile', 'dashboard', 'sidebar', 'navigation', 'header',
+                'footer', 'container', 'row', 'col', 'text-center', 'text-left', 'text-right',
+                'hidden', 'visible', 'active', 'inactive', 'success', 'error', 'warning', 'info'
+            ];
+            
+            const duplicates = [];
+            const seen = new Set();
+            
+            cssClasses.forEach(cls => {
+                if (seen.has(cls)) {
+                    duplicates.push(cls);
+                } else {
+                    seen.add(cls);
+                }
+            });
+            
+            if (duplicates.length > 0) {
+                addResult('warning', `Found ${duplicates.length} potential CSS class conflicts`);
+            } else {
+                addResult('success', 'No CSS class conflicts found');
+            }
+        }
+
+        // Test 4: Check for API endpoint conflicts
+        function testAPIEndpoints() {
+            addResult('info', 'Testing API endpoint conflicts...');
+            
+            const endpoints = [
+                '/.netlify/functions/config',
+                '/.netlify/functions/ai-proxy',
+                '/api/goals',
+                '/api/achievements',
+                '/api/user',
+                '/api/analytics'
+            ];
+            
+            const duplicates = [];
+            const seen = new Set();
+            
+            endpoints.forEach(endpoint => {
+                if (seen.has(endpoint)) {
+                    duplicates.push(endpoint);
+                } else {
+                    seen.add(endpoint);
+                }
+            });
+            
+            if (duplicates.length > 0) {
+                addResult('error', `Found ${duplicates.length} duplicate API endpoints`);
+            } else {
+                addResult('success', 'No API endpoint conflicts found');
+            }
+        }
+
+        // Run all tests
+        function runTests() {
+            addResult('info', 'Starting duplicate analysis...');
+            testFunctionDuplicates();
+            testFunctionOverrides();
+            testCSSConflicts();
+            testAPIEndpoints();
+            addResult('success', 'Analysis complete!');
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

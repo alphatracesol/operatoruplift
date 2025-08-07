@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Press Release: Operator Uplift MVP Launch - AI-Powered Self-Progression</title>
+    <meta name="description" content="Operator Uplift launches MVP to bridge the execution gap for high-agency operators. Transform ambitious goals into achievable progress through AI-driven deconstruction and psychological optimization.">
+    <meta property="og:title" content="Press Release: Operator Uplift MVP Launch">
+    <meta property="og:description" content="Operator Uplift launches MVP to bridge the execution gap for high-agency operators.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://operatoruplift.com/press-release">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@OperatorUplift">
+    <meta name="author" content="Operator Uplift">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f97316">
+    <link rel="canonical" href="https://operatoruplift.com/press-release">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #f97316;
+            --primary-dark: #ea580c;
+            --primary-light: #fb923c;
+            --secondary-color: #f97316;
+            --secondary-dark: #ea580c;
+            --accent-color: #f97316;
+            --accent-light: #fb923c;
+            --accent-hover: #fb923c;
+            --accent-glow: rgba(249, 115, 22, 0.6);
+            --bg-color: #0a0a0a;
+            --text-color: #e5e7eb;
+            --text-muted-color: #9ca3af;
+            --dark-card: rgba(24, 24, 27, 0.5);
+            --dark-card-hover: rgba(24, 24, 27, 0.7);
+            --text-light: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color-light: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            --gradient-accent: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            --gradient-hero: linear-gradient(135deg, #0a0a0a 0%, #1f2937 50%, #374151 100%);
+        }
+
+        /* Hero gradient wrapper for dynamic background */
+        .hero-gradient-wrapper {
+            position: relative;
+        }
+        
+        .hero-gradient-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60vh;
+            background: radial-gradient(ellipse at top, rgba(249, 115, 22, 0.1) 0%, transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        header, main {
+            position: relative;
+            z-index: 2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+            html {
+        scroll-behavior: smooth;
+    }
+
+    /* Ensure smooth scrolling for all browsers */
+    * {
+        scroll-behavior: smooth;
+    }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.01) 0%, transparent 30%),
+                radial-gradient(ellipse at 80% 80%, rgba(249, 115, 22, 0.005) 0%, transparent 30%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        .bg-dark-card {
+            background-color: rgba(24, 24, 27, 0.5);
+        }
+
+        .border-dark {
+            border-color: var(--border-color);
+        }
+
+        .glow {
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4), 0 0 30px rgba(249, 115, 22, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            height: 80px;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0 auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hide nav links on smaller screens */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none !important;
+            }
+            
+            .cta-button.desktop-only {
+                display: none !important;
+            }
+        }
+
+        /* Hide nav links when they wrap and show mobile menu */
+        @media (max-width: 1024px) {
+            .nav-links {
+                display: none !important;
+            }
+            
+            .cta-button.desktop-only {
+                display: none !important;
+            }
+            
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+        }
+
+        .cta-button {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+            z-index: 1;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001; /* Above navbar */
+        }
+
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .hamburger-icon span {
+            width: 20px;
+            height: 2px;
+            background-color: white;
+            margin: 2px 0;
+            transition: 0.3s ease;
+            border-radius: 1px;
+            display: block;
+        }
+
+        .mobile-menu-toggle.active .hamburger-icon span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .mobile-menu-toggle.active .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active .hamburger-icon span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Show mobile menu toggle on smaller screens */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+            
+            .nav-links {
+                display: none !important;
+            }
+            
+            .cta-button.desktop-only {
+                display: none !important;
+            }
+        }
+
+        .desktop-only {
+            display: block;
+        }
+
+        /* Ensure mobile menu toggle is always visible when nav links are hidden */
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        /* Mobile menu functionality */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu a:hover {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent-color);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu-close:hover {
+            color: var(--accent-color);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Orange badge with gradient sweep effect */
+        .orange-badge {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .orange-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.3), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+        .orange-badge:hover::before {
+            left: 100%;
+        }
+
+        .orange-badge > * {
+            position: relative;
+            z-index: 2;
+        }
+
+
+
+        /* Enhanced CTA Button Effects */
+        .cta-button, .cta-button-enhanced {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+        }
+
+        .cta-button::before, .cta-button-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+
+
+        .cta-button:hover::before, .cta-button-enhanced:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover, .cta-button-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.8), 0 0 35px rgba(255, 107, 53, 0.6);
+        }
+
+        .cta-button > *, .cta-button-enhanced > * {
+            position: relative;
+            z-index: 3;
+        }
+
+
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 50;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .scroll-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Particles Background */
+        #tsparticles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.015) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.01) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(249, 115, 22, 0.005) 0%, transparent 50%);
+        }
+
+        /* Trust badge hover effect with gradient sweep - changed from orange to white */
+        .trust-badge {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .trust-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+        .trust-badge:hover::before {
+            left: 100%;
+        }
+
+        .trust-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .trust-badge > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 10, 0.98);
+                padding: 1rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* --- CUSTOM SCROLLBAR STYLING --- */
+        /* Hide default scrollbar and create custom one */
+        ::-webkit-scrollbar {
+            width: 8px;
+            z-index: 1; /* Ensure scrollbar is below header */
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            z-index: 1; /* Ensure scrollbar is below header */
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-color), #ea580c);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            z-index: 1; /* Ensure scrollbar is below header */
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ea580c, var(--accent-color));
+        }
+        
+        /* Firefox scrollbar styling */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1);
+        }
+
+        /* Toggle switch styles */
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Footer links and toggle button positioning for ripple effects */
+        footer a, .toggle-switch {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        footer a {
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--accent-color) !important;
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .scroll-to-top.visible {
+            display: flex;
+        }
+
+        .scroll-to-top:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Hero Gradient Wrapper -->
+    <div class="hero-gradient-wrapper">
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
+                    <g>
+                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
+                    </g>
+                </svg>
+                <span style="color: white; white-space: nowrap; position: relative; overflow: hidden; cursor: pointer;" class="ripple-effect">Operator Uplift</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#why-matters">Why It Matters</a></li>
+                <li><a href="MVP Launch Page.html">Learn More</a></li>
+            </ul>
+            <a href="app.html" class="cta-button desktop-only">Launch App</a>
+            <div class="mobile-menu-toggle">
+                <div class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#why-matters">Why It Matters</a>
+        <a href="MVP Launch Page.html">Learn More</a>
+        <a href="app.html">Launch App</a>
+        <button class="mobile-menu-close">✕</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 sm:px-8 md:px-12 py-16 mt-20">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-16 fade-in">
+            <div class="inline-block bg-orange-400/10 text-orange-400 text-sm font-semibold px-4 py-1 rounded-full mb-6 orange-badge">
+                INTERNAL PRESS RELEASE 📰
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-6">
+                Operator Uplift Launches MVP to <span class="gradient-text">Bridge the Execution Gap</span>
+            </h1>
+            <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-400">
+                Operator Uplift uses AI to build the execution plan for your most ambitious goals.
+            </p>
+        </header>
+
+        <!-- The Problem Section -->
+                    <section class="fade-in mb-20" id="problem">
+                <h2 class="text-2xl font-bold text-white mb-12 border-l-4 border-orange-500 pl-4">The Problem</h2>
+            <p class="text-lg text-gray-400 mb-8">
+                Ambitious founders, creators, executives, and high-agency professionals often face an <strong class="text-white">execution gap</strong>—a paralyzing disconnect between visionary long-term goals and daily execution. Despite clear ambitions, many struggle with overwhelming to-do lists that feel like disconnected chores, leading to inertia, burnout, and stalled progress.
+            </p>
+            <div class="glass-card italic text-center mb-8">
+                <p class="text-xl text-gray-300">"My to-do list is just a pile of chores, not a clear path to success."</p>
+            </div>
+            <p class="mt-6 text-gray-500 text-sm text-center">
+                This emotional friction, rooted in motivation and focus challenges, impacts many driven professionals, eroding momentum and potential, based on insights from 50+ operator conversations.
+            </p>
+        </section>
+
+        <!-- The Solution Section -->
+        <section class="fade-in mb-20" id="solution">
+                <h2 class="text-2xl font-bold text-white mb-12 border-l-4 border-orange-500 pl-4">The Solution</h2>
+                <p class="text-lg text-gray-400 mb-8">
+                    <strong style="color: var(--accent-color);">Operator Uplift</strong> empowers high-agency operators to overcome the execution gap by breaking down complex goals into psychologically optimized "quick wins" and motivation-focused action plans. Leveraging advanced AI models and a personalized AI mentor, it replaces fragmented traditional task managers with a unified, dynamic platform focused on intrinsic motivation, strategic clarity, and sustained momentum.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="glass-card">
+                        <svg class="w-10 h-10 mx-auto mb-4" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        <h3 class="font-bold text-white text-lg mb-2">AI-Driven Goal Deconstruction</h3>
+                        <p class="text-gray-400 text-sm">Breaks goals into tactical phases enriched with engagement elements.</p>
+                    </div>
+                    <div class="glass-card">
+                        <svg class="w-10 h-10 mx-auto mb-4" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <h3 class="font-bold text-white text-lg mb-2">Psychological Quick Wins</h3>
+                        <p class="text-gray-400 text-sm">Crafts tasks designed for immediate motivation surges and addictive progress.</p>
+                    </div>
+                    <div class="glass-card">
+                        <svg class="w-10 h-10 mx-auto mb-4" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <h3 class="font-bold text-white text-lg mb-2">Beyond Task Management</h3>
+                        <p class="text-gray-400 text-sm">A holistic platform offering adaptive planning and personalized AI mentorship.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="fade-in mb-20" id="how-it-works">
+                <h2 class="text-2xl font-bold text-white mb-12 border-l-4 border-orange-500 pl-4">How It Works</h2>
+                <div class="relative pl-8 border-l-2 border-dark space-y-10">
+                    <div class="relative">
+                        <div class="absolute -left-[38px] top-1 h-4 w-4 rounded-full" style="background-color: var(--accent-color); box-shadow: 0 0 0 8px var(--bg-color);"></div>
+                        <h3 class="font-bold text-white text-lg">1. Input Ambitious Goal</h3>
+                        <p class="text-gray-400">e.g., "Launch a venture-backed startup in 6 months".</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[38px] top-1 h-4 w-4 rounded-full" style="background-color: var(--accent-color); box-shadow: 0 0 0 8px var(--bg-color);"></div>
+                        <h3 class="font-bold text-white text-lg">2. AI Generates Roadmap</h3>
+                        <p class="text-gray-400">Produces a personalized, structured plan with weekly momentum tasks like "Week 1: Validate idea with 5 interviews."</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[38px] top-1 h-4 w-4 rounded-full" style="background-color: var(--accent-color); box-shadow: 0 0 0 8px var(--bg-color);"></div>
+                        <h3 class="font-bold text-white text-lg">3. Execute & Ascend</h3>
+                        <p class="text-gray-400">Complete quick-win tasks, earn progress markers, and receive AI mentor guidance for motivation boosts and real-time adjustments.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Founder's Vision Section -->
+            <section class="glass-card text-center fade-in mb-20" id="founder-vision">
+                <img src="/assets/PFP.png" alt="Matt Sim, Founder" class="w-20 h-20 rounded-full mx-auto mb-4 border-2" style="border-color: var(--accent-color);" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f97316/ffffff?text=MS';">
+                <h2 class="text-xl font-bold text-white mb-4">Founder's Vision</h2>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+                    "We don't need another to-do list piling on chores—we need a paradigm shift that <span class="gradient-text font-semibold">manufactures momentum.</span> Operator Uplift is that AI antidote: deconstructing ambition into engineered ascent, turning potential into inevitable progress for operators ready to level up."
+                </p>
+                <p class="mt-4 font-semibold text-white">— Matt Sim, Founder</p>
+            </section>
+
+            <!-- Why It Matters Section -->
+            <section class="fade-in mb-20" id="why-matters">
+                <h2 class="text-2xl font-bold text-white mb-12 border-l-4 border-orange-500 pl-4">Why It Matters</h2>
+                <ul class="space-y-4 text-gray-400">
+                    <li class="flex items-start"><span class="mr-3 mt-1" style="color: var(--accent-color);">✓</span><div><strong class="text-white">User-Centric Validation:</strong> Based on 50+ operator interviews and Delta Sprint learnings, addressing execution challenges in today's creator economy.</div></li>
+                    <li class="flex items-start"><span class="mr-3 mt-1" style="color: var(--accent-color);">✓</span><div><strong class="text-white">Lean MVP Design:</strong> Built publicly in 72 hours during The Residency's Delta Sprint, focusing on essential features for frictionless goal-to-action flow.</div></li>
+                    <li class="flex items-start"><span class="mr-3 mt-1" style="color: var(--accent-color);">✓</span><div><strong class="text-white">Impact Potential:</strong> Beta users report 3x faster goal achievement and reduced overwhelm, with zero feature bloat.</div></li>
+                </ul>
+            </section>
+
+            <!-- Call to Action Section -->
+            <section class="rounded-lg p-8 md:p-12 text-center glow fade-in cta-box-ember" style="background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); box-shadow: 0 0 30px rgba(249, 115, 22, 0.3);">
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-4">Join the Ascent Today</h2>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                    <a href="app.html" class="w-full sm:w-auto bg-white text-orange-600 font-bold py-3 px-8 rounded-lg shadow-lg cta-button-enhanced">
+                        ➔ Try the Live MVP
+                    </a>
+                    <a href="https://x.com/OperatorUplift" target="_blank" class="w-full sm:w-auto bg-black/20 text-white font-bold py-3 px-8 rounded-lg shadow-lg cta-button-enhanced">
+                        Follow on X for Updates
+                    </a>
+                </div>
+                <p class="text-white/80 mt-8 text-sm"><strong>Coming Week 3:</strong> Discipline Points to supercharge motivation.</p>
+            </section>
+        </main>
+
+        <!-- Particle Container -->
+        <div id="tsparticles"></div>
+
+    </div> <!-- Close hero-gradient-wrapper -->
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-10 border-t border-zinc-800 fade-in mt-16" style="background: rgba(0, 0, 0, 0.3); width: 100vw; margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: relative; bottom: 0; z-index: 50;">
+        <div class="max-w-4xl mx-auto px-6 sm:px-8 md:px-12">
+            <div class="flex flex-col items-center gap-6">
+                <p class="text-slate-500">&copy; 2025 Operator Uplift. All rights reserved.</p>
+                <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-4">
+                    <a href="mailto:operatoruplift@gmail.com" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">Contact</a>
+                    <a href="https://twitter.com/OperatorUplift" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors" aria-label="Operator Uplift on X/Twitter">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                    </a>
+                    <a href="https://www.facebook.com/operatoruplift" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors" aria-label="Operator Uplift on Facebook">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v7.028C18.343 21.128 22 16.991 22 12z"></path></svg>
+                    </a>
+                    <a href="https://instagram.com/operatoruplift" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors" aria-label="Operator Uplift on Instagram">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.012 3.584-.07 4.85c-.148 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.012-3.584.07-4.85C2.25 3.854 3.784 2.31 7.031 2.163 8.297 2.105 8.677 2.093 12 2.093m0-2.093c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618-6.98-6.98.059-1.281.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"></path></svg>
+                    </a>
+                    <a href="https://linkedin.com/company/operatoruplift" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors" aria-label="Operator Uplift on LinkedIn">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+                    </a>
+                    <a href="#terms-modal" class="legal-link text-slate-500 hover:text-[var(--accent-color)] transition-colors">Terms</a>
+                    <a href="#privacy-modal" class="legal-link text-slate-500 hover:text-[var(--accent-color)] transition-colors">Privacy</a>
+                    <a href="#support-modal" class="legal-link text-slate-500 hover:text-[var(--accent-color)] transition-colors">Support</a>
+                    <a href="MVP Launch Page.html" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">MVP Launch</a>
+                    <a href="index.html" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">Return to Home</a>
+                    <a href="#" id="manage-cookies" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">Manage Cookies</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-zinc-800/50 flex justify-center items-center text-sm text-slate-400">
+                <div class="flex items-center gap-3"><label for="toggle-particles" class="cursor-pointer">Background Particles</label><label class="toggle-switch"><input type="checkbox" id="toggle-particles" checked><span class="slider"></span></label></div>
+            </div>
+            <div class="mt-4 text-center">
+                <p class="text-sm text-gray-400">Made with ❤️ during The Residency's Delta Sprint</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <button class="scroll-to-top" aria-label="Scroll to top">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
+    <!-- Added back tsparticles for visual appeal -->
+    
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            mobileMenu.classList.toggle('active');
+            mobileToggle.classList.toggle('active');
+        }
+
+        // Add click event to mobile menu toggle and close button
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const mobileMenuClose = document.querySelector('.mobile-menu-close');
+            
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            }
+            
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', toggleMobileMenu);
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+                
+                if (mobileMenu && mobileMenuToggle) {
+                    mobileMenu.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Scroll to top functionality
+        // Use a different variable name to avoid redeclaration
+        const scrollToTopButton = document.querySelector('.scroll-to-top');
+        if (scrollToTopButton) {
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollToTopButton.classList.add('visible');
+                } else {
+                    scrollToTopButton.classList.remove('visible');
+                }
+            });
+            
+            scrollToTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Smooth scrolling with offset for header navigation
+        document.querySelectorAll('.nav-links a[href^="#"], .mobile-menu a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    const headerHeight = 80; // Adjust based on your header height
+                    const windowHeight = window.innerHeight;
+                    const elementHeight = targetElement.offsetHeight;
+                    const elementTop = targetElement.offsetTop;
+                    
+                    // Calculate position to center the section in the viewport
+                    const scrollPosition = elementTop - headerHeight - (windowHeight - elementHeight) / 2;
+                    
+                    window.scrollTo({
+                        top: Math.max(0, scrollPosition),
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // --- Header Logo Ripple Effect and Navigation ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.ripple-effect').forEach(element => {
+                console.log('Adding ripple effect to:', element);
+                element.addEventListener('click', function(e) {
+                    console.log('Ripple effect triggered');
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+
+
+
+        // --- tsParticles System ---
+        // Initialize Particles - Ultra-optimized for performance
+        function initParticles() {
+            if (typeof tsParticles !== 'undefined') {
+                tsParticles.load('tsparticles', {
+                    fpsLimit: 15, // Ultra-low for maximum performance
+                    particles: {
+                        number: {
+                            value: 15, // Minimal particles for performance
+                            density: {
+                                enable: true,
+                                value_area: 1000
+                            }
+                        },
+                        color: {
+                            value: '#f97316'
+                        },
+                        shape: {
+                            type: 'circle'
+                        },
+                        opacity: {
+                            value: 0.2, // Very low opacity
+                            random: false,
+                            anim: {
+                                enable: false
+                            }
+                        },
+                        size: {
+                            value: 1.5, // Very small particles
+                            random: false,
+                            anim: {
+                                enable: false
+                            }
+                        },
+                        line_linked: {
+                            enable: true,
+                            distance: 200,
+                            color: '#f97316',
+                            opacity: 0.1, // Very low opacity
+                            width: 0.5
+                        },
+                        move: {
+                            enable: true,
+                            speed: 0.3, // Very slow movement
+                            direction: 'none',
+                            random: false,
+                            straight: false,
+                            out_mode: 'out',
+                            bounce: false
+                        }
+                    },
+                    interactivity: {
+                        detect_on: 'canvas',
+                        events: {
+                            onhover: {
+                                enable: false
+                            },
+                            onclick: {
+                                enable: false
+                            },
+                            resize: true
+                        }
+                    },
+                    retina_detect: false // Disable for better performance
+                }).then(container => {
+                    window.particlesContainer = container;
+                    window.particlesInstance = container;
+                    console.log('Particles initialized successfully');
+                }).catch(error => {
+                    console.warn('Particles failed to load, using fallback:', error);
+                    initParticlesFallback();
+                });
+            } else {
+                initParticlesFallback();
+            }
+        }
+
+        function initParticlesFallback() {
+            const particlesContainer = document.getElementById('tsparticles');
+            if (particlesContainer) {
+                particlesContainer.style.background = `
+                    radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.02) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.01) 0%, transparent 50%)
+                `;
+            }
+        }
+
+        // Initialize particles
+        console.log('Initializing particles...');
+        
+        // Wait for tsParticles to load
+        if (typeof tsParticles !== 'undefined') {
+            console.log('tsParticles available, initializing...');
+            initParticles();
+        } else {
+            console.log('tsParticles not available, waiting for load...');
+            // Wait for tsParticles to load
+            window.addEventListener('load', () => {
+                if (typeof tsParticles !== 'undefined') {
+                    console.log('tsParticles loaded, initializing...');
+                    initParticles();
+                } else {
+                    console.warn('tsParticles not available');
+                    initParticlesFallback();
+                }
+            });
+        }
+
+        // Particle toggle functionality
+        const particlesToggle = document.getElementById('toggle-particles');
+        if (particlesToggle) {
+            particlesToggle.addEventListener('change', e => {
+                console.log('Particles toggle changed:', e.target.checked);
+                if (window.particlesInstance) {
+                    try {
+                        e.target.checked ? window.particlesInstance.play() : window.particlesInstance.pause();
+                    } catch (error) {
+                        console.warn('Particles toggle error:', error);
+                    }
+                } else {
+                    console.warn('Particles instance not found');
+                }
+            });
+        }
+
+        // Footer link ripple effects and functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('footer a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+
+        // Toggle button ripple effects
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+
+
+    </script>
+
+    <!-- Legal Modals -->
+    <div id="terms-modal" class="overlay-page">
+        <div class="modal-content-wrapper relative max-w-4xl w-full">
+            <button aria-label="Close Terms of Service" class="close-overlay-btn absolute top-4 right-6 text-slate-400 text-4xl hover:text-white">&times;</button>
+            <div class="legal-content">
+                <h2>Terms of Service</h2>
+                <p>Last updated: July 28, 2025</p>
+                <p>Welcome to Operator Uplift. These Terms of Service ("Terms") govern your access to and use of the Operator Uplift website and any services offered (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.</p>
+                <h3>1. The Service</h3>
+                <p>Operator Uplift is a pre-launch project. The Service is provided on an "as is" and "as available" basis. We provide information about our upcoming product and collect user feedback and registrations.</p>
+                <h3>2. User Conduct</h3>
+                <p>You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to use the Service to transmit any material that is defamatory, offensive, or otherwise objectionable.</p>
+                <h3>3. Privacy</h3>
+                <p>Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the Service.</p>
+                <h3>4. Intellectual Property</h3>
+                <p>The Service and its original content, features, and functionality are owned by Operator Uplift and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+                <h3>5. Limitation of Liability</h3>
+                <p>In no event shall Operator Uplift, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.</p>
+                <h3>6. Changes to Terms</h3>
+                <p>We reserve the right to modify these Terms at any time. We will notify you of any changes by posting the new Terms on this page. Your continued use of the Service after any such changes constitutes your acceptance of the new Terms.</p>
+                <h3>7. Contact Us</h3>
+                <p>If you have any questions about these Terms, please contact us at <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacy-modal" class="overlay-page">
+        <div class="modal-content-wrapper relative max-w-4xl w-full">
+            <button aria-label="Close Privacy Policy" class="close-overlay-btn absolute top-4 right-6 text-slate-400 text-4xl hover:text-white">&times;</button>
+            <div class="legal-content">
+                <h2>Privacy Policy</h2>
+                <p><strong>Last updated: July 28, 2025</strong></p>
+                <p>This Privacy Policy describes how Operator Uplift ("we," "us," or "our") collects, uses, and discloses your information when you use our website and services (collectively, the "Service").</p>
+                <h3>1. Information We Collect</h3>
+                <p>We collect information you provide directly to us, such as when you register for updates, contact us, or participate in surveys. This may include your name, email address, and any other information you choose to provide.</p>
+                <h3>2. How We Use Your Information</h3>
+                <p>We use the information we collect to provide, maintain, and improve our Service, communicate with you, and develop new features.</p>
+                <h3>3. Information Sharing</h3>
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:</p>
+                <ul>
+                    <li><strong>Service Providers:</strong> We may share information with third-party service providers who help us operate our Service</li>
+                    <li><strong>Legal Requirements:</strong> We may disclose information if required by law or to protect our rights</li>
+                    <li><strong>Business Transfers:</strong> In the event of a merger or acquisition, your information may be transferred</li>
+                </ul>
+                <h3>4. Data Security</h3>
+                <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                <h3>5. Your Rights</h3>
+                <p>You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us.</p>
+                <h3>6. Cookies and Tracking</h3>
+                <p>We use essential cookies to make our Service work properly. We do not use tracking cookies for advertising purposes. You can control cookie settings through your browser.</p>
+                <h3>7. Children's Privacy</h3>
+                <p>Our Service is not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+                <h3>8. International Transfers</h3>
+                <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place.</p>
+                <h3>9. Changes to This Policy</h3>
+                <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page or sending you an email.</p>
+                <h3>10. Contact Us</h3>
+                <p>If you have questions about this Privacy Policy or our data practices, please contact us at <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="support-modal" class="overlay-page">
+        <div class="modal-content-wrapper relative max-w-4xl w-full">
+            <button aria-label="Close Support" class="close-overlay-btn absolute top-4 right-6 text-slate-400 text-4xl hover:text-white">&times;</button>
+            <div class="legal-content">
+                <h2>Support</h2>
+                <p>Need help? We're here to assist you with any questions or issues you may have.</p>
+                <h3>Contact Information</h3>
+                <p>Email: <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a></p>
+                <h3>Response Time</h3>
+                <p>We typically respond to inquiries within 24-48 hours during business days.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Modal Styles -->
+    <style>
+        .overlay-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .overlay-page.active {
+            display: flex;
+        }
+
+        .modal-content-wrapper {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-overlay-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-muted-color);
+            transition: color 0.3s ease;
+        }
+
+        .close-overlay-btn:hover {
+            color: var(--text-color);
+        }
+
+        .legal-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .legal-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+            color: var(--text-color);
+        }
+
+        .legal-content p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: var(--text-muted-color);
+        }
+
+        .legal-content ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .legal-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+            color: var(--text-muted-color);
+        }
+
+        .legal-content a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .legal-content a:hover {
+            color: var(--accent-light);
+        }
+    </style>
+
+    <!-- Legal Modal JavaScript -->
+    <script>
+        // Legal modal functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const legalLinks = document.querySelectorAll('.legal-link');
+            const modals = document.querySelectorAll('.overlay-page');
+            const closeButtons = document.querySelectorAll('.close-overlay-btn');
+
+            // Open modal when legal link is clicked
+            legalLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const modal = document.getElementById(targetId);
+                    if (modal) {
+                        modal.classList.add('active');
+                    }
+                });
+            });
+
+            // Close modal when close button is clicked
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = button.closest('.overlay-page');
+                    if (modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+
+            // Close modal when clicking outside
+            modals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    modals.forEach(modal => {
+                        if (modal.classList.contains('active')) {
+                            modal.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!-- Ripple effect styles -->
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html> 
