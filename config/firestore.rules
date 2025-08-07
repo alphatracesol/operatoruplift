@@ -38,105 +38,165 @@ service cloud.firestore {
              data.type in ['motivation', 'advice', 'goal-breakdown', 'chat', 'analysis'];
     }
 
-    // Users can only access their own data with relaxed validation
+    // Users can only access their own data - RELAXED for development
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && 
-                       request.auth.uid == userId && 
-                       request.auth.token.email_verified == true;
-      allow update: if request.auth != null && 
-                       request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
       allow delete: if false; // Prevent user deletion for data integrity
     }
     
-    // Users can only access their own goals with relaxed validation
+    // Users can only access their own goals - RELAXED for development
     match /goals/{goalId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && 
+                     (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
-    // Habits - users can only access their own habits
+    // Habits - users can only access their own habits - RELAXED for development
     match /habits/{habitId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
-    // Focus sessions - users can only access their own sessions
+    // Focus sessions - users can only access their own sessions - RELAXED for development
     match /focusSessions/{sessionId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
-    // AI interactions - users can only access their own interactions
+    // AI interactions - users can only access their own interactions - RELAXED for development
     match /aiInteractions/{interactionId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
     // Community templates - read only for authenticated users, write by creator
     match /communityTemplates/{templateId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && 
-                      request.auth.uid == resource.data.createdBy;
+                      (resource == null || resource.data.createdBy == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.createdBy;
-      allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.createdBy == request.auth.uid);
     }
     
     // Leaderboard - read only for authenticated users, write by user
     match /leaderboard/{entryId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && 
-                      request.auth.uid == resource.data.userId;
+                      (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
     // Challenges - read only for authenticated users, write by creator
     match /challenges/{challengeId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && 
-                      request.auth.uid == resource.data.createdBy;
+                      (resource == null || resource.data.createdBy == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.createdBy;
-      allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.createdBy == request.auth.uid);
     }
     
-    // User achievements - users can only access their own achievements
+    // User achievements - users can only access their own achievements - RELAXED for development
     match /achievements/{achievementId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
-    // User analytics - users can only access their own analytics
+    // User analytics - users can only access their own analytics - RELAXED for development
     match /analytics/{analyticsId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
       allow create: if request.auth != null && 
                        request.auth.uid == request.resource.data.userId;
       allow update: if request.auth != null && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // User settings - users can only access their own settings - RELAXED for development
+    match /settings/{settingId} {
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // User personality profiles - users can only access their own profiles - RELAXED for development
+    match /personalityProfiles/{profileId} {
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // User conversation history - users can only access their own conversations - RELAXED for development
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // User gamification data - users can only access their own data - RELAXED for development
+    match /gamification/{gamificationId} {
+      allow read, write: if request.auth != null && 
+                           (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
+      allow delete: if request.auth != null && 
+                       (resource == null || resource.data.userId == request.auth.uid);
     }
     
     // Rate limiting for AI interactions
