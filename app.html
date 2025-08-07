@@ -94,6 +94,7 @@
             --bg-color: #0a0a0a;
             --bg-gradient-start: #111827;
             --bg-gradient-end: #0a0a0a;
+            --accent-gradient: var(--gradient-accent);
             --text-color: #e5e7eb;
             --text-muted-color: #9ca3af;
             --card-bg-glass: rgba(24, 24, 27, 0.4);
@@ -107,6 +108,7 @@
             --bg-color: #ffffff;
             --bg-gradient-start: #f8fafc;
             --bg-gradient-end: #ffffff;
+            --accent-gradient: var(--gradient-accent);
             --text-color: #1f2937;
             --text-muted-color: #6b7280;
             --card-bg-glass: rgba(255, 255, 255, 0.8);
@@ -1534,13 +1536,13 @@
     <script>
         // Environment variables injected by build process
         window.ENV = {
-            FIREBASE_API_KEY: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-            FIREBASE_AUTH_DOMAIN: "operatoruplift.firebaseapp.com",
-            FIREBASE_PROJECT_ID: "operatoruplift",
-            FIREBASE_STORAGE_BUCKET: "operatoruplift.appspot.com",
-            FIREBASE_MESSAGING_SENDER_ID: "123456789012",
-            FIREBASE_APP_ID: "1:123456789012:web:abcdefghijklmnop",
-            FIREBASE_MEASUREMENT_ID: "G-XXXXXXXXXX"
+            FIREBASE_API_KEY: "",
+            FIREBASE_AUTH_DOMAIN: "",
+            FIREBASE_PROJECT_ID: "",
+            FIREBASE_STORAGE_BUCKET: "",
+            FIREBASE_MESSAGING_SENDER_ID: "",
+            FIREBASE_APP_ID: "",
+            FIREBASE_MEASUREMENT_ID: ""
         };
     </script>
     
@@ -1636,7 +1638,7 @@
         } else {
             // Fallback configuration for development
             const firebaseConfig = {
-                apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                apiKey: "",
                 authDomain: "operatoruplift.firebaseapp.com",
                 projectId: "operatoruplift",
                 storageBucket: "operatoruplift.appspot.com",
