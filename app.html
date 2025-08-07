@@ -1636,11 +1636,20 @@
         
         auth.onAuthStateChanged((user) => {
             console.log('🔄 Auth state changed:', user ? 'User logged in' : 'User logged out');
+            console.log('🔍 Auth state initialized flag:', authStateInitialized);
             
             // Don't trigger view changes on initial load
             if (!authStateInitialized) {
                 authStateInitialized = true;
                 console.log('🔄 Auth state observer initialized');
+                
+                // Check if user is already logged in on initial load
+                if (user) {
+                    console.log('👤 User already logged in on page load:', user.email);
+                    OperatorUplift.currentUser = user;
+                    showView('dashboard');
+                    initializeUserData(user);
+                }
                 return;
             }
             
@@ -1707,12 +1716,17 @@
             if (loginForm) {
                 loginForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    console.log('🔄 Login form submitted');
+                    
                     const email = document.getElementById('loginEmail').value;
                     const password = document.getElementById('loginPassword').value;
                     
+                    console.log('📧 Login attempt for:', email);
+                    
                     try {
-                        await auth.signInWithEmailAndPassword(email, password);
-                        console.log('✅ Login successful');
+                        const result = await auth.signInWithEmailAndPassword(email, password);
+                        console.log('✅ Login successful for user:', result.user.email);
+                        console.log('🔄 Auth state should change now...');
                     } catch (error) {
                         console.error('❌ Login error:', error.message);
                         showError('Login failed: ' + error.message);
