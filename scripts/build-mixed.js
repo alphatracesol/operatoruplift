@@ -92,21 +92,32 @@ function copyDirIfExists(source, dest) {
                 try {
                     let content = fs.readFileSync(source, 'utf8');
                     
-                    // Replace environment variable placeholders
+                    // Create environment variables object
                     const envVars = {
-                        '%FIREBASE_API_KEY%': process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || '',
-                        '%FIREBASE_AUTH_DOMAIN%': process.env.FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-                        '%FIREBASE_PROJECT_ID%': process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || '',
-                        '%FIREBASE_STORAGE_BUCKET%': process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-                        '%FIREBASE_MESSAGING_SENDER_ID%': process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-                        '%FIREBASE_APP_ID%': process.env.FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID || '',
-                        '%FIREBASE_MEASUREMENT_ID%': process.env.FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID || ''
+                        FIREBASE_API_KEY: process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || '',
+                        FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+                        FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || '',
+                        FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+                        FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+                        FIREBASE_APP_ID: process.env.FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID || '',
+                        FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID || ''
                     };
                     
-                    // Replace all placeholders
-                    Object.keys(envVars).forEach(placeholder => {
-                        content = content.replace(new RegExp(placeholder, 'g'), envVars[placeholder]);
-                    });
+                    // Create environment variables script
+                    const envScript = `
+    <script>
+        // Environment variables injected by build process
+        window.ENV = ${JSON.stringify(envVars)};
+    </script>`;
+                    
+                    // Insert environment variables script before firebase-config.js
+                    const firebaseScriptIndex = content.indexOf('<script src="firebase-config.js"></script>');
+                    if (firebaseScriptIndex !== -1) {
+                        content = content.slice(0, firebaseScriptIndex) + envScript + '\n    ' + content.slice(firebaseScriptIndex);
+                        console.log('✅ Environment variables injected into HTML');
+                    } else {
+                        console.log('⚠️  firebase-config.js script tag not found in HTML');
+                    }
                     
                     fs.writeFileSync(dest, content);
                     console.log(`✅ Processed and copied: ${source} -> ${dest}`);
