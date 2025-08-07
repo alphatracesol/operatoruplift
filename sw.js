@@ -67,14 +67,33 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+// Utility function to sanitize URLs containing API keys
+function sanitizeUrl(url) {
+    if (typeof url !== 'string') return url;
+    
+    // Remove API keys from various Firebase endpoints
+    const patterns = [
+        /key=([^&]+)/g,
+        /api_key=([^&]+)/g,
+        /auth_token=([^&]+)/g,
+        /token=([^&]+)/g
+    ];
+    
+    let sanitized = url;
+    patterns.forEach(pattern => {
+        sanitized = sanitized.replace(pattern, (match, key) => {
+            return match.replace(key, '***');
+        });
+    });
+    
+    return sanitized;
+}
+
 // Fetch event - implement caching strategies
 self.addEventListener('fetch', (event) => {
     // CRITICAL: Never cache POST requests - handle them immediately
     if (event.request.method === 'POST') {
-        // Don't log sensitive URLs with API keys
-        const safeUrl = event.request.url.includes('key=') ? 
-            event.request.url.split('key=')[0] + 'key=***' : 
-            event.request.url;
+        const safeUrl = sanitizeUrl(event.request.url);
         console.log(`🚫 POST request detected, bypassing cache: ${safeUrl}`);
         event.respondWith(fetch(event.request));
         return;
@@ -83,10 +102,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     const strategy = getCacheStrategy(url);
     
-    // Don't log sensitive URLs with API keys
-    const safePathname = url.pathname.includes('key=') ? 
-        url.pathname.split('key=')[0] + 'key=***' : 
-        url.pathname;
+    const safePathname = sanitizeUrl(url.pathname);
     console.log(`📡 Fetch: ${safePathname} (${strategy})`);
     
     switch (strategy) {
@@ -108,10 +124,7 @@ self.addEventListener('fetch', (event) => {
 async function cacheFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        // Don't log sensitive URLs with API keys
-        const safeUrl = request.url.includes('key=') ? 
-            request.url.split('key=')[0] + 'key=***' : 
-            request.url;
+        const safeUrl = sanitizeUrl(request.url);
         console.log('🚫 POST request detected in cacheFirst, bypassing cache:', safeUrl);
         return fetch(request);
     }
@@ -131,7 +144,7 @@ async function cacheFirst(request) {
         request.url.includes('firebase.googleapis.com') ||
         request.url.includes('firebaseinstallations.googleapis.com') ||
         request.url.includes('googletagmanager.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', request.url);
+        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     
@@ -139,7 +152,7 @@ async function cacheFirst(request) {
     const cachedResponse = await cache.match(request);
     
     if (cachedResponse) {
-        console.log('📦 Serving from cache:', request.url);
+        console.log('📦 Serving from cache:', sanitizeUrl(request.url));
         return cachedResponse;
     }
     
@@ -159,10 +172,7 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        // Don't log sensitive URLs with API keys
-        const safeUrl = request.url.includes('key=') ? 
-            request.url.split('key=')[0] + 'key=***' : 
-            request.url;
+        const safeUrl = sanitizeUrl(request.url);
         console.log('🚫 POST request detected in networkFirst, bypassing cache:', safeUrl);
         return fetch(request);
     }
