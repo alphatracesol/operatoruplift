@@ -30,7 +30,6 @@ const BUILD_FILES = [
 const ASSET_DIRS = [
     'assets',
     'css',
-    'js',
     'images'
 ];
 
@@ -92,13 +91,13 @@ function copyDirIfExists(source, dest) {
                     '*.spec.js',
                     '*.config.js',
                     'src',  // Skip entire src directory (contains build-time files)
+                    'js',   // Skip entire js directory (contains ES6 modules)
                     // Development and test files
                     'app-clean.html',
                     'app-fixed.html',
                     'app-optimized.html',
                     'error-logger.html',
                     'final-fix-verification.html',
-                    'module-diagnostic.html',
                     'phase2-error-logger.html',
                     'phase2-fix-verification.html',
                     'phase3-error-logger.html',
@@ -107,7 +106,15 @@ function copyDirIfExists(source, dest) {
                     'verify-functionality.html',
                     'last working version.html',
                     'last-working-version.html',
-                    'perfect-inline-spa.html'
+                    'perfect-inline-spa.html',
+                    // ES6 module files that cause browser errors
+                    'js/app.js',  // Contains ES6 imports
+                    'assets/js/main.js',  // Contains ES6 imports
+                    'assets/js/auth.js',  // Contains ES6 imports
+                    'assets/js/ai.js',  // May contain ES6 imports
+                    'assets/js/ui.js',  // May contain ES6 imports
+                    'assets/js/ai-agents.js',  // May contain ES6 imports
+                    'assets/js/ai-prompts.js'  // May contain ES6 imports
                 ];
                 
                 const shouldSkip = skipFiles.some(skipFile => {
