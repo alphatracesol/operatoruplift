@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Hunt Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .product-hunt-badge {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .product-hunt-badge:hover {
+            transform: scale(1.05);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Product Hunt Badge Test</h1>
+        
+        <div id="status" class="status">Testing Product Hunt badge...</div>
+        
+        <div class="product-hunt-badge">
+            <a href="https://www.producthunt.com/products/operator-uplift?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-operator-uplift" target="_blank" rel="noopener noreferrer" aria-label="Operator Uplift on Product Hunt">
+                <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1002966&theme=light" 
+                     alt="Operator Uplift - Deconstruct Your Ambition. Elevate Your Ascent. | Product Hunt" 
+                     style="width: 250px; height: 54px;" 
+                     width="250" 
+                     height="54"
+                     onload="imageLoaded()"
+                     onerror="imageError()" />
+            </a>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <h3>Debug Info:</h3>
+            <p>Image URL: <code>https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1002966&theme=light</code></p>
+            <p>Post ID: 1002966</p>
+            <p>Theme: light</p>
+        </div>
+    </div>
+
+    <script>
+        function imageLoaded() {
+            document.getElementById('status').innerHTML = '✅ Product Hunt badge loaded successfully!';
+            document.getElementById('status').className = 'status success';
+        }
+        
+        function imageError() {
+            document.getElementById('status').innerHTML = '❌ Product Hunt badge failed to load. Check console for details.';
+            document.getElementById('status').className = 'status error';
+        }
+        
+        // Test if image loads within 5 seconds
+        setTimeout(() => {
+            const img = document.querySelector('.product-hunt-badge img');
+            if (img && !img.complete) {
+                imageError();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
