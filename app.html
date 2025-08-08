@@ -24,10 +24,30 @@
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" crossorigin="anonymous"></script>
     <!-- Date-fns for date manipulation -->
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    
+    <!-- Immediate theme initialization -->
+    <script>
+        // Set initial theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('operatorUpliftTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            console.log('🎨 Immediate theme set:', savedTheme);
+        })();
+    </script>
     <style>
-        /* Immediate background fix to prevent white flash */
+        /* Theme-aware background initialization */
         html, body {
-            background-color: #0a0a0a !important;
+            background-color: var(--bg-color);
+            transition: background-color 0.3s ease;
+        }
+        
+        /* Ensure theme is applied immediately */
+        html[data-theme="light"] {
+            background-color: var(--bg-color);
+        }
+        
+        html[data-theme="dark"] {
+            background-color: var(--bg-color);
         }
         
             /* --- ENHANCED GLOBAL STYLES & CSS VARIABLES --- */
@@ -68,7 +88,7 @@
             --gray-900: #111827;
             
             /* === BACKGROUND SYSTEM === */
-            --bg-color: #0a0a0a;
+            --bg-color: #0a0a0a; /* Default dark, will be overridden by theme */
             --bg-secondary: #111111;
             --bg-tertiary: #1a1a1a;
             --bg-elevated: #222222;
@@ -81,9 +101,7 @@
             --text-inverse: #0a0a0a;
             
             /* === CARD & GLASS SYSTEM === */
-            --dark-card: rgba(24, 24, 27, 0.5);
-            --dark-card-hover: rgba(24, 24, 27, 0.7);
-            --card-bg-glass: rgba(24, 24, 27, 0.4);
+            --button-hover: rgba(24, 24, 27, 0.7);
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-bg-light: rgba(255, 255, 255, 0.1);
             --glass-bg-heavy: rgba(255, 255, 255, 0.15);
@@ -98,6 +116,11 @@
             --input-bg: rgba(0,0,0,0.2);
             --input-border: rgba(255, 255, 255, 0.1);
             --input-focus: rgba(249, 115, 22, 0.3);
+            
+            /* === THEME TOGGLE === */
+            --theme-toggle-bg: rgba(255, 255, 255, 0.1);
+            --theme-toggle-hover: rgba(255, 255, 255, 0.2);
+            --theme-toggle-border: rgba(255, 255, 255, 0.2);
             
             /* === SIDEBAR SYSTEM === */
             --sidebar-bg: rgba(10, 10, 10, 0.8);
@@ -163,6 +186,38 @@
             --z-toast: 1080;
             --z-loading: 10000;
         }
+        
+        /* Theme Toggle Button Styles */
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-toggle-border);
+            background: var(--theme-toggle-bg);
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-toggle-btn:hover {
+            background: var(--theme-toggle-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
 
         /* === ENHANCED THEME SYSTEM === */
         [data-theme="dark"] {
@@ -171,8 +226,11 @@
             --bg-tertiary: #1a1a1a;
             --bg-elevated: #222222;
             --text-color: #e5e7eb;
+            --text-light: #e5e7eb;
+            --text-muted: #9ca3af;
             --text-muted-color: #9ca3af;
-            --card-bg-glass: rgba(24, 24, 27, 0.4);
+            --text-inverse: #0a0a0a;
+            --card-bg-glass: rgba(0, 0, 0, 0.4);
             --border-glass: rgba(255, 255, 255, 0.1);
             --sidebar-bg: rgba(10, 10, 10, 0.8);
             --input-bg: rgba(0,0,0,0.2);
@@ -180,6 +238,13 @@
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-bg-light: rgba(255, 255, 255, 0.1);
             --glass-bg-heavy: rgba(255, 255, 255, 0.15);
+            --button-hover: rgba(24, 24, 27, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color-light: rgba(255, 255, 255, 0.2);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --theme-toggle-bg: rgba(0, 0, 0, 0.4);
+            --theme-toggle-hover: rgba(0, 0, 0, 0.5);
+            --theme-toggle-border: rgba(255, 255, 255, 0.2);
         }
 
         [data-theme="light"] {
@@ -188,15 +253,25 @@
             --bg-tertiary: #f3f4f6;
             --bg-elevated: #e5e7eb;
             --text-color: #1f2937;
+            --text-light: #1f2937;
+            --text-muted: #6b7280;
             --text-muted-color: #6b7280;
-            --card-bg-glass: rgba(255, 255, 255, 0.8);
+            --text-inverse: #ffffff;
+            --card-bg-glass: rgba(255, 255, 255, 0.15);
             --border-glass: rgba(0, 0, 0, 0.1);
             --sidebar-bg: rgba(255, 255, 255, 0.9);
-            --input-bg: rgba(255,255,255,0.8);
+            --input-bg: rgba(255, 255, 255, 0.1);
             --particle-color: #000000;
             --glass-bg: rgba(0, 0, 0, 0.05);
             --glass-bg-light: rgba(0, 0, 0, 0.1);
             --glass-bg-heavy: rgba(0, 0, 0, 0.15);
+            --button-hover: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-color-light: rgba(0, 0, 0, 0.2);
+            --input-border: rgba(0, 0, 0, 0.1);
+            --theme-toggle-bg: rgba(255, 255, 255, 0.15);
+            --theme-toggle-hover: rgba(255, 255, 255, 0.25);
+            --theme-toggle-border: rgba(0, 0, 0, 0.1);
         }
 
         /* === ACCESSIBILITY ENHANCEMENTS === */
@@ -232,6 +307,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Loading screen */
@@ -667,13 +743,28 @@
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px 40px 20px;
             text-align: center;
+            position: relative;
+            z-index: 15; /* Higher than matrix rain */
+        }
+
+                /* Matrix Rain Background - Canvas-based */
+        #matrix-rain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.5;
         }
 
         /* Auth Header */
         .auth-header {
             margin-bottom: 40px;
+            margin-top: 60px;
         }
 
         .auth-logo {
@@ -684,9 +775,9 @@
         }
 
         .auth-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
             margin-bottom: 10px;
         }
 
@@ -700,11 +791,6 @@
         .auth-forms {
             position: relative;
             margin-bottom: 30px;
-            background: var(--card-bg-glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 40px;
             display: grid;
             gap: 20px;
         }
@@ -714,8 +800,8 @@
             background: var(--card-bg-glass);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 40px;
         }
 
         .auth-form.active {
@@ -819,33 +905,13 @@
             margin-top: 30px;
         }
 
-        .divider {
-            position: relative;
-            text-align: center;
-            margin: 20px 0;
-        }
 
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--border-glass);
-        }
-
-        .divider span {
-            background: var(--bg-color);
-            padding: 0 15px;
-            color: var(--text-muted-color);
-            font-size: 0.9rem;
-        }
 
         .btn-social {
             width: 100%;
             padding: 12px 24px;
             background: var(--card-bg-glass);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border-glass);
             border-radius: 8px;
             color: var(--text-color);
@@ -860,7 +926,7 @@
         }
 
         .btn-social:hover {
-            background: var(--dark-card-hover);
+            background: var(--button-hover);
             border-color: var(--border-color-light);
         }
 
@@ -927,7 +993,7 @@
         }
 
         .btn-icon:hover {
-            background: var(--dark-card-hover);
+            background: var(--button-hover);
             border-color: var(--border-color-light);
         }
 
@@ -1042,7 +1108,7 @@
         }
 
         .action-btn:hover {
-            background: var(--dark-card-hover);
+            background: var(--button-hover);
             border-color: var(--accent-color);
             transform: translateY(-2px);
         }
@@ -1075,7 +1141,7 @@
         }
 
         .goal-item:hover {
-            background: var(--dark-card-hover);
+            background: var(--button-hover);
         }
 
         .goal-info h4 {
@@ -1278,7 +1344,7 @@
         }
 
         .btn-secondary:hover {
-            background: var(--dark-card-hover);
+            background: var(--button-hover);
             border-color: var(--border-color-light);
         }
 
@@ -1315,6 +1381,9 @@
     </style>
 </head>
 <body>
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-rain-canvas"></canvas>
+    
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-logo">
@@ -1419,9 +1488,6 @@
 
                 <!-- Social Login -->
                 <div class="social-login">
-                    <div class="divider">
-                        <span>or continue with</span>
-                    </div>
                     <button id="googleSignIn" class="btn-social">
                         <svg viewBox="0 0 24 24" width="24" height="24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1651,118 +1717,100 @@
     
     <script src="firebase-config.js"></script>
     
-    <!-- Function Registry & Error Boundary System -->
+    <!-- Main Application Script -->
     <script>
-        // ========================================
-        // FUNCTION REGISTRY & ERROR BOUNDARY SYSTEM
-        // ========================================
-        // This system prevents function conflicts and provides error boundaries
-        // for the entire application.
+        // Foundation JavaScript - Phase 1
+        console.log('🚀 Operator Uplift - Foundation Loaded');
         
-        console.log('🛡️ Initializing Function Registry & Error Boundary System');
-        
-        // Global Function Registry
+        // ===== FUNCTION REGISTRY SYSTEM =====
+        // Prevents function override conflicts and provides centralized management
         window.FunctionRegistry = {
             functions: new Map(),
-            callbacks: new Map(),
-            overrides: new Map(),
+            modules: new Map(),
+            conflicts: [],
             
             // Register a function with conflict detection
-            register: function(name, func, module = 'unknown', priority = 0) {
-                if (this.functions.has(name)) {
-                    const existing = this.functions.get(name);
-                    console.warn(`⚠️ Function Registry: ${name} is being redefined`, {
-                        existing: { module: existing.module, priority: existing.priority },
-                        new: { module: module, priority: priority }
-                    });
+            register: function(moduleName, functionName, func, options = {}) {
+                const key = `${moduleName}.${functionName}`;
+                
+                if (this.functions.has(key)) {
+                    const conflict = {
+                        module: moduleName,
+                        function: functionName,
+                        existing: this.functions.get(key),
+                        new: func,
+                        timestamp: new Date().toISOString()
+                    };
                     
-                    // Track overrides for analysis
-                    if (!this.overrides.has(name)) {
-                        this.overrides.set(name, []);
+                    this.conflicts.push(conflict);
+                    console.warn(`⚠️ Function Registry: Conflict detected for ${key}`, conflict);
+                    
+                    if (options.allowOverride) {
+                        console.log(`✅ Function Registry: Overriding ${key} (allowed)`);
+                        this.functions.set(key, func);
+                        return true;
+                    } else {
+                        console.error(`❌ Function Registry: Override blocked for ${key}`);
+                        return false;
                     }
-                    this.overrides.get(name).push({
-                        module: existing.module,
-                        priority: existing.priority,
-                        timestamp: Date.now()
-                    });
                 }
                 
-                this.functions.set(name, {
-                    func: func,
-                    module: module,
-                    priority: priority,
-                    registeredAt: Date.now()
-                });
-                
-                console.log(`✅ Function Registry: Registered ${name} from ${module}`);
+                this.functions.set(key, func);
+                console.log(`✅ Function Registry: Registered ${key}`);
                 return true;
             },
             
             // Get a registered function
-            get: function(name) {
-                const entry = this.functions.get(name);
-                if (entry) {
-                    return entry.func;
-                }
-                console.error(`❌ Function Registry: Function ${name} not found`);
-                return null;
+            get: function(moduleName, functionName) {
+                const key = `${moduleName}.${functionName}`;
+                return this.functions.get(key);
             },
             
-            // Register a callback (for event-driven functions)
-            registerCallback: function(name, callback, module = 'unknown') {
-                if (!this.callbacks.has(name)) {
-                    this.callbacks.set(name, []);
+            // Execute a function with error handling
+            execute: function(moduleName, functionName, ...args) {
+                const func = this.get(moduleName, functionName);
+                if (!func) {
+                    console.error(`❌ Function Registry: Function not found ${moduleName}.${functionName}`);
+                    return null;
                 }
-                this.callbacks.get(name).push({
-                    callback: callback,
-                    module: module,
-                    registeredAt: Date.now()
-                });
-                console.log(`✅ Function Registry: Registered callback for ${name} from ${module}`);
-            },
-            
-            // Execute all callbacks for a given name
-            executeCallbacks: function(name, ...args) {
-                const callbacks = this.callbacks.get(name);
-                if (callbacks) {
-                    callbacks.forEach(({ callback, module }) => {
-                        try {
-                            callback(...args);
-                        } catch (error) {
-                            console.error(`❌ Function Registry: Error in callback for ${name} from ${module}:`, error);
-                        }
-                    });
+                
+                try {
+                    return func(...args);
+                } catch (error) {
+                    console.error(`❌ Function Registry: Error executing ${moduleName}.${functionName}:`, error);
+                    return null;
                 }
             },
             
-            // Get registry statistics
-            getStats: function() {
-                return {
-                    totalFunctions: this.functions.size,
-                    totalCallbacks: this.callbacks.size,
-                    totalOverrides: this.overrides.size,
-                    overrides: Array.from(this.overrides.entries()).map(([name, overrides]) => ({
-                        name: name,
-                        count: overrides.length,
-                        overrides: overrides
-                    }))
-                };
+            // Register a module
+            registerModule: function(moduleName, moduleFunctions) {
+                this.modules.set(moduleName, moduleFunctions);
+                console.log(`✅ Function Registry: Module registered ${moduleName}`);
+            },
+            
+            // Get conflicts report
+            getConflicts: function() {
+                return this.conflicts;
+            },
+            
+            // Clear conflicts
+            clearConflicts: function() {
+                this.conflicts = [];
             }
         };
         
-        // Error Boundary System
+        // ===== ERROR BOUNDARY SYSTEM =====
         window.ErrorBoundary = {
             errors: [],
-            maxErrors: 50,
+            maxErrors: 10,
             
             // Capture and log errors
-            capture: function(error, context = 'unknown') {
+            capture: function(error, context = {}) {
                 const errorInfo = {
                     message: error.message,
                     stack: error.stack,
                     context: context,
-                    timestamp: Date.now(),
-                    url: window.location.href
+                    timestamp: new Date().toISOString()
                 };
                 
                 this.errors.push(errorInfo);
@@ -1772,77 +1820,177 @@
                     this.errors.shift();
                 }
                 
-                console.error(`🚨 Error Boundary: ${error.message}`, errorInfo);
-                
-                // Show user-friendly error message
-                this.showUserError(error.message);
+                console.error('❌ ErrorBoundary captured:', errorInfo);
+                return errorInfo;
             },
             
-            // Show user-friendly error message
-            showUserError: function(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-boundary-message';
-                errorDiv.innerHTML = `
-                    <div style="
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: rgba(239, 68, 68, 0.9);
-                        color: white;
-                        padding: 15px;
-                        border-radius: 8px;
-                        z-index: 10000;
-                        max-width: 300px;
-                        font-family: 'Inter', sans-serif;
-                        font-size: 14px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                    ">
-                        <strong>⚠️ Error Detected</strong><br>
-                        ${message}<br>
-                        <small>This has been logged for review.</small>
-                    </div>
-                `;
-                
-                document.body.appendChild(errorDiv);
-                
-                // Remove after 5 seconds
-                setTimeout(() => {
-                    if (errorDiv.parentNode) {
-                        errorDiv.parentNode.removeChild(errorDiv);
-                    }
-                }, 5000);
+            // Get error report
+            getErrors: function() {
+                return this.errors;
             },
             
-            // Get error statistics
-            getStats: function() {
-                return {
-                    totalErrors: this.errors.length,
-                    recentErrors: this.errors.slice(-10),
-                    errorTypes: this.errors.reduce((acc, error) => {
-                        acc[error.context] = (acc[error.context] || 0) + 1;
-                        return acc;
-                    }, {})
-                };
+            // Clear errors
+            clearErrors: function() {
+                this.errors = [];
             }
         };
         
-        // Global error handler
-        window.addEventListener('error', (event) => {
-            ErrorBoundary.capture(event.error, 'global');
-        });
+        // ===== NAMESPACE SYSTEM =====
+        window.AppNamespace = {
+            core: {},
+            ui: {},
+            auth: {},
+            data: {},
+            ai: {},
+            gamification: {},
+            utils: {}
+        };
         
-        // Unhandled promise rejection handler
-        window.addEventListener('unhandledrejection', (event) => {
-            ErrorBoundary.capture(new Error(event.reason), 'promise');
-        });
-        
-        console.log('✅ Function Registry & Error Boundary System initialized');
-    </script>
-    
-    <!-- Main Application Script -->
-    <script>
-        // Foundation JavaScript - Phase 1
-        console.log('🚀 Operator Uplift - Foundation Loaded');
+        // ===== THEME SYSTEM (DARK/LIGHT MODE) =====
+        window.ThemeManager = {
+            currentTheme: 'dark',
+            themes: {
+                dark: {
+                    '--bg-color': '#0a0a0a',
+                    '--bg-secondary': '#111111',
+                    '--bg-tertiary': '#1a1a1a',
+                    '--bg-elevated': '#222222',
+                    '--text-color': '#e5e7eb',
+                    '--text-light': '#e5e7eb',
+                    '--text-muted': '#9ca3af',
+                    '--text-muted-color': '#9ca3af',
+                    '--text-inverse': '#0a0a0a',
+                    '--button-hover': 'rgba(24, 24, 27, 0.7)',
+                    '--card-bg-glass': 'rgba(0, 0, 0, 0.4)',
+                    '--glass-bg': 'rgba(255, 255, 255, 0.05)',
+                    '--glass-bg-light': 'rgba(255, 255, 255, 0.1)',
+                    '--glass-bg-heavy': 'rgba(255, 255, 255, 0.15)',
+                    '--border-color': 'rgba(255, 255, 255, 0.1)',
+                    '--border-color-light': 'rgba(255, 255, 255, 0.2)',
+                    '--border-glass': 'rgba(255, 255, 255, 0.1)',
+                    '--input-bg': 'rgba(0,0,0,0.2)',
+                    '--input-border': 'rgba(255, 255, 255, 0.1)',
+                    '--theme-toggle-bg': 'rgba(0, 0, 0, 0.4)',
+                    '--theme-toggle-hover': 'rgba(0, 0, 0, 0.5)',
+                    '--theme-toggle-border': 'rgba(255, 255, 255, 0.2)'
+                },
+                light: {
+                    '--bg-color': '#ffffff',
+                    '--bg-secondary': '#f9fafb',
+                    '--bg-tertiary': '#f3f4f6',
+                    '--bg-elevated': '#e5e7eb',
+                    '--text-color': '#1f2937',
+                    '--text-light': '#1f2937',
+                    '--text-muted': '#6b7280',
+                    '--text-muted-color': '#6b7280',
+                    '--text-inverse': '#ffffff',
+                    '--button-hover': 'rgba(0, 0, 0, 0.1)',
+                    '--card-bg-glass': 'rgba(255, 255, 255, 0.15)',
+                    '--glass-bg': 'rgba(0, 0, 0, 0.05)',
+                    '--glass-bg-light': 'rgba(0, 0, 0, 0.1)',
+                    '--glass-bg-heavy': 'rgba(0, 0, 0, 0.15)',
+                    '--border-color': 'rgba(0, 0, 0, 0.1)',
+                    '--border-color-light': 'rgba(0, 0, 0, 0.2)',
+                    '--border-glass': 'rgba(0, 0, 0, 0.1)',
+                    '--input-bg': 'rgba(255, 255, 255, 0.1)',
+                    '--input-border': 'rgba(0, 0, 0, 0.1)',
+                    '--theme-toggle-bg': 'rgba(255, 255, 255, 0.15)',
+                    '--theme-toggle-hover': 'rgba(255, 255, 255, 0.25)',
+                    '--theme-toggle-border': 'rgba(0, 0, 0, 0.1)'
+                }
+            },
+            
+            // Initialize theme system
+            init: function() {
+                // Load saved theme from localStorage
+                const savedTheme = localStorage.getItem('operatorUpliftTheme');
+                if (savedTheme && this.themes[savedTheme]) {
+                    this.currentTheme = savedTheme;
+                }
+                
+                // Set initial data-theme attribute
+                document.documentElement.setAttribute('data-theme', this.currentTheme);
+                
+                // Apply current theme
+                this.applyTheme(this.currentTheme);
+                
+                // Set up theme toggle functionality
+                this.setupThemeToggle();
+                
+                console.log('✅ ThemeManager initialized with theme:', this.currentTheme);
+            },
+            
+            // Apply theme to document
+            applyTheme: function(themeName) {
+                if (!this.themes[themeName]) {
+                    console.error('❌ Theme not found:', themeName);
+                    return false;
+                }
+                
+                const theme = this.themes[themeName];
+                const root = document.documentElement;
+                
+                // Set data-theme attribute for CSS selectors
+                root.setAttribute('data-theme', themeName);
+                
+                // Apply all CSS variables
+                Object.entries(theme).forEach(([property, value]) => {
+                    root.style.setProperty(property, value);
+                });
+                
+                this.currentTheme = themeName;
+                localStorage.setItem('operatorUpliftTheme', themeName);
+                
+                // Update theme indicator in UI
+                this.updateThemeIndicator();
+                
+                console.log('✅ Theme applied:', themeName);
+                return true;
+            },
+            
+            // Toggle between dark and light themes
+            toggleTheme: function() {
+                const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                return this.applyTheme(newTheme);
+            },
+            
+            // Set up theme toggle button
+            setupThemeToggle: function() {
+                // Create theme toggle button if it doesn't exist
+                let themeToggle = document.getElementById('themeToggle');
+                if (!themeToggle) {
+                    themeToggle = document.createElement('button');
+                    themeToggle.id = 'themeToggle';
+                    themeToggle.className = 'theme-toggle-btn';
+                    themeToggle.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+                    themeToggle.title = `Switch to ${this.currentTheme === 'dark' ? 'light' : 'dark'} mode`;
+                    
+                    // Add to body for visibility
+                    document.body.appendChild(themeToggle);
+                }
+                
+                // Add click event
+                themeToggle.onclick = () => {
+                    this.toggleTheme();
+                    themeToggle.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+                    themeToggle.title = `Switch to ${this.currentTheme === 'dark' ? 'light' : 'dark'} mode`;
+                };
+            },
+            
+            // Update theme indicator in UI
+            updateThemeIndicator: function() {
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+                    themeToggle.title = `Switch to ${this.currentTheme === 'dark' ? 'light' : 'dark'} mode`;
+                }
+            },
+            
+            // Get current theme
+            getCurrentTheme: function() {
+                return this.currentTheme;
+            }
+        };
         
         // Global app state
         window.OperatorUplift = {
@@ -1852,7 +2000,10 @@
             config: {
                 version: '1.0.0',
                 buildDate: new Date().toISOString()
-            }
+            },
+            registry: window.FunctionRegistry,
+            errors: window.ErrorBoundary,
+            namespace: window.AppNamespace
         };
 
         // Loading screen management
@@ -1872,6 +2023,10 @@
                 }, 500);
             }
         }
+        
+        // Register core functions with the registry
+        FunctionRegistry.register('core', 'updateLoadingProgress', updateLoadingProgress);
+        FunctionRegistry.register('core', 'hideLoadingScreen', hideLoadingScreen);
 
         // View management
         function showView(viewName) {
@@ -1894,12 +2049,109 @@
             } else {
                 console.error('❌ Target view not found:', `${viewName}View`);
             }
+            
+            // Matrix rain is always visible - no need to control it per view
+            console.log('🌧️ Matrix rain remains visible for all views');
         }
+        
+        // Register view management functions
+        FunctionRegistry.register('core', 'showView', showView);
+
+        // Matrix Rain Background Effect - Canvas-based
+        function initializeMatrixRain() {
+            const canvas = document.getElementById('matrix-rain-canvas');
+            if (!canvas) {
+                console.error('❌ Matrix rain canvas not found');
+                return;
+            }
+            
+            console.log('🎬 Initializing matrix rain (Canvas)...');
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const rainDrops = Array.from({ length: columns }).map(() => 1);
+
+            const draw = () => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#f97316';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            };
+            
+            // Clear any existing interval
+            if (window.matrixInterval) {
+                clearInterval(window.matrixInterval);
+            }
+            
+            window.matrixInterval = setInterval(draw, 50);
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            console.log('✅ Matrix rain initialized (Canvas)');
+        }
+
+        // Manual matrix rain trigger for testing
+        function testMatrixRain() {
+            console.log('🧪 Testing matrix rain (Canvas)...');
+            const canvas = document.getElementById('matrix-rain-canvas');
+            if (canvas) {
+                initializeMatrixRain();
+                console.log('✅ Matrix rain test completed');
+            } else {
+                console.error('❌ Matrix rain canvas not found for test');
+            }
+        }
+
+        // Handle window resize for matrix rain
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                console.log('🔄 Resizing matrix rain (Canvas)...');
+                const canvas = document.getElementById('matrix-rain-canvas');
+                if (canvas) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+            }, 250);
+        });
 
         // Initialize foundation
         function initializeFoundation() {
             console.log('🔧 Initializing foundation...');
             updateLoadingProgress(25);
+            
+            // Initialize theme system
+            if (window.ThemeManager) {
+                window.ThemeManager.init();
+                console.log('✅ Theme system initialized');
+            }
+            
+            // Initialize matrix rain background after DOM is loaded
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    initializeMatrixRain();
+                    console.log('✅ Matrix rain initialized after DOM load');
+                }, 500);
+            });
             
             // Set up basic event listeners
             document.addEventListener('DOMContentLoaded', () => {
@@ -1921,7 +2173,10 @@
                 }, 500);
             }, 1000);
         }
-
+        
+        // Register foundation functions
+        FunctionRegistry.register('core', 'initializeFoundation', initializeFoundation);
+        
         // Start initialization
         initializeFoundation();
 
@@ -2004,35 +2259,14 @@
                 console.log('✅ User authenticated:', user.email);
                 OperatorUplift.currentUser = user;
                 
-                // Show loading screen during transition
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.classList.remove('hidden');
-                    loadingScreen.style.display = 'flex';
-                }
+                // Direct view transition without loading screen
+                console.log('🔄 Transitioning to dashboard...');
+                showView('dashboard');
+                console.log('✅ Dashboard view activated');
                 
-                // Force view transition with a small delay to ensure DOM is ready
-                setTimeout(() => {
-                    console.log('🔄 Transitioning to dashboard...');
-                    showView('dashboard');
-                    console.log('✅ Dashboard view activated');
-                    
-                    // Hide loading screen after transition
-                    setTimeout(() => {
-                        if (loadingScreen) {
-                            loadingScreen.classList.add('hidden');
-                            setTimeout(() => {
-                                loadingScreen.style.display = 'none';
-                            }, 300);
-                        }
-                    }, 500);
-                }, 100);
-                
-                // Initialize user data after view transition
-                setTimeout(() => {
-                    console.log('🔄 Initializing user data...');
-                    initializeUserData(user);
-                }, 200);
+                // Initialize user data
+                console.log('🔄 Initializing user data...');
+                initializeUserData(user);
             } else {
                 console.log('🔒 User signed out');
                 OperatorUplift.currentUser = null;
@@ -3345,7 +3579,7 @@ Focus on actionable insights and encouragement.
                             legend: {
                                 position: 'bottom',
                                 labels: {
-                                    color: '#e5e7eb'
+                                    color: 'var(--text-color)'
                                 }
                             }
                         }
@@ -3382,7 +3616,7 @@ Focus on actionable insights and encouragement.
                                 beginAtZero: true,
                                 max: 100,
                                 ticks: {
-                                    color: '#e5e7eb'
+                                    color: 'var(--text-color)'
                                 },
                                 grid: {
                                     color: 'rgba(229, 231, 235, 0.1)'
@@ -3390,7 +3624,7 @@ Focus on actionable insights and encouragement.
                             },
                             x: {
                                 ticks: {
-                                    color: '#e5e7eb'
+                                    color: 'var(--text-color)'
                                 },
                                 grid: {
                                     color: 'rgba(229, 231, 235, 0.1)'
@@ -3400,7 +3634,7 @@ Focus on actionable insights and encouragement.
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: '#e5e7eb'
+                                    color: 'var(--text-color)'
                                 }
                             }
                         }
@@ -3560,20 +3794,21 @@ Focus on actionable insights and encouragement.
         }
 
         function applyTheme(theme) {
-            const root = document.documentElement;
-            if (theme === 'light') {
-                root.style.setProperty('--bg-primary', '#ffffff');
-                root.style.setProperty('--bg-secondary', '#f8fafc');
-                root.style.setProperty('--text-primary', '#1f2937');
-                root.style.setProperty('--text-secondary', '#6b7280');
-                root.style.setProperty('--border-color', '#e5e7eb');
-            } else {
-                root.style.setProperty('--bg-primary', '#0a0a0a');
-                root.style.setProperty('--bg-secondary', '#1a1a1a');
-                root.style.setProperty('--text-primary', '#f9fafb');
-                root.style.setProperty('--text-secondary', '#9ca3af');
-                root.style.setProperty('--border-color', '#374151');
-            }
+            // This function is deprecated - using ThemeManager instead
+            // const root = document.documentElement;
+            // if (theme === 'light') {
+            //     root.style.setProperty('--bg-primary', '#ffffff');
+            //     root.style.setProperty('--bg-secondary', '#f8fafc');
+            //     root.style.setProperty('--text-primary', '#1f2937');
+            //     root.style.setProperty('--text-secondary', '#6b7280');
+            //     root.style.setProperty('--border-color', '#e5e7eb');
+            // } else {
+            //     root.style.setProperty('--bg-primary', '#0a0a0a');
+            //     root.style.setProperty('--bg-secondary', '#1a1a1a');
+            //     root.style.setProperty('--text-primary', '#f9fafb');
+            //     root.style.setProperty('--text-secondary', '#9ca3af');
+            //     root.style.setProperty('--border-color', '#374151');
+            // }
         }
 
         // Goal Details View

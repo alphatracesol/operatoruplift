@@ -41,7 +41,7 @@
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://cdn.tailwindcss.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.pexels.com https://www.facebook.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://connect.facebook.net; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://cdn.tailwindcss.com https://connect.facebook.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.pexels.com https://www.facebook.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://connect.facebook.net; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
@@ -619,6 +619,190 @@
         
         footer a:hover {
             color: var(--accent-color) !important;
+        }
+        
+        /* Product Hunt Badge styles */
+        .product-hunt-badge {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            filter: brightness(0.9);
+        }
+        
+        .product-hunt-badge:hover {
+            transform: scale(1.05);
+            filter: brightness(1);
+        }
+        
+        @media (max-width: 768px) {
+            .product-hunt-badge {
+                width: 200px !important;
+                height: auto !important;
+            }
+        }
+        
+        /* Hero section Product Hunt badge specific styles */
+        .hero .product-hunt-badge {
+            margin-top: 2rem;
+            opacity: 0.9;
+        }
+        
+        .hero .product-hunt-badge:hover {
+            opacity: 1;
+        }
+
+        /* Phantom Wallet Button */
+        .phantom-button {
+            background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        
+        .phantom-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .phantom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(153, 69, 255, 0.4);
+        }
+
+        .phantom-button::before {
+            content: "👻";
+            font-size: 1.1rem;
+        }
+
+        /* Token Information Styles */
+        .token-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .token-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .trade-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .trade-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        }
+
+        .contract-address {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .address-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .address-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .address-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            cursor: text;
+        }
+
+        .address-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .copy-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-button:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .token-info {
+                margin-top: 1.5rem;
+            }
+            
+            .token-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .contract-address {
+                margin: 0 1rem;
+            }
+            
+            .address-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .phantom-button {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
         }
         
         /* Button styles */
@@ -2678,6 +2862,7 @@
                 <li><a href="#faq">FAQ</a></li>
                 <li><a href="press-release.html">Press Release</a></li>
             </ul>
+            <button id="phantom-connect" class="phantom-button desktop-only">Connect Wallet</button>
             <a href="app.html" class="cta-button desktop-only">Launch App</a>
             <div class="mobile-menu-toggle">
                 <div class="hamburger-icon">
@@ -2728,6 +2913,44 @@
                 <div class="hero-buttons">
                     <a href="app.html" class="cta-button accent-glow-button" id="launch-app-btn">Launch App Now</a>
                     <a href="#features" class="btn-secondary" id="learn-more-btn">Learn More</a>
+                </div>
+
+                <!-- Token Information -->
+                <div class="token-info mt-8">
+                    <div class="token-buttons">
+                        <a href="https://birdeye.so/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?chain=solana" target="_blank" rel="noopener noreferrer" class="trade-button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Trade $UPLIFT on Birdeye
+                        </a>
+                    </div>
+                    <div class="contract-address">
+                        <span class="address-label">Contract Address:</span>
+                        <div class="address-container">
+                            <input type="text" value="6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS" readonly id="solana-ca" class="address-input">
+                            <button onclick="copyAddress()" class="copy-button" title="Copy address">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Optional Wallet Balance Display -->
+                        <div id="wallet-balance" class="wallet-balance" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; font-size: 0.9rem;">
+                            <span class="balance-label" style="color: var(--text-muted);">Balance:</span>
+                            <span class="balance-amount" style="color: var(--text-color); font-weight: 600; margin-left: 5px;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Hunt Badge -->
+                <div class="mt-8 flex justify-center">
+                    <a href="https://www.producthunt.com/products/operator-uplift?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-operator&#0045;uplift" target="_blank" rel="noopener noreferrer" class="product-hunt-badge" aria-label="Operator Uplift on Product Hunt">
+                        <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1002966&theme=light&t=1754625802802" alt="Operator&#0032;Uplift - Deconstruct&#0032;Your&#0032;Ambition&#0046;&#0032;Elevate&#0032;Your&#0032;Ascent&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+                    </a>
                 </div>
                 
 
@@ -4266,7 +4489,156 @@
             e.preventDefault();
             });
         });
+
+        // --- Copy Address Function ---
+        function copyAddress() {
+            const addressInput = document.getElementById('solana-ca');
+            if (addressInput) {
+                navigator.clipboard.writeText(addressInput.value).then(() => {
+                    // Show success feedback
+                    const copyButton = document.querySelector('.copy-button');
+                    if (copyButton) {
+                        const originalHTML = copyButton.innerHTML;
+                        copyButton.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        `;
+                        copyButton.style.background = '#10b981';
+                        setTimeout(() => {
+                            copyButton.innerHTML = originalHTML;
+                            copyButton.style.background = '';
+                        }, 2000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to copy address:', err);
+                });
+            }
+        }
+
+        // --- Phantom Wallet Connection ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const phantomButton = document.getElementById('phantom-connect');
+            if (phantomButton) {
+                phantomButton.addEventListener('click', async () => {
+                    await phantomLogin();
+                });
+
+                // Check if already connected on page load
+                const isConnected = localStorage.getItem('phantomConnected');
+                const publicKey = localStorage.getItem('phantomPublicKey');
+                const phantomProvider = window.solana || window.phantom?.solana;
+                if (isConnected && publicKey && phantomProvider && (phantomProvider.isPhantom || window.phantom?.solana)) {
+                    connectAccountAnimation(publicKey);
+                }
+            }
+        });
+
+        // Enhanced Phantom Login Function
+        async function phantomLogin() {
+            // Debug logging
+            console.log('🔍 Checking for Phantom wallet...');
+            console.log('window.solana:', window.solana);
+            console.log('window.phantom:', window.phantom);
+            
+            // More robust Phantom detection
+            const isPhantomInstalled = window.solana && window.solana.isPhantom;
+            const isPhantomAvailable = window.phantom && window.phantom.solana;
+            
+            console.log('isPhantomInstalled:', isPhantomInstalled);
+            console.log('isPhantomAvailable:', isPhantomAvailable);
+            
+            if (!isPhantomInstalled && !isPhantomAvailable) {
+                console.log('❌ Phantom not detected');
+                alert("Phantom browser extension is not detected! Please install it from https://phantom.app/");
+                window.open('https://phantom.app/', '_blank');
+                return;
+            }
+            
+            // Use the available Phantom provider
+            const phantomProvider = window.solana || window.phantom?.solana;
+
+            try {
+                // Check if already connected
+                if (phantomProvider.isConnected) {
+                    // Disconnect
+                    await phantomProvider.disconnect();
+                    const phantomButton = document.getElementById('phantom-connect');
+                    phantomButton.textContent = 'Connect Wallet';
+                    phantomButton.style.background = 'linear-gradient(135deg, #9945FF 0%, #14F195 100%)';
+                    localStorage.removeItem('phantomConnected');
+                    localStorage.removeItem('phantomPublicKey');
+                    console.log('Disconnected from Phantom wallet');
+                    return;
+                }
+
+                // Connect to Phantom
+                const resp = await phantomProvider.connect();
+                const publicKey = resp.publicKey.toString();
+                connectAccountAnimation(publicKey);
+                
+            } catch (err) {
+                console.error('Phantom connection error:', err);
+                if (err.code === 4001) {
+                    alert('Connection was rejected by user');
+                } else {
+                    alert('Failed to connect to Phantom wallet. Please try again.');
+                }
+            }
+        }
+
+        // Enhanced Account Animation Function
+        async function connectAccountAnimation(publicKey) {
+            const phantomButton = document.getElementById('phantom-connect');
+            
+            // Update button text with truncated public key
+            phantomButton.textContent = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
+            phantomButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            
+            // Store connection state
+            localStorage.setItem('phantomConnected', 'true');
+            localStorage.setItem('phantomPublicKey', publicKey);
+            
+            console.log('Connected to Phantom wallet:', publicKey);
+            
+            // Optional: Show balance if Solana Web3.js is available
+            if (typeof solanaWeb3 !== 'undefined') {
+                try {
+                    await showBalance(publicKey);
+                } catch (error) {
+                    console.log('Could not fetch balance:', error);
+                }
+            }
+        }
+
+        // Enhanced Balance Display Function
+        async function showBalance(publicKey) {
+            try {
+                let provider = window.solana;
+                let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+                let value = await connection.getBalance(provider.publicKey);
+                const balance = (value / 1e9).toFixed(4);
+                
+                console.log(`Wallet Balance: ${balance} SOL`);
+                
+                // Optional: Display balance in UI
+                const balanceElement = document.getElementById('wallet-balance');
+                if (balanceElement) {
+                    const balanceAmount = balanceElement.querySelector('.balance-amount');
+                    if (balanceAmount) {
+                        balanceAmount.textContent = `${balance} SOL`;
+                        balanceElement.style.display = 'block';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+            }
+        }
     </script>
+
+    <!-- Solana Web3.js Library -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
 
     <!-- Ripple effect styles -->
     <style>
