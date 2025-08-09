@@ -160,6 +160,8 @@
     <style>
       .burn-counter-wrapper { margin-top: 1.5rem; display: flex; justify-content: center; position: relative; z-index: 10; }
       .burn-counter { display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; backdrop-filter: blur(10px); background: var(--card-bg-glass); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+      .burn-counter-link { text-decoration: none; }
+      .burn-counter-link:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; border-radius: 14px; }
       .burn-icon { position: relative; width: 28px; height: 28px; display: grid; place-items: center; }
       .burn-icon .flame { font-size: 22px; display: inline-block; animation: flame-bob 1.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.7)); }
       .burn-icon .embers { pointer-events: none; position: absolute; inset: 0; overflow: visible; }
@@ -2998,15 +3000,9 @@
                     </div>
                 </div>
                 
-                <!-- Product Hunt Badge -->
-                <div class="mt-8 flex justify-center">
-                    <a href="https://www.producthunt.com/products/operator-uplift?utm_source=badge-follow&utm_medium=badge&utm_source=badge-operator-uplift" target="_blank" rel="noopener noreferrer" class="product-hunt-badge" aria-label="Operator Uplift on Product Hunt">
-                        <img src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1096103&theme=light&v=2" alt="Operator Uplift - Deconstruct Your Ambition. Elevate Your Ascent. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
-                    </a>
-                </div>
-
                 <!-- Burn Counter -->
                 <div class="burn-counter-wrapper" aria-live="polite">
+                    <a class="burn-counter-link" href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener noreferrer" aria-label="View burn activity on Solscan">
                     <div class="burn-counter glass-card">
                         <div class="burn-icon" aria-hidden="true">
                             <span class="flame" role="img">🔥</span>
@@ -3017,6 +3013,14 @@
                             <span id="burn-counter" class="burn-value">Calculating…</span>
                         </div>
                     </div>
+                    </a>
+                </div>
+
+                <!-- Product Hunt Badge (moved below burn counter) -->
+                <div class="mt-6 flex justify-center">
+                    <a href="https://www.producthunt.com/products/operator-uplift?utm_source=badge-follow&utm_medium=badge&utm_source=badge-operator&#0045;uplift" target="_blank" rel="noopener noreferrer" aria-label="Operator Uplift on Product Hunt">
+                        <img src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1096103&theme=light" alt="Operator&#0032;Uplift - Deconstruct&#0032;Your&#0032;Ambition&#0046;&#0032;Elevate&#0032;Your&#0032;Ascent&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+                    </a>
                 </div>
                 
 
