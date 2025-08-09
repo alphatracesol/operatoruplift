@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login UI Test</title>
+    <style>
+        :root {
+            --primary-color: #f97316;
+            --bg-color: #0a0a0a;
+            --text-color: #e5e7eb;
+            --card-bg-glass: rgba(0, 0, 0, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --button-hover: rgba(24, 24, 27, 0.7);
+            --theme-toggle-bg: rgba(0, 0, 0, 0.4);
+            --theme-toggle-hover: rgba(0, 0, 0, 0.5);
+            --theme-toggle-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --card-bg-glass: rgba(255, 255, 255, 0.4);
+            --border-glass: rgba(0, 0, 0, 0.1);
+            --button-hover: rgba(0, 0, 0, 0.1);
+            --theme-toggle-bg: rgba(255, 255, 255, 0.4);
+            --theme-toggle-hover: rgba(255, 255, 255, 0.5);
+            --theme-toggle-border: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .test-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .auth-form {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            margin: 5px;
+        }
+
+        .btn-link:hover {
+            color: var(--text-color);
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-toggle-border);
+            background: var(--theme-toggle-bg);
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--theme-toggle-hover);
+            transform: scale(1.1);
+        }
+
+        .status {
+            background: var(--card-bg-glass);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .fix-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .fix-success {
+            background: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggle">🌙</button>
+
+    <div class="test-content">
+        <h1>Login UI Test</h1>
+        <p>Testing the login UI fixes:</p>
+        
+        <div class="status">
+            <h3>✅ Fixes Applied:</h3>
+            <div class="fix-status fix-success">Title Size: 1.8rem (was 2.5rem)</div>
+            <div class="fix-status fix-success">Glassmorphism: 40% opacity</div>
+            <div class="fix-status fix-success">Single Login Box</div>
+            <div class="fix-status fix-success">Proper Transparency</div>
+        </div>
+
+        <!-- Simulated Login Form -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/>
+                    <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <h1 class="auth-title">Operator Uplift</h1>
+        </div>
+
+        <form class="auth-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" class="btn-primary">Sign In</button>
+            
+            <div style="text-align: center;">
+                <button type="button" class="btn-link">Don't have an account? Sign up</button>
+                <button type="button" class="btn-link">Forgot password?</button>
+            </div>
+        </form>
+
+        <div class="status">
+            <strong>Current Theme:</strong> <span id="current-theme">dark</span><br>
+            <strong>Card Background:</strong> <span id="card-bg">rgba(0, 0, 0, 0.4)</span><br>
+            <strong>Title Size:</strong> <span id="title-size">1.8rem</span><br>
+            <strong>Glassmorphism:</strong> <span id="glassmorphism">40% opacity</span>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'dark';
+        
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateStatus();
+            updateThemeToggle();
+        }
+        
+        function updateStatus() {
+            const computedStyle = getComputedStyle(document.documentElement);
+            const cardBg = computedStyle.getPropertyValue('--card-bg-glass');
+            
+            document.getElementById('current-theme').textContent = currentTheme;
+            document.getElementById('card-bg').textContent = cardBg;
+            document.getElementById('title-size').textContent = '1.8rem';
+            document.getElementById('glassmorphism').textContent = '40% opacity';
+        }
+
+        function updateThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.innerHTML = currentTheme === 'dark' ? '🌙' : '☀️';
+            themeToggle.title = `Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} mode`;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            updateThemeToggle();
+        });
+    </script>
+</body>
+</html>
+

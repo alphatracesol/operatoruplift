@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain Z-Index Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .test-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 15; /* Same as auth-container */
+        }
+        
+        /* Matrix Rain Background */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5; /* Above background, below content */
+            overflow: hidden;
+            display: block;
+            background: transparent;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100vh;
+            color: #f97316;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 8px #f97316, 0 0 16px #f97316;
+            animation: matrix-fall linear infinite;
+            opacity: 0.9;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        @keyframes matrix-fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .status {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div id="matrixRain" class="matrix-rain"></div>
+    
+    <div class="test-content">
+        <h1>Matrix Rain Z-Index Test</h1>
+        <p>This test verifies the matrix rain is visible above the background but below the content.</p>
+        
+        <button onclick="testMatrix()">Test Matrix Rain</button>
+        <button onclick="checkZIndex()">Check Z-Index</button>
+        
+        <div class="status">
+            <strong>Status:</strong><br>
+            <span id="status">Ready to test...</span>
+        </div>
+    </div>
+
+    <script>
+        function testMatrix() {
+            const status = document.getElementById('status');
+            status.textContent = 'Testing matrix rain...';
+            
+            const matrixContainer = document.getElementById('matrixRain');
+            if (!matrixContainer) {
+                status.textContent = '❌ Matrix rain container not found';
+                return;
+            }
+            
+            // Clear existing columns
+            matrixContainer.innerHTML = '';
+            
+            const columns = Math.floor(window.innerWidth / 25);
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = (i * 25) + 'px';
+                column.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                column.style.animationDelay = Math.random() * 3 + 's';
+                
+                let columnText = '';
+                const columnLength = Math.floor(Math.random() * 15) + 8;
+                for (let j = 0; j < columnLength; j++) {
+                    columnText += characters[Math.floor(Math.random() * characters.length)];
+                }
+                column.textContent = columnText;
+                
+                matrixContainer.appendChild(column);
+            }
+            
+            status.textContent = `✅ Matrix rain created with ${columns} columns`;
+        }
+        
+        function checkZIndex() {
+            const status = document.getElementById('status');
+            const matrixRain = document.getElementById('matrixRain');
+            const testContent = document.querySelector('.test-content');
+            
+            if (matrixRain && testContent) {
+                const matrixZIndex = getComputedStyle(matrixRain).zIndex;
+                const contentZIndex = getComputedStyle(testContent).zIndex;
+                
+                status.textContent = `Matrix Rain Z-Index: ${matrixZIndex}, Content Z-Index: ${contentZIndex}`;
+            } else {
+                status.textContent = '❌ Could not check z-index';
+            }
+        }
+        
+        // Auto-test on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testMatrix();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

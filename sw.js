@@ -139,7 +139,7 @@ async function cacheFirst(request) {
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
+        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     
@@ -187,7 +187,7 @@ async function networkFirst(request) {
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
+        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     
@@ -197,7 +197,7 @@ async function networkFirst(request) {
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
         request.url.includes('google-analytics.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', request.url);
+        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     
@@ -215,7 +215,7 @@ async function networkFirst(request) {
         const cachedResponse = await cache.match(request);
         
         if (cachedResponse) {
-            console.log('📦 Serving API from cache:', request.url);
+            console.log('📦 Serving API from cache:', sanitizeUrl(request.url));
             return cachedResponse;
         }
         
@@ -226,17 +226,14 @@ async function networkFirst(request) {
 async function staleWhileRevalidate(request) {
     // CRITICAL: Never cache POST requests - multiple safety checks
     if (request.method === 'POST') {
-        // Don't log sensitive URLs with API keys
-        const safeUrl = request.url.includes('key=') ? 
-            request.url.split('key=')[0] + 'key=***' : 
-            request.url;
+        const safeUrl = sanitizeUrl(request.url);
         console.log('🚫 POST request detected in staleWhileRevalidate, bypassing cache:', safeUrl);
         return fetch(request);
     }
     
     // Skip caching for chrome-extension URLs
     if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', request.url);
+        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     
@@ -249,7 +246,7 @@ async function staleWhileRevalidate(request) {
         request.url.includes('firebase.googleapis.com') ||
         request.url.includes('firebaseinstallations.googleapis.com') ||
         request.url.includes('googletagmanager.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', request.url);
+        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
     

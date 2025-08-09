@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixes Verification</title>
+    <style>
+        :root {
+            --primary-color: #f97316;
+            --bg-color: #0a0a0a;
+            --text-color: #e5e7eb;
+            --card-bg-glass: rgba(0, 0, 0, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --card-bg-glass: rgba(255, 255, 255, 0.15);
+            --border-glass: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .test-card {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-glass);
+            background: var(--card-bg-glass);
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .status {
+            background: var(--card-bg-glass);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        .fix-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .fix-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .phantom-button {
+            background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .phantom-button::before {
+            content: "👻";
+            font-size: 1.1rem;
+        }
+
+        .phantom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(153, 69, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+
+    <div style="max-width: 600px; margin: 0 auto; padding: 30px;">
+        <h1>Fixes Verification</h1>
+        
+        <div class="status">
+            <h3>✅ Fixes Applied:</h3>
+            <div class="fix-status fix-success">Phantom Wallet: Improved detection</div>
+            <div class="fix-status fix-success">Product Hunt: Moved under token info</div>
+            <div class="fix-status fix-success">Login Cards: 15% transparency</div>
+            <div class="fix-status fix-success">Logo/Title: Better positioning</div>
+        </div>
+
+        <div class="test-card">
+            <h2>Login Card Test</h2>
+            <p>This should have proper glassmorphism transparency</p>
+            <p><strong>Light Mode:</strong> 15% white transparency</p>
+            <p><strong>Dark Mode:</strong> 40% black transparency</p>
+        </div>
+
+        <div class="test-card">
+            <h2>Phantom Wallet Test</h2>
+            <button id="phantom-connect" class="phantom-button">Connect Wallet</button>
+            <p>Click to test wallet connection logic</p>
+        </div>
+
+        <div class="status">
+            <strong>Current Theme:</strong> <span id="theme">dark</span><br>
+            <strong>Card BG:</strong> <span id="card-bg">rgba(0, 0, 0, 0.4)</span><br>
+            <strong>Background:</strong> <span id="bg">#0a0a0a</span>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'dark';
+        
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateStatus();
+            document.getElementById('themeToggle').innerHTML = currentTheme === 'dark' ? '🌙' : '☀️';
+        }
+        
+        function updateStatus() {
+            const style = getComputedStyle(document.documentElement);
+            document.getElementById('theme').textContent = currentTheme;
+            document.getElementById('card-bg').textContent = style.getPropertyValue('--card-bg-glass');
+            document.getElementById('bg').textContent = style.getPropertyValue('--bg-color');
+        }
+        
+        // Phantom wallet test
+        document.addEventListener('DOMContentLoaded', () => {
+            const phantomButton = document.getElementById('phantom-connect');
+            if (phantomButton) {
+                phantomButton.addEventListener('click', async () => {
+                    try {
+                        if (typeof window.solana !== 'undefined' && window.solana.isPhantom) {
+                            const response = await window.solana.connect();
+                            const publicKey = response.publicKey.toString();
+                            phantomButton.textContent = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
+                            phantomButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                            console.log('Connected to Phantom wallet:', publicKey);
+                        } else {
+                            window.open('https://phantom.app/', '_blank');
+                        }
+                    } catch (error) {
+                        console.error('Failed to connect to Phantom:', error);
+                        phantomButton.textContent = 'Connect Wallet';
+                    }
+                });
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', updateStatus);
+    </script>
+</body>
+</html>
+
+

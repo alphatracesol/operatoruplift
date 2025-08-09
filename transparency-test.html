@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transparency Test</title>
+    <style>
+        :root {
+            --primary-color: #f97316;
+            --bg-color: #0a0a0a;
+            --text-color: #e5e7eb;
+            --card-bg-glass: rgba(0, 0, 0, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --card-bg-glass: rgba(255, 255, 255, 0.25);
+            --border-glass: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .test-card {
+            background: var(--card-bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-glass);
+            background: var(--card-bg-glass);
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .status {
+            background: var(--card-bg-glass);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+
+    <div style="max-width: 600px; margin: 0 auto; padding: 30px;">
+        <h1>Transparency Test</h1>
+        
+        <div class="test-card">
+            <h2>Main Login Card</h2>
+            <p>This should have proper glassmorphism transparency</p>
+        </div>
+
+        <div class="test-card">
+            <h2>Google Sign-in Card</h2>
+            <p>This should match the main card transparency</p>
+        </div>
+
+        <div class="status">
+            <strong>Theme:</strong> <span id="theme">dark</span><br>
+            <strong>Card BG:</strong> <span id="card-bg">rgba(0, 0, 0, 0.4)</span><br>
+            <strong>Background:</strong> <span id="bg">#0a0a0a</span>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'dark';
+        
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateStatus();
+            document.getElementById('themeToggle').innerHTML = currentTheme === 'dark' ? '🌙' : '☀️';
+        }
+        
+        function updateStatus() {
+            const style = getComputedStyle(document.documentElement);
+            document.getElementById('theme').textContent = currentTheme;
+            document.getElementById('card-bg').textContent = style.getPropertyValue('--card-bg-glass');
+            document.getElementById('bg').textContent = style.getPropertyValue('--bg-color');
+        }
+        
+        document.addEventListener('DOMContentLoaded', updateStatus);
+    </script>
+</body>
+</html>
+

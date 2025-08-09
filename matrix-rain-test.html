@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 20;
+        }
+        
+        /* Matrix Rain Background */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            color: #f97316;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 8px #f97316, 0 0 15px #f97316;
+            animation: matrix-fall linear infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes matrix-fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div id="matrixRain" class="matrix-rain"></div>
+    
+    <div class="test-container">
+        <h1>Matrix Rain Test</h1>
+        <p>You should see orange falling characters in the background.</p>
+        
+        <button onclick="toggleMatrixRain()">Toggle Matrix Rain</button>
+        <button onclick="reinitializeMatrixRain()">Reinitialize Matrix Rain</button>
+        
+        <div id="status" style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">
+            <strong>Status:</strong> <span id="statusText">Initializing...</span>
+        </div>
+    </div>
+
+    <script>
+        function initializeMatrixRain() {
+            const matrixContainer = document.getElementById('matrixRain');
+            if (!matrixContainer) {
+                console.error('❌ Matrix rain container not found');
+                document.getElementById('statusText').textContent = 'Error: Container not found';
+                return;
+            }
+            
+            console.log('🎬 Initializing matrix rain...');
+            document.getElementById('statusText').textContent = 'Initializing...';
+            
+            // Clear existing columns
+            matrixContainer.innerHTML = '';
+            
+            const columns = Math.floor(window.innerWidth / 20);
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            console.log(`📊 Creating ${columns} matrix columns`);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = (i * 20) + 'px';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let columnText = '';
+                const columnLength = Math.floor(Math.random() * 20) + 10;
+                for (let j = 0; j < columnLength; j++) {
+                    columnText += characters[Math.floor(Math.random() * characters.length)];
+                }
+                column.textContent = columnText;
+                
+                matrixContainer.appendChild(column);
+            }
+            
+            console.log('✅ Matrix rain columns created');
+            document.getElementById('statusText').textContent = `Created ${columns} columns`;
+        }
+        
+        function toggleMatrixRain() {
+            const matrixRain = document.getElementById('matrixRain');
+            if (matrixRain.style.display === 'none' || matrixRain.style.display === '') {
+                matrixRain.style.display = 'block';
+                document.getElementById('statusText').textContent = 'Matrix rain: ON';
+            } else {
+                matrixRain.style.display = 'none';
+                document.getElementById('statusText').textContent = 'Matrix rain: OFF';
+            }
+        }
+        
+        function reinitializeMatrixRain() {
+            initializeMatrixRain();
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMatrixRain();
+        });
+    </script>
+</body>
+</html>
+

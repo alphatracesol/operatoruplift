@@ -2430,9 +2430,34 @@
                     const userData = userDoc.data();
                     OperatorUplift.userData = userData;
                     console.log('📊 User data loaded:', userData);
+                } else {
+                    // Create user document if it doesn't exist
+                    console.log('🆕 Creating new user document for:', user.email);
+                    const userData = {
+                        name: user.displayName || user.email,
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        level: 1,
+                        experience: 0,
+                        goals: [],
+                        achievements: []
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(userData);
+                    OperatorUplift.userData = userData;
+                    console.log('✅ User document created:', userData);
                 }
             } catch (error) {
-                console.error('❌ Error loading user data:', error);
+                console.error('❌ Error loading/creating user data:', error);
+                // Create a basic user data object as fallback
+                OperatorUplift.userData = {
+                    name: user.displayName || user.email,
+                    email: user.email,
+                    level: 1,
+                    experience: 0,
+                    goals: [],
+                    achievements: []
+                };
             }
         }
 
@@ -2562,6 +2587,10 @@
                 return dashboardData.goals; // Return goals for AI context
             } catch (error) {
                 console.error('❌ Error loading goals:', error);
+                // If the subcollection doesn't exist yet, that's okay - just return empty array
+                dashboardData.goals = [];
+                updateGoalsList();
+                updateStats();
                 return [];
             }
         }
@@ -2619,6 +2648,10 @@
                 return userAchievements; // Return achievements for AI context
             } catch (error) {
                 console.error('❌ Error loading achievements:', error);
+                // If the subcollection doesn't exist yet, that's okay - just return empty array
+                userAchievements = [];
+                dashboardData.achievements = [];
+                updateAchievementsUI();
                 return [];
             }
         }

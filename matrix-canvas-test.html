@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain Canvas Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .test-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 15;
+        }
+        
+        /* Matrix Rain Background - Canvas-based */
+        #matrix-rain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .status {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-rain-canvas"></canvas>
+    
+    <div class="test-content">
+        <h1>Matrix Rain Canvas Test</h1>
+        <p>This test verifies the Canvas-based matrix rain implementation.</p>
+        
+        <button onclick="testMatrix()">Test Matrix Rain</button>
+        <button onclick="checkCanvas()">Check Canvas</button>
+        <button onclick="toggleMatrix()">Toggle Matrix</button>
+        
+        <div class="status">
+            <strong>Status:</strong><br>
+            <span id="status">Ready to test...</span>
+        </div>
+    </div>
+
+    <script>
+        let matrixInterval = null;
+        
+        function initializeMatrixRain() {
+            const canvas = document.getElementById('matrix-rain-canvas');
+            if (!canvas) {
+                console.error('❌ Matrix rain canvas not found');
+                return;
+            }
+            
+            console.log('🎬 Initializing matrix rain (Canvas)...');
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const rainDrops = Array.from({ length: columns }).map(() => 1);
+
+            const draw = () => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f97316';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            };
+            
+            // Clear any existing interval
+            if (matrixInterval) {
+                clearInterval(matrixInterval);
+            }
+            
+            matrixInterval = setInterval(draw, 50);
+            
+            console.log('✅ Matrix rain initialized (Canvas)');
+            return true;
+        }
+        
+        function testMatrix() {
+            const status = document.getElementById('status');
+            status.textContent = 'Testing matrix rain...';
+            
+            if (initializeMatrixRain()) {
+                status.textContent = '✅ Matrix rain initialized successfully';
+            } else {
+                status.textContent = '❌ Matrix rain initialization failed';
+            }
+        }
+        
+        function checkCanvas() {
+            const status = document.getElementById('status');
+            const canvas = document.getElementById('matrix-rain-canvas');
+            
+            if (canvas) {
+                const computedStyle = getComputedStyle(canvas);
+                const zIndex = computedStyle.zIndex;
+                const opacity = computedStyle.opacity;
+                const width = canvas.width;
+                const height = canvas.height;
+                
+                status.textContent = `Canvas: Z-Index: ${zIndex}, Opacity: ${opacity}, Size: ${width}x${height}`;
+            } else {
+                status.textContent = '❌ Canvas not found';
+            }
+        }
+        
+        function toggleMatrix() {
+            const status = document.getElementById('status');
+            if (matrixInterval) {
+                clearInterval(matrixInterval);
+                matrixInterval = null;
+                status.textContent = '⏸️ Matrix rain paused';
+            } else {
+                initializeMatrixRain();
+                status.textContent = '▶️ Matrix rain resumed';
+            }
+        }
+        
+        // Auto-test on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testMatrix();
+                checkCanvas();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

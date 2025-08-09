@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 20;
+        }
+        
+        /* Matrix Rain Background */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+            display: block;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100vh;
+            color: #f97316;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 8px #f97316, 0 0 16px #f97316;
+            animation: matrix-fall linear infinite;
+            opacity: 0.9;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        @keyframes matrix-fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .debug-info {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div id="matrixRain" class="matrix-rain"></div>
+    
+    <div class="debug-container">
+        <h1>Matrix Rain Debug Test</h1>
+        <p>This test will help identify why matrix rain isn't working.</p>
+        
+        <div class="debug-info">
+            <strong>Debug Info:</strong><br>
+            <span id="debugInfo">Loading...</span>
+        </div>
+        
+        <button onclick="testMatrixRain()">Test Matrix Rain</button>
+        <button onclick="checkElements()">Check Elements</button>
+        <button onclick="forceShow()">Force Show Matrix</button>
+        <button onclick="clearMatrix()">Clear Matrix</button>
+        
+        <div class="debug-info">
+            <strong>Console Logs:</strong><br>
+            <div id="consoleLogs" style="max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Override console.log to capture logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addLog(message, type = 'log') {
+            const logsDiv = document.getElementById('consoleLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? '#ff6b6b' : '#4ecdc4';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        function checkElements() {
+            const matrixRain = document.getElementById('matrixRain');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            let info = '';
+            info += `Matrix Rain Element: ${matrixRain ? 'Found' : 'NOT FOUND'}<br>`;
+            if (matrixRain) {
+                info += `Display: ${getComputedStyle(matrixRain).display}<br>`;
+                info += `Z-Index: ${getComputedStyle(matrixRain).zIndex}<br>`;
+                info += `Children: ${matrixRain.children.length}<br>`;
+                info += `Width: ${matrixRain.offsetWidth}<br>`;
+                info += `Height: ${matrixRain.offsetHeight}<br>`;
+            }
+            
+            debugInfo.innerHTML = info;
+        }
+        
+        function testMatrixRain() {
+            console.log('🧪 Testing matrix rain...');
+            const matrixContainer = document.getElementById('matrixRain');
+            if (!matrixContainer) {
+                console.error('❌ Matrix rain container not found');
+                return;
+            }
+            
+            console.log('🎬 Initializing matrix rain...');
+            
+            // Clear existing columns
+            matrixContainer.innerHTML = '';
+            
+            // Calculate better column spacing
+            const columnWidth = 25; // Slightly wider spacing
+            const columns = Math.floor(window.innerWidth / columnWidth);
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            console.log(`📊 Creating ${columns} matrix columns`);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                
+                // Better positioning calculation
+                const leftPosition = (i * columnWidth) + (Math.random() * 10 - 5); // Add some randomness
+                column.style.left = leftPosition + 'px';
+                
+                // Better animation timing
+                const duration = Math.random() * 4 + 3; // 3-7 seconds
+                const delay = Math.random() * 3; // 0-3 seconds delay
+                column.style.animationDuration = duration + 's';
+                column.style.animationDelay = delay + 's';
+                
+                // Create random characters for this column
+                let columnText = '';
+                const columnLength = Math.floor(Math.random() * 15) + 8; // 8-23 characters
+                for (let j = 0; j < columnLength; j++) {
+                    columnText += characters[Math.floor(Math.random() * characters.length)];
+                }
+                column.textContent = columnText;
+                
+                matrixContainer.appendChild(column);
+            }
+            
+            console.log('✅ Matrix rain columns created');
+            checkElements();
+        }
+        
+        function forceShow() {
+            const matrixRain = document.getElementById('matrixRain');
+            if (matrixRain) {
+                matrixRain.style.display = 'block';
+                matrixRain.style.background = 'rgba(255, 0, 0, 0.1)'; // Red background to see it
+                console.log('🔴 Forced matrix rain to show with red background');
+            }
+        }
+        
+        function clearMatrix() {
+            const matrixRain = document.getElementById('matrixRain');
+            if (matrixRain) {
+                matrixRain.innerHTML = '';
+                matrixRain.style.background = '';
+                console.log('🧹 Cleared matrix rain');
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Page loaded');
+            checkElements();
+            testMatrixRain();
+        });
+    </script>
+</body>
+</html>

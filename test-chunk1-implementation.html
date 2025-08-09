@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunk 1 Implementation Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg-glass);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--glass-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .test-pass {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            color: #10b981;
+        }
+        
+        .test-fail {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .test-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-toggle-border);
+            background: var(--theme-toggle-bg);
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-toggle-btn:hover {
+            background: var(--theme-toggle-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Chunk 1 Implementation Test</h1>
+        <p>Testing Function Registry, Error Boundary, and Theme System</p>
+        
+        <div class="test-section">
+            <h2>📋 Test Results</h2>
+            <div id="testResults"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎛️ Manual Tests</h2>
+            <button onclick="testFunctionRegistry()">Test Function Registry</button>
+            <button onclick="testErrorBoundary()">Test Error Boundary</button>
+            <button onclick="testThemeSystem()">Test Theme System</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 System Status</h2>
+            <div id="systemStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test results container
+        const testResults = document.getElementById('testResults');
+        const systemStatus = document.getElementById('systemStatus');
+        
+        function addTestResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result test-${type}`;
+            div.textContent = message;
+            testResults.appendChild(div);
+        }
+        
+        function updateSystemStatus() {
+            const status = {
+                functionRegistry: typeof window.FunctionRegistry !== 'undefined',
+                errorBoundary: typeof window.ErrorBoundary !== 'undefined',
+                themeManager: typeof window.ThemeManager !== 'undefined',
+                appNamespace: typeof window.AppNamespace !== 'undefined',
+                operatorUplift: typeof window.OperatorUplift !== 'undefined'
+            };
+            
+            systemStatus.innerHTML = `
+                <div class="test-result test-${status.functionRegistry ? 'pass' : 'fail'}">
+                    Function Registry: ${status.functionRegistry ? '✅ Active' : '❌ Missing'}
+                </div>
+                <div class="test-result test-${status.errorBoundary ? 'pass' : 'fail'}">
+                    Error Boundary: ${status.errorBoundary ? '✅ Active' : '❌ Missing'}
+                </div>
+                <div class="test-result test-${status.themeManager ? 'pass' : 'fail'}">
+                    Theme Manager: ${status.themeManager ? '✅ Active' : '❌ Missing'}
+                </div>
+                <div class="test-result test-${status.appNamespace ? 'pass' : 'fail'}">
+                    App Namespace: ${status.appNamespace ? '✅ Active' : '❌ Missing'}
+                </div>
+                <div class="test-result test-${status.operatorUplift ? 'pass' : 'fail'}">
+                    Operator Uplift: ${status.operatorUplift ? '✅ Active' : '❌ Missing'}
+                </div>
+            `;
+        }
+        
+        function testFunctionRegistry() {
+            addTestResult('🧪 Testing Function Registry...', 'info');
+            
+            if (typeof window.FunctionRegistry === 'undefined') {
+                addTestResult('❌ Function Registry not found', 'fail');
+                return;
+            }
+            
+            // Test 1: Registration
+            const testFunc = () => 'test';
+            const result = window.FunctionRegistry.register('test', 'testFunc', testFunc);
+            if (result) {
+                addTestResult('✅ Function registration successful', 'pass');
+            } else {
+                addTestResult('❌ Function registration failed', 'fail');
+            }
+            
+            // Test 2: Retrieval
+            const retrieved = window.FunctionRegistry.get('test', 'testFunc');
+            if (retrieved === testFunc) {
+                addTestResult('✅ Function retrieval successful', 'pass');
+            } else {
+                addTestResult('❌ Function retrieval failed', 'fail');
+            }
+            
+            // Test 3: Execution
+            const executed = window.FunctionRegistry.execute('test', 'testFunc');
+            if (executed === 'test') {
+                addTestResult('✅ Function execution successful', 'pass');
+            } else {
+                addTestResult('❌ Function execution failed', 'fail');
+            }
+            
+            // Test 4: Conflict detection
+            const duplicateFunc = () => 'duplicate';
+            const conflictResult = window.FunctionRegistry.register('test', 'testFunc', duplicateFunc);
+            if (!conflictResult) {
+                addTestResult('✅ Conflict detection working', 'pass');
+            } else {
+                addTestResult('❌ Conflict detection failed', 'fail');
+            }
+        }
+        
+        function testErrorBoundary() {
+            addTestResult('🧪 Testing Error Boundary...', 'info');
+            
+            if (typeof window.ErrorBoundary === 'undefined') {
+                addTestResult('❌ Error Boundary not found', 'fail');
+                return;
+            }
+            
+            // Test 1: Error capture
+            try {
+                throw new Error('Test error for boundary');
+            } catch (error) {
+                const errorInfo = window.ErrorBoundary.capture(error, { test: true });
+                if (errorInfo && errorInfo.message === 'Test error for boundary') {
+                    addTestResult('✅ Error capture successful', 'pass');
+                } else {
+                    addTestResult('❌ Error capture failed', 'fail');
+                }
+            }
+            
+            // Test 2: Error storage
+            const errors = window.ErrorBoundary.getErrors();
+            if (errors.length > 0) {
+                addTestResult(`✅ Error storage working (${errors.length} errors stored)`, 'pass');
+            } else {
+                addTestResult('❌ Error storage failed', 'fail');
+            }
+        }
+        
+        function testThemeSystem() {
+            addTestResult('🧪 Testing Theme System...', 'info');
+            
+            if (typeof window.ThemeManager === 'undefined') {
+                addTestResult('❌ Theme Manager not found', 'fail');
+                return;
+            }
+            
+            // Test 1: Theme initialization
+            try {
+                window.ThemeManager.init();
+                addTestResult('✅ Theme initialization successful', 'pass');
+            } catch (error) {
+                addTestResult('❌ Theme initialization failed: ' + error.message, 'fail');
+            }
+            
+            // Test 2: Theme toggle
+            const currentTheme = window.ThemeManager.getCurrentTheme();
+            const toggleResult = window.ThemeManager.toggleTheme();
+            if (toggleResult) {
+                addTestResult('✅ Theme toggle successful', 'pass');
+            } else {
+                addTestResult('❌ Theme toggle failed', 'fail');
+            }
+            
+            // Test 3: Theme application
+            const newTheme = window.ThemeManager.getCurrentTheme();
+            if (newTheme !== currentTheme) {
+                addTestResult(`✅ Theme change successful (${currentTheme} → ${newTheme})`, 'pass');
+            } else {
+                addTestResult('❌ Theme change failed', 'fail');
+            }
+        }
+        
+        function runAllTests() {
+            testResults.innerHTML = '';
+            addTestResult('🚀 Running all tests...', 'info');
+            
+            setTimeout(() => testFunctionRegistry(), 100);
+            setTimeout(() => testErrorBoundary(), 200);
+            setTimeout(() => testThemeSystem(), 300);
+            
+            setTimeout(() => {
+                addTestResult('🎯 All tests completed!', 'info');
+                updateSystemStatus();
+            }, 500);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSystemStatus();
+            addTestResult('📋 Test environment ready. Click "Run All Tests" to begin.', 'info');
+        });
+    </script>
+</body>
+</html>
+
