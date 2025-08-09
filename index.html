@@ -159,19 +159,21 @@
 
     <style>
       .burn-counter-wrapper { margin-top: 1.5rem; display: flex; justify-content: center; position: relative; z-index: 10; }
-      .burn-counter { display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; backdrop-filter: blur(10px); background: var(--card-bg-glass); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+      .burn-counter { display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; backdrop-filter: blur(10px); background: var(--card-bg-glass); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 24px rgba(255,60,60,0.18); overflow: visible; }
       .burn-counter-link { text-decoration: none; }
       .burn-counter-link:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; border-radius: 14px; }
-      .burn-icon { position: relative; width: 28px; height: 28px; display: grid; place-items: center; }
-      .burn-icon .flame { font-size: 22px; display: inline-block; animation: flame-bob 1.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.7)); }
+      .burn-icon { position: relative; width: 30px; height: 30px; display: grid; place-items: center; overflow: visible; }
+      .burn-icon .flame { font-size: 22px; display: inline-block; animation: flame-bob 1.6s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(255, 60, 60, 0.95)) drop-shadow(0 0 16px rgba(255, 30, 30, 0.55)); }
       .burn-icon .embers { pointer-events: none; position: absolute; inset: 0; overflow: visible; }
-      .burn-icon .embers::before, .burn-icon .embers::after { content: ""; position: absolute; bottom: 2px; left: 50%; width: 4px; height: 4px; background: radial-gradient(circle, rgba(255,180,120,0.9), rgba(255,140,80,0.1)); border-radius: 50%; transform: translateX(-50%); animation: ember-rise 1.8s ease-in infinite; }
-      .burn-icon .embers::after { width: 3px; height: 3px; animation-delay: .6s; left: 40%; }
+      .burn-icon .embers::before, .burn-icon .embers::after { content: ""; position: absolute; bottom: 0; left: 50%; width: 5px; height: 5px; background: radial-gradient(circle, rgba(255,120,120,0.95), rgba(255,80,80,0.1)); border-radius: 50%; transform: translateX(-50%); animation: ember-rise 2s ease-in infinite; }
+      .burn-icon .embers::after { width: 3px; height: 3px; animation-delay: .5s; left: 38%; }
+      .burn-icon .embers.s2::before { content: ""; bottom: -1px; left: 62%; width: 4px; height: 4px; animation-delay: .8s; }
+      .burn-icon .embers.s3::before { content: ""; bottom: -2px; left: 45%; width: 3px; height: 3px; animation-delay: 1.1s; }
       .burn-text { display: flex; flex-direction: column; line-height: 1.1; }
       .burn-label { color: var(--text-muted); font-size: .8rem; letter-spacing: .02em; }
       .burn-value { color: var(--text-color); font-weight: 700; font-size: 1rem; }
       @keyframes flame-bob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.04); } }
-      @keyframes ember-rise { 0% { opacity: .9; transform: translate(-50%, 0) scale(1); } 70% { opacity: .4; transform: translate(-50%, -10px) scale(.8); } 100% { opacity: 0; transform: translate(-50%, -16px) scale(.6); } }
+      @keyframes ember-rise { 0% { opacity: .95; transform: translate(-50%, 0) scale(1); } 60% { opacity: .5; transform: translate(-50%, -14px) scale(.85); filter: drop-shadow(0 0 6px rgba(255,50,50,.6)); } 100% { opacity: 0; transform: translate(-50%, -22px) scale(.65); } }
 
       /* Trust strip + micro-UX + sticky CTA */
       .trust-strip { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); }
