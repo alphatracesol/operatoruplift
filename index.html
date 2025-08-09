@@ -172,6 +172,30 @@
       .burn-value { color: var(--text-color); font-weight: 700; font-size: 1rem; }
       @keyframes flame-bob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.04); } }
       @keyframes ember-rise { 0% { opacity: .9; transform: translate(-50%, 0) scale(1); } 70% { opacity: .4; transform: translate(-50%, -10px) scale(.8); } 100% { opacity: 0; transform: translate(-50%, -16px) scale(.6); } }
+
+      /* Trust strip + micro-UX + sticky CTA */
+      .trust-strip { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); }
+      .trust-strip .trust-caption { font-size: .85rem; letter-spacing: .02em; }
+      .trust-logos { display: flex; gap: 16px; align-items: center; opacity: .7; flex-wrap: wrap; justify-content: center; }
+      .trust-logo { height: 18px; padding: 6px 10px; border-radius: 999px; border: 1px dashed var(--card-border); background: var(--card-bg-glass); color: var(--text-muted); font-size: .8rem; }
+
+      .cta-button { transition: transform .2s ease, box-shadow .2s ease; }
+      .cta-button:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(249, 115, 22, .25); }
+
+      .mobile-sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: none; padding: 10px 14px; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg-color) 85%, transparent); border-top: 1px solid var(--card-border); }
+      .mobile-sticky-cta .bar { max-width: 1040px; margin: 0 auto; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+      .mobile-sticky-cta .label { color: var(--text-muted); font-size: .9rem; }
+      .mobile-sticky-cta .cta-button { padding: 10px 14px; }
+
+      @media (max-width: 768px) {
+        .mobile-sticky-cta { display: block; }
+      }
+
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .burn-icon .flame, .burn-icon .embers { animation: none !important; }
+        .cta-button { transition: none; }
+      }
     </style>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1462196764930097&ev=PageView&noscript=1"
@@ -3016,6 +3040,17 @@
                     </a>
                 </div>
 
+                <!-- Trust Strip (lightweight, non-intrusive) -->
+                <div class="trust-strip">
+                    <div class="trust-caption">Trusted by builders and operators</div>
+                    <div class="trust-logos">
+                        <span class="trust-logo">Founders</span>
+                        <span class="trust-logo">Athletes</span>
+                        <span class="trust-logo">Creators</span>
+                        <span class="trust-logo">Analysts</span>
+                    </div>
+                </div>
+
                 <!-- Product Hunt Badge removed per request -->
                 
 
@@ -3074,6 +3109,14 @@
             </div>
         </div>
     </section>
+
+    <!-- Sticky mobile CTA (only on small screens) -->
+    <div class="mobile-sticky-cta" role="region" aria-label="Quick actions">
+        <div class="bar">
+            <span class="label">Ready to ascend?</span>
+            <a href="app.html" class="cta-button accent-glow-button">Launch App</a>
+        </div>
+    </div>
 
 
 
