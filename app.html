@@ -2046,6 +2046,23 @@
                 targetView.classList.add('active');
                 OperatorUplift.currentView = viewName;
                 console.log('✅ Activated view:', targetView.id);
+
+                // Update any nav links with data-view to reflect active state
+                const navLinks = document.querySelectorAll('[data-view]');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('data-view') === viewName) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                // Update view title if present
+                const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
+                if (viewTitleEl) {
+                    const pretty = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                    viewTitleEl.textContent = pretty;
+                }
             } else {
                 console.error('❌ Target view not found:', `${viewName}View`);
             }
