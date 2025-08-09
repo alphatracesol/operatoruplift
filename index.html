@@ -4684,9 +4684,10 @@
         // Enhanced Balance Display Function
         async function showBalance(publicKey) {
             try {
-                let provider = window.solana;
-                let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-                let value = await connection.getBalance(provider.publicKey);
+                const provider = window.solana || window.phantom?.solana;
+                if (!provider || !publicKey) throw new Error('No provider or public key');
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+                const value = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
                 const balance = (value / 1e9).toFixed(4);
                 
                 console.log(`Wallet Balance: ${balance} SOL`);

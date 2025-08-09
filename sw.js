@@ -1,10 +1,10 @@
 // Enhanced Service Worker for Operator Uplift
 // Version: 2.2 - Fixed POST Request Caching and Removed Problematic URLs
 
-const CACHE_NAME = 'operator-uplift-v2.2';
-const STATIC_CACHE = 'static-v2.2';
-const DYNAMIC_CACHE = 'dynamic-v2.2';
-const API_CACHE = 'api-v2.2';
+const CACHE_NAME = 'operator-uplift-v2.3';
+const STATIC_CACHE = 'static-v2.3';
+const DYNAMIC_CACHE = 'dynamic-v2.3';
+const API_CACHE = 'api-v2.3';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
