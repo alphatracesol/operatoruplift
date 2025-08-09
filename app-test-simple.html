@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Test - Simple</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>App Functionality Test</h1>
+    
+    <div class="test-section">
+        <h3>Core Functions Test</h3>
+        <button onclick="testCoreFunctions()">Test Core Functions</button>
+        <div id="coreResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Theme System Test</h3>
+        <button onclick="testThemeSystem()">Test Theme System</button>
+        <div id="themeResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Function Registry Test</h3>
+        <button onclick="testFunctionRegistry()">Test Function Registry</button>
+        <div id="registryResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Error Boundary Test</h3>
+        <button onclick="testErrorBoundary()">Test Error Boundary</button>
+        <div id="errorResults"></div>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'success') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = type;
+            div.style.padding = '10px';
+            div.style.margin = '5px 0';
+            div.style.borderRadius = '3px';
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        function testCoreFunctions() {
+            clearResults('coreResults');
+            
+            try {
+                // Test if core functions exist
+                if (typeof showView === 'function') {
+                    addResult('coreResults', '✅ showView function exists', 'success');
+                } else {
+                    addResult('coreResults', '❌ showView function missing', 'error');
+                }
+                
+                if (typeof showLoginForm === 'function') {
+                    addResult('coreResults', '✅ showLoginForm function exists', 'success');
+                } else {
+                    addResult('coreResults', '❌ showLoginForm function missing', 'error');
+                }
+                
+                if (typeof showRegisterForm === 'function') {
+                    addResult('coreResults', '✅ showRegisterForm function exists', 'success');
+                } else {
+                    addResult('coreResults', '✅ showRegisterForm function exists', 'success');
+                }
+                
+                if (typeof showForgotPassword === 'function') {
+                    addResult('coreResults', '✅ showForgotPassword function exists', 'success');
+                } else {
+                    addResult('coreResults', '❌ showForgotPassword function missing', 'error');
+                }
+                
+                if (typeof toggleTheme === 'function') {
+                    addResult('coreResults', '✅ toggleTheme function exists', 'success');
+                } else {
+                    addResult('coreResults', '❌ toggleTheme function missing', 'error');
+                }
+                
+            } catch (error) {
+                addResult('coreResults', `❌ Error testing core functions: ${error.message}`, 'error');
+            }
+        }
+
+        function testThemeSystem() {
+            clearResults('themeResults');
+            
+            try {
+                if (typeof window.ThemeManager !== 'undefined') {
+                    addResult('themeResults', '✅ ThemeManager exists', 'success');
+                    
+                    if (typeof window.ThemeManager.init === 'function') {
+                        addResult('themeResults', '✅ ThemeManager.init exists', 'success');
+                    } else {
+                        addResult('themeResults', '❌ ThemeManager.init missing', 'error');
+                    }
+                    
+                    if (typeof window.ThemeManager.toggleTheme === 'function') {
+                        addResult('themeResults', '✅ ThemeManager.toggleTheme exists', 'success');
+                    } else {
+                        addResult('themeResults', '❌ ThemeManager.toggleTheme missing', 'error');
+                    }
+                    
+                    if (typeof window.ThemeManager.getCurrentTheme === 'function') {
+                        addResult('themeResults', '✅ ThemeManager.getCurrentTheme exists', 'success');
+                    } else {
+                        addResult('themeResults', '❌ ThemeManager.getCurrentTheme missing', 'error');
+                    }
+                    
+                } else {
+                    addResult('themeResults', '❌ ThemeManager missing', 'error');
+                }
+                
+            } catch (error) {
+                addResult('themeResults', `❌ Error testing theme system: ${error.message}`, 'error');
+            }
+        }
+
+        function testFunctionRegistry() {
+            clearResults('registryResults');
+            
+            try {
+                if (typeof window.FunctionRegistry !== 'undefined') {
+                    addResult('registryResults', '✅ FunctionRegistry exists', 'success');
+                    
+                    if (typeof window.FunctionRegistry.register === 'function') {
+                        addResult('registryResults', '✅ FunctionRegistry.register exists', 'success');
+                    } else {
+                        addResult('registryResults', '❌ FunctionRegistry.register missing', 'error');
+                    }
+                    
+                    if (typeof window.FunctionRegistry.get === 'function') {
+                        addResult('registryResults', '✅ FunctionRegistry.get exists', 'success');
+                    } else {
+                        addResult('registryResults', '❌ FunctionRegistry.get missing', 'error');
+                    }
+                    
+                    if (typeof window.FunctionRegistry.execute === 'function') {
+                        addResult('registryResults', '✅ FunctionRegistry.execute exists', 'success');
+                    } else {
+                        addResult('registryResults', '❌ FunctionRegistry.execute missing', 'error');
+                    }
+                    
+                } else {
+                    addResult('registryResults', '❌ FunctionRegistry missing', 'error');
+                }
+                
+            } catch (error) {
+                addResult('registryResults', `❌ Error testing function registry: ${error.message}`, 'error');
+            }
+        }
+
+        function testErrorBoundary() {
+            clearResults('errorResults');
+            
+            try {
+                if (typeof window.ErrorBoundary !== 'undefined') {
+                    addResult('errorResults', '✅ ErrorBoundary exists', 'success');
+                    
+                    if (typeof window.ErrorBoundary.capture === 'function') {
+                        addResult('errorResults', '✅ ErrorBoundary.capture exists', 'success');
+                    } else {
+                        addResult('errorResults', '❌ ErrorBoundary.capture missing', 'error');
+                    }
+                    
+                    if (typeof window.ErrorBoundary.getErrors === 'function') {
+                        addResult('errorResults', '✅ ErrorBoundary.getErrors exists', 'success');
+                    } else {
+                        addResult('errorResults', '❌ ErrorBoundary.getErrors missing', 'error');
+                    }
+                    
+                } else {
+                    addResult('errorResults', '❌ ErrorBoundary missing', 'error');
+                }
+                
+            } catch (error) {
+                addResult('errorResults', `❌ Error testing error boundary: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

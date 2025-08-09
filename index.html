@@ -2820,7 +2820,202 @@
                 padding: 0.75rem !important;
                 min-height: 44px !important;
             }
-                    }
+        }
+
+        /* --- BURN COUNTER STYLES --- */
+        .burn-counter-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .burn-counter-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.05));
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            min-width: 320px;
+            box-shadow: 0 8px 32px rgba(249, 115, 22, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .burn-counter-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(249, 115, 22, 0.25);
+            border-color: rgba(249, 115, 22, 0.5);
+        }
+
+        .burn-counter-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+        }
+
+        .flame-emoji {
+            font-size: 2rem;
+            animation: flame-flicker 2s infinite alternate;
+            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
+        }
+
+        .burn-counter-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .burn-counter-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .burn-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .burn-stat:last-child {
+            border-bottom: none;
+        }
+
+        .burn-stat.highlight {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.1));
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .percentage-value {
+            color: #f97316;
+            font-weight: 800;
+        }
+
+        .embers-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ember {
+            position: absolute;
+            font-size: 1rem;
+            opacity: 0.7;
+            animation: ember-float 4s infinite linear;
+        }
+
+        .ember-1 {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .ember-2 {
+            top: 30%;
+            right: 20%;
+            animation-delay: 1s;
+        }
+
+        .ember-3 {
+            bottom: 25%;
+            left: 25%;
+            animation-delay: 2s;
+        }
+
+        .ember-4 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        .ember-5 {
+            bottom: 40%;
+            right: 35%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes flame-flicker {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
+            }
+            25% {
+                transform: scale(1.1) rotate(2deg);
+                filter: drop-shadow(0 0 12px rgba(249, 115, 22, 0.8));
+            }
+            50% {
+                transform: scale(0.95) rotate(-1deg);
+                filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.4));
+            }
+            75% {
+                transform: scale(1.05) rotate(1deg);
+                filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.7));
+            }
+        }
+
+        @keyframes ember-float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0.7;
+            }
+            25% {
+                transform: translateY(-10px) translateX(5px) rotate(90deg);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translateY(-20px) translateX(-5px) rotate(180deg);
+                opacity: 0.5;
+                transform: translateY(-15px) translateX(3px) rotate(270deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0) translateX(0) rotate(360deg);
+                opacity: 0.7;
+            }
+        }
+
+        /* Responsive adjustments for burn counter */
+        @media (max-width: 768px) {
+            .burn-counter-card {
+                min-width: 280px;
+                padding: 1rem;
+            }
+            
+            .burn-counter-title {
+                font-size: 1.1rem;
+            }
+            
+            .stat-value {
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
         <body>
@@ -2951,6 +3146,37 @@
                     <a href="https://www.producthunt.com/products/operator-uplift?utm_source=badge-follow&utm_medium=badge&utm_source=badge-operator-uplift" target="_blank" rel="noopener noreferrer" class="product-hunt-badge" aria-label="Operator Uplift on Product Hunt">
                         <img src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1096103&theme=light&v=2" alt="Operator Uplift - Deconstruct Your Ambition. Elevate Your Ascent. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
                     </a>
+                </div>
+                
+                <!-- Token Burn Counter -->
+                <div class="burn-counter-container mt-8">
+                    <div class="burn-counter-card">
+                        <div class="burn-counter-header">
+                            <div class="flame-emoji">🔥</div>
+                            <h3 class="burn-counter-title">$UPLIFT Burn Counter</h3>
+                        </div>
+                        <div class="burn-counter-stats">
+                            <div class="burn-stat">
+                                <span class="stat-label">Initial Supply:</span>
+                                <span class="stat-value">1,000,000,000</span>
+                            </div>
+                            <div class="burn-stat">
+                                <span class="stat-label">Current Supply:</span>
+                                <span class="stat-value" id="current-supply">995,222,025.292806765</span>
+                            </div>
+                            <div class="burn-stat highlight">
+                                <span class="stat-label">Tokens Burned:</span>
+                                <span class="stat-value" id="burned-amount">4,777,974.707193235</span>
+                            </div>
+                        </div>
+                        <div class="embers-container">
+                            <div class="ember ember-1">✨</div>
+                            <div class="ember ember-2">✨</div>
+                            <div class="ember ember-3">✨</div>
+                            <div class="ember ember-4">✨</div>
+                            <div class="ember ember-5">✨</div>
+                        </div>
+                    </div>
                 </div>
                 
 
@@ -4635,6 +4861,133 @@
                 console.error('Error fetching balance:', error);
             }
         }
+
+        // --- BURN COUNTER FUNCTIONS ---
+        let burnCounterInterval;
+
+        // Initialize burn counter on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBurnCounter();
+            // Update every 30 seconds
+            burnCounterInterval = setInterval(updateBurnCounter, 30000);
+        });
+
+        // Update burn counter with live data
+        async function updateBurnCounter() {
+            try {
+                const initialSupply = 1000000000; // 1 billion initial supply
+                let currentSupply = 995222025.292806765; // Current supply (will be updated via API)
+                
+                // Try to fetch current supply from Solscan API
+                try {
+                    const response = await fetch('https://public-api.solscan.io/token/meta?tokenAddress=6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.supply) {
+                            currentSupply = parseFloat(data.supply);
+                        }
+                    }
+                } catch (apiError) {
+                    console.log('Using fallback supply data:', apiError.message);
+                }
+                
+                const burned = initialSupply - currentSupply;
+                const burnPercentage = (burned / initialSupply) * 100;
+                
+                // Update the burn counter display using existing HTML structure
+                const currentSupplyElement = document.getElementById('current-supply');
+                const burnedAmountElement = document.getElementById('burned-amount');
+                
+                if (currentSupplyElement) {
+                    currentSupplyElement.textContent = currentSupply.toLocaleString(undefined, {maximumFractionDigits: 9});
+                }
+                
+                if (burnedAmountElement) {
+                    burnedAmountElement.textContent = burned.toLocaleString(undefined, {maximumFractionDigits: 9});
+                }
+                
+                // Add burn percentage to the highlight section
+                const highlightStat = document.querySelector('.burn-stat.highlight');
+                if (highlightStat) {
+                    const percentageSpan = highlightStat.querySelector('.percentage-value');
+                    if (!percentageSpan) {
+                        const percentageDiv = document.createElement('div');
+                        percentageDiv.className = 'burn-stat';
+                        percentageDiv.innerHTML = `
+                            <span class="stat-label">Burn Rate:</span>
+                            <span class="stat-value">${burnPercentage.toFixed(4)}%</span>
+                        `;
+                        highlightStat.parentNode.insertBefore(percentageDiv, highlightStat.nextSibling);
+                    } else {
+                        percentageSpan.textContent = `${burnPercentage.toFixed(4)}%`;
+                    }
+                }
+                
+                // Animate the flame emoji
+                animateFlame();
+                
+            } catch (error) {
+                console.error('Error updating burn counter:', error);
+                // Fallback display - update existing elements
+                const currentSupplyElement = document.getElementById('current-supply');
+                const burnedAmountElement = document.getElementById('burned-amount');
+                
+                if (currentSupplyElement) {
+                    currentSupplyElement.textContent = '995,222,025.292806765';
+                }
+                
+                if (burnedAmountElement) {
+                    burnedAmountElement.textContent = '4,777,974.707193235';
+                }
+            }
+        }
+
+        // Animate the flame emoji with ember effects
+        function animateFlame() {
+            const flameElement = document.querySelector('.flame-emoji');
+            if (flameElement) {
+                // Add floating animation
+                flameElement.style.animation = 'flameFloat 2s ease-in-out infinite';
+                
+                // Create ember particles
+                createEmbers();
+            }
+        }
+
+        // Create floating ember particles
+        function createEmbers() {
+            const container = document.querySelector('.burn-counter-card');
+            if (!container) return;
+            
+            // Remove existing embers
+            const existingEmbers = container.querySelectorAll('.ember');
+            existingEmbers.forEach(ember => ember.remove());
+            
+            // Create new embers
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const ember = document.createElement('div');
+                    ember.className = 'ember';
+                    ember.style.left = Math.random() * 100 + '%';
+                    ember.style.animationDelay = Math.random() * 2 + 's';
+                    container.appendChild(ember);
+                    
+                    // Remove ember after animation
+                    setTimeout(() => {
+                        if (ember.parentNode) {
+                            ember.parentNode.removeChild(ember);
+                        }
+                    }, 3000);
+                }, i * 200);
+            }
+        }
+
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (burnCounterInterval) {
+                clearInterval(burnCounterInterval);
+            }
+        });
     </script>
 
     <!-- Solana Web3.js Library -->
