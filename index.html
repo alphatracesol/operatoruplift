@@ -109,13 +109,19 @@
     <script>
       (function burnCounterInit(){
         const el = () => document.getElementById('burn-counter');
+        const elPct = () => document.getElementById('burn-percent');
         const initialSupply = 1_000_000_000;
-        const fallbackCurrent = 995_222_025.292806765;
+        const fallbackCurrent = 989_922_015.292806765; // reflects ~10,077,984 burned fallback
 
         function setValue(currentSupply){
           const burned = Math.max(0, initialSupply - Number(currentSupply || 0));
           const target = el();
           if (target) target.textContent = burned.toLocaleString(undefined, { maximumFractionDigits: 9 });
+          const pctEl = elPct();
+          if (pctEl) {
+            const pct = (burned / initialSupply) * 100;
+            pctEl.textContent = `(${pct.toFixed(4)}%)`;
+          }
         }
 
         async function fetchSupply(){
@@ -172,6 +178,7 @@
       .burn-text { display: flex; flex-direction: column; line-height: 1.1; }
       .burn-label { color: var(--text-muted); font-size: .8rem; letter-spacing: .02em; }
       .burn-value { color: var(--text-color); font-weight: 700; font-size: 1rem; }
+      .burn-percent { color: var(--text-muted); font-size: .8rem; }
       @keyframes flame-bob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.04); } }
       @keyframes ember-rise { 0% { opacity: .95; transform: translate(-50%, 0) scale(1); } 60% { opacity: .5; transform: translate(-50%, -14px) scale(.85); filter: drop-shadow(0 0 6px rgba(255,50,50,.6)); } 100% { opacity: 0; transform: translate(-50%, -22px) scale(.65); } }
 
@@ -3039,6 +3046,7 @@
                         <div class="burn-text">
                             <span class="burn-label">Tokens Burned</span>
                             <span id="burn-counter" class="burn-value">Calculating…</span>
+                            <span id="burn-percent" class="burn-percent"></span>
                         </div>
                     </div>
                     </a>
