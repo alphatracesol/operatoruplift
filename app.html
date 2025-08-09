@@ -2472,6 +2472,29 @@
             alert('Success: ' + message);
         }
 
+        // Animated number helper for smooth stat updates
+        function animateNumberInto(element, targetValue, options = {}) {
+            if (!element) return;
+            const { durationMs = 600, prefix = '', suffix = '' } = options;
+            const startValue = Number(element.textContent?.replace(/[^0-9.]/g, '') || 0);
+            const endValue = Number(targetValue || 0);
+            if (!isFinite(startValue) || !isFinite(endValue)) {
+                element.textContent = `${prefix}${endValue}${suffix}`;
+                return;
+            }
+            const startTime = performance.now();
+            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+            function step(now) {
+                const elapsed = now - startTime;
+                const t = Math.min(1, elapsed / durationMs);
+                const eased = easeOutCubic(t);
+                const current = startValue + (endValue - startValue) * eased;
+                element.textContent = `${prefix}${Math.round(current)}${suffix}`;
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
         // Make functions globally available
         window.showLoginForm = showLoginForm;
         window.showRegisterForm = showRegisterForm;
@@ -2539,13 +2562,13 @@
             const levelProgressTextElement = document.getElementById('levelProgressText');
             
             if (activeGoalsElement) {
-                activeGoalsElement.textContent = stats.activeGoals;
+                animateNumberInto(activeGoalsElement, stats.activeGoals);
             }
             if (completedGoalsElement) {
-                completedGoalsElement.textContent = stats.completedGoals;
+                animateNumberInto(completedGoalsElement, stats.completedGoals);
             }
             if (completionRateElement) {
-                completionRateElement.textContent = stats.completionRate + '%';
+                animateNumberInto(completionRateElement, stats.completionRate, { suffix: '%' });
             }
             
             // Update level progress
