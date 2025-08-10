@@ -41,12 +41,14 @@
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://cdn.tailwindcss.com https://connect.facebook.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.pexels.com https://www.facebook.com https://api.producthunt.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://connect.facebook.net https://api.mainnet-beta.solana.com https://public-api.solscan.io https://api.producthunt.com; frame-src 'self' https://www.google.com https://cards.producthunt.com https://dexscreener.com https://www.dexscreener.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://cdn.tailwindcss.com https://connect.facebook.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.pexels.com https://www.facebook.com https://api.producthunt.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://connect.facebook.net https://api.mainnet-beta.solana.com https://public-api.solscan.io https://api.producthunt.com; frame-src 'self' https://www.google.com https://cards.producthunt.com https://dexscreener.com https://www.dexscreener.com; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>Operator Uplift - AI-Powered Self-Progression</title>
+    <!-- Ambient audio for landing page -->
+    <audio id="index-audio" src="Velvet Horizon.mp3" preload="auto" loop></audio>
     <meta name="description" content="Join 10,000+ operators who transformed their goals into epic quests. Earn Essence, unlock achievements, and level up your life with the ultimate gamified productivity platform.">
     <meta name="keywords" content="gamified goals, productivity app, goal setting, task management, achievements, AI mentor, habit tracking">
     <meta property="og:title" content="Operator Uplift - AI-Powered Self-Progression">
@@ -3995,6 +3997,15 @@
 
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
+            // Ambient audio at 3% volume
+            const indexAudio = document.getElementById('index-audio');
+            if (indexAudio) {
+                indexAudio.volume = 0.03;
+                const tryPlay = () => indexAudio.play().catch(()=>{});
+                tryPlay();
+                document.addEventListener('click', tryPlay, { once: true, capture: true });
+                document.addEventListener('touchstart', tryPlay, { once: true, capture: true });
+            }
             // --- Loading Screen ---
             // Hide loading screen only after interactive features bind
             const hideLoader = () => {
