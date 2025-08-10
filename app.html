@@ -4027,15 +4027,17 @@
             if (habitCtx) {
                 const ctx = habitCtx.getContext('2d');
                 if (habitCtx._chart) habitCtx._chart.destroy();
-                // If habits collection exists, we can derive simple streak/lastDone counts
                 const labelsHabit = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
                 const dataHabit = new Array(7).fill(0);
-                // Use focus sessions as proxy for habit activity until habit completions are tracked
-                // Populate from last 7 days of focusSessions count per weekday
-                // This is fully functional if focus sessions exist
-                // For accuracy, prefer habit completion timestamps in future
-                dataHabit.forEach((_,i)=>dataHabit[i]=0);
-                habitCtx._chart = new Chart(ctx, { type:'bar', data:{ labels:labelsHabit, datasets:[{ label:'Habit Activity', data:dataHabit, backgroundColor:'#10b981'}]}, options:{ responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}}});
+                if (OperatorUplift.currentUser) {
+                    db.collection('users').doc(OperatorUplift.currentUser.uid).collection('habits').get().then(snap => {
+                        snap.forEach(doc => {
+                            const completed = Array.isArray(doc.data().completedOn) ? doc.data().completedOn : [];
+                            completed.forEach(dStr => { const d = new Date(dStr); if (!isNaN(d)) dataHabit[d.getDay()]++; });
+                        });
+                        habitCtx._chart = new Chart(ctx, { type:'bar', data:{ labels:labelsHabit, datasets:[{ label:'Habit Completions', data:dataHabit, backgroundColor:'#10b981'}]}, options:{ responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}}});
+                    });
+                }
             }
         }
         function renderCalendar() {
@@ -4552,6 +4554,7 @@
                             frequency,
                             streak: 0,
                             lastDone: null,
+                            completedOn: [],
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
@@ -4570,9 +4573,13 @@
                 const ref = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('habits').doc(habitId);
                 const snap = await ref.get();
                 let streak = Number(snap.data()?.streak || 0) + 1;
+                const todayStr = new Date().toISOString().slice(0,10);
+                const existing = Array.isArray(snap.data()?.completedOn) ? snap.data().completedOn : [];
+                if (!existing.includes(todayStr)) existing.push(todayStr);
                 await ref.set({
                     lastDone: firebase.firestore.FieldValue.serverTimestamp(),
                     streak,
+                    completedOn: existing,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 OperatorUplift.ui?.showToast?.('Nice! Habit logged', 'success');

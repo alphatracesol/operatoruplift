@@ -46,6 +46,7 @@ service cloud.firestore {
       match /habits/{habitId} {
         allow read, update, delete: if isOwner(userId);
         allow create: if isOwner(userId) && isValidHabitData(request.resource.data);
+        allow update: if isOwner(userId);
       }
       match /focusSessions/{sessionId} {
         allow read, update, delete: if isOwner(userId);
