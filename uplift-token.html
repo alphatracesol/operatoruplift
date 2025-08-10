@@ -382,11 +382,12 @@
         /* Visuals */
         .viz-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap:1rem; align-items:stretch; }
         /* Ensure tokenomics/roadmap can show 4 in a row on wide screens */
-        .tokenomics-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 1rem; }
-        @media (min-width: 1200px) {
-            .tokenomics-grid { grid-template-columns: repeat(4, 1fr); }
-            .roadmap { display:grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-        }
+        .tokenomics-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: clamp(.5rem, 1.5vw, 1rem); }
+        .roadmap { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: clamp(.5rem, 1.5vw, 1rem); }
+        /* Scale card content down as viewport narrows to avoid wrapping */
+        .tokenomics-grid .token-info-card, .roadmap .roadmap-item { padding: clamp(.6rem, 1.5vw, 1rem); }
+        .tokenomics-grid .token-info-card h3, .roadmap .roadmap-item h4 { font-size: clamp(.9rem, 1.8vw, 1.2rem); }
+        .tokenomics-grid .token-info-card .muted, .roadmap .roadmap-item ul { font-size: clamp(.75rem, 1.6vw, .95rem); }
         .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; margin: .25rem auto 0; background: conic-gradient(var(--accent-color) 0 50%, #ffffff 0 100%); box-shadow: 0 0 25px rgba(255,165,0,.25) inset; }
         .donut::after { content: ''; position: absolute; inset: 22px; background: var(--bg-color); border-radius: 50%; }
         @keyframes donut-in { from { transform: scale(.9) rotate(-20deg); opacity:0; } to { transform: scale(1) rotate(0deg); opacity:1; } }
@@ -417,10 +418,10 @@
         .site-footer { margin-top: auto; }
         /* Weekly visualizer */
         .week { display:grid; grid-template-columns: repeat(7,1fr); gap:.5rem; width:100%; overflow:visible; }
-        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:1rem; min-height:110px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
+        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:clamp(.6rem, 2vw, 1rem); min-height:clamp(90px, 18vw, 110px); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
         .day:hover { transform: translateY(-3px); background: rgba(255,255,255,.06); border-color: var(--accent-color); box-shadow: 0 6px 20px rgba(249, 115, 22, .15); }
         .day .name { color: var(--text-muted); font-size:clamp(.75rem, 1.8vw, .95rem); font-weight:600; }
-        .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid var(--border-color); background: rgba(255,255,255,.06); white-space:nowrap; }
+        .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.2rem .45rem; border-radius:999px; font-size:.75rem; border:1px solid var(--border-color); background: rgba(255,255,255,.06); white-space:nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
         /* Gradient sweep hover for small badges/chips/buttons */
         .badge, .pill, .status, .copy-btn {
             position: relative;
@@ -444,8 +445,8 @@
 
         /* Fire orb removed in favor of centered emoji */
         .fire-orb-wrap, .fire-orb, .fire-orb-inner { display: none !important; }
-        /* Centered animated fire emoji under last burn label on larger layouts */
-        .fire-emoji { position: absolute; left: 50%; transform: translateX(-50%); bottom: clamp(0px, 6%, 28px); font-size: clamp(36px, 11vw, 64px); line-height: 1; z-index: 2; filter: drop-shadow(0 0 12px rgba(255,80,20,.95)) drop-shadow(0 0 22px rgba(255,120,40,.65)); animation: flame-pulse 1.2s ease-in-out infinite; }
+        /* Fire emoji removed */
+        .fire-emoji { display: none !important; }
         @keyframes flame-pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.08); } }
         @media (max-width: 768px) { .fire-emoji { display: none; } }
 
@@ -858,7 +859,21 @@
         <section id="burn" class="section">
             <h3 class="section-title">Live Burn Counter</h3>
             <p class="section-subtext">Live data sourced from Solana RPC and Solscan public API. If values show dashes, data may be temporarily unavailable. Wallet configured: <code>DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</code>.</p>
-            <div class="viz-grid" style="margin-top:1rem; align-items:stretch;">
+            <div class="viz-grid" id="burn-grid" style="margin-top:1rem; align-items:stretch; position: relative;">
+                <div id="burn-loading" aria-hidden="true" style="position:absolute; inset:0; display:none; align-items:center; justify-content:center; backdrop-filter: blur(6px); background: rgba(10,10,10,.55); z-index:5;">
+                    <div class="scene" style="width:64px;height:64px;perspective:600px;">
+                        <div class="cube" style="width:64px;height:64px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(32px);">
+                                <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                            </div>
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(32px);"></div>
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(32px);"></div>
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(32px);"></div>
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(32px);"></div>
+                            <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(32px);"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card kpi reveal" style="position:relative; overflow:hidden; box-shadow:0 0 20px rgba(239,68,68,.35) inset, 0 0 25px rgba(239,68,68,.2); border-color: rgba(239,68,68,.45);">
                     <div class="value" id="burn-current-supply">—</div>
                     <div class="label">Current Supply</div>
@@ -869,7 +884,7 @@
                     <div class="label">Total Burned (Tracked)</div>
                     <div class="embers"></div>
                 </div>
-                <div class="card kpi reveal" style="position:relative; overflow:hidden; box-shadow:0 0 20px rgba(239,68,68,.35) inset, 0 0 25px rgba(239,68,68,.2); border-color: rgba(239,68,68,.45);">
+                <div class="card kpi reveal" id="burn-last-card" style="position:relative; overflow:hidden; box-shadow:0 0 20px rgba(239,68,68,.35) inset, 0 0 25px rgba(239,68,68,.2); border-color: rgba(239,68,68,.45);">
                     <div class="value" id="burn-last-time">—</div>
                     <div class="label">Last Burn</div>
                     <div class="embers"></div>
@@ -1066,7 +1081,8 @@
                 <div class="mt-8 pt-6 border-t border-zinc-800/50 flex justify-center items-center text-sm text-slate-400">
                     Financial Disclosure: We are not financial advisors. Nothing on this site is financial advice. Do your own research and consult a professional.
                 </div>
-                <div class="mt-4 text-center">
+                <div class="mt-4 text-center flex flex-col items-center gap-4">
+                    <div class="flex items-center gap-3"><label for="toggle-particles" class="cursor-pointer">Background Particles</label><label class="toggle-switch"><input type="checkbox" id="toggle-particles" checked><span class="slider"></span></label></div>
                     <p class="text-sm text-gray-400">Made with <span class="heartbeat">❤️</span> during The Residency's Delta Sprint</p>
                 </div>
             </div>
@@ -1477,6 +1493,8 @@
             }
 
             async function loadBurnData(){
+                const overlay = document.getElementById('burn-loading');
+                if (overlay) overlay.style.display = 'flex';
                 try {
                     // Supply via Solscan public API
                     // Docs: public-api.solscan.io (supply endpoints may vary; placeholder logic shown)
@@ -1537,6 +1555,8 @@
                             elList.appendChild(li);
                         });
                     }
+                } finally {
+                    if (overlay) overlay.style.display = 'none';
                 }
             }
             if (btnRefresh) btnRefresh.addEventListener('click', (e)=>{ e.preventDefault(); loadBurnData(); });
