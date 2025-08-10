@@ -268,7 +268,7 @@ async function buildMixed() {
 
     // Copy top-level media assets (images/icons) used by pages linking to root paths
     console.log('\n🖼️  Copying root-level media assets...');
-    const rootMediaExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico']);
+    const rootMediaExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico', '.mp3', '.wav', '.ogg']);
     const rootFiles = fs.readdirSync(process.cwd());
     rootFiles.forEach(file => {
         const ext = path.extname(file).toLowerCase();
