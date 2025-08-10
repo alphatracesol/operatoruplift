@@ -167,7 +167,7 @@
 
     <style>
       .burn-counter-wrapper { margin-top: 1.5rem; display: flex; justify-content: center; position: relative; z-index: 10; }
-      .burn-counter { display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; backdrop-filter: blur(10px); background: var(--card-bg-glass); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 24px rgba(255,60,60,0.18); overflow: visible; }
+      .burn-counter { display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; backdrop-filter: blur(14px); background: var(--card-bg-glass); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 24px rgba(255,60,60,0.18); overflow: visible; }
       .burn-counter-link { text-decoration: none; }
       .burn-counter-link:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; border-radius: 14px; }
       .burn-icon { position: relative; width: 30px; height: 30px; display: grid; place-items: center; overflow: visible; }
@@ -193,7 +193,7 @@
       .cta-button { transition: transform .2s ease, box-shadow .2s ease; }
       .cta-button:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(249, 115, 22, .25); }
 
-      .mobile-sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: none; padding: 10px 14px; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg-color) 85%, transparent); border-top: 1px solid var(--card-border); }
+      .mobile-sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: none; padding: 10px 14px; backdrop-filter: blur(14px); background: color-mix(in srgb, var(--bg-color) 85%, transparent); border-top: 1px solid var(--card-border); }
       .mobile-sticky-cta .bar { max-width: 1040px; margin: 0 auto; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
       .mobile-sticky-cta .label { color: var(--text-muted); font-size: .9rem; }
       .mobile-sticky-cta .cta-button { padding: 10px 14px; }
@@ -423,8 +423,8 @@
             right: 0;
             bottom: 0;
             background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             z-index: 100;
             opacity: 0;
             visibility: hidden;
@@ -692,8 +692,8 @@
         /* Footer styles */
         footer {
             background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             z-index: 50;
@@ -813,7 +813,7 @@
             align-items: center;
             gap: 0.5rem;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
             padding: 1rem;
@@ -924,7 +924,7 @@
             color: var(--text-light);
             border: 2px solid var(--border-color);
             padding: 0.75rem 1.5rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
         }
         
         .btn-secondary:hover {
@@ -981,8 +981,8 @@
                         right: 0;
                         z-index: 1000;
                         background: rgba(10, 10, 10, 0.95);
-                        backdrop-filter: blur(20px);
-                        -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
                         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                         transition: all 0.3s ease;
                     }
@@ -1041,8 +1041,8 @@
                         right: 0;
                         width: 100%;
                         background: rgba(10, 10, 10, 0.95);
-                        backdrop-filter: blur(20px);
-                        -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
                         border-bottom: 1px solid var(--border-color);
                         z-index: 1000;
                         padding: 1.5rem 0;
@@ -1381,7 +1381,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
             padding: 0.75rem 1.25rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
             transition: all 0.3s ease;
         }
 
@@ -1413,7 +1413,7 @@
             font-weight: 600;
             text-decoration: none;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
             position: relative;
             overflow: hidden;
         }
@@ -1473,7 +1473,7 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
             box-sizing: border-box;
             box-shadow: 0 0 6px rgba(249, 115, 22, 0.1);
             transform-origin: center center;
@@ -2922,7 +2922,7 @@
             @keyframes cube-spin { from { transform: rotateX(0deg) rotateY(0deg); } to { transform: rotateX(360deg) rotateY(360deg); } }
         </style>
         <div class="loader-scene" style="width:100px;height:100px;perspective:600px;">
-            <div class="cube" style="width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+            <div class="cube" style="width:100px;height:100px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
                 <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(50px);">
                     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
