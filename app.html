@@ -2884,15 +2884,16 @@
             }
             
             goalsList.innerHTML = dashboardData.goals.map(goal => `
-                <div class="goal-item" onclick="viewGoal('${goal.id}')">
-                    <div class="goal-info">
+                <div class="goal-item">
+                    <div class="goal-info" onclick="viewGoal('${goal.id}')">
                         <h4>${goal.title}</h4>
                         <div class="goal-meta">
                             ${goal.category} • ${goal.difficulty} • Due ${formatDate(goal.deadline)}
                         </div>
                     </div>
-                    <div class="goal-status status-${goal.status || 'active'}">
-                        ${goal.status || 'Active'}
+                    <div class="goal-actions">
+                        <span class="goal-status status-${goal.status || 'active'}">${goal.status || 'Active'}</span>
+                        ${goal.status !== 'completed' ? `<button class="btn-secondary" onclick="completeGoal('${goal.id}')">Mark Complete</button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -2924,6 +2925,122 @@
                 dashboardData.achievements = [];
                 updateAchievementsUI();
                 return [];
+            }
+        }
+
+        // Load all goals for Goals view
+        async function loadAllUserGoals() {
+            if (!OperatorUplift.currentUser) return [];
+            try {
+                const snap = await db.collection('users')
+                    .doc(OperatorUplift.currentUser.uid)
+                    .collection('goals')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                const goals = [];
+                snap.forEach(doc => goals.push({ id: doc.id, ...doc.data() }));
+                return goals;
+            } catch (e) {
+                console.error('❌ Error loading all goals:', e);
+                return [];
+            }
+        }
+
+        // Render Goals view list
+        async function renderGoalsViewList() {
+            const container = document.getElementById('goalsList');
+            if (!container) return;
+            OperatorUplift.ui?.showOverlay?.('Loading goals...');
+            const goals = await loadAllUserGoals();
+            OperatorUplift.ui?.hideOverlay?.();
+            if (!goals.length) {
+                container.innerHTML = `
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Your Goals</h3></div>
+                        <div id="goalsEmpty" class="empty-state">
+                            <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            <p>No goals yet</p>
+                            <button class="btn-primary" id="goalsCreateCta">Create Your First Goal</button>
+                        </div>
+                    </div>
+                `;
+                const cta = document.getElementById('goalsCreateCta');
+                if (cta) cta.addEventListener('click', showAddGoalModal);
+                return;
+            }
+            container.innerHTML = goals.map(goal => `
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>${goal.title}</h3>
+                        <div class="card-actions">
+                            ${goal.status !== 'completed' ? `<button class="btn-secondary" onclick="completeGoal('${goal.id}')">Mark Complete</button>` : '<span class="badge">Completed</span>'}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">${goal.category} • ${goal.difficulty} • Due ${formatDate(goal.deadline)}</p>
+                        ${goal.description ? `<p style="margin-top:6px;">${goal.description}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Complete goal action
+        async function completeGoal(goalId) {
+            if (!OperatorUplift.currentUser || !goalId) return;
+            try {
+                // Update Firestore
+                const goalRef = db.collection('users')
+                    .doc(OperatorUplift.currentUser.uid)
+                    .collection('goals')
+                    .doc(goalId);
+                await goalRef.set({ status: 'completed', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+
+                // Update local state
+                const g = dashboardData.goals.find(x => x.id === goalId);
+                if (g) g.status = 'completed';
+
+                // Apply XP reward based on difficulty
+                const xpMap = { easy: 10, medium: 25, hard: 50, epic: 100 };
+                const xp = xpMap[(g?.difficulty || 'easy')] || 10;
+                await applyXP(xp);
+
+                updateGoalsList();
+                updateStats();
+                OperatorUplift.ui?.showToast?.('Goal marked complete! +'+xp+' XP', 'success');
+                // Re-render goals view if visible
+                if (OperatorUplift.currentView === 'goals') {
+                    renderGoalsViewList();
+                }
+                // Check achievements
+                checkAndAwardAchievements?.();
+            } catch (e) {
+                console.error('❌ Failed to complete goal:', e);
+                OperatorUplift.ui?.showToast?.('Failed to mark complete', 'error');
+            }
+        }
+
+        async function applyXP(xp) {
+            try {
+                const data = OperatorUplift.userData || { level: 1, experience: 0 };
+                let level = Number(data.level) || 1;
+                let exp = Number(data.experience) || 0;
+                exp += xp;
+                let leveledUp = false;
+                while (exp >= level * 100) {
+                    exp -= level * 100;
+                    level += 1;
+                    leveledUp = true;
+                }
+                data.level = level;
+                data.experience = exp;
+                OperatorUplift.userData = data;
+                updateProgressStats();
+                // Persist to Firestore
+                await db.collection('users').doc(OperatorUplift.currentUser.uid)
+                    .set({ level, experience: exp }, { merge: true });
+                if (leveledUp) OperatorUplift.ui?.showToast?.('Level Up! 🎉', 'success');
+            } catch (e) {
+                console.error('XP apply failed:', e);
             }
         }
 
@@ -3045,8 +3162,8 @@
         }
 
         function showAllGoals() {
-            // Will be implemented in later phases
-            showSuccess('All goals view coming soon!');
+            showView('goals');
+            renderGoalsViewList();
         }
 
         function showAllAchievements() {
