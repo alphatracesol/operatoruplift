@@ -18,6 +18,7 @@ const STATIC_FILES = [
 
 const BUILD_FILES = [
     'index.html',
+    'uplift-token.html',
     'login.html',
     'dashboard.html',
     'press-release.html',
@@ -264,6 +265,22 @@ async function buildMixed() {
     copyDirIfExists('netlify', path.join(buildDir, 'netlify'));
     copyDirIfExists('tests', path.join(buildDir, 'tests'));
     copyDirIfExists('docs', path.join(buildDir, 'docs'));
+
+    // Copy top-level media assets (images/icons) used by pages linking to root paths
+    console.log('\n🖼️  Copying root-level media assets...');
+    const rootMediaExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico']);
+    const rootFiles = fs.readdirSync(process.cwd());
+    rootFiles.forEach(file => {
+        const ext = path.extname(file).toLowerCase();
+        if (rootMediaExtensions.has(ext)) {
+            try {
+                fs.copyFileSync(path.join(process.cwd(), file), path.join(buildDir, file));
+                console.log(`✅ Copied media: ${file}`);
+            } catch (e) {
+                console.log(`❌ Failed copying media ${file}: ${e.message}`);
+            }
+        }
+    });
     
     console.log('\n✅ Mixed deployment build completed!');
     console.log('\n📋 Summary:');
