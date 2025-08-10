@@ -345,7 +345,6 @@
             margin-bottom: 20px;
             animation: pulse 2s infinite;
         }
-
         .loading-text {
             font-size: 1rem;
             color: var(--text-color);
@@ -694,7 +693,6 @@
             font-size: 0.7rem;
             font-weight: 500;
         }
-
         .integration-connect-btn {
             background: var(--accent-color);
             color: white;
@@ -1045,7 +1043,6 @@
             background: var(--button-hover);
             border-color: var(--border-color-light);
         }
-
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
@@ -1396,7 +1393,6 @@
             background: var(--button-hover);
             border-color: var(--border-color-light);
         }
-
         /* Responsive Dashboard */
         @media (max-width: 768px) {
             .dashboard-header {
@@ -1733,7 +1729,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Add Goal Modal -->
             <div id="addGoalModal" class="modal">
                 <div class="modal-content">
@@ -2044,7 +2039,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Settings View -->
         <div id="settingsView" class="view-container" style="display:none;">
             <div class="dashboard-header">
@@ -2370,7 +2364,6 @@
                 this.conflicts = [];
             }
         };
-        
         // ===== ERROR BOUNDARY SYSTEM =====
         window.ErrorBoundary = {
             errors: [],
@@ -2717,7 +2710,6 @@
                 }
             }, 250);
         });
-
         // Initialize foundation
         function initializeFoundation() {
             console.log('🔧 Initializing foundation...');
@@ -3001,40 +2993,28 @@
                     });
                     
                     try {
-                        // Check for popup blocker
-                        const popup = window.open('', '_blank', 'width=400,height=600');
-                        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-                            throw new Error('Popup blocked. Please allow popups for this site.');
-                        }
-                        popup.close();
-                        
+                        // Try popup first
                         const result = await auth.signInWithPopup(provider);
                         const user = result.user;
-                        
                         console.log('✅ Google sign-in successful:', user.email);
-                        
-                        // User data will be handled by initializeUserData in auth state change
-                        
                     } catch (error) {
-                        console.error('❌ Google sign-in error:', error);
-                        
-                        let errorMessage = 'Google sign-in failed';
-                        if (error.code === 'auth/popup-blocked') {
-                            errorMessage = 'Popup blocked. Please allow popups and try again.';
-                        } else if (error.code === 'auth/popup-closed-by-user') {
-                            errorMessage = 'Sign-in cancelled.';
-                        } else if (error.code === 'auth/account-exists-with-different-credential') {
-                            errorMessage = 'Account exists with different sign-in method.';
-                        } else if (error.message) {
-                            errorMessage += ': ' + error.message;
+                        console.warn('Popup sign-in failed, attempting redirect...', error);
+                        try {
+                            await auth.signInWithRedirect(provider);
+                        } catch (redirectError) {
+                            console.error('❌ Google sign-in redirect error:', redirectError);
+                            let errorMessage = 'Google sign-in failed';
+                            if (redirectError.code === 'auth/account-exists-with-different-credential') {
+                                errorMessage = 'Account exists with different sign-in method.';
+                            } else if (redirectError.message) {
+                                errorMessage += ': ' + redirectError.message;
+                            }
+                            showError(errorMessage);
                         }
-                        
-                        showError(errorMessage);
                     }
                 });
             }
         }
-
         // User data initialization (robust schema + lastLogin merge)
         async function initializeUserData(user) {
             try {
@@ -3371,7 +3351,6 @@
                 </div>
             `).join('');
         }
-
         // Load user achievements (consolidated function)
         async function loadUserAchievements() {
             if (!OperatorUplift.currentUser) return;
@@ -3718,7 +3697,6 @@
         function viewGoal(goalId) {
             showGoalDetails(goalId);
         }
-
         function refreshProgress() {
             loadUserGoals();
             loadUserAchievements();
@@ -4375,7 +4353,6 @@
             maxTokens: 2000,
             temperature: 0.7
         };
-
         // AI Chat Interface
         function initializeAIChat() {
             const aiChatView = document.getElementById('aiChatView');
@@ -4701,7 +4678,6 @@ Keep it positive and actionable.
         async function analyzeProgressWithAI() {
             const prompt = `
 Analyze the user's progress and provide insights on:
-
 1. Progress patterns and trends
 2. Areas of success and momentum
 3. Potential obstacles or plateaus
@@ -5045,7 +5021,6 @@ Focus on actionable insights and encouragement.
         const aiStyleSheet = document.createElement('style');
         aiStyleSheet.textContent = aiStyles;
         document.head.appendChild(aiStyleSheet);
-
         // ===== PHASE 4 COMPLETION =====
         console.log('🚀 Phase 4: AI Integration Complete');
         console.log('✅ AI Chat Interface: DeepSeek AI integration for goal analysis');
@@ -5397,7 +5372,6 @@ Focus on actionable insights and encouragement.
             loadGoalDetails(goalId);
             showView('goalDetails');
         }
-
         async function loadGoalDetails(goalId) {
             if (!OperatorUplift.currentUser) return;
             
@@ -5724,7 +5698,6 @@ Focus on actionable insights and encouragement.
                 importFileInput.addEventListener('change', importUserData);
             }
         }
-
         async function exportUserData() {
             if (!OperatorUplift.currentUser) return;
 
@@ -6046,7 +6019,6 @@ Focus on actionable insights and encouragement.
 
             updateAdvancedAnalyticsUI();
         }
-
         function generatePredictiveInsights() {
             advancedAnalytics.predictiveInsights = [];
 
@@ -6389,7 +6361,6 @@ Focus on actionable insights and encouragement.
             setupAdaptiveAI();
             initializeConversationMemory();
         }
-
         async function loadPersonalityProfile() {
             if (!OperatorUplift.currentUser) return;
 
@@ -6726,7 +6697,6 @@ Focus on actionable insights and encouragement.
                 auditLogging: true
             }
         };
-
         // Production Environment Setup
         function initializeProductionEnvironment() {
             console.log('🚀 Initializing Production Environment...');
@@ -7077,7 +7047,6 @@ Focus on actionable insights and encouragement.
                     trackUserAction('backup_automatic', { success: false, error: error.message });
                 }
             }
-            
             // Clean up old backups
             async function cleanupOldBackups(userId) {
                 try {
@@ -7426,7 +7395,6 @@ Focus on actionable insights and encouragement.
             if ('connection' in navigator) {
                 navigator.connection.addEventListener('change', monitorNetworkPerformance);
             }
-            
             // Initial network check
             monitorNetworkPerformance();
             

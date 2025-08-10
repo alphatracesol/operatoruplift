@@ -67,10 +67,18 @@ service cloud.firestore {
       match /settings/{docId} {
         allow read, write: if isOwner(userId);
       }
+      // AI profile (nested)
+      match /aiProfile/{docId} {
+        allow read, write: if isOwner(userId);
+      }
       match /personalityProfiles/{docId} {
         allow read, write: if isOwner(userId);
       }
+      // AI conversations (legacy and current)
       match /conversations/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /aiConversations/{docId} {
         allow read, write: if isOwner(userId);
       }
       match /gamification/{docId} {
