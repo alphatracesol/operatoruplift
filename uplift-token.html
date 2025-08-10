@@ -1131,12 +1131,13 @@
       .overlay-page { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(10,10,10,.85); opacity: 0; visibility: hidden; transition: opacity .25s ease; padding: 0 1rem; }
       .overlay-page.is-scrollable { align-items: flex-start; padding-top: 5vh; }
       .overlay-page.active { opacity: 1; visibility: visible; }
-      .modal-content-wrapper { background: rgba(24,24,27,.95); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 2rem; max-width: 760px; width: 92vw; max-height: 90vh; overflow-y: auto; transform: scale(.98); opacity: .98; transition: transform .2s ease, opacity .2s ease; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+      .modal-content-wrapper { background: rgba(24,24,27,.95); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 2.25rem; max-width: 760px; width: 92vw; max-height: 90vh; overflow-y: auto; transform: scale(.98); opacity: .98; transition: transform .2s ease, opacity .2s ease; box-shadow: 0 10px 30px rgba(0,0,0,.35); line-height: 1.7; }
       .overlay-page.active .modal-content-wrapper { transform: scale(1); opacity: 1; }
-      .modal-content-wrapper h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: .75rem; color: var(--text-color); }
-      .modal-content-wrapper h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: .5rem; color: var(--text-color); }
-      .modal-content-wrapper p, .modal-content-wrapper ul { color: var(--text-muted-color); margin-bottom: 1rem; }
+      .modal-content-wrapper h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-color); }
+      .modal-content-wrapper h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.1rem; margin-bottom: .6rem; color: var(--text-color); }
+      .modal-content-wrapper p, .modal-content-wrapper ul { color: var(--text-muted-color); margin-bottom: 1.1rem; }
       .modal-content-wrapper ul { margin-left: 1.25rem; list-style: disc; }
+      .modal-content-wrapper li { margin: .25rem 0; }
       .modal-content-wrapper a { color: var(--accent-hover); text-decoration: underline; }
       .modal-content-wrapper a:hover { color: var(--text-color); }
       .modal-content-wrapper::-webkit-scrollbar { width: 8px; }
@@ -1145,7 +1146,7 @@
       .modal-content-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
       .close-overlay-btn { position:absolute; top: 1rem; right: 1rem; background:none; border:none; color: #cbd5e1; font-size: 2rem; cursor: pointer; padding: .25rem .5rem; border-radius: 8px; }
       .close-overlay-btn:hover { background: rgba(255,255,255,.1); color: var(--text-color); }
-      @media (max-width: 768px) { .overlay-page { padding: 1rem .5rem; } .modal-content-wrapper { padding: 1.25rem; margin: 0 .25rem; } .close-overlay-btn { top: .5rem; right: .75rem; } }
+      @media (max-width: 768px) { .overlay-page { padding: 1rem .5rem; } .modal-content-wrapper { padding: 1.5rem; margin: 0 .25rem; } .close-overlay-btn { top: .5rem; right: .75rem; } }
     </style>
 
     <script>
@@ -1326,7 +1327,13 @@
                   percent: 1.5,
                   currentSupply: 984922016.665317129,
                   lastBurnAgo: '2 hrs ago',
-                  lastTxSig: '3Hhj2Rhk8nUVwWaf8J7niQuvLrKa2uN5MVZXKZwbX4khkuBYNtDfgrGS43Rgc5HMmg5XsRJexfMDF1h4S6jtoJFS'
+                  lastTxSig: '3Hhj2Rhk8nUVwWaf8J7niQuvLrKa2uN5MVZXKZwbX4khkuBYNtDfgrGS43Rgc5HMmg5XsRJexfMDF1h4S6jtoJFS',
+                  extraTxs: [
+                    { sig: '23BWox9SRvg212v2Wg96DZfNJ9kXuyae9DwxKKxbzwnsXXpAMBj2ovde1cp1adBNBx7kpMHqHzDhULD6v5LDaCPw', ago: '9 hrs ago' },
+                    { sig: '256H5QiSiVRvchZPjW3iBcqdQFm3vkgKhN4PF3QfNbBxMAjPCnkAbRpSAkGwakM2g8ufnBqNZwPqGhFeGuJK9Dyb', ago: '1 day ago' },
+                    { sig: '2nkY8vTP9FSMKdKoFKUa6TaEESQaovNJ93HR55sP16rh6X48P8P9wmqXgU5A7jE5VY1tYGutZrP22pmjvsMnQWYD', ago: '1 day ago' },
+                    { sig: '3XDkUjvXGb1nDtRtZJ1APn9P9iyaEbxfjvR7k7HkJYRCaMNzB9bvBQmzCqgBbuDVQ1hZmx6i2F95JLX1MwZPqSKK', ago: '2 days ago' }
+                  ]
                 }
             };
             const elSupply = document.getElementById('burn-current-supply');
@@ -1406,12 +1413,16 @@
                     if (elLast && CONFIG.fallback?.lastBurnAgo) {
                         elLast.textContent = CONFIG.fallback.lastBurnAgo;
                     }
-                    if (elList && CONFIG.fallback?.lastTxSig) {
+                    if (elList) {
                         elList.innerHTML = '';
-                        const sig = CONFIG.fallback.lastTxSig;
-                        const li = document.createElement('li');
-                        li.innerHTML = `<a href="https://solscan.io/tx/${sig}" target="_blank" rel="noopener">${sig.slice(0,8)}…${sig.slice(-6)}</a> <span class="muted">${CONFIG.fallback.lastBurnAgo}</span>`;
-                        elList.appendChild(li);
+                        const entries = [];
+                        if (CONFIG.fallback?.lastTxSig) entries.push({ sig: CONFIG.fallback.lastTxSig, ago: CONFIG.fallback.lastBurnAgo||'' });
+                        (CONFIG.fallback?.extraTxs||[]).forEach(x=> entries.push(x));
+                        entries.slice(0, CONFIG.txCount).forEach(x=>{
+                            const li = document.createElement('li');
+                            li.innerHTML = `<a href="https://solscan.io/tx/${x.sig}" target="_blank" rel="noopener">${x.sig.slice(0,8)}…${x.sig.slice(-6)}</a> <span class="muted">${x.ago||''}</span>`;
+                            elList.appendChild(li);
+                        });
                     }
                 }
             }
