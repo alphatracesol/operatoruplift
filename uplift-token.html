@@ -431,6 +431,10 @@
         .badge.treasury { border-color: rgba(16,185,129,.35); color:#86efac; }
         .badge.gov { border-color: rgba(234,179,8,.35); color:#fde68a; }
 
+        /* Fire orb animation next to Last Burn */
+        .fire-orb { position:absolute; right:10px; top:10px; width:22px; height:22px; border-radius:50%; background: conic-gradient(from 0deg, #ff7a18, #ff3d00, #ffb703, #ff7a18); box-shadow: 0 0 14px rgba(255,95,0,.6), 0 0 26px rgba(255,140,0,.35); animation: orb-spin .8s linear infinite; }
+        @keyframes orb-spin { to { transform: rotate(360deg); } }
+
         /* Footer heart beat */
         @keyframes heart-beat { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.12); } 40% { transform: scale(0.98); } 60% { transform: scale(1.08); } 80% { transform: scale(0.99); } }
         .heartbeat { display:inline-block; animation: heart-beat 1.6s ease-in-out infinite; transform-origin:center; }
@@ -830,6 +834,7 @@
                     <div class="value" id="burn-last-time">—</div>
                     <div class="label">Last Burn</div>
                     <div class="embers"></div>
+                    <div class="fire-orb" aria-hidden="true"></div>
                 </div>
                 <div class="card reveal" style="display:flex; flex-direction:column; gap:.5rem; position:relative; overflow:hidden; box-shadow:0 0 20px rgba(239,68,68,.35) inset, 0 0 25px rgba(239,68,68,.2); border-color: rgba(239,68,68,.45);">
                     <div class="row" style="justify-content:space-between; align-items:center;">
