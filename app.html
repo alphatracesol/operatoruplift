@@ -364,6 +364,9 @@
             50% { transform: scale(1.1); opacity: 0.8; }
         }
 
+        /* Ensure header auth cube uses the same animation as loaders */
+        @keyframes cube-spin { from { transform: rotateX(0deg) rotateY(0deg); } to { transform: rotateX(360deg) rotateY(360deg); } }
+
         /* Main container */
         .app-container {
             min-height: 100vh;
