@@ -4017,8 +4017,9 @@
                 ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
                     document.addEventListener(evt, unmute, listenerOpts));
                 window.addEventListener('scroll', unmute, true);
-                window.addEventListener('focus', tryPlay, true);
-                document.addEventListener('visibilitychange', tryPlay, true);
+            window.addEventListener('focus', tryPlay, true);
+            document.addEventListener('visibilitychange', tryPlay, true);
+            document.addEventListener('resume-audio', tryPlay, true);
             }
             // --- Loading Screen ---
             // Hide loading screen only after interactive features bind

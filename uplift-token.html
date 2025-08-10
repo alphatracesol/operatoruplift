@@ -119,10 +119,13 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
             align-items: center;
         }
+        .nav-container .logo { grid-column: 1; }
+        .nav-container .nav-links { grid-column: 3; justify-self: start; }
 
         .logo {
             display: flex;
@@ -376,7 +379,7 @@
         .muted { color: var(--text-muted); }
 
         /* Visuals */
-        .viz-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+        .viz-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:1rem; align-items:stretch; }
         .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; margin: .25rem auto 0; background: conic-gradient(var(--accent-color) 0 50%, #ffffff 0 100%); box-shadow: 0 0 25px rgba(255,165,0,.25) inset; }
         .donut::after { content: ''; position: absolute; inset: 22px; background: var(--bg-color); border-radius: 50%; }
         @keyframes donut-in { from { transform: scale(.9) rotate(-20deg); opacity:0; } to { transform: scale(1) rotate(0deg); opacity:1; } }
