@@ -1720,6 +1720,81 @@
                     </div>
                 </div>
 
+                <!-- Stats Grid (Essence, Energy, Chapter, Streak) -->
+                <div class="dashboard-grid" id="statsGrid">
+                    <div class="dashboard-card stat-card">
+                        <div class="value" id="essenceValue">0</div>
+                        <div class="label">💰 Essence</div>
+                        <div class="stat-trend" id="essenceTrend">+0 today</div>
+                    </div>
+                    <div class="dashboard-card stat-card">
+                        <div class="value" id="energyValue">100</div>
+                        <div class="label">⚡ Energy</div>
+                        <div class="stat-trend" id="energyTrend">Regenerating</div>
+                    </div>
+                    <div class="dashboard-card stat-card">
+                        <div class="value" id="chapterValue">1</div>
+                        <div class="label">⭐ Chapter</div>
+                        <div class="stat-trend" id="chapterTrend">0 XP to next</div>
+                    </div>
+                    <div class="dashboard-card stat-card">
+                        <div class="value" id="streakValue">🔥 0</div>
+                        <div class="label">Daily Streak</div>
+                        <div class="stat-trend" id="streakTrend">Keep it up!</div>
+                    </div>
+                </div>
+
+                <!-- Progress Bars (Chapter + Energy) -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Chapter Progress</h3></div>
+                        <div class="card-body">
+                            <div class="progress-text"><span id="chapterProgressText">0/100 XP</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="chapterProgressBar" style="width:0%"></div></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Energy Level</h3></div>
+                        <div class="card-body">
+                            <div class="progress-text"><span id="energyLevelText">100 / 100</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="energyProgressBar" style="width:100%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Activity + Operator Profile -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Weekly Activity</h3></div>
+                        <div class="card-body">
+                            <div id="weeklyActivityBars" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; align-items:end; height:120px;"></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Operator Profile</h3></div>
+                        <div class="card-body" id="characterStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;"></div>
+                    </div>
+                </div>
+
+                <!-- Treasure Chest + Share Progress -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" id="treasureChestCard">
+                        <div class="card-header"><h3>Treasure Chest</h3></div>
+                        <div class="card-body" style="display:flex; align-items:center; gap:12px;">
+                            <div id="chestIcon" style="font-size:32px;">🎁</div>
+                            <div>
+                                <div id="chestProgressText" class="text-muted">Complete tasks to unlock</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Share Your Progress</h3></div>
+                        <div class="card-body" style="display:flex; gap:10px;">
+                            <button id="shareProgressBtn" class="btn-secondary" style="flex:1;">🔗 Copy Summary</button>
+                            <button id="shareXBtn" class="btn-secondary" style="flex:1;">🕊️ Share on X</button>
+                        </div>
+                    </div>
+                </div>
                 <!-- Recent Goals Card -->
                 <div class="dashboard-card goals-card">
                     <div class="card-header">
@@ -3295,6 +3370,10 @@
                 
                 // Update progress
                 updateProgressStats();
+                // Update stats grid and weekly activity
+                updateStatsGrid();
+                renderWeeklyActivity();
+                renderCharacterStats();
             }
         }
 
@@ -3331,6 +3410,43 @@
             if (levelProgressTextElement) {
                 levelProgressTextElement.textContent = `${currentXP}/${xpForNextLevel} XP`;
             }
+            // Mirror values into chapter progress card
+            const chapterText = document.getElementById('chapterProgressText');
+            const chapterBar = document.getElementById('chapterProgressBar');
+            if (chapterText) chapterText.textContent = `${currentXP}/${xpForNextLevel} XP`;
+            if (chapterBar) chapterBar.style.width = progressPercent + '%';
+        }
+
+        function updateStatsGrid() {
+            const stats = OperatorUplift.userData?.stats || {};
+            const essenceEl = document.getElementById('essenceValue'); if (essenceEl) essenceEl.textContent = stats.points ?? 0;
+            const energyEl = document.getElementById('energyValue'); if (energyEl) energyEl.textContent = 100;
+            const chapterEl = document.getElementById('chapterValue'); if (chapterEl) chapterEl.textContent = OperatorUplift.userData?.level || 1;
+            const streakEl = document.getElementById('streakValue'); if (streakEl) streakEl.textContent = `🔥 ${stats.currentStreak||0}`;
+            const energyTxt = document.getElementById('energyLevelText'); if (energyTxt) energyTxt.textContent = '100 / 100';
+            const energyBar = document.getElementById('energyProgressBar'); if (energyBar) energyBar.style.width = '100%';
+        }
+
+        function renderWeeklyActivity() {
+            const container = document.getElementById('weeklyActivityBars');
+            if (!container) return;
+            const days = ['S','M','T','W','T','F','S'];
+            container.innerHTML = days.map((d,i)=>{
+                const h = Math.floor(Math.random()*100); // placeholder until analytics
+                return `<div title="${d}" style="height:${h}%; background: var(--accent-color); border-radius:6px;"></div>`;
+            }).join('');
+        }
+
+        function renderCharacterStats() {
+            const grid = document.getElementById('characterStatsGrid');
+            if (!grid) return;
+            const items = [
+                { label: 'Focus', value: 'High' },
+                { label: 'Clarity', value: 'Rising' },
+                { label: 'Momentum', value: `${OperatorUplift.userData?.stats?.currentStreak||0} day streak` },
+                { label: 'Chapter', value: `${OperatorUplift.userData?.level||1}` }
+            ];
+            grid.innerHTML = items.map(it=>`<div style="background: var(--glass-bg); border:1px solid var(--border-glass); border-radius:10px; padding:12px;"><div class="text-muted">${it.label}</div><div style="font-weight:700;">${it.value}</div></div>`).join('');
         }
 
         // Load user goals from Firestore
@@ -3811,6 +3927,22 @@
             } catch (e) {
                 console.error('Goal delete failed:', e);
                 OperatorUplift.ui?.showToast?.('Failed to delete goal', 'error');
+            }
+            // Share progress handlers
+            const copyBtn = document.getElementById('shareProgressBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    const data = OperatorUplift.userData?.stats || {};
+                    const summary = `Essence: ${data.points||0}, Level: ${data.level||1}, Completed Goals: ${data.completedGoals||0}`;
+                    try { await navigator.clipboard.writeText(summary); OperatorUplift.ui?.showToast?.('Copied summary', 'success'); } catch {}
+                });
+            }
+            const xBtn = document.getElementById('shareXBtn');
+            if (xBtn) {
+                xBtn.addEventListener('click', () => {
+                    const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Making progress with Operator Uplift. #goals #focus');
+                    window.open(url, '_blank', 'noopener');
+                });
             }
         }
 
