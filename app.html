@@ -1801,6 +1801,40 @@
                     </form>
                 </div>
             </div>
+            <!-- Onboarding Modal -->
+            <div id="onboardingModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Welcome to Operator Uplift</h2>
+                        <button class="btn-icon" onclick="closeOnboarding()">✖</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Let's personalize your experience. Answer two quick questions.</p>
+                        <div class="form-group">
+                            <label>Your primary focus right now?</label>
+                            <select id="onbFocus">
+                                <option value="productivity">Productivity</option>
+                                <option value="fitness">Fitness</option>
+                                <option value="learning">Learning</option>
+                                <option value="finance">Finance</option>
+                                <option value="career">Career</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred pacing</label>
+                            <select id="onbPace">
+                                <option value="fast">Fast (short sprints)</option>
+                                <option value="balanced">Balanced</option>
+                                <option value="deep">Deep (longer cycles)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeOnboarding()">Skip</button>
+                        <button class="btn-primary" onclick="completeOnboarding()">Continue</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Edit Goal Modal -->
             <div id="editGoalModal" class="modal">
@@ -2990,6 +3024,7 @@
                     stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0, aiCredits: 50 },
                     settings: { theme: 'dark', colorScheme: 'Firewall Flare', notifications: true },
                     achievements: [],
+                    onboardingCompleted: false,
                 };
 
                 if (snap.exists) {
@@ -2998,6 +3033,7 @@
                     const data = { ...baseDefaults, ...snap.data() };
                     if (!data.stats) data.stats = baseDefaults.stats;
                     if (data.stats.aiCredits == null) data.stats.aiCredits = 50;
+                    if (typeof data.onboardingCompleted !== 'boolean') data.onboardingCompleted = false;
                     OperatorUplift.userData = data;
                     console.log('📊 User data loaded:', data);
                 } else {
@@ -3172,6 +3208,7 @@
             loadUserGoals();
             loadUserAchievements();
             setupDashboardEventListeners();
+            maybeShowOnboarding();
         }
 
         // Update dashboard UI with user data
@@ -3875,6 +3912,34 @@
             }
         }
         function renderShop() { /* placeholder */ }
+
+        // ===== Onboarding =====
+        function maybeShowOnboarding() {
+            if (!OperatorUplift.userData || OperatorUplift.userData.onboardingCompleted) return;
+            const modal = document.getElementById('onboardingModal');
+            if (modal) modal.classList.add('active');
+        }
+        function closeOnboarding() {
+            const modal = document.getElementById('onboardingModal');
+            if (modal) modal.classList.remove('active');
+        }
+        async function completeOnboarding() {
+            try {
+                const focus = document.getElementById('onbFocus').value;
+                const pace = document.getElementById('onbPace').value;
+                // Persist onboarding preferences
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).set({
+                    onboardingCompleted: true,
+                    preferences: { focus, pace }
+                }, { merge: true });
+                OperatorUplift.userData.onboardingCompleted = true;
+                closeOnboarding();
+                OperatorUplift.ui?.showToast?.('Preferences saved', 'success');
+            } catch (e) {
+                console.error('Onboarding save failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to save preferences', 'error');
+            }
+        }
 
         // ===== JOURNEYS (AI Planner - lightweight local generator) =====
         function setupJourneys() {
