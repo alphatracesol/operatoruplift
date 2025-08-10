@@ -1589,6 +1589,11 @@
             <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏆</a>
             <a href="#" data-view="habits" class="nav-link" title="Habits" aria-label="Habits" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">✅</a>
             <a href="#" data-view="focus" class="nav-link" title="Focus" aria-label="Focus" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">⏱️</a>
+            <a href="#" data-view="analytics" class="nav-link" title="Analytics" aria-label="Analytics" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📈</a>
+            <a href="#" data-view="calendar" class="nav-link" title="Calendar" aria-label="Calendar" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📅</a>
+            <a href="#" data-view="community" class="nav-link" title="Community" aria-label="Community" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">👥</a>
+            <a href="#" data-view="finance" class="nav-link" title="Finance" aria-label="Finance" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">💰</a>
+            <a href="#" data-view="shop" class="nav-link" title="Shop" aria-label="Shop" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🛒</a>
         </aside>
 
         <!-- In-app loading overlay -->
@@ -1958,6 +1963,68 @@
                         <p class="text-muted">Signed in as: <span id="settingsUserEmail"></span></p>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analyticsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Analytics</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Weekly Summary</h3></div>
+                    <div class="card-body" id="analyticsWeeklySummary">No data yet</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Top Categories</h3></div>
+                    <div class="card-body" id="analyticsTopCategories">No data yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendarView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Calendar</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-body" id="calendarContainer">Upcoming: None</div>
+            </div>
+        </div>
+
+        <!-- Community View -->
+        <div id="communityView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Community</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-body">Community feed coming soon.</div>
+            </div>
+        </div>
+
+        <!-- Finance View -->
+        <div id="financeView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Finance</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-body" id="financeSummary">No transactions yet.</div>
+            </div>
+        </div>
+
+        <!-- Shop View -->
+        <div id="shopView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Shop</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-body">Operator Uplift Shop coming soon.</div>
             </div>
         </div>
     </div>
@@ -3304,6 +3371,16 @@
                 } else if (view === 'focus') {
                     initializeFocusControls();
                     renderFocusSessions();
+                } else if (view === 'analytics') {
+                    renderAnalytics();
+                } else if (view === 'calendar') {
+                    renderCalendar();
+                } else if (view === 'community') {
+                    renderCommunity();
+                } else if (view === 'finance') {
+                    renderFinance();
+                } else if (view === 'shop') {
+                    renderShop();
                 }
             });
             // Hide sidebar on initial auth view
@@ -3318,8 +3395,8 @@
         }
 
         function showAnalytics() {
-            // Will be implemented in later phases
-            showSuccess('Analytics coming soon!');
+            showView('analytics');
+            renderAnalytics();
         }
 
         function showSettings() {
@@ -3344,8 +3421,7 @@
         }
 
         function viewGoal(goalId) {
-            // Will be implemented in later phases
-            showSuccess('Goal details coming soon!');
+            showGoalDetails(goalId);
         }
 
         function refreshProgress() {
@@ -3353,6 +3429,36 @@
             loadUserAchievements();
             showSuccess('Progress refreshed!');
         }
+
+        // Lightweight renderers for new views
+        function renderAnalytics() {
+            const target = document.getElementById('analyticsWeeklySummary');
+            const top = document.getElementById('analyticsTopCategories');
+            if (!target || !top) return;
+            const goals = dashboardData.goals || [];
+            const completed = goals.filter(g => g.status === 'completed').length;
+            target.textContent = `Goals completed this week: ${completed}`;
+            const counts = new Map();
+            goals.forEach(g => counts.set(g.category || 'uncategorized', (counts.get(g.category || 'uncategorized') || 0) + 1));
+            top.textContent = counts.size ? Array.from(counts.entries()).map(([k,v]) => `${k}: ${v}`).join(', ') : 'No categories yet';
+        }
+        function renderCalendar() {
+            const c = document.getElementById('calendarContainer');
+            if (!c) return;
+            const goals = dashboardData.goals || [];
+            const upcoming = goals
+                .filter(g => g.deadline)
+                .slice(0, 5)
+                .map(g => `${g.title} — due ${formatDate(g.deadline)}`);
+            c.textContent = upcoming.length ? upcoming.join(' | ') : 'Upcoming: None';
+        }
+        function renderCommunity() { /* placeholder */ }
+        function renderFinance() {
+            const f = document.getElementById('financeSummary');
+            if (!f) return;
+            f.textContent = 'No transactions yet.';
+        }
+        function renderShop() { /* placeholder */ }
 
         // ===== HABITS =====
         async function renderHabitsList() {
