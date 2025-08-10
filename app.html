@@ -1594,6 +1594,7 @@
             <a href="#" data-view="community" class="nav-link" title="Community" aria-label="Community" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">👥</a>
             <a href="#" data-view="finance" class="nav-link" title="Finance" aria-label="Finance" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">💰</a>
             <a href="#" data-view="shop" class="nav-link" title="Shop" aria-label="Shop" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🛒</a>
+            <a href="#" data-view="achievements" class="nav-link" title="Achievements" aria-label="Achievements" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏅</a>
         </aside>
 
         <!-- In-app loading overlay -->
@@ -2025,6 +2026,18 @@
             </div>
             <div class="dashboard-card">
                 <div class="card-body">Operator Uplift Shop coming soon.</div>
+            </div>
+        </div>
+
+        <!-- Achievements View -->
+        <div id="achievementsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Achievements</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header"><h3>Your Achievements</h3></div>
+                <div class="achievements-grid" id="achievementsGridFull"></div>
             </div>
         </div>
     </div>
@@ -3381,6 +3394,8 @@
                     renderFinance();
                 } else if (view === 'shop') {
                     renderShop();
+                } else if (view === 'achievements') {
+                    renderAchievementsView();
                 }
             });
             // Hide sidebar on initial auth view
@@ -3411,8 +3426,8 @@
         }
 
         function showAllAchievements() {
-            // Will be implemented in later phases
-            showSuccess('All achievements view coming soon!');
+            showView('achievements');
+            renderAchievementsView();
         }
 
         function showUserMenu() {
@@ -4887,6 +4902,26 @@ Focus on actionable insights and encouragement.
                     </div>
                 `;
                 achievementsContainer.appendChild(achievementElement);
+            });
+        }
+
+        function renderAchievementsView() {
+            const container = document.getElementById('achievementsGridFull');
+            if (!container) return;
+            container.innerHTML = '';
+            achievements.forEach(achievement => {
+                const isUnlocked = userAchievements.some(ua => ua.achievementId === achievement.id);
+                const el = document.createElement('div');
+                el.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+                el.innerHTML = `
+                    <div class="achievement-icon">${isUnlocked ? achievement.icon : '🔒'}</div>
+                    <div class="achievement-content">
+                        <h3 class="achievement-title">${achievement.title}</h3>
+                        <p class="achievement-description">${achievement.description}</p>
+                        ${isUnlocked ? `<span class="achievement-date">Unlocked: ${achievement.unlockedAt}</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(el);
             });
         }
 
