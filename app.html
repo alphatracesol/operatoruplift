@@ -1587,6 +1587,8 @@
         <aside id="appSidebar" class="app-sidebar" style="position:fixed;left:0;top:0;height:100dvh;width:64px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:flex-start;padding:16px 8px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
             <a href="#" data-view="dashboard" class="nav-link active" title="Dashboard" aria-label="Dashboard" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📊</a>
             <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏆</a>
+            <a href="#" data-view="habits" class="nav-link" title="Habits" aria-label="Habits" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">✅</a>
+            <a href="#" data-view="focus" class="nav-link" title="Focus" aria-label="Focus" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">⏱️</a>
         </aside>
 
         <!-- In-app loading overlay -->
@@ -1817,6 +1819,77 @@
         <!-- AI Chat View -->
         <div id="aiChatView" class="view-container">
             <!-- AI Chat content will be added in next chunk -->
+        </div>
+
+        <!-- Habits View -->
+        <div id="habitsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h2>Habits</h2>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" onclick="showAddHabitModal()">+ New Habit</button>
+                </div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Your Habits</h3></div>
+                    <div id="habitsList" class="list"></div>
+                </div>
+            </div>
+            <!-- Add Habit Modal -->
+            <div id="addHabitModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Create Habit</h2>
+                        <button class="btn-icon" onclick="closeAddHabitModal()">✖</button>
+                    </div>
+                    <form id="addHabitForm">
+                        <div class="form-group">
+                            <label for="habitName">Habit Name</label>
+                            <input type="text" id="habitName" required placeholder="e.g., Read 20 minutes">
+                        </div>
+                        <div class="form-group">
+                            <label for="habitFrequency">Frequency</label>
+                            <select id="habitFrequency" required>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-secondary" onclick="closeAddHabitModal()">Cancel</button>
+                            <button type="submit" class="btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Focus View -->
+        <div id="focusView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h2>Focus</h2>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Session</h3></div>
+                    <div class="card-body" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                        <div id="focusTimer" style="font-size:32px;font-weight:700;">00:00</div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn-primary" id="focusStartBtn">Start</button>
+                            <button class="btn-secondary" id="focusPauseBtn">Pause</button>
+                            <button class="btn-secondary" id="focusResetBtn">Reset</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Recent Sessions</h3></div>
+                    <div id="focusSessionsList" class="list"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Goal Details View -->
@@ -3224,6 +3297,14 @@
                 e.preventDefault();
                 const view = link.getAttribute('data-view');
                 showView(view);
+                if (view === 'goals') {
+                    renderGoalsViewList();
+                } else if (view === 'habits') {
+                    renderHabitsList();
+                } else if (view === 'focus') {
+                    initializeFocusControls();
+                    renderFocusSessions();
+                }
             });
             // Hide sidebar on initial auth view
             if (OperatorUplift.currentView === 'auth') {
@@ -3271,6 +3352,182 @@
             loadUserGoals();
             loadUserAchievements();
             showSuccess('Progress refreshed!');
+        }
+
+        // ===== HABITS =====
+        async function renderHabitsList() {
+            if (!OperatorUplift.currentUser) return;
+            const container = document.getElementById('habitsList');
+            if (!container) return;
+            OperatorUplift.ui?.showOverlay?.('Loading habits...');
+            try {
+                const snap = await db.collection('users')
+                    .doc(OperatorUplift.currentUser.uid)
+                    .collection('habits')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                const habits = [];
+                snap.forEach(doc => habits.push({ id: doc.id, ...doc.data() }));
+                if (!habits.length) {
+                    container.innerHTML = '<div class="empty-state"><p>No habits yet</p></div>';
+                } else {
+                    container.innerHTML = habits.map(h => `
+                        <div class="list-item">
+                            <div>
+                                <div style="font-weight:600;">${h.name}</div>
+                                <div class="text-muted">${h.frequency || 'daily'}</div>
+                            </div>
+                            <div>
+                                <button class="btn-secondary" onclick="markHabitToday('${h.id}')">Did it today</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('❌ Habits load failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to load habits', 'error');
+            } finally {
+                OperatorUplift.ui?.hideOverlay?.();
+            }
+        }
+
+        function showAddHabitModal() {
+            document.getElementById('addHabitModal').classList.add('active');
+        }
+        function closeAddHabitModal() {
+            document.getElementById('addHabitModal').classList.remove('active');
+            const f = document.getElementById('addHabitForm');
+            if (f) f.reset();
+        }
+        (function setupHabitForm(){
+            const form = document.getElementById('addHabitForm');
+            if (!form) return;
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!OperatorUplift.currentUser) return;
+                const name = document.getElementById('habitName').value.trim();
+                const frequency = document.getElementById('habitFrequency').value;
+                if (!name) return;
+                try {
+                    await db.collection('users')
+                        .doc(OperatorUplift.currentUser.uid)
+                        .collection('habits')
+                        .add({
+                            name,
+                            frequency,
+                            streak: 0,
+                            lastDone: null,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    closeAddHabitModal();
+                    OperatorUplift.ui?.showToast?.('Habit created', 'success');
+                    renderHabitsList();
+                } catch (e) {
+                    console.error('Habit create failed:', e);
+                    OperatorUplift.ui?.showToast?.('Failed to create habit', 'error');
+                }
+            });
+        })();
+        async function markHabitToday(habitId) {
+            if (!OperatorUplift.currentUser) return;
+            try {
+                const ref = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('habits').doc(habitId);
+                const snap = await ref.get();
+                let streak = Number(snap.data()?.streak || 0) + 1;
+                await ref.set({
+                    lastDone: firebase.firestore.FieldValue.serverTimestamp(),
+                    streak,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                OperatorUplift.ui?.showToast?.('Nice! Habit logged', 'success');
+                renderHabitsList();
+            } catch (e) {
+                console.error('Habit mark failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to mark habit', 'error');
+            }
+        }
+
+        // ===== FOCUS SESSIONS =====
+        let focusInterval = null;
+        let focusSeconds = 0;
+        function initializeFocusControls() {
+            const start = document.getElementById('focusStartBtn');
+            const pause = document.getElementById('focusPauseBtn');
+            const reset = document.getElementById('focusResetBtn');
+            if (!start || !pause || !reset) return;
+            start.onclick = startFocus;
+            pause.onclick = pauseFocus;
+            reset.onclick = resetFocus;
+            updateFocusTimer();
+        }
+        function updateFocusTimer() {
+            const t = document.getElementById('focusTimer');
+            if (!t) return;
+            const m = String(Math.floor(focusSeconds / 60)).padStart(2, '0');
+            const s = String(focusSeconds % 60).padStart(2, '0');
+            t.textContent = `${m}:${s}`;
+        }
+        function startFocus() {
+            if (focusInterval) return;
+            focusInterval = setInterval(() => {
+                focusSeconds += 1;
+                updateFocusTimer();
+            }, 1000);
+        }
+        function pauseFocus() {
+            if (!focusInterval) return;
+            clearInterval(focusInterval);
+            focusInterval = null;
+            saveFocusSessionPart();
+        }
+        function resetFocus() {
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+            if (focusSeconds > 0) saveFocusSessionPart(true);
+            focusSeconds = 0;
+            updateFocusTimer();
+        }
+        async function saveFocusSessionPart(final = false) {
+            try {
+                if (!OperatorUplift.currentUser || focusSeconds <= 0) return;
+                await db.collection('users')
+                    .doc(OperatorUplift.currentUser.uid)
+                    .collection('focusSessions')
+                    .add({ duration: focusSeconds, startTime: new Date(), final });
+                renderFocusSessions();
+            } catch (e) {
+                console.error('Focus save failed:', e);
+            }
+        }
+        async function renderFocusSessions() {
+            if (!OperatorUplift.currentUser) return;
+            const list = document.getElementById('focusSessionsList');
+            if (!list) return;
+            try {
+                const snap = await db.collection('users')
+                    .doc(OperatorUplift.currentUser.uid)
+                    .collection('focusSessions')
+                    .orderBy('startTime', 'desc')
+                    .limit(10)
+                    .get();
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                if (!items.length) {
+                    list.innerHTML = '<div class="empty-state"><p>No sessions yet</p></div>';
+                    return;
+                }
+                list.innerHTML = items.map(s => `
+                    <div class="list-item">
+                        <div>${new Date(s.startTime?.toDate ? s.startTime.toDate() : s.startTime).toLocaleString()}</div>
+                        <div>${Math.floor((s.duration||0)/60)}m ${(s.duration||0)%60}s</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Focus list failed:', e);
+            }
         }
 
         // Utility functions
