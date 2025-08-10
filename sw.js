@@ -110,8 +110,11 @@ self.addEventListener('fetch', (event) => {
         
         // Always explicitly handle cross-origin requests to avoid no-op warnings
         const requestUrl = new URL(event.request.url);
-        // If we are not handling the request (e.g., navigation to external origin), do nothing
-        if (requestUrl.origin !== self.location.origin) return;
+        // If request is cross-origin, explicitly proxy through network to avoid no-op
+        if (requestUrl.origin !== self.location.origin) {
+            event.respondWith(fetch(event.request));
+            return;
+        }
         
         const url = requestUrl;
         const strategy = getCacheStrategy(url);
