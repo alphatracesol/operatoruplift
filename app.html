@@ -2265,10 +2265,12 @@
                         if (audio) {
                             audio.volume = 0.03;
                             audio.loop = true;
+                            audio.muted = true;
+                            const unmute = () => { audio.muted = false; audio.play().catch(()=>{}); };
                             const tryPlay = () => audio.play().catch(() => {});
                             tryPlay();
-                            const once = () => { tryPlay(); document.removeEventListener('click', once, { capture: true }); };
-                            document.addEventListener('click', once, { capture: true, once: true });
+                            document.addEventListener('click', unmute, { capture: true, once: true });
+                            document.addEventListener('touchstart', unmute, { capture: true, once: true });
                         }
                     } catch {}
                     console.log('🎯 Foundation initialization complete');

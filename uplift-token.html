@@ -1327,10 +1327,13 @@
             const tokenAudio = document.getElementById('uplift-audio');
             if (tokenAudio) {
                 tokenAudio.volume = 0.03;
+                tokenAudio.loop = true;
+                tokenAudio.muted = true;
+                const unlock = () => { tokenAudio.muted = false; tokenAudio.play().catch(()=>{}); };
                 const tryPlay = () => tokenAudio.play().catch(()=>{});
                 tryPlay();
-                document.addEventListener('click', tryPlay, { once: true, capture: true });
-                document.addEventListener('touchstart', tryPlay, { once: true, capture: true });
+                document.addEventListener('click', unlock, { once: true, capture: true });
+                document.addEventListener('touchstart', unlock, { once: true, capture: true });
             }
  
             // --- Live Burn Counter (hourly refresh) ---

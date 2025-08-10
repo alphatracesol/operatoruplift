@@ -4001,10 +4001,13 @@
             const indexAudio = document.getElementById('index-audio');
             if (indexAudio) {
                 indexAudio.volume = 0.03;
+                indexAudio.loop = true;
+                indexAudio.muted = true;
+                const unmute = () => { indexAudio.muted = false; indexAudio.play().catch(()=>{}); };
                 const tryPlay = () => indexAudio.play().catch(()=>{});
                 tryPlay();
-                document.addEventListener('click', tryPlay, { once: true, capture: true });
-                document.addEventListener('touchstart', tryPlay, { once: true, capture: true });
+                document.addEventListener('click', unmute, { once: true, capture: true });
+                document.addEventListener('touchstart', unmute, { once: true, capture: true });
             }
             // --- Loading Screen ---
             // Hide loading screen only after interactive features bind
