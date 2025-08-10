@@ -213,8 +213,8 @@ async function networkFirst(request) {
     
     try {
         const networkResponse = await fetch(request);
-        // Triple-check method before caching
-        if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
+        // Do not cache partial (206) or non-OK responses
+        if (networkResponse.ok && networkResponse.status !== 206 && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
             cache.put(request, networkResponse.clone());
         }
         return networkResponse;
@@ -309,6 +309,10 @@ function getCacheStrategy(url) {
         url.pathname.includes('.svg') ||
         url.pathname.includes('.webp')) {
         return 'stale-while-revalidate';
+    }
+    // Audio
+    if (url.pathname.includes('.mp3') || url.pathname.includes('.wav') || url.pathname.includes('.ogg')) {
+        return 'network-only';
     }
     
     // API calls
