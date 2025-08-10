@@ -3984,27 +3984,36 @@
             for (let i = 13; i >= 0; i--) {
                 const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
                 const key = d.toDateString();
-                labelsProd.push(`${d.getMonth()+1}/${d.getDate()}`);
-                const count = goals.filter(g => g.status === 'completed' && (g.completedAt?.toDate ? g.completedAt.toDate().toDateString() : '') === key).length;
+                labelsProd.push(`${d.getMonth() + 1}/${d.getDate()}`);
+                const completedDate = (g) => (g.completedAt?.toDate ? g.completedAt.toDate() : null);
+                const count = goals.filter(g => g.status === 'completed' && completedDate(g)?.toDateString() === key).length;
                 dataProd.push(count);
             }
-            const prodCtx = document.getElementById('productivityChart');
-            if (prodCtx) {
-                const ctx = prodCtx.getContext('2d');
-                if (prodCtx._chart) prodCtx._chart.destroy();
-                prodCtx._chart = new Chart(ctx, { type:'bar', data:{ labels: labelsProd, datasets:[{ label:'Completions', data:dataProd, backgroundColor:'rgba(249,115,22,0.35)'}]}, options:{ responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}}});
+            const prodEl = document.getElementById('productivityChart');
+            if (prodEl) {
+                const ctx = prodEl.getContext('2d');
+                if (prodEl._chart) prodEl._chart.destroy();
+                prodEl._chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: labelsProd, datasets: [{ label: 'Completions', data: dataProd, backgroundColor: 'rgba(249,115,22,0.35)' }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
             }
 
             // Category Distribution
             const categoryCounts = {};
-            goals.forEach(g => { const c = g.category || 'uncategorized'; categoryCounts[c] = (categoryCounts[c]||0)+1; });
+            goals.forEach(g => { const c = g.category || 'uncategorized'; categoryCounts[c] = (categoryCounts[c] || 0) + 1; });
             const catLabels = Object.keys(categoryCounts);
             const catData = Object.values(categoryCounts);
-            const catCtx = document.getElementById('categoryChart');
-            if (catCtx) {
-                const ctx = catCtx.getContext('2d');
-                if (catCtx._chart) catCtx._chart.destroy();
-                catCtx._chart = new Chart(ctx, { type:'doughnut', data:{ labels:catLabels, datasets:[{ data:catData, backgroundColor:['#f97316','#10b981','#3b82f6','#f59e0b','#ef4444','#a855f7','#22d3ee'] }] }, options:{ responsive:true, plugins:{ legend:{ position:'bottom' }}}});
+            const catEl = document.getElementById('categoryChart');
+            if (catEl) {
+                const ctx = catEl.getContext('2d');
+                if (catEl._chart) catEl._chart.destroy();
+                catEl._chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#f97316', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#22d3ee'] }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
             }
 
             // Task Velocity (goals created per day, last 14 days)
@@ -4012,22 +4021,27 @@
             for (let i = 13; i >= 0; i--) {
                 const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
                 const key = d.toDateString();
-                const count = goals.filter(g => (g.createdAt?.toDate ? g.createdAt.toDate().toDateString() : '') === key).length;
+                const createdDate = (g) => (g.createdAt?.toDate ? g.createdAt.toDate() : null);
+                const count = goals.filter(g => createdDate(g)?.toDateString() === key).length;
                 dataVel.push(count);
             }
-            const velCtx = document.getElementById('velocityChart');
-            if (velCtx) {
-                const ctx = velCtx.getContext('2d');
-                if (velCtx._chart) velCtx._chart.destroy();
-                velCtx._chart = new Chart(ctx, { type:'line', data:{ labels:labelsProd, datasets:[{ label:'Created', data:dataVel, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.25)', fill:true, tension:0.3 }]}, options:{ responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}}});
+            const velEl = document.getElementById('velocityChart');
+            if (velEl) {
+                const ctx = velEl.getContext('2d');
+                if (velEl._chart) velEl._chart.destroy();
+                velEl._chart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: labelsProd, datasets: [{ label: 'Created', data: dataVel, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.25)', fill: true, tension: 0.3 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
             }
 
-            // Habit Tracking (completions per day last 7 days)
-            const habitCtx = document.getElementById('habitChart');
-            if (habitCtx) {
-                const ctx = habitCtx.getContext('2d');
-                if (habitCtx._chart) habitCtx._chart.destroy();
-                const labelsHabit = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            // Habit Tracking (completions per weekday)
+            const habitEl = document.getElementById('habitChart');
+            if (habitEl) {
+                const ctx = habitEl.getContext('2d');
+                if (habitEl._chart) habitEl._chart.destroy();
+                const labelsHabit = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                 const dataHabit = new Array(7).fill(0);
                 if (OperatorUplift.currentUser) {
                     db.collection('users').doc(OperatorUplift.currentUser.uid).collection('habits').get().then(snap => {
@@ -4035,7 +4049,11 @@
                             const completed = Array.isArray(doc.data().completedOn) ? doc.data().completedOn : [];
                             completed.forEach(dStr => { const d = new Date(dStr); if (!isNaN(d)) dataHabit[d.getDay()]++; });
                         });
-                        habitCtx._chart = new Chart(ctx, { type:'bar', data:{ labels:labelsHabit, datasets:[{ label:'Habit Completions', data:dataHabit, backgroundColor:'#10b981'}]}, options:{ responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}}});
+                        habitEl._chart = new Chart(ctx, {
+                            type: 'bar',
+                            data: { labels: labelsHabit, datasets: [{ label: 'Habit Completions', data: dataHabit, backgroundColor: '#10b981' }] },
+                            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                        });
                     });
                 }
             }
