@@ -460,7 +460,13 @@
 
         @media (max-width: 1024px) { .week { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 768px) { .week { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 520px) { .week { grid-template-columns: repeat(2, 1fr); } .day { padding:.6rem; min-height:78px; } .token-info-card, .card { max-width: 100%; overflow: hidden; } }
+        @media (max-width: 520px) {
+            .week { grid-template-columns: repeat(2, 1fr); }
+            .day { padding:.6rem; min-height:78px; }
+            .token-info-card, .card { max-width: 100%; overflow: hidden; }
+            /* Center Sunday (last card) when it stands alone on the last row */
+            .week .day:last-child { grid-column: 1 / -1; justify-self: center; }
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
