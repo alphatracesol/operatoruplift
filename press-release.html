@@ -1283,12 +1283,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (particlesToggle) {
             particlesToggle.addEventListener('change', e => {
                 console.log('Particles toggle changed:', e.target.checked);
-                if (window.particlesInstance) {
-                    try {
-                        e.target.checked ? window.particlesInstance.play() : window.particlesInstance.pause();
-                    } catch (error) {
-                        console.warn('Particles toggle error:', error);
-                    }
+                const inst = window.particlesInstance || window.particlesContainer;
+                if (inst && typeof inst.play === 'function' && typeof inst.pause === 'function') {
+                    try { e.target.checked ? inst.play() : inst.pause(); } catch (error) { console.warn('Particles toggle error:', error); }
                 } else {
                     console.warn('Particles instance not found');
                 }

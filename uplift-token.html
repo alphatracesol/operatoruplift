@@ -124,8 +124,9 @@
             gap: 1rem;
             align-items: center;
         }
-        .nav-container .logo { grid-column: 1; }
-        .nav-container .nav-links { grid-column: 3; justify-self: start; }
+        .nav-container .logo { grid-column: 1; justify-self: start; }
+        .nav-container .nav-links { grid-column: 2; justify-self: center; }
+        .nav-container .cta-button { grid-column: 3; justify-self: end; }
 
         .logo {
             display: flex;
@@ -379,7 +380,13 @@
         .muted { color: var(--text-muted); }
 
         /* Visuals */
-        .viz-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:1rem; align-items:stretch; }
+        .viz-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap:1rem; align-items:stretch; }
+        /* Ensure tokenomics/roadmap can show 4 in a row on wide screens */
+        .tokenomics-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 1rem; }
+        @media (min-width: 1200px) {
+            .tokenomics-grid { grid-template-columns: repeat(4, 1fr); }
+            .roadmap { display:grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+        }
         .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; margin: .25rem auto 0; background: conic-gradient(var(--accent-color) 0 50%, #ffffff 0 100%); box-shadow: 0 0 25px rgba(255,165,0,.25) inset; }
         .donut::after { content: ''; position: absolute; inset: 22px; background: var(--bg-color); border-radius: 50%; }
         @keyframes donut-in { from { transform: scale(.9) rotate(-20deg); opacity:0; } to { transform: scale(1) rotate(0deg); opacity:1; } }
@@ -410,7 +417,7 @@
         .site-footer { margin-top: auto; }
         /* Weekly visualizer */
         .week { display:grid; grid-template-columns: repeat(7,1fr); gap:.5rem; width:100%; overflow:visible; }
-        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:.75rem; min-height:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
+        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:1rem; min-height:110px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
         .day:hover { transform: translateY(-3px); background: rgba(255,255,255,.06); border-color: var(--accent-color); box-shadow: 0 6px 20px rgba(249, 115, 22, .15); }
         .day .name { color: var(--text-muted); font-size:clamp(.75rem, 1.8vw, .95rem); font-weight:600; }
         .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid var(--border-color); background: rgba(255,255,255,.06); white-space:nowrap; }
@@ -438,7 +445,7 @@
         /* Fire orb removed in favor of centered emoji */
         .fire-orb-wrap, .fire-orb, .fire-orb-inner { display: none !important; }
         /* Centered animated fire emoji under last burn label on larger layouts */
-        .fire-emoji { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; font-size: 44px; line-height: 1; z-index: 2; filter: drop-shadow(0 0 12px rgba(255,80,20,.95)) drop-shadow(0 0 22px rgba(255,120,40,.65)); animation: flame-pulse 1.2s ease-in-out infinite; }
+        .fire-emoji { position: absolute; left: 50%; transform: translateX(-50%); bottom: clamp(4px, 2%, 14px); font-size: clamp(32px, 10vw, 56px); line-height: 1; z-index: 2; filter: drop-shadow(0 0 12px rgba(255,80,20,.95)) drop-shadow(0 0 22px rgba(255,120,40,.65)); animation: flame-pulse 1.2s ease-in-out infinite; }
         @keyframes flame-pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.08); } }
         @media (max-width: 768px) { .fire-emoji { display: none; } }
 
@@ -466,7 +473,7 @@
         @media (max-width: 768px) { .week { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 520px) {
             .week { grid-template-columns: repeat(2, 1fr); }
-            .day { padding:.6rem; min-height:78px; }
+            .day { padding:.75rem; min-height:96px; }
             .token-info-card, .card { max-width: 100%; overflow: hidden; }
             /* Center Sunday (last card) when it stands alone on the last row */
             .week .day:last-child { grid-column: 1 / -1; justify-self: center; }
@@ -591,6 +598,10 @@
 
         <!-- Particles Canvas -->
         <div id="particles"></div>
+        <div style="position:fixed; right:1rem; top:74px; z-index:1001; display:flex; align-items:center; gap:.5rem;">
+            <label for="toggle-particles-token" class="text-sm text-slate-400" style="cursor:pointer;">Particles</label>
+            <label class="toggle-switch"><input type="checkbox" id="toggle-particles-token" checked><span class="slider"></span></label>
+        </div>
 
         
 
@@ -1344,6 +1355,7 @@
             st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
             // Initialize particles (lightweight config)
+            let tokenParticlesInstance = null;
             if (window.tsParticles) {
                 tsParticles.load('particles', {
                     background: { color: { value: 'transparent' } },
@@ -1361,6 +1373,16 @@
                         modes: {}
                     },
                     detectRetina: true
+                }).then((container) => { tokenParticlesInstance = container; }).catch(()=>{});
+            }
+
+            // Token particles toggle
+            const tokenToggle = document.getElementById('toggle-particles-token');
+            if (tokenToggle) {
+                tokenToggle.addEventListener('change', (e) => {
+                    if (tokenParticlesInstance) {
+                        try { e.target.checked ? tokenParticlesInstance.play() : tokenParticlesInstance.pause(); } catch {}
+                    }
                 });
             }
 
