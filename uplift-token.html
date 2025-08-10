@@ -1348,11 +1348,22 @@
                 tokenAudio.volume = 0.03;
                 tokenAudio.loop = true;
                 tokenAudio.muted = true;
-                const unlock = () => { tokenAudio.muted = false; tokenAudio.play().catch(()=>{}); };
+                const unlock = () => { tokenAudio.muted = false; tokenAudio.play().catch(()=>{}); cleanup(); };
                 const tryPlay = () => tokenAudio.play().catch(()=>{});
+                const cleanup = () => {
+                    ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
+                        document.removeEventListener(evt, unlock, listenerOpts));
+                    window.removeEventListener('scroll', unlock, true);
+                    window.removeEventListener('focus', tryPlay, true);
+                    document.removeEventListener('visibilitychange', tryPlay, true);
+                };
+                const listenerOpts = { capture: true, once: true };
                 tryPlay();
-                document.addEventListener('click', unlock, { once: true, capture: true });
-                document.addEventListener('touchstart', unlock, { once: true, capture: true });
+                ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
+                    document.addEventListener(evt, unlock, listenerOpts));
+                window.addEventListener('scroll', unlock, true);
+                window.addEventListener('focus', tryPlay, true);
+                document.addEventListener('visibilitychange', tryPlay, true);
             }
  
             // --- Live Burn Counter (hourly refresh) ---

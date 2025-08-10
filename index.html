@@ -4003,11 +4003,22 @@
                 indexAudio.volume = 0.03;
                 indexAudio.loop = true;
                 indexAudio.muted = true;
-                const unmute = () => { indexAudio.muted = false; indexAudio.play().catch(()=>{}); };
+                const unmute = () => { indexAudio.muted = false; indexAudio.play().catch(()=>{}); cleanup(); };
                 const tryPlay = () => indexAudio.play().catch(()=>{});
+                const cleanup = () => {
+                    ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
+                        document.removeEventListener(evt, unmute, listenerOpts));
+                    window.removeEventListener('scroll', unmute, true);
+                    window.removeEventListener('focus', tryPlay, true);
+                    document.removeEventListener('visibilitychange', tryPlay, true);
+                };
+                const listenerOpts = { capture: true, once: true };
                 tryPlay();
-                document.addEventListener('click', unmute, { once: true, capture: true });
-                document.addEventListener('touchstart', unmute, { once: true, capture: true });
+                ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
+                    document.addEventListener(evt, unmute, listenerOpts));
+                window.addEventListener('scroll', unmute, true);
+                window.addEventListener('focus', tryPlay, true);
+                document.addEventListener('visibilitychange', tryPlay, true);
             }
             // --- Loading Screen ---
             // Hide loading screen only after interactive features bind
