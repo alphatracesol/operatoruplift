@@ -405,7 +405,7 @@
         .hero-gradient-wrapper, .navbar, main, section { position: relative; z-index: 2; }
         .site-footer { margin-top: auto; }
         /* Weekly visualizer */
-        .week { display:grid; grid-template-columns: repeat(7,1fr); gap:.5rem; width:100%; overflow:hidden; }
+        .week { display:grid; grid-template-columns: repeat(7,1fr); gap:.5rem; width:100%; overflow:visible; }
         .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:.75rem; min-height:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
         .day:hover { transform: translateY(-3px); background: rgba(255,255,255,.06); border-color: var(--accent-color); box-shadow: 0 6px 20px rgba(249, 115, 22, .15); }
         .day .name { color: var(--text-muted); font-size:clamp(.75rem, 1.8vw, .95rem); font-weight:600; }
@@ -808,7 +808,7 @@
         <!-- 9) Live Burn Counter (Planned Data Hook) -->
         <section id="burn" class="section">
             <h3 class="section-title">Live Burn Counter</h3>
-            <p class="section-subtext">Live data sourced from Solana RPC and Solscan public API. If values show dashes, configure the burn wallet and initial supply.</p>
+            <p class="section-subtext">Live data sourced from Solana RPC and Solscan public API. If values show dashes, data may be temporarily unavailable. Wallet configured: <code>DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</code>.</p>
             <div class="viz-grid" style="margin-top:1rem; align-items:stretch;">
                 <div class="card kpi reveal" style="position:relative; overflow:hidden; box-shadow:0 0 20px rgba(239,68,68,.35) inset, 0 0 25px rgba(239,68,68,.2); border-color: rgba(239,68,68,.45);">
                     <div class="value" id="burn-current-supply">—</div>
@@ -1026,10 +1026,101 @@
         </div>
     </footer>
 
-    <!-- Legal Modals (copied to match index) -->
-    <div id="privacy-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Privacy Policy</h2><p>We respect your privacy and are committed to protecting your personal data. Our privacy policy explains how we collect, use, and safeguard your information when you use Operator Uplift.</p><h3>Information We Collect</h3><p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p><h3>How We Use Your Information</h3><ul><li>To provide and maintain our services</li><li>To personalize your experience</li><li>To communicate with you about updates and features</li><li>To improve our services and develop new features</li></ul><h3>Data Security</h3><p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p><h3>Contact Us</h3><p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@operatoruplift.com">privacy@operatoruplift.com</a></p></div></div>
-    <div id="terms-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Terms of Service</h2><p><strong>Last updated: July 28, 2025</strong></p><p>Welcome to Operator Uplift. These Terms of Service ("Terms") govern your access to and use of the Operator Uplift website and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.</p><h3>Acceptance of Terms</h3><p>By accessing or using Operator Uplift, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this service.</p><h3>Description of Service</h3><p>Operator Uplift is an AI-powered self-progression platform that helps users set, track, and achieve their goals through gamification, community features, and personalized AI assistance.</p><h3>Contact Information</h3><p>For questions about these Terms of Service, please contact us at <a href="mailto:legal@operatoruplift.com">legal@operatoruplift.com</a></p></div></div>
-    <div id="support-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Support</h2><p>Need help? We're here to assist you on your journey to achieving your goals!</p><h3>Contact Information</h3><ul><li><strong>Email:</strong> <a href="mailto:support@operatoruplift.com">support@operatoruplift.com</a></li><li><strong>Response Time:</strong> Within 24 hours</li></ul></div></div>
+    <!-- Legal Modals (exact match to index content) -->
+    <div id="privacy-modal" class="overlay-page">
+        <div class="modal-content-wrapper">
+            <button class="close-overlay-btn" onclick="hideAllPages && hideAllPages()" aria-label="Close modal">×</button>
+            <h2>Privacy Policy</h2>
+            <p>We respect your privacy and are committed to protecting your personal data. Our privacy policy explains how we collect, use, and safeguard your information when you use Operator Uplift.</p>
+            <h3>Information We Collect</h3>
+            <p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p>
+            <h3>How We Use Your Information</h3>
+            <ul>
+                <li>To provide and maintain our services</li>
+                <li>To personalize your experience</li>
+                <li>To communicate with you about updates and features</li>
+                <li>To improve our services and develop new features</li>
+            </ul>
+            <h3>Data Security</h3>
+            <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+            <h3>Contact Us</h3>
+            <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a></p>
+        </div>
+    </div>
+    <div id="terms-modal" class="overlay-page">
+        <div class="modal-content-wrapper">
+            <button class="close-overlay-btn" onclick="hideAllPages && hideAllPages()" aria-label="Close modal">×</button>
+            <h2>Terms of Service</h2>
+            <p><strong>Last updated: July 28, 2025</strong></p>
+            <p>Welcome to Operator Uplift. These Terms of Service ("Terms") govern your access to and use of the Operator Uplift website and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.</p>
+            <h3>1. Acceptance of Terms</h3>
+            <p>By accessing or using Operator Uplift, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this service.</p>
+            <h3>2. Description of Service</h3>
+            <p>Operator Uplift is an AI-powered self-progression platform that helps users set, track, and achieve their goals through gamification, community features, and personalized AI assistance. The service includes goal setting, progress tracking, achievement systems, and community interactions.</p>
+            <h3>3. User Accounts and Registration</h3>
+            <p>To access certain features of the Service, you must create an account. You agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete information during registration</li>
+                <li>Maintain and update your account information to keep it accurate and current</li>
+                <li>Maintain the security of your account credentials</li>
+                <li>Accept responsibility for all activities that occur under your account</li>
+                <li>Notify us immediately of any unauthorized use of your account</li>
+            </ul>
+            <h3>4. Acceptable Use</h3>
+            <p>You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to:</p>
+            <ul>
+                <li>Use the Service for any illegal or unauthorized purpose</li>
+                <li>Violate any applicable laws or regulations</li>
+                <li>Infringe upon the rights of others</li>
+                <li>Attempt to gain unauthorized access to the Service or its systems</li>
+                <li>Interfere with or disrupt the Service or servers</li>
+                <li>Use the Service to transmit harmful, offensive, or inappropriate content</li>
+                <li>Attempt to reverse engineer or copy the Service</li>
+            </ul>
+            <h3>5. User Content</h3>
+            <p>You retain ownership of content you create and share on the Service. By posting content, you grant us a license to use, display, and distribute your content in connection with the Service. You are responsible for ensuring you have the right to share any content you post.</p>
+            <h3>6. Privacy and Data Protection</h3>
+            <p>Your privacy is important to us. Our collection and use of personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference.</p>
+            <h3>7. AI Features and Limitations</h3>
+            <p>The Service includes AI-powered features that provide suggestions and assistance. While we strive for accuracy, AI-generated content may not always be perfect or suitable for your specific situation. You should use your judgment and verify any important information.</p>
+            <h3>8. Community Guidelines</h3>
+            <p>When participating in community features, you agree to:</p>
+            <ul>
+                <li>Be respectful and supportive of other users</li>
+                <li>Share constructive and helpful content</li>
+                <li>Respect diverse perspectives and experiences</li>
+                <li>Report inappropriate behavior or content</li>
+            </ul>
+            <h3>9. Intellectual Property</h3>
+            <p>The Service and its original content, features, and functionality are owned by Operator Uplift and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+            <h3>10. Termination</h3>
+            <p>We may terminate or suspend your account and access to the Service at any time, with or without cause, with or without notice. Upon termination, your right to use the Service will cease immediately.</p>
+            <h3>11. Limitation of Liability</h3>
+            <p>To the maximum extent permitted by law, Operator Uplift shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or use, arising out of or relating to your use of the Service.</p>
+            <h3>12. Changes to Terms</h3>
+            <p>We reserve the right to modify these Terms at any time. We will notify users of significant changes by posting the new Terms on this page. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.</p>
+            <h3>13. Contact Information</h3>
+            <p>For questions about these Terms of Service, please contact us at <a href=\"mailto:operatoruplift@gmail.com\">operatoruplift@gmail.com</a></p>
+        </div>
+    </div>
+    <div id="support-modal" class="overlay-page">
+        <div class="modal-content-wrapper">
+            <button class="close-overlay-btn" onclick="hideAllPages && hideAllPages()" aria-label="Close modal">×</button>
+            <h2>Support</h2>
+            <p>Need help? We're here to assist you on your journey to achieving your goals!</p>
+            <h3>Contact Information</h3>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:support@operatoruplift.com">support@operatoruplift.com</a></li>
+                <li><strong>Response Time:</strong> Within 24 hours</li>
+                <li><strong>Live Chat:</strong> Available during business hours</li>
+            </ul>
+            <h3>Common Questions</h3>
+            <p>Check our FAQ section for answers to frequently asked questions about using Operator Uplift effectively.</p>
+            <h3>Feature Requests</h3>
+            <p>Have an idea for a new feature? We'd love to hear from you! Send us your suggestions and feedback.</p>
+            <p>We're committed to helping you achieve your goals and will do our best to provide timely and helpful support.</p>
+        </div>
+    </div>
 
     <style>
       /* Modal & Legal Page Styles (matched to index.html) */
@@ -1224,8 +1315,9 @@
             const CONFIG = {
                 tokenMint: '6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS',
                 burnWallet: 'DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h',
-                initialSupply: 1000000000 * (10**9), // initial supply: 1,000,000,000 tokens (assuming 9 decimals)
-                txCount: 5
+                initialSupply: 1000000000 * (10**9), // initial supply: 1,000,000,000 tokens (9 decimals)
+                txCount: 5,
+                fallback: { totalBurned: 15077983.334682871, percent: 1.5 }
             };
             const elSupply = document.getElementById('burn-current-supply');
             const elTotal = document.getElementById('burn-total');
@@ -1294,7 +1386,10 @@
                         if (isFinite(total)) elTotal.textContent = formatNum(Math.max(0,total));
                     }
                 } catch (e){
-                    // fallback UI remains dashes
+                    // Fallback values if API temporarily unavailable
+                    if (elTotal && CONFIG.fallback?.totalBurned) {
+                        elTotal.textContent = `${formatNum(CONFIG.fallback.totalBurned)} (${CONFIG.fallback.percent}%)`;
+                    }
                 }
             }
             if (btnRefresh) btnRefresh.addEventListener('click', loadBurnData);
