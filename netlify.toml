@@ -13,7 +13,7 @@
   external_node_modules = ["firebase-admin"]
 
 [[redirects]]
-  from = "/*"
+  from = "/app/*"
   to = "/app.html"
   status = 200
 
