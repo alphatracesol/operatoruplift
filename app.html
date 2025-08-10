@@ -2069,6 +2069,20 @@
                     </div>
                 </div>
                 <div class="dashboard-card">
+                    <div class="card-header"><h3>Profile</h3></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="profileDisplayName">Display Name</label>
+                            <input id="profileDisplayName" type="text" placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAvatarUrl">Avatar URL</label>
+                            <input id="profileAvatarUrl" type="url" placeholder="https://...">
+                        </div>
+                        <button class="btn-primary" onclick="saveProfileSettings()">Save Profile</button>
+                    </div>
+                </div>
+                <div class="dashboard-card">
                     <div class="card-header"><h3>Data Management</h3></div>
                     <div class="card-body" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                         <button id="exportDataBtn" class="btn-secondary">Export Data</button>
@@ -3918,6 +3932,25 @@
             if (!OperatorUplift.userData || OperatorUplift.userData.onboardingCompleted) return;
             const modal = document.getElementById('onboardingModal');
             if (modal) modal.classList.add('active');
+        }
+
+        // ===== Settings: Profile Save =====
+        async function saveProfileSettings() {
+            try {
+                const displayName = document.getElementById('profileDisplayName').value.trim();
+                const avatarUrl = document.getElementById('profileAvatarUrl').value.trim();
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).set({
+                    displayName,
+                    avatarUrl
+                }, { merge: true });
+                OperatorUplift.userData.name = displayName || OperatorUplift.userData.name;
+                OperatorUplift.userData.avatarUrl = avatarUrl;
+                updateDashboardUI();
+                OperatorUplift.ui?.showToast?.('Profile updated', 'success');
+            } catch (e) {
+                console.error('Profile save failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to save profile', 'error');
+            }
         }
         function closeOnboarding() {
             const modal = document.getElementById('onboardingModal');
