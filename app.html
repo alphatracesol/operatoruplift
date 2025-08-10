@@ -2209,10 +2209,17 @@
         <div id="shopView" class="view-container" style="display:none;">
             <div class="dashboard-header">
                 <div class="header-left"><h2>Shop</h2></div>
-                <div class="header-right"></div>
+                <div class="header-right">
+                    <span id="aiCreditsBadgeShop" class="badge" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--border-glass);padding:6px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--text-color);">AI: 0</span>
+                </div>
             </div>
             <div class="dashboard-card">
-                <div class="card-body">Operator Uplift Shop coming soon.</div>
+                <div class="card-header"><h3>Featured Items</h3></div>
+                <div class="card-body" id="shopItemsList"></div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header"><h3>Your Purchases</h3></div>
+                <div class="card-body" id="purchasesList"></div>
             </div>
         </div>
 
@@ -3702,7 +3709,6 @@
             loadUserAchievements();
             showSuccess('Progress refreshed!');
         }
-
         // ===== GOALS: Edit & Delete =====
         function openEditGoalModal(goalId) {
             const goal = dashboardData.goals.find(g => g.id === goalId);
@@ -3983,7 +3989,107 @@
             }
         }
 
-        function renderShop() { /* placeholder */ }
+        function renderShop() {
+            if (!OperatorUplift.currentUser) return;
+            // Update credits badge
+            const credits = OperatorUplift?.userData?.stats?.aiCredits ?? 0;
+            const badge = document.getElementById('aiCreditsBadgeShop');
+            if (badge) badge.textContent = `AI: ${credits}`;
+
+            const itemsEl = document.getElementById('shopItemsList');
+            const purchasesEl = document.getElementById('purchasesList');
+            if (!itemsEl || !purchasesEl) return;
+
+            // Load items (public catalog) and user's purchases
+            Promise.all([
+                db.collection('shopItems').orderBy('sort', 'asc').limit(20).get(),
+                db.collection('users').doc(OperatorUplift.currentUser.uid).collection('purchases').orderBy('purchasedAt', 'desc').limit(20).get()
+            ]).then(([itemsSnap, purchasesSnap]) => {
+                const items = [];
+                itemsSnap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                itemsEl.innerHTML = items.length ? items.map(it => `
+                    <div class="list-item" style="align-items:flex-start;gap:8px;">
+                        <div style="flex:1;">
+                            <div style="font-weight:600;">${it.name || 'Item'}</div>
+                            <div class="text-muted">${it.description || ''}</div>
+                        </div>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <span class="badge">${Number(it.price||0)} AI</span>
+                            <button class="btn-primary" onclick="purchaseItem('${it.id}', ${Number(it.price||0)})">Buy</button>
+                        </div>
+                    </div>
+                `).join('') : '<div class="empty-state"><p>No items available</p></div>';
+
+                const purchases = [];
+                purchasesSnap.forEach(doc => purchases.push({ id: doc.id, ...doc.data() }));
+                purchasesEl.innerHTML = purchases.length ? purchases.map(p => `
+                    <div class="list-item" style="align-items:flex-start;gap:8px;">
+                        <div style="flex:1;">
+                            <div>${p.itemName || p.itemId}</div>
+                            <div class="text-muted">Purchased ${new Date(p.purchasedAt?.toDate ? p.purchasedAt.toDate() : p.purchasedAt).toLocaleString()}</div>
+                        </div>
+                        <div><span class="badge">-${Number(p.price||0)} AI</span></div>
+                    </div>
+                `).join('') : '<div class="empty-state"><p>No purchases yet</p></div>';
+            }).catch(err => {
+                console.error('Shop load failed:', err);
+            });
+        }
+
+        async function purchaseItem(itemId, price) {
+            try {
+                if (!OperatorUplift.currentUser) return;
+                const uid = OperatorUplift.currentUser.uid;
+
+                // Fetch item to get display data
+                const itemRef = db.collection('shopItems').doc(itemId);
+                const itemSnap = await itemRef.get();
+                if (!itemSnap.exists) {
+                    OperatorUplift.ui?.showToast?.('Item not found', 'error');
+                    return;
+                }
+                const item = itemSnap.data();
+
+                // Check credits
+                const currentCredits = OperatorUplift?.userData?.stats?.aiCredits ?? 0;
+                if (currentCredits < price) {
+                    OperatorUplift.ui?.showToast?.('Not enough AI credits', 'error');
+                    return;
+                }
+
+                // Write purchase and decrement credits atomically
+                const userRef = db.collection('users').doc(uid);
+                const purchaseRef = userRef.collection('purchases').doc();
+
+                await db.runTransaction(async (tx) => {
+                    const userSnap = await tx.get(userRef);
+                    if (!userSnap.exists) throw new Error('User doc missing');
+                    const stats = userSnap.data().stats || {};
+                    const credits = Number(stats.aiCredits || 0);
+                    if (credits < price) throw new Error('INSUFFICIENT_CREDITS');
+                    tx.update(userRef, { 'stats.aiCredits': firebase.firestore.FieldValue.increment(-Number(price)) });
+                    tx.set(purchaseRef, {
+                        itemId,
+                        itemName: item.name || itemId,
+                        price: Number(price),
+                        purchasedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+
+                // Refresh local and UI
+                if (OperatorUplift.userData?.stats) {
+                    OperatorUplift.userData.stats.aiCredits = Number(OperatorUplift.userData.stats.aiCredits || 0) - Number(price);
+                }
+                OperatorUplift.ui?.showToast?.('Purchase successful', 'success');
+                renderShop();
+                if (typeof initializeDashboard === 'function') initializeDashboard();
+            } catch (e) {
+                console.error('Purchase failed:', e);
+                let msg = 'Purchase failed';
+                if (String(e && e.message).includes('INSUFFICIENT_CREDITS')) msg = 'Not enough AI credits';
+                OperatorUplift.ui?.showToast?.(msg, 'error');
+            }
+        }
 
         // ===== Onboarding =====
         function maybeShowOnboarding() {
@@ -4683,7 +4789,6 @@ Analyze the user's progress and provide insights on:
 3. Potential obstacles or plateaus
 4. Recommendations for maintaining motivation
 5. Next steps for continued growth
-
 Focus on actionable insights and encouragement.
             `;
             
@@ -5034,7 +5139,6 @@ Focus on actionable insights and encouragement.
         if (typeof initializeAIChat === 'function') {
             console.log('🤖 AI Chat system ready');
         }
-
         // ===== PHASE 5: ADVANCED FEATURES =====
         
         // Analytics Dashboard
