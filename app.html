@@ -1595,6 +1595,7 @@
             <a href="#" data-view="finance" class="nav-link" title="Finance" aria-label="Finance" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">💰</a>
             <a href="#" data-view="shop" class="nav-link" title="Shop" aria-label="Shop" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🛒</a>
             <a href="#" data-view="achievements" class="nav-link" title="Achievements" aria-label="Achievements" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏅</a>
+            <a href="#" data-view="journeys" class="nav-link" title="Journeys" aria-label="Journeys" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🧭</a>
         </aside>
 
         <!-- In-app loading overlay -->
@@ -2092,6 +2093,38 @@
             </div>
             <div class="dashboard-card">
                 <div class="card-body">Operator Uplift Shop coming soon.</div>
+            </div>
+        </div>
+
+        <!-- Journeys View -->
+        <div id="journeysView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Journeys</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Plan a Journey</h3></div>
+                    <div class="card-body">
+                        <form id="journeyForm">
+                            <div class="form-group">
+                                <label for="journeyGoal">Destination Goal</label>
+                                <input id="journeyGoal" type="text" placeholder="e.g., Launch MVP" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="journeyHorizon">Time Horizon (weeks)</label>
+                                <input id="journeyHorizon" type="number" min="1" max="52" value="8">
+                            </div>
+                            <div class="modal-actions">
+                                <button type="submit" class="btn-primary">Generate Plan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Suggested Milestones</h3></div>
+                    <div class="card-body" id="journeyMilestones"></div>
+                </div>
             </div>
         </div>
 
@@ -3462,6 +3495,8 @@
                     renderShop();
                 } else if (view === 'achievements') {
                     renderAchievementsView();
+                } else if (view === 'journeys') {
+                    setupJourneys();
                 }
             });
             // Hide sidebar on initial auth view
@@ -3662,6 +3697,103 @@
             }
         }
         function renderShop() { /* placeholder */ }
+
+        // ===== JOURNEYS (AI Planner - lightweight local generator) =====
+        function setupJourneys() {
+            const form = document.getElementById('journeyForm');
+            if (!form || form.dataset.bound) return;
+            form.dataset.bound = '1';
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const goal = (document.getElementById('journeyGoal').value || '').trim();
+                const weeks = Math.max(1, Math.min(52, Number(document.getElementById('journeyHorizon').value || 8)));
+                if (!goal) return;
+                const milestones = generateJourneyMilestones(goal, weeks);
+                renderJourneyMilestones(milestones);
+            });
+        }
+        function generateJourneyMilestones(goal, weeks) {
+            const phases = [
+                'Discovery & Scoping',
+                'Design & Prototype',
+                'Implementation',
+                'Testing & Hardening',
+                'Launch & Feedback',
+                'Iterate & Improve'
+            ];
+            const chunk = Math.max(1, Math.round(weeks / phases.length));
+            const out = [];
+            for (let i = 0; i < phases.length; i++) {
+                const startWeek = i * chunk + 1;
+                const endWeek = Math.min(weeks, (i + 1) * chunk);
+                out.push({
+                    title: `${phases[i]}`,
+                    range: `Week ${startWeek}-${endWeek}`,
+                    tasks: suggestTasksForPhase(phases[i], goal)
+                });
+                if (endWeek >= weeks) break;
+            }
+            return out;
+        }
+        function suggestTasksForPhase(phase, goal) {
+            const base = [
+                `Define success metrics for ${goal}`,
+                `Identify risks and mitigations`,
+                `Create checklist and assign owners`
+            ];
+            if (phase.includes('Discovery')) base.unshift(`Research requirements for ${goal}`);
+            if (phase.includes('Design')) base.unshift('Wireframe core flows', 'Review with stakeholders');
+            if (phase.includes('Implementation')) base.unshift('Break down into sprints', 'Implement core features');
+            if (phase.includes('Testing')) base.unshift('Write tests', 'Fix critical bugs');
+            if (phase.includes('Launch')) base.unshift('Prepare launch comms', 'Release v1');
+            if (phase.includes('Iterate')) base.unshift('Collect feedback', 'Prioritize next sprint');
+            return base;
+        }
+        function renderJourneyMilestones(milestones) {
+            const container = document.getElementById('journeyMilestones');
+            if (!container) return;
+            if (!milestones.length) { container.innerHTML = '<div class="empty-state"><p>No plan generated</p></div>'; return; }
+            container.innerHTML = milestones.map(m => `
+                <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
+                    <div style=\"min-width:160px;font-weight:700;\">${m.range}</div>
+                    <div style=\"flex:1;\">
+                        <div style=\"font-weight:700;margin-bottom:4px;\">${m.title}</div>
+                        <ul style=\"margin:0;padding-left:18px;\">${m.tasks.map(t=>`<li>${t}</li>`).join('')}</ul>
+                    </div>
+                    <div>
+                        <button class=\"btn-secondary\" onclick=\"createGoalsFromMilestone('${encodeURIComponent(JSON.stringify(m))}')\">Add as goals</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        async function createGoalsFromMilestone(serialized) {
+            try {
+                const m = JSON.parse(decodeURIComponent(serialized));
+                if (!OperatorUplift.currentUser) return;
+                const batch = db.batch();
+                const userGoals = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('goals');
+                m.tasks.forEach(task => {
+                    const ref = userGoals.doc();
+                    batch.set(ref, {
+                        title: `${m.title}: ${task}`,
+                        description: '',
+                        category: 'journey',
+                        difficulty: 'medium',
+                        deadline: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 14*24*3600*1000)),
+                        priority: 'medium',
+                        status: 'active',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                await batch.commit();
+                OperatorUplift.ui?.showToast?.('Milestone tasks added as goals', 'success');
+                loadUserGoals();
+            } catch (e) {
+                console.error('Create goals from milestone failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to add goals', 'error');
+            }
+        }
 
         // ===== HABITS =====
         async function renderHabitsList() {
