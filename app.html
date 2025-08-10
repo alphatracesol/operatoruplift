@@ -344,9 +344,9 @@
         }
 
         .loading-text {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--text-color);
-            margin: 12px 0 8px 0;
+            margin: 8px 0 6px 0;
         }
 
         .loading-progress {
@@ -756,6 +756,10 @@
         .view-container.active {
             display: block;
         }
+        /* Ensure auth view stays flex when active for vertical centering */
+        #authView.view-container.active {
+            display: flex !important;
+        }
 
         /* Responsive design */
         @media (max-width: 768px) {
@@ -774,7 +778,7 @@
             text-align: center;
             position: relative;
             z-index: 15; /* Higher than matrix rain */
-            transform: translateY(-18px);
+            transform: translateY(-26px);
         }
 
                 /* Matrix Rain Background - Canvas-based */
