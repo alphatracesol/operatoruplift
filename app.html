@@ -3866,12 +3866,44 @@
                 const posts = [];
                 snap.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
                 feed.innerHTML = posts.length ? posts.map(p => `
-                    <div class=\"list-item\">
-                        <div>${(p.createdAt?.toDate ? p.createdAt.toDate() : p.createdAt) ? new Date(p.createdAt.toDate()).toLocaleString() : ''}</div>
-                        <div>${p.text}</div>
+                    <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
+                        <div style=\"flex:1;\">
+                            <div class=\"text-muted\">${p.createdAt?.toDate ? new Date(p.createdAt.toDate()).toLocaleString() : ''}</div>
+                            <div>${p.text}</div>
+                        </div>
+                        <div style=\"display:flex;gap:6px;\">
+                            <button class=\"btn-secondary\" onclick=\"likePost('${p.id}')\">❤️ ${p.likes||0}</button>
+                            ${OperatorUplift.currentUser?.uid === p.userId ? `<button class=\"btn-secondary\" onclick=\"deletePost('${p.id}')\">Delete</button>` : ''}
+                        </div>
                     </div>`).join('') : '<div class=\"empty-state\"><p>No posts yet</p></div>';
             } catch (e) {
                 console.error('Feed load failed:', e);
+            }
+        }
+
+        async function likePost(postId) {
+            try {
+                await db.collection('communityPosts').doc(postId).update({ likes: firebase.firestore.FieldValue.increment(1) });
+                renderCommunity();
+            } catch (e) {
+                console.error('Like failed:', e);
+            }
+        }
+
+        async function deletePost(postId) {
+            try {
+                const ref = db.collection('communityPosts').doc(postId);
+                const snap = await ref.get();
+                if (!snap.exists) return;
+                if (snap.data().userId !== OperatorUplift.currentUser?.uid) {
+                    OperatorUplift.ui?.showToast?.('You can only delete your own posts', 'error');
+                    return;
+                }
+                await ref.delete();
+                OperatorUplift.ui?.showToast?.('Post deleted', 'success');
+                renderCommunity();
+            } catch (e) {
+                console.error('Delete post failed:', e);
             }
         }
 
@@ -3915,16 +3947,51 @@
                 const net = income - expense;
                 summaryEl.textContent = `Income: $${income.toFixed(2)} • Expense: $${expense.toFixed(2)} • Net: $${net.toFixed(2)}`;
                 listEl.innerHTML = txns.length ? txns.map(t => `
-                    <div class=\"list-item\">
+                    <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
                         <div>${new Date(t.date?.toDate ? t.date.toDate() : t.date).toLocaleDateString()}</div>
-                        <div>${t.type === 'income' ? '+' : '-'}$${Number(t.amount||0).toFixed(2)} • ${t.category}</div>
-                        <div class=\"text-muted\">${t.note || ''}</div>
+                        <div style=\"flex:1;\">${t.type === 'income' ? '+' : '-'}$${Number(t.amount||0).toFixed(2)} • ${t.category}
+                            <div class=\"text-muted\">${t.note || ''}</div>
+                        </div>
+                        <div style=\"display:flex;gap:6px;\">
+                            <button class=\"btn-secondary\" onclick=\"editTxn('${t.id}')\">Edit</button>
+                            <button class=\"btn-secondary\" onclick=\"deleteTxn('${t.id}')\">Delete</button>
+                        </div>
                     </div>
                 `).join('') : '<div class=\"empty-state\"><p>No transactions yet</p></div>';
             } catch (e) {
                 console.error('Txn list failed:', e);
             }
         }
+
+        async function deleteTxn(id) {
+            try {
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('transactions').doc(id).delete();
+                OperatorUplift.ui?.showToast?.('Transaction deleted', 'success');
+                renderFinance();
+            } catch (e) {
+                console.error('Delete txn failed:', e);
+            }
+        }
+
+        async function editTxn(id) {
+            try {
+                const ref = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('transactions').doc(id);
+                const snap = await ref.get();
+                if (!snap.exists) return;
+                const t = snap.data();
+                const amountStr = prompt('Amount', String(t.amount || 0));
+                if (amountStr == null) return;
+                const amount = Number(amountStr);
+                if (!isFinite(amount) || amount <= 0) return;
+                const note = prompt('Note', t.note || '');
+                await ref.set({ amount, note }, { merge: true });
+                OperatorUplift.ui?.showToast?.('Transaction updated', 'success');
+                renderFinance();
+            } catch (e) {
+                console.error('Edit txn failed:', e);
+            }
+        }
+
         function renderShop() { /* placeholder */ }
 
         // ===== Onboarding =====
