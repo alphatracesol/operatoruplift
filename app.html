@@ -324,6 +324,10 @@
             align-items: center;
             z-index: 10000; /* Highest z-index for loading screen */
             transition: opacity 0.5s ease-out;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            box-sizing: border-box;
+            gap: 10px;
         }
 
         .loading-screen.hidden {
@@ -341,7 +345,7 @@
         .loading-text {
             font-size: 1.2rem;
             color: var(--text-color);
-            margin: 18px 0 10px 0;
+            margin: 12px 0 8px 0;
         }
 
         .loading-progress {
@@ -350,7 +354,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             overflow: hidden;
-            margin-top: 12px;
+            margin-top: 8px;
         }
 
         .loading-bar {
@@ -375,6 +379,13 @@
             flex-direction: column;
         }
 
+        /* Small viewport height tweaks to prevent loader clipping */
+        @media (max-height: 640px) {
+            .loading-screen .scene { width: 68px !important; height: 68px !important; }
+            .loading-text { margin: 8px 0 6px 0; font-size: 1rem; }
+            .loading-progress { width: 160px; margin-top: 6px; }
+        }
+
         /* View containers */
         .view-container {
             display: none;
@@ -382,6 +393,17 @@
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
+        }
+
+        /* Center auth view vertically and respect safe areas */
+        #authView.view-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+            padding-top: max(16px, env(safe-area-inset-top));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
         }
 
         /* ===== PHASE 7: ADVANCED FEATURES ENHANCEMENT STYLES ===== */
@@ -747,10 +769,11 @@
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 24px 20px 40px 20px;
+            padding: 24px 20px 28px 20px;
             text-align: center;
             position: relative;
             z-index: 15; /* Higher than matrix rain */
+            transform: translateY(-10px);
         }
 
                 /* Matrix Rain Background - Canvas-based */
@@ -767,15 +790,15 @@
 
         /* Auth Header */
         .auth-header {
-            margin-bottom: 48px;
-            margin-top: 36px;
+            margin-bottom: 24px;
+            margin-top: 24px;
         }
 
         .auth-logo {
-            width: 68px;
-            height: 68px;
-            margin: 0 auto 20px;
-            transform: scale(.86);
+            width: 64px;
+            height: 64px;
+            margin: 4px auto 12px;
+            transform: scale(.84);
             transform-origin: center;
             animation: pulse 2s infinite;
         }
@@ -784,7 +807,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-color);
-            margin: 22px 0 18px 0;
+            margin: 18px 0 16px 0;
         }
 
         .auth-subtitle {
@@ -796,9 +819,9 @@
         /* Auth Forms */
         .auth-forms {
             position: relative;
-            margin: -6px 0 24px 0;
+            margin: -20px 0 10px 0;
             display: grid;
-            gap: 20px;
+            gap: 16px;
         }
 
         .auth-form {
@@ -1391,25 +1414,25 @@
     <canvas id="matrix-rain-canvas"></canvas>
     
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="scene" style="width:100px;height:100px;perspective:600px;">
-            <div class="cube" style="width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(50px);">
+        <div id="loadingScreen" class="loading-screen">
+            <div class="scene" style="width:84px;height:84px;perspective:600px;">
+                <div class="cube" style="width:84px;height:84px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(50px);">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(50px);">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(50px);">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(50px);">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
-                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(50px);">
+                    <div class="cube-face" style="position:absolute;width:84px;height:84px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(42px);">
                     <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
                 </div>
             </div>
@@ -1430,24 +1453,24 @@
                     <!-- Logo and Title -->
                     <div class="auth-header">
                         <audio id="vh-audio" src="assets/audio/velvet-horizon.mp3" preload="auto"></audio>
-                        <div class="auth-logo" style="width:80px;height:80px;perspective:600px;margin:0 auto;">
-                            <div class="cube" style="width:80px;height:80px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(40px);">
+                        <div class="auth-logo" style="width:68px;height:68px;perspective:600px;margin:0 auto;">
+                            <div class="cube" style="width:68px;height:68px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(40px);">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(40px);">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(40px);">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(40px);">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
-                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(40px);">
+                                <div class="cube-face" style="position:absolute;width:68px;height:68px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(34px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
                                 </div>
                             </div>
