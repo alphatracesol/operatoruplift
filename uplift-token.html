@@ -445,7 +445,7 @@
         /* Fire orb removed in favor of centered emoji */
         .fire-orb-wrap, .fire-orb, .fire-orb-inner { display: none !important; }
         /* Centered animated fire emoji under last burn label on larger layouts */
-        .fire-emoji { position: absolute; left: 50%; transform: translateX(-50%); bottom: clamp(4px, 2%, 14px); font-size: clamp(32px, 10vw, 56px); line-height: 1; z-index: 2; filter: drop-shadow(0 0 12px rgba(255,80,20,.95)) drop-shadow(0 0 22px rgba(255,120,40,.65)); animation: flame-pulse 1.2s ease-in-out infinite; }
+        .fire-emoji { position: absolute; left: 50%; transform: translateX(-50%); bottom: clamp(0px, 6%, 28px); font-size: clamp(36px, 11vw, 64px); line-height: 1; z-index: 2; filter: drop-shadow(0 0 12px rgba(255,80,20,.95)) drop-shadow(0 0 22px rgba(255,120,40,.65)); animation: flame-pulse 1.2s ease-in-out infinite; }
         @keyframes flame-pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.08); } }
         @media (max-width: 768px) { .fire-emoji { display: none; } }
 
@@ -598,10 +598,6 @@
 
         <!-- Particles Canvas -->
         <div id="particles"></div>
-        <div style="position:fixed; right:1rem; top:74px; z-index:1001; display:flex; align-items:center; gap:.5rem;">
-            <label for="toggle-particles-token" class="text-sm text-slate-400" style="cursor:pointer;">Particles</label>
-            <label class="toggle-switch"><input type="checkbox" id="toggle-particles-token" checked><span class="slider"></span></label>
-        </div>
 
         
 
@@ -1376,13 +1372,16 @@
                 }).then((container) => { tokenParticlesInstance = container; }).catch(()=>{});
             }
 
-            // Token particles toggle
-            const tokenToggle = document.getElementById('toggle-particles-token');
-            if (tokenToggle) {
-                tokenToggle.addEventListener('change', (e) => {
-                    if (tokenParticlesInstance) {
-                        try { e.target.checked ? tokenParticlesInstance.play() : tokenParticlesInstance.pause(); } catch {}
-                    }
+            // Token particles toggle button (match index style)
+            const tokenToggleBtn = document.querySelector('.site-footer #toggle-particles') || document.getElementById('toggle-particles');
+            if (tokenToggleBtn) {
+                tokenToggleBtn.addEventListener('click', () => {
+                    if (!tokenParticlesInstance) return;
+                    const pressed = tokenToggleBtn.getAttribute('aria-pressed') === 'true';
+                    try {
+                        if (pressed) { tokenParticlesInstance.pause(); tokenToggleBtn.setAttribute('aria-pressed','false'); }
+                        else { tokenParticlesInstance.play(); tokenToggleBtn.setAttribute('aria-pressed','true'); }
+                    } catch {}
                 });
             }
 
@@ -1426,6 +1425,8 @@
                 document.addEventListener('visibilitychange', tryPlay, true);
                 // Custom resume event hook if navigation returns without full reload
                 document.addEventListener('resume-audio', tryPlay, true);
+                // Failsafe retry after visibility
+                setTimeout(tryPlay, 1500);
             }
  
             // --- Live Burn Counter (hourly refresh) ---

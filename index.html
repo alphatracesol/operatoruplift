@@ -4020,6 +4020,8 @@
             window.addEventListener('focus', tryPlay, true);
             document.addEventListener('visibilitychange', tryPlay, true);
             document.addEventListener('resume-audio', tryPlay, true);
+                // Failsafe: attempt autoplay again after tab becomes visible
+                setTimeout(tryPlay, 1500);
             }
             // --- Loading Screen ---
             // Hide loading screen only after interactive features bind

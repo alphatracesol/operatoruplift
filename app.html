@@ -2281,6 +2281,7 @@
                             document.addEventListener('click', unmute, { capture: true, once: true });
                             document.addEventListener('touchstart', unmute, { capture: true, once: true });
                             document.addEventListener('resume-audio', tryPlay, true);
+                            setTimeout(tryPlay, 1500);
                         }
                     } catch {}
                     console.log('🎯 Foundation initialization complete');

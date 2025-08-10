@@ -938,7 +938,7 @@
                 </div>
             </div>
             <div class="mt-8 pt-6 border-t border-zinc-800/50 flex justify-center items-center text-sm text-slate-400">
-                <div class="flex items-center gap-3"><label for="toggle-particles" class="cursor-pointer">Background Particles</label><label class="toggle-switch"><input type="checkbox" id="toggle-particles" checked><span class="slider"></span></label></div>
+                <button id="toggle-particles" class="cta-button" type="button" aria-pressed="true">Toggle Particles</button>
             </div>
             <div class="mt-4 text-center">
                 <p class="text-sm text-gray-400">Made with <span class="heartbeat">❤️</span> during The Residency's Delta Sprint</p>
@@ -1281,11 +1281,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Particle toggle functionality
         const particlesToggle = document.getElementById('toggle-particles');
         if (particlesToggle) {
-            particlesToggle.addEventListener('change', e => {
-                console.log('Particles toggle changed:', e.target.checked);
+            particlesToggle.addEventListener('click', () => {
                 const inst = window.particlesInstance || window.particlesContainer;
                 if (inst && typeof inst.play === 'function' && typeof inst.pause === 'function') {
-                    try { e.target.checked ? inst.play() : inst.pause(); } catch (error) { console.warn('Particles toggle error:', error); }
+                    try {
+                        if (particlesToggle.getAttribute('aria-pressed') === 'true') {
+                            inst.pause(); particlesToggle.setAttribute('aria-pressed','false');
+                        } else { inst.play(); particlesToggle.setAttribute('aria-pressed','true'); }
+                    } catch (error) { console.warn('Particles toggle error:', error); }
                 } else {
                     console.warn('Particles instance not found');
                 }
