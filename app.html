@@ -2751,7 +2751,11 @@
                 setTimeout(() => {
                     updateLoadingProgress(100);
                     hideLoadingScreen();
-                    showView('auth');
+                    if (auth && auth.currentUser) {
+                        showView('dashboard');
+                    } else {
+                        showView('auth');
+                    }
                     // Soft ambient audio on login page
                     try {
                         const audio = document.getElementById('vh-audio');
@@ -2842,7 +2846,10 @@
                 if (user) {
                     console.log('👤 User already logged in on page load:', user.email);
                     OperatorUplift.currentUser = user;
-                    showView('dashboard');
+                    // Only switch to dashboard if currently on auth
+                    if (OperatorUplift.currentView !== 'dashboard') {
+                        showView('dashboard');
+                    }
                     initializeUserData(user);
                 }
                 return;
@@ -2860,7 +2867,9 @@
                 
                 // Direct view transition without loading screen
                 console.log('🔄 Transitioning to dashboard...');
-                showView('dashboard');
+                if (OperatorUplift.currentView !== 'dashboard') {
+                    showView('dashboard');
+                }
                 console.log('✅ Dashboard view activated');
                 
                 // Initialize user data
