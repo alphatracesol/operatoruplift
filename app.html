@@ -1799,6 +1799,73 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Edit Goal Modal -->
+            <div id="editGoalModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Edit Goal</h2>
+                        <button class="btn-icon" onclick="closeEditGoalModal()">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form id="editGoalForm">
+                        <input type="hidden" id="editGoalId">
+                        <div class="form-group">
+                            <label for="editGoalTitle">Goal Title</label>
+                            <input type="text" id="editGoalTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editGoalDescription">Description</label>
+                            <textarea id="editGoalDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editGoalCategory">Category</label>
+                                <select id="editGoalCategory" required>
+                                    <option value="fitness">Fitness & Health</option>
+                                    <option value="career">Career & Business</option>
+                                    <option value="learning">Learning & Skills</option>
+                                    <option value="relationships">Relationships</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="personal">Personal Development</option>
+                                    <option value="journey">Journey</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGoalDifficulty">Difficulty</label>
+                                <select id="editGoalDifficulty" required>
+                                    <option value="easy">Easy (10 XP)</option>
+                                    <option value="medium">Medium (25 XP)</option>
+                                    <option value="hard">Hard (50 XP)</option>
+                                    <option value="epic">Epic (100 XP)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editGoalDeadline">Deadline</label>
+                                <input type="date" id="editGoalDeadline" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGoalPriority">Priority</label>
+                                <select id="editGoalPriority" required>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-secondary" onclick="closeEditGoalModal()">Cancel</button>
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Goals View (stub) -->
@@ -3216,6 +3283,8 @@
                     <div class="goal-actions">
                         <span class="goal-status status-${goal.status || 'active'}">${goal.status || 'Active'}</span>
                         ${goal.status !== 'completed' ? `<button class="btn-secondary" onclick="completeGoal('${goal.id}')">Mark Complete</button>` : ''}
+                        <button class="btn-secondary" onclick="openEditGoalModal('${goal.id}')">Edit</button>
+                        <button class="btn-secondary" onclick="deleteGoal('${goal.id}')">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -3296,6 +3365,8 @@
                         <h3>${goal.title}</h3>
                         <div class="card-actions">
                             ${goal.status !== 'completed' ? `<button class="btn-secondary" onclick="completeGoal('${goal.id}')">Mark Complete</button>` : '<span class="badge">Completed</span>'}
+                            <button class="btn-secondary" onclick="openEditGoalModal('${goal.id}')">Edit</button>
+                            <button class="btn-secondary" onclick="deleteGoal('${goal.id}')">Delete</button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -3544,6 +3615,69 @@
             loadUserGoals();
             loadUserAchievements();
             showSuccess('Progress refreshed!');
+        }
+
+        // ===== GOALS: Edit & Delete =====
+        function openEditGoalModal(goalId) {
+            const goal = dashboardData.goals.find(g => g.id === goalId);
+            if (!goal) return;
+            document.getElementById('editGoalId').value = goal.id;
+            document.getElementById('editGoalTitle').value = goal.title || '';
+            document.getElementById('editGoalDescription').value = goal.description || '';
+            document.getElementById('editGoalCategory').value = goal.category || '';
+            document.getElementById('editGoalDifficulty').value = goal.difficulty || 'medium';
+            document.getElementById('editGoalPriority').value = goal.priority || 'medium';
+            if (goal.deadline) {
+                const d = new Date(goal.deadline?.toDate ? goal.deadline.toDate() : goal.deadline);
+                document.getElementById('editGoalDeadline').value = d.toISOString().slice(0,10);
+            }
+            document.getElementById('editGoalModal').classList.add('active');
+        }
+        function closeEditGoalModal() {
+            document.getElementById('editGoalModal').classList.remove('active');
+            document.getElementById('editGoalForm').reset();
+        }
+        (function bindEditGoalForm(){
+            const form = document.getElementById('editGoalForm');
+            if (!form) return;
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!OperatorUplift.currentUser) return;
+                const id = document.getElementById('editGoalId').value;
+                const title = document.getElementById('editGoalTitle').value;
+                const description = document.getElementById('editGoalDescription').value;
+                const category = document.getElementById('editGoalCategory').value;
+                const difficulty = document.getElementById('editGoalDifficulty').value;
+                const priority = document.getElementById('editGoalPriority').value;
+                const deadlineStr = document.getElementById('editGoalDeadline').value;
+                const deadline = deadlineStr ? new Date(deadlineStr) : null;
+                try {
+                    await db.collection('users').doc(OperatorUplift.currentUser.uid)
+                        .collection('goals').doc(id)
+                        .set({ title, description, category, difficulty, priority, deadline, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                    OperatorUplift.ui?.showToast?.('Goal updated', 'success');
+                    closeEditGoalModal();
+                    loadUserGoals();
+                    if (OperatorUplift.currentView === 'goals') renderGoalsViewList();
+                } catch (e2) {
+                    console.error('Goal update failed:', e2);
+                    OperatorUplift.ui?.showToast?.('Failed to update goal', 'error');
+                }
+            });
+        })();
+        async function deleteGoal(goalId) {
+            if (!OperatorUplift.currentUser || !goalId) return;
+            try {
+                await db.collection('users').doc(OperatorUplift.currentUser.uid)
+                    .collection('goals').doc(goalId).delete();
+                dashboardData.goals = dashboardData.goals.filter(g => g.id !== goalId);
+                updateGoalsList();
+                if (OperatorUplift.currentView === 'goals') renderGoalsViewList();
+                OperatorUplift.ui?.showToast?.('Goal deleted', 'success');
+            } catch (e) {
+                console.error('Goal delete failed:', e);
+                OperatorUplift.ui?.showToast?.('Failed to delete goal', 'error');
+            }
         }
 
         // Lightweight renderers for new views
