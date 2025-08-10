@@ -17,6 +17,11 @@
   to = "/app.html"
   status = 200
 
+[[redirects]]
+  from = "/uplift-token"
+  to = "/uplift-token.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
