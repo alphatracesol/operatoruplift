@@ -746,7 +746,7 @@
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 36px 20px 40px 20px;
+            padding: 24px 20px 40px 20px;
             text-align: center;
             position: relative;
             z-index: 15; /* Higher than matrix rain */
@@ -767,13 +767,15 @@
         /* Auth Header */
         .auth-header {
             margin-bottom: 48px;
-            margin-top: 48px;
+            margin-top: 36px;
         }
 
         .auth-logo {
             width: 68px;
             height: 68px;
-            margin: -6px auto 12px;
+            margin: -6px auto 16px;
+            transform: scale(.88) translateY(-4px);
+            transform-origin: center;
             animation: pulse 2s infinite;
         }
 
@@ -793,7 +795,7 @@
         /* Auth Forms */
         .auth-forms {
             position: relative;
-            margin: 20px 0 30px 0;
+            margin: 12px 0 30px 0;
             display: grid;
             gap: 20px;
         }

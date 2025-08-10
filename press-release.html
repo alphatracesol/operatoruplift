@@ -717,6 +717,10 @@
     </style>
 </head>
 <body class="antialiased">
+    <style>
+      @keyframes heart-beat { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.12); } 40% { transform: scale(0.98); } 60% { transform: scale(1.08); } 80% { transform: scale(0.99); } }
+      .heartbeat { display:inline-block; animation: heart-beat 1.6s ease-in-out infinite; transform-origin:center; }
+    </style>
     <!-- Loading Screen -->
     <div id="loading-screen" style="position:fixed;inset:0;background:#0a0a0a;z-index:10000;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease-out;">
         <div class="scene" style="width:100px;height:100px;perspective:600px;">
