@@ -2211,6 +2211,7 @@
                         const audio = document.getElementById('vh-audio');
                         if (audio) {
                             audio.volume = 0.03;
+                            audio.loop = true;
                             const tryPlay = () => audio.play().catch(() => {});
                             tryPlay();
                             const once = () => { tryPlay(); document.removeEventListener('click', once, { capture: true }); };

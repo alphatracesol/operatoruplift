@@ -504,6 +504,8 @@
     </style>
     <!-- Optional particles.js via CDN (lightweight) -->
     <script defer src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <!-- Ambient audio for token page -->
+    <audio id="uplift-audio" src="assets/audio/Raindrops and Reverie.mp3" preload="auto" loop></audio>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -834,7 +836,7 @@
                         <strong>Recent Burn Transactions</strong>
                         <div class="row">
                             <button class="copy-btn" id="burn-refresh" type="button">Refresh</button>
-                            <a id="burn-view-wallet" class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h" target="_blank" rel="noopener">View Burn Wallet</a>
+                            <a id="burn-view-wallet" class="pill" href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener">View Burn Wallet</a>
                         </div>
                     </div>
                     <ol id="burn-tx-list" class="muted" style="padding-left:1.25rem; display:grid; gap:.35rem;"></ol>
@@ -1316,6 +1318,16 @@
                 });
             }
 
+            // Ambient audio at 3% volume
+            const tokenAudio = document.getElementById('uplift-audio');
+            if (tokenAudio) {
+                tokenAudio.volume = 0.03;
+                const tryPlay = () => tokenAudio.play().catch(()=>{});
+                tryPlay();
+                document.addEventListener('click', tryPlay, { once: true });
+                document.addEventListener('touchstart', tryPlay, { once: true });
+            }
+ 
             // --- Live Burn Counter (hourly refresh) ---
             const CONFIG = {
                 tokenMint: '6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS',
