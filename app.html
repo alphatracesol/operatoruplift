@@ -1047,15 +1047,16 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 32px;
             margin-bottom: 30px;
         }
 
         /* Dashboard Cards */
         .dashboard-card {
-            background: var(--card-bg-glass);
+            /* Enforce 40% transparency with blur inside wrapper */
+            background: rgba(20,20,20,0.6);
             backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 16px;
             padding: 24px;
             box-shadow: var(--shadow-lg);
