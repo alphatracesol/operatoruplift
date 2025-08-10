@@ -37,7 +37,11 @@ service cloud.firestore {
 
       match /goals/{goalId} {
         allow read, update, delete: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidGoalData(request.resource.data);
+        // Nested goals do not require userId field; validate essential fields only
+        allow create: if isOwner(userId) &&
+          request.resource.data.keys().hasAll(['title','category']) &&
+          (request.resource.data.title is string) &&
+          (request.resource.data.category in ['health','productivity','learning','mindfulness','social','other','journey']);
       }
       match /habits/{habitId} {
         allow read, update, delete: if isOwner(userId);
