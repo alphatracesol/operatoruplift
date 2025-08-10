@@ -1,10 +1,10 @@
 // Enhanced Service Worker for Operator Uplift
 // Version: 2.2 - Fixed POST Request Caching and Removed Problematic URLs
 
-const CACHE_NAME = 'operator-uplift-v2.4';
-const STATIC_CACHE = 'static-v2.4';
-const DYNAMIC_CACHE = 'dynamic-v2.4';
-const API_CACHE = 'api-v2.4';
+const CACHE_NAME = 'operator-uplift-v2.5';
+const STATIC_CACHE = 'static-v2.5';
+const DYNAMIC_CACHE = 'dynamic-v2.5';
+const API_CACHE = 'api-v2.5';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
@@ -169,9 +169,13 @@ async function cacheFirst(request) {
     
     try {
         const networkResponse = await fetch(request);
+        // Do not cache partial (206) or non-OK responses
+        if (!networkResponse || !networkResponse.ok || networkResponse.status === 206) {
+            return networkResponse;
+        }
         // Triple-check method before caching
-        if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
-            cache.put(request, networkResponse.clone());
+        if (request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
+            try { await cache.put(request, networkResponse.clone()); } catch (e) { console.warn('Cache put failed (networkFirst):', e); }
         }
         return networkResponse;
     } catch (error) {
@@ -259,9 +263,13 @@ async function staleWhileRevalidate(request) {
     const cachedResponse = await cache.match(request);
     
     const fetchPromise = fetch(request).then(networkResponse => {
+        // Do not cache partial (206) or non-OK responses
+        if (!networkResponse || !networkResponse.ok || networkResponse.status === 206) {
+            return networkResponse;
+        }
         // Triple-check method before caching
-        if (networkResponse.ok && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
-            cache.put(request, networkResponse.clone());
+        if (request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
+            try { cache.put(request, networkResponse.clone()); } catch (e) { console.warn('Cache put failed (SWR):', e); }
         }
         return networkResponse;
     }).catch(error => {
