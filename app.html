@@ -3163,6 +3163,7 @@
                     await userRef.set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                     const data = { ...baseDefaults, ...snap.data() };
                     if (!data.stats) data.stats = baseDefaults.stats;
+                    if (data.stats.energy == null) data.stats.energy = 100;
                     if (data.stats.aiCredits == null) data.stats.aiCredits = 50;
                     if (typeof data.onboardingCompleted !== 'boolean') data.onboardingCompleted = false;
                     OperatorUplift.userData = data;
