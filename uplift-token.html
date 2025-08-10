@@ -386,7 +386,17 @@
         .roadmap { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: clamp(.5rem, 1.5vw, 1rem); }
         /* Scale card content down as viewport narrows to avoid wrapping */
         .tokenomics-grid .token-info-card, .roadmap .roadmap-item { padding: clamp(.6rem, 1.5vw, 1rem); }
-        .tokenomics-grid .token-info-card h3, .roadmap .roadmap-item h4 { font-size: clamp(.9rem, 1.8vw, 1.2rem); }
+        .tokenomics-grid .token-info-card h3, .roadmap .roadmap-item h4 { font-size: clamp(.85rem, 1.6vw, 1.15rem); }
+        /* Center titles and avoid awkward wrapping by scaling + ellipsis */
+        .token-info-card h3, .roadmap .roadmap-item h4, .card.kpi .label {
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
         .tokenomics-grid .token-info-card .muted, .roadmap .roadmap-item ul { font-size: clamp(.75rem, 1.6vw, .95rem); }
         .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; margin: .25rem auto 0; background: conic-gradient(var(--accent-color) 0 50%, #ffffff 0 100%); box-shadow: 0 0 25px rgba(255,165,0,.25) inset; }
         .donut::after { content: ''; position: absolute; inset: 22px; background: var(--bg-color); border-radius: 50%; }
