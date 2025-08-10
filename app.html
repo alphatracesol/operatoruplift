@@ -331,6 +331,9 @@
             gap: 10px;
         }
 
+        /* Raise spinner on loading screen slightly */
+        .loading-screen .scene { transform: translateY(-18px); }
+
         .loading-screen.hidden {
             opacity: 0;
             pointer-events: none;
@@ -812,7 +815,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-color);
-            margin: 14px 0 18px 0;
+            margin: 32px 0 16px 0;
         }
 
         .auth-subtitle {
@@ -824,10 +827,13 @@
         /* Auth Forms */
         .auth-forms {
             position: relative;
-            margin: -26px 0 12px 0;
+            margin: -8px 0 12px 0;
             display: grid;
             gap: 16px;
         }
+
+        /* Raise only the main login form a bit higher */
+        #loginForm { margin-top: -22px; }
 
         .auth-form {
             display: none;
@@ -1458,7 +1464,7 @@
                     <!-- Logo and Title -->
                     <div class="auth-header">
                         <audio id="vh-audio" src="Jordan Racer.mp3" preload="auto" loop></audio>
-                        <div class="auth-logo" style="width:56px;height:56px;perspective:600px;margin:0 auto;">
+                        <div class="auth-logo" style="width:56px;height:56px;perspective:600px;margin:0 auto; transform: translateY(4px);">
                             <div class="cube" style="width:56px;height:56px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
                                 <div class="cube-face" style="position:absolute;width:56px;height:56px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(28px);">
                                     <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
