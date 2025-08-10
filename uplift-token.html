@@ -1321,7 +1321,13 @@
                 burnWallet: 'DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h',
                 initialSupply: 1000000000 * (10**9), // initial supply: 1,000,000,000 tokens (9 decimals)
                 txCount: 5,
-                fallback: { totalBurned: 15077983.334682871, percent: 1.5 }
+                fallback: {
+                  totalBurned: 15077983.334682871,
+                  percent: 1.5,
+                  currentSupply: 984922016.665317129,
+                  lastBurnAgo: '2 hrs ago',
+                  lastTxSig: '3Hhj2Rhk8nUVwWaf8J7niQuvLrKa2uN5MVZXKZwbX4khkuBYNtDfgrGS43Rgc5HMmg5XsRJexfMDF1h4S6jtoJFS'
+                }
             };
             const elSupply = document.getElementById('burn-current-supply');
             const elTotal = document.getElementById('burn-total');
@@ -1391,8 +1397,21 @@
                     }
                 } catch (e){
                     // Fallback values if API temporarily unavailable
-                    if (elTotal && CONFIG.fallback?.totalBurned) {
+                    if (elSupply && CONFIG.fallback?.currentSupply != null) {
+                        elSupply.textContent = formatNum(CONFIG.fallback.currentSupply);
+                    }
+                    if (elTotal && CONFIG.fallback?.totalBurned != null) {
                         elTotal.textContent = `${formatNum(CONFIG.fallback.totalBurned)} (${CONFIG.fallback.percent}%)`;
+                    }
+                    if (elLast && CONFIG.fallback?.lastBurnAgo) {
+                        elLast.textContent = CONFIG.fallback.lastBurnAgo;
+                    }
+                    if (elList && CONFIG.fallback?.lastTxSig) {
+                        elList.innerHTML = '';
+                        const sig = CONFIG.fallback.lastTxSig;
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="https://solscan.io/tx/${sig}" target="_blank" rel="noopener">${sig.slice(0,8)}…${sig.slice(-6)}</a> <span class="muted">${CONFIG.fallback.lastBurnAgo}</span>`;
+                        elList.appendChild(li);
                     }
                 }
             }
