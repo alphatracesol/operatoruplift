@@ -1615,11 +1615,12 @@
         <!-- Dashboard View -->
         <div id="dashboardView" class="view-container">
             <!-- Dashboard Header -->
-            <div class="dashboard-header">
+            <div class="dashboard-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <div class="header-left">
                     <p class="dashboard-subtitle">Level <span id="userLevel">1</span> • <span id="userExperience">0</span> XP</p>
                 </div>
-                <div class="header-right">
+                <div class="header-right" style="display:flex;align-items:center;gap:8px;">
+                    <span id="aiCreditsBadge" class="badge" title="AI credits remaining">AI: 0</span>
                     <button id="addGoalBtn" class="btn-primary">+ Add Goal</button>
                     <button id="userMenuBtn" class="btn-icon">
                         <svg viewBox="0 0 24 24" width="24" height="24">
@@ -3192,6 +3193,11 @@
                 if (userExperienceElement) {
                     userExperienceElement.textContent = userData.experience || 0;
                 }
+                const creditsEl = document.getElementById('aiCreditsBadge');
+                if (creditsEl && userData.stats) {
+                    const credits = userData.stats.aiCredits ?? 0;
+                    creditsEl.textContent = `AI: ${credits}`;
+                }
                 
                 // Update progress
                 updateProgressStats();
@@ -4387,7 +4393,8 @@ Please provide helpful, actionable advice related to goal setting, personal deve
                 }
                 
                 const data = await response.json();
-                return data.content || 'I apologize, but I couldn\'t process your request at the moment.';
+                // ai-proxy returns { response: string }
+                return data.response || data.content || 'I apologize, but I couldn\'t process your request at the moment.';
             } catch (error) {
                 console.error('AI API Error:', error);
                 return 'I apologize, but I\'m having trouble connecting to my AI services right now. Please try again later.';
