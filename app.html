@@ -2985,7 +2985,7 @@
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                     level: 1,
                     experience: 0,
-                    stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0 },
+                    stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0, aiCredits: 50 },
                     settings: { theme: 'dark', colorScheme: 'Firewall Flare', notifications: true },
                     achievements: [],
                 };
@@ -2994,6 +2994,8 @@
                     // Merge lastLogin and preserve existing
                     await userRef.set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                     const data = { ...baseDefaults, ...snap.data() };
+                    if (!data.stats) data.stats = baseDefaults.stats;
+                    if (data.stats.aiCredits == null) data.stats.aiCredits = 50;
                     OperatorUplift.userData = data;
                     console.log('📊 User data loaded:', data);
                 } else {
