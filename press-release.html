@@ -717,6 +717,32 @@
     </style>
 </head>
 <body class="antialiased">
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="position:fixed;inset:0;background:#0a0a0a;z-index:10000;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease-out;">
+        <div class="scene" style="width:100px;height:100px;perspective:600px;">
+            <div class="cube" style="width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+                <div class="cube-face" style="position:absolute;width:100px;height:100px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(50px);">
+                    <svg class="cube-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;filter:drop-shadow(0 0 6px var(--accent-color));"><path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/><path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Gradient Wrapper -->
     <div class="hero-gradient-wrapper">
     
@@ -724,12 +750,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo" onclick="window.location.href='index.html'">
-                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="var(--accent-color)" stroke-width="2"/>
-                    <g>
-                        <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="var(--accent-color)" stroke-width="1.5"/>
-                    </g>
-                </svg>
+                <img src="assets/img/Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:24px;height:24px;object-fit:contain;filter: drop-shadow(0 0 3px var(--accent-color));">
                 <span style="color: white; white-space: nowrap; position: relative; overflow: hidden; cursor: pointer;" class="ripple-effect">Operator Uplift</span>
             </div>
             <ul class="nav-links">
@@ -840,7 +861,7 @@
             
             <!-- Founder's Vision Section -->
             <section class="glass-card text-center fade-in mb-20" id="founder-vision">
-                <img src="/assets/PFP.png" alt="Matt Sim, Founder" class="w-20 h-20 rounded-full mx-auto mb-4 border-2" style="border-color: var(--accent-color);" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f97316/ffffff?text=MS';">
+                <img src="assets/PFP.png" alt="Matt Sim, Founder" class="w-20 h-20 rounded-full mx-auto mb-4 border-2 object-cover" style="border-color: var(--accent-color); object-position: 50% 30%; background:#0a0a0a;" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f97316/ffffff?text=MS';">
                 <h2 class="text-xl font-bold text-white mb-4">Founder's Vision</h2>
                 <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
                     "We don't need another to-do list piling on chores—we need a paradigm shift that <span class="gradient-text font-semibold">manufactures momentum.</span> Operator Uplift is that AI antidote: deconstructing ambition into engineered ascent, turning potential into inevitable progress for operators ready to level up."
@@ -884,7 +905,7 @@
             <div class="flex flex-col items-center gap-6">
                 <p class="text-slate-500">&copy; 2025 Operator Uplift. All rights reserved.</p>
                 <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-4">
-                    <a href="mailto:operatoruplift@gmail.com" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">Contact</a>
+                    <a href="mailto:press@operatoruplift.com" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors">Contact</a>
                     <a href="https://twitter.com/OperatorUplift" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-[var(--accent-color)] transition-colors" aria-label="Operator Uplift on X/Twitter">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
                     </a>
@@ -925,6 +946,36 @@
     <!-- Added back tsparticles for visual appeal -->
     
     <script>
+        // Hide loading screen after initial render
+        window.addEventListener('load', () => {
+            const ls = document.getElementById('loading-screen');
+            if (ls) { ls.style.opacity = '0'; setTimeout(()=> ls.remove(), 650); }
+        });
+
+        // Add gold glow to all $UPLIFT occurrences if any present
+        (function highlightUplift(){
+            try{
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+                    acceptNode: node => node.nodeValue && node.nodeValue.includes('$UPLIFT') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+                });
+                const nodes = [];
+                while (walker.nextNode()) nodes.push(walker.currentNode);
+                nodes.forEach(textNode => {
+                    const parts = textNode.nodeValue.split('$UPLIFT');
+                    const frag = document.createDocumentFragment();
+                    parts.forEach((part, idx) => {
+                        if (part) frag.appendChild(document.createTextNode(part));
+                        if (idx < parts.length - 1) {
+                            const span = document.createElement('span');
+                            span.className = 'glow-gold';
+                            span.textContent = '$UPLIFT';
+                            frag.appendChild(span);
+                        }
+                    });
+                    textNode.parentNode && textNode.parentNode.replaceChild(frag, textNode);
+                });
+            } catch {}
+        })();
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
             const navbar = document.querySelector('.navbar');
@@ -1268,7 +1319,7 @@
                 <h3>6. Changes to Terms</h3>
                 <p>We reserve the right to modify these Terms at any time. We will notify you of any changes by posting the new Terms on this page. Your continued use of the Service after any such changes constitutes your acceptance of the new Terms.</p>
                 <h3>7. Contact Us</h3>
-                <p>If you have any questions about these Terms, please contact us at <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a>.</p>
+                <p>If you have any questions about these Terms, please contact us at <a href="mailto:legal@operatoruplift.com">legal@operatoruplift.com</a>.</p>
             </div>
         </div>
     </div>
@@ -1304,7 +1355,7 @@
                 <h3>9. Changes to This Policy</h3>
                 <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page or sending you an email.</p>
                 <h3>10. Contact Us</h3>
-                <p>If you have questions about this Privacy Policy or our data practices, please contact us at <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a>.</p>
+                <p>If you have questions about this Privacy Policy or our data practices, please contact us at <a href="mailto:privacy@operatoruplift.com">privacy@operatoruplift.com</a>.</p>
             </div>
         </div>
     </div>
@@ -1316,7 +1367,7 @@
                 <h2>Support</h2>
                 <p>Need help? We're here to assist you with any questions or issues you may have.</p>
                 <h3>Contact Information</h3>
-                <p>Email: <a href="mailto:operatoruplift@gmail.com">operatoruplift@gmail.com</a></p>
+                <p>Email: <a href="mailto:support@operatoruplift.com">support@operatoruplift.com</a></p>
                 <h3>Response Time</h3>
                 <p>We typically respond to inquiries within 24-48 hours during business days.</p>
             </div>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Matrix Rain Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #f97316;
+        }
+        
+        .test-button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h3>Matrix Rain Test</h3>
+        <p>Testing matrix rain visibility and character density</p>
+        <button class="test-button" onclick="testMatrixRain()">Test Matrix Rain</button>
+        <button class="test-button" onclick="testDarkMode()">Test Dark Mode</button>
+        <button class="test-button" onclick="window.location.href='app.html'">Go to App</button>
+    </div>
+    
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrix-rain-canvas"></canvas>
+    
+    <script>
+        // Matrix Rain Background Effect - Canvas-based
+        function initializeMatrixRain() {
+            const canvas = document.getElementById('matrix-rain-canvas');
+            if (!canvas) {
+                console.error('❌ Matrix rain canvas not found');
+                return;
+            }
+            
+            console.log('🎬 Initializing matrix rain (Canvas)...');
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=<>?~|{}[]()/\\';
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            const rainDrops = Array.from({ length: columns }).map(() => Math.random() * canvas.height);
+
+            const draw = () => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw multiple characters per column for better density
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const x = i * fontSize;
+                    const y = rainDrops[i];
+                    
+                    // Draw main character
+                    ctx.fillStyle = '#f97316';
+                    ctx.font = fontSize + 'px monospace';
+                    const mainChar = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                    ctx.fillText(mainChar, x, y);
+                    
+                    // Draw trailing characters with fading effect
+                    for (let j = 1; j < 8; j++) {
+                        const alpha = 0.8 - (j * 0.1);
+                        ctx.fillStyle = `rgba(249, 115, 22, ${alpha})`;
+                        const trailChar = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                        ctx.fillText(trailChar, x, y - (j * fontSize));
+                    }
+                    
+                    // Reset column when it goes off screen
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.98) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i] += 0.8;
+                }
+            };
+            
+            // Clear any existing interval
+            if (window.matrixInterval) {
+                clearInterval(window.matrixInterval);
+            }
+            
+            window.matrixInterval = setInterval(draw, 50);
+            
+            console.log('✅ Matrix rain initialized (Canvas)');
+        }
+        
+        function testMatrixRain() {
+            console.log('🧪 Testing matrix rain...');
+            initializeMatrixRain();
+        }
+        
+        function testDarkMode() {
+            document.body.style.background = document.body.style.background === '#000000' ? '#ffffff' : '#000000';
+            console.log('🎨 Toggled background color');
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMatrixRain();
+        });
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrix-rain-canvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>

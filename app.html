@@ -1407,11 +1407,28 @@
                 <div class="auth-forms">
                     <!-- Logo and Title -->
                     <div class="auth-header">
-                        <div class="auth-logo">
-                            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M25.0558 23.4284L16 28.5713L6.94421 23.4284V13.1427L16 8L25.0558 13.1427V23.4284Z" stroke="#f97316" stroke-width="2"/>
-                                <path d="M16 18.2857L16 8M16 18.2857L22.9282 22.1429M16 18.2857L9.0718 22.1429" stroke="#f97316" stroke-width="1.5"/>
-                            </svg>
+                        <audio id="vh-audio" src="assets/audio/velvet-horizon.mp3" preload="auto"></audio>
+                        <div class="auth-logo" style="width:80px;height:80px;perspective:600px;margin:0 auto;">
+                            <div class="cube" style="width:80px;height:80px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(40px);">
+                                    <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(90deg) translateZ(40px);">
+                                    <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(180deg) translateZ(40px);">
+                                    <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(-90deg) translateZ(40px);">
+                                    <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(90deg) translateZ(40px);">
+                                    <img src="Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                                <div class="cube-face" style="position:absolute;width:80px;height:80px;background:rgba(249,115,22,.08);border:2px solid #f97316;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateX(-90deg) translateZ(40px);">
+                                    <img src="assets/img/Operator Uplift LOGO PNG 2.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;filter: drop-shadow(0 0 6px #f97316);">
+                                </div>
+                            </div>
                         </div>
                         <h1 class="auth-title">Operator Uplift</h1>
                     </div>
@@ -2186,6 +2203,17 @@
                     updateLoadingProgress(100);
                     hideLoadingScreen();
                     showView('auth');
+                    // Soft ambient audio on login page
+                    try {
+                        const audio = document.getElementById('vh-audio');
+                        if (audio) {
+                            audio.volume = 0.03;
+                            const tryPlay = () => audio.play().catch(() => {});
+                            tryPlay();
+                            const once = () => { tryPlay(); document.removeEventListener('click', once, { capture: true }); };
+                            document.addEventListener('click', once, { capture: true, once: true });
+                        }
+                    } catch {}
                     console.log('🎯 Foundation initialization complete');
                 }, 500);
             }, 1000);

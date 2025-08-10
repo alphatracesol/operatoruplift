@@ -1,10 +1,10 @@
 // Enhanced Service Worker for Operator Uplift
 // Version: 2.2 - Fixed POST Request Caching and Removed Problematic URLs
 
-const CACHE_NAME = 'operator-uplift-v2.3';
-const STATIC_CACHE = 'static-v2.3';
-const DYNAMIC_CACHE = 'dynamic-v2.3';
-const API_CACHE = 'api-v2.3';
+const CACHE_NAME = 'operator-uplift-v2.4';
+const STATIC_CACHE = 'static-v2.4';
+const DYNAMIC_CACHE = 'dynamic-v2.4';
+const API_CACHE = 'api-v2.4';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
@@ -99,32 +99,34 @@ function sanitizeUrl(url) {
 
 // Fetch event - implement caching strategies
 self.addEventListener('fetch', (event) => {
-    // CRITICAL: Never cache POST requests - handle them immediately
-    if (event.request.method === 'POST') {
-        const safeUrl = sanitizeUrl(event.request.url);
-        console.log(`🚫 POST request detected, bypassing cache: ${safeUrl}`);
-        event.respondWith(fetch(event.request));
-        return;
-    }
-    
-    const url = new URL(event.request.url);
-    const strategy = getCacheStrategy(url);
-    
-    const safePathname = sanitizeUrl(url.pathname);
-    console.log(`📡 Fetch: ${safePathname} (${strategy})`);
-    
-    switch (strategy) {
-        case 'cache-first':
-            event.respondWith(cacheFirst(event.request));
-            break;
-        case 'network-first':
-            event.respondWith(networkFirst(event.request));
-            break;
-        case 'stale-while-revalidate':
-            event.respondWith(staleWhileRevalidate(event.request));
-            break;
-        default:
-            event.respondWith(networkOnly(event.request));
+    try {
+        // CRITICAL: Never cache POST requests - handle them immediately
+        if (event.request.method === 'POST') {
+            const safeUrl = sanitizeUrl(event.request.url);
+            console.log(`🚫 POST request detected, bypassing cache: ${safeUrl}`);
+            event.respondWith(fetch(event.request));
+            return;
+        }
+        
+        // Always explicitly handle cross-origin requests to avoid no-op warnings
+        const requestUrl = new URL(event.request.url);
+        // If we are not handling the request (e.g., navigation to external origin), do nothing
+        if (requestUrl.origin !== self.location.origin) return;
+        
+        const url = requestUrl;
+        const strategy = getCacheStrategy(url);
+        
+        const safePathname = sanitizeUrl(url.pathname);
+        console.log(`📡 Fetch: ${safePathname} (${strategy})`);
+        
+        if (strategy === 'cache-first') event.respondWith(cacheFirst(event.request));
+        else if (strategy === 'network-first') event.respondWith(networkFirst(event.request));
+        else if (strategy === 'stale-while-revalidate') event.respondWith(staleWhileRevalidate(event.request));
+        else event.respondWith(networkOnly(event.request));
+    } catch (err) {
+        console.error('❌ Fetch handler error:', err);
+        // If an unhandled error occurs and we didn't take control, let browser proceed
+        // Avoid responding with a duplicate when no event.respondWith was called
     }
 });
 
@@ -151,7 +153,8 @@ async function cacheFirst(request) {
         request.url.includes('google-analytics.com') ||
         request.url.includes('firebase.googleapis.com') ||
         request.url.includes('firebaseinstallations.googleapis.com') ||
-        request.url.includes('googletagmanager.com')) {
+        request.url.includes('googletagmanager.com') ||
+        request.url.includes('api.producthunt.com')) {
         console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
@@ -196,7 +199,8 @@ async function networkFirst(request) {
         request.url.includes('cdn.jsdelivr.net') ||
         request.url.includes('apis.google.com') || 
         request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com')) {
+        request.url.includes('google-analytics.com') ||
+        request.url.includes('api.producthunt.com')) {
         console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
@@ -245,7 +249,8 @@ async function staleWhileRevalidate(request) {
         request.url.includes('google-analytics.com') ||
         request.url.includes('firebase.googleapis.com') ||
         request.url.includes('firebaseinstallations.googleapis.com') ||
-        request.url.includes('googletagmanager.com')) {
+        request.url.includes('googletagmanager.com') ||
+        request.url.includes('api.producthunt.com')) {
         console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
         return fetch(request);
     }
@@ -261,6 +266,8 @@ async function staleWhileRevalidate(request) {
         return networkResponse;
     }).catch(error => {
         console.error('❌ Network failed for stale-while-revalidate:', error);
+        // Always return a Response to avoid unhandled promise rejections
+        return new Response('Network error', { status: 502 });
     });
     
     return cachedResponse || fetchPromise;

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Configuration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left-color: #f44336;
+        }
+        .warning {
+            border-left-color: #ff9800;
+        }
+        .success {
+            border-left-color: #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.warning { background: #ff9800; }
+        .status.pending { background: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Configuration Test</h1>
+        <p>This page tests the Firebase configuration setup with Netlify functions.</p>
+        
+        <div class="test-section">
+            <h3>1. Netlify Function Test</h3>
+            <p>Testing the configuration endpoint...</p>
+            <button onclick="testNetlifyFunction()">Test Netlify Function</button>
+            <div id="netlify-test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Firebase SDK Test</h3>
+            <p>Testing Firebase SDK loading and initialization...</p>
+            <button onclick="testFirebaseSDK()">Test Firebase SDK</button>
+            <div id="firebase-test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Configuration Validation</h3>
+            <p>Validating Firebase configuration values...</p>
+            <button onclick="validateConfig()">Validate Configuration</button>
+            <div id="validation-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Complete Integration Test</h3>
+            <p>Running full integration test...</p>
+            <button onclick="runFullTest()">Run Full Test</button>
+            <div id="integration-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test Log</h3>
+            <div id="test-log" class="log"></div>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        let testResults = {
+            netlifyFunction: 'pending',
+            firebaseSDK: 'pending',
+            configValidation: 'pending',
+            integration: 'pending'
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('test-log');
+            const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+            logElement.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function updateStatus(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <span class="status ${status}">${status.toUpperCase()}</span>
+                <p>${message}</p>
+            `;
+            testResults[elementId.replace('-result', '')] = status;
+        }
+
+        async function testNetlifyFunction() {
+            log('Testing Netlify function endpoint...');
+            try {
+                const response = await fetch('/.netlify/functions/config');
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Netlify function responded successfully', 'success');
+                    log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                    
+                    if (data.firebaseConfig) {
+                        updateStatus('netlify-test-result', 'success', 
+                            'Netlify function working correctly. Firebase config received.');
+                    } else {
+                        updateStatus('netlify-test-result', 'warning', 
+                            'Netlify function working but no Firebase config found.');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`❌ Netlify function test failed: ${error.message}`, 'error');
+                updateStatus('netlify-test-result', 'error', 
+                    `Function test failed: ${error.message}`);
+            }
+        }
+
+        function testFirebaseSDK() {
+            log('Testing Firebase SDK loading...');
+            try {
+                if (typeof firebase !== 'undefined') {
+                    log('✅ Firebase SDK loaded successfully', 'success');
+                    updateStatus('firebase-test-result', 'success', 
+                        'Firebase SDK loaded and ready.');
+                } else {
+                    throw new Error('Firebase SDK not loaded');
+                }
+            } catch (error) {
+                log(`❌ Firebase SDK test failed: ${error.message}`, 'error');
+                updateStatus('firebase-test-result', 'error', 
+                    `SDK test failed: ${error.message}`);
+            }
+        }
+
+        async function validateConfig() {
+            log('Validating Firebase configuration...');
+            try {
+                const response = await fetch('/.netlify/functions/config');
+                if (response.ok) {
+                    const data = await response.json();
+                    const config = data.firebaseConfig;
+                    
+                    if (!config) {
+                        throw new Error('No Firebase configuration received');
+                    }
+
+                    const requiredFields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+                    const missingFields = requiredFields.filter(field => !config[field]);
+                    
+                    if (missingFields.length > 0) {
+                        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+                    }
+
+                    log('✅ Configuration validation passed', 'success');
+                    log(`Config: ${JSON.stringify(config, null, 2)}`, 'info');
+                    updateStatus('validation-result', 'success', 
+                        'All required Firebase configuration fields present.');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`❌ Configuration validation failed: ${error.message}`, 'error');
+                updateStatus('validation-result', 'error', 
+                    `Validation failed: ${error.message}`);
+            }
+        }
+
+        async function runFullTest() {
+            log('🚀 Running complete integration test...');
+            
+            // Reset all tests
+            testResults = {
+                netlifyFunction: 'pending',
+                firebaseSDK: 'pending',
+                configValidation: 'pending',
+                integration: 'pending'
+            };
+
+            // Run all tests
+            await testNetlifyFunction();
+            testFirebaseSDK();
+            await validateConfig();
+
+            // Check if all tests passed
+            const allPassed = Object.values(testResults).every(status => status === 'success');
+            
+            if (allPassed) {
+                log('🎉 All tests passed! Firebase configuration is working correctly.', 'success');
+                updateStatus('integration-result', 'success', 
+                    'All tests passed! Firebase configuration is ready for production.');
+            } else {
+                const failedTests = Object.entries(testResults)
+                    .filter(([test, status]) => status !== 'success')
+                    .map(([test]) => test);
+                
+                log(`⚠️ Some tests failed: ${failedTests.join(', ')}`, 'warning');
+                updateStatus('integration-result', 'warning', 
+                    `Some tests failed. Check individual test results above.`);
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('test-log').textContent = '';
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            log('🚀 Firebase Configuration Test Started', 'info');
+            log('Testing Firebase SDK loading...', 'info');
+            testFirebaseSDK();
+        });
+    </script>
+</body>
+</html>
