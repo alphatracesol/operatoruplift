@@ -2010,8 +2010,25 @@
                 <div class="header-left"><h2>Community</h2></div>
                 <div class="header-right"></div>
             </div>
-            <div class="dashboard-card">
-                <div class="card-body">Community feed coming soon.</div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Share an Update</h3></div>
+                    <div class="card-body">
+                        <form id="communityPostForm">
+                            <div class="form-group">
+                                <label for="communityPostText">What's on your mind?</label>
+                                <textarea id="communityPostText" rows="3" placeholder="Share progress, wins, or tips..."></textarea>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="submit" class="btn-primary">Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Latest Posts</h3></div>
+                    <div class="card-body" id="communityFeed"></div>
+                </div>
             </div>
         </div>
 
@@ -2021,8 +2038,49 @@
                 <div class="header-left"><h2>Finance</h2></div>
                 <div class="header-right"></div>
             </div>
-            <div class="dashboard-card">
-                <div class="card-body" id="financeSummary">No transactions yet.</div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Add Transaction</h3></div>
+                    <div class="card-body">
+                        <form id="addTxnForm">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label for="txnType">Type</label>
+                                    <select id="txnType"><option value="expense">Expense</option><option value="income">Income</option></select>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label for="txnCategory">Category</label>
+                                    <select id="txnCategory"><option value="general">General</option><option value="tools">Tools</option><option value="education">Education</option><option value="health">Health</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label for="txnAmount">Amount</label>
+                                    <input type="number" id="txnAmount" step="0.01" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label for="txnDate">Date</label>
+                                    <input type="date" id="txnDate">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="txnNote">Note</label>
+                                <input type="text" id="txnNote" placeholder="Optional">
+                            </div>
+                            <div class="modal-actions">
+                                <button type="submit" class="btn-primary">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Summary</h3></div>
+                    <div class="card-body" id="financeSummary">Loading...</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Recent Transactions</h3></div>
+                    <div class="card-body" id="transactionsList"></div>
+                </div>
             </div>
         </div>
 
@@ -3509,11 +3567,99 @@
             if (prev) prev.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) - 1); renderCalendar(); };
             if (next) next.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) + 1); renderCalendar(); };
         }
-        function renderCommunity() { /* placeholder */ }
-        function renderFinance() {
-            const f = document.getElementById('financeSummary');
-            if (!f) return;
-            f.textContent = 'No transactions yet.';
+        async function renderCommunity() {
+            const feed = document.getElementById('communityFeed');
+            const form = document.getElementById('communityPostForm');
+            if (!feed) return;
+            // Bind form once
+            if (form && !form.dataset.bound) {
+                form.dataset.bound = '1';
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!OperatorUplift.currentUser) return;
+                    const text = (document.getElementById('communityPostText').value || '').trim();
+                    if (!text) return;
+                    try {
+                        await db.collection('communityPosts').add({
+                            userId: OperatorUplift.currentUser.uid,
+                            text,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        document.getElementById('communityPostText').value = '';
+                        OperatorUplift.ui?.showToast?.('Posted', 'success');
+                        renderCommunity();
+                    } catch (e2) {
+                        console.error('Post failed:', e2);
+                        OperatorUplift.ui?.showToast?.('Failed to post', 'error');
+                    }
+                });
+            }
+            try {
+                const snap = await db.collection('communityPosts')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                const posts = [];
+                snap.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
+                feed.innerHTML = posts.length ? posts.map(p => `
+                    <div class=\"list-item\">
+                        <div>${(p.createdAt?.toDate ? p.createdAt.toDate() : p.createdAt) ? new Date(p.createdAt.toDate()).toLocaleString() : ''}</div>
+                        <div>${p.text}</div>
+                    </div>`).join('') : '<div class=\"empty-state\"><p>No posts yet</p></div>';
+            } catch (e) {
+                console.error('Feed load failed:', e);
+            }
+        }
+
+        async function renderFinance() {
+            const summaryEl = document.getElementById('financeSummary');
+            const listEl = document.getElementById('transactionsList');
+            const form = document.getElementById('addTxnForm');
+            if (!summaryEl || !listEl) return;
+            // Bind form once
+            if (form && !form.dataset.bound) {
+                form.dataset.bound = '1';
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!OperatorUplift.currentUser) return;
+                    const type = document.getElementById('txnType').value;
+                    const category = document.getElementById('txnCategory').value;
+                    const amount = Number(document.getElementById('txnAmount').value);
+                    const date = document.getElementById('txnDate').value ? new Date(document.getElementById('txnDate').value) : new Date();
+                    const note = document.getElementById('txnNote').value.trim();
+                    if (!isFinite(amount) || amount <= 0) return;
+                    try {
+                        await db.collection('users').doc(OperatorUplift.currentUser.uid)
+                            .collection('transactions')
+                            .add({ type, category, amount, date, note, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                        OperatorUplift.ui?.showToast?.('Transaction added', 'success');
+                        form.reset();
+                        renderFinance();
+                    } catch (e2) {
+                        console.error('Txn add failed:', e2);
+                        OperatorUplift.ui?.showToast?.('Failed to add transaction', 'error');
+                    }
+                });
+            }
+            try {
+                const snap = await db.collection('users').doc(OperatorUplift.currentUser.uid)
+                    .collection('transactions').orderBy('date', 'desc').limit(20).get();
+                const txns = [];
+                snap.forEach(doc => txns.push({ id: doc.id, ...doc.data() }));
+                let income = 0, expense = 0;
+                txns.forEach(t => { if (t.type === 'income') income += Number(t.amount)||0; else expense += Number(t.amount)||0; });
+                const net = income - expense;
+                summaryEl.textContent = `Income: $${income.toFixed(2)} • Expense: $${expense.toFixed(2)} • Net: $${net.toFixed(2)}`;
+                listEl.innerHTML = txns.length ? txns.map(t => `
+                    <div class=\"list-item\">
+                        <div>${new Date(t.date?.toDate ? t.date.toDate() : t.date).toLocaleDateString()}</div>
+                        <div>${t.type === 'income' ? '+' : '-'}$${Number(t.amount||0).toFixed(2)} • ${t.category}</div>
+                        <div class=\"text-muted\">${t.note || ''}</div>
+                    </div>
+                `).join('') : '<div class=\"empty-state\"><p>No transactions yet</p></div>';
+            } catch (e) {
+                console.error('Txn list failed:', e);
+            }
         }
         function renderShop() { /* placeholder */ }
 
