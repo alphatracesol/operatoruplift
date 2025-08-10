@@ -1630,6 +1630,19 @@
 
             <!-- Dashboard Grid -->
             <div class="dashboard-grid">
+                <!-- AI Mentor Widget -->
+                <div class="dashboard-card" id="aiMentorCard">
+                    <div class="card-header">
+                        <h3>🤖 Your AI Mentor</h3>
+                        <div class="card-actions">
+                            <button class="btn-secondary" id="mentorRefreshBtn">Refresh</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p id="aiMentorMessage" class="text-muted">Loading personalized guidance...</p>
+                    </div>
+                </div>
+
                 <!-- Progress Overview Card -->
                 <div class="dashboard-card progress-card">
                     <div class="card-header">
@@ -1692,6 +1705,17 @@
                             </svg>
                             <span>Settings</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- AI Insights Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>AI Insights</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="personalityInsights"></div>
+                        <div id="adaptiveSuggestions" style="margin-top:12px;"></div>
                     </div>
                 </div>
 
@@ -2741,6 +2765,14 @@
                 updateLoadingProgress(50);
                 console.log('📄 DOM loaded');
                 setupAuthEventListeners();
+                // Tone.js lazy init on first gesture
+                const resumeAudio = async () => {
+                    try { if (window.Tone && Tone.context.state !== 'running') await Tone.start(); } catch {}
+                    document.removeEventListener('click', resumeAudio, true);
+                    document.removeEventListener('touchstart', resumeAudio, true);
+                };
+                document.addEventListener('click', resumeAudio, true);
+                document.addEventListener('touchstart', resumeAudio, true);
             });
 
             // Initialize loading sequence
@@ -6473,6 +6505,8 @@ Focus on actionable insights and encouragement.
             loadPersonalityProfile();
             setupAdaptiveAI();
             initializeConversationMemory();
+            // Update mentor widget when data is ready
+            setTimeout(updateAIMentorWidget, 300);
         }
         async function loadPersonalityProfile() {
             if (!OperatorUplift.currentUser) return;
@@ -6663,6 +6697,23 @@ Focus on actionable insights and encouragement.
                     `;
                     suggestionsContainer.appendChild(suggestionElement);
                 });
+            }
+            updateAIMentorWidget();
+        }
+
+        async function updateAIMentorWidget() {
+            const el = document.getElementById('aiMentorMessage');
+            if (!el) return;
+            try {
+                const name = OperatorUplift?.userData?.name || 'Operator';
+                const completed = OperatorUplift?.userData?.stats?.completedGoals || 0;
+                const active = OperatorUplift?.userData?.stats?.totalGoals || 0;
+                const profile = aiEnhancementData?.personalityProfile;
+                const style = profile?.communicationStyle || 'direct';
+                const msg = `Stay sharp, ${name}. ${completed} wins logged, ${active} active. ${style === 'direct' ? 'Focus on the next high-leverage action.' : 'Keep momentum; one step at a time.'}`;
+                el.textContent = msg;
+            } catch (e) {
+                console.warn('Mentor widget update failed:', e);
             }
         }
 
