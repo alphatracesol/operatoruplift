@@ -1989,10 +1989,18 @@
         <div id="calendarView" class="view-container" style="display:none;">
             <div class="dashboard-header">
                 <div class="header-left"><h2>Calendar</h2></div>
-                <div class="header-right"></div>
+                <div class="header-right" style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn-secondary" id="calPrevBtn">←</button>
+                    <div id="calMonthLabel" class="text-muted" style="min-width:140px;text-align:center;">Month YYYY</div>
+                    <button class="btn-secondary" id="calNextBtn">→</button>
+                </div>
             </div>
             <div class="dashboard-card">
-                <div class="card-body" id="calendarContainer">Upcoming: None</div>
+                <div class="card-body">
+                    <div id="calendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;">
+                        <!-- Calendar cells will render here -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -3458,14 +3466,48 @@
             top.textContent = counts.size ? Array.from(counts.entries()).map(([k,v]) => `${k}: ${v}`).join(', ') : 'No categories yet';
         }
         function renderCalendar() {
-            const c = document.getElementById('calendarContainer');
-            if (!c) return;
+            const grid = document.getElementById('calendarGrid');
+            const label = document.getElementById('calMonthLabel');
+            const prev = document.getElementById('calPrevBtn');
+            const next = document.getElementById('calNextBtn');
+            if (!grid || !label) return;
+            // Track month offset in dataset
+            const offset = Number(grid.dataset.offset || 0);
+            const today = new Date();
+            const viewDate = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+            const monthName = viewDate.toLocaleString('default', { month: 'long' });
+            label.textContent = `${monthName} ${year}`;
+            // Build calendar cells
+            const firstWeekday = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
             const goals = dashboardData.goals || [];
-            const upcoming = goals
-                .filter(g => g.deadline)
-                .slice(0, 5)
-                .map(g => `${g.title} — due ${formatDate(g.deadline)}`);
-            c.textContent = upcoming.length ? upcoming.join(' | ') : 'Upcoming: None';
+            const goalsByDay = new Map();
+            goals.forEach(g => {
+                if (!g.deadline) return;
+                const d = new Date(g.deadline);
+                if (d.getMonth() !== month || d.getFullYear() !== year) return;
+                const day = d.getDate();
+                const arr = goalsByDay.get(day) || [];
+                arr.push(g);
+                goalsByDay.set(day, arr);
+            });
+            const cells = [];
+            for (let i = 0; i < firstWeekday; i++) cells.push('<div></div>');
+            for (let day = 1; day <= daysInMonth; day++) {
+                const items = goalsByDay.get(day) || [];
+                const badges = items.slice(0, 3).map(it => `<div class=\"badge\">${it.category || 'goal'}</div>`).join('');
+                cells.push(`
+                    <div class=\"calendar-cell\" style=\"border:1px solid var(--border-glass);border-radius:8px;padding:6px;min-height:72px;display:flex;flex-direction:column;gap:6px;\">
+                        <div style=\"font-weight:700;\">${day}</div>
+                        <div style=\"display:flex;gap:4px;flex-wrap:wrap;\">${badges}</div>
+                    </div>
+                `);
+            }
+            grid.innerHTML = cells.join('');
+            if (prev) prev.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) - 1); renderCalendar(); };
+            if (next) next.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) + 1); renderCalendar(); };
         }
         function renderCommunity() { /* placeholder */ }
         function renderFinance() {
