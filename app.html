@@ -1621,6 +1621,7 @@
                 </div>
                 <div class="header-right" style="display:flex;align-items:center;gap:8px;">
                     <span id="aiCreditsBadge" class="badge" title="AI credits remaining">AI: 0</span>
+                    <button id="addCreditsBtn" class="btn-secondary">Add Credits</button>
                     <button id="addGoalBtn" class="btn-primary">+ Add Goal</button>
                     <button id="userMenuBtn" class="btn-icon">
                         <svg viewBox="0 0 24 24" width="24" height="24">
@@ -3542,6 +3543,32 @@
                     } catch (e) {
                         console.error('Logout failed:', e);
                         OperatorUplift.ui?.showToast?.('Logout failed', 'error');
+                    }
+                });
+            }
+            // Add credits button
+            const addCredits = document.getElementById('addCreditsBtn');
+            if (addCredits) {
+                addCredits.addEventListener('click', async () => {
+                    const code = prompt('Enter promo code to add AI credits:');
+                    if (!code) return;
+                    try {
+                        const idToken = await auth.currentUser.getIdToken();
+                        const res = await fetch('/.netlify/functions/credits', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                            body: JSON.stringify({ code })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Failed');
+                        // Update local credits and refresh badge
+                        OperatorUplift.userData.stats = OperatorUplift.userData.stats || {};
+                        OperatorUplift.userData.stats.aiCredits = data.balance ?? OperatorUplift.userData.stats.aiCredits;
+                        updateDashboardUI();
+                        OperatorUplift.ui?.showToast?.(`Added ${data.added} credits`, 'success');
+                    } catch (err) {
+                        console.error('Add credits failed:', err);
+                        OperatorUplift.ui?.showToast?.('Invalid code or server error', 'error');
                     }
                 });
             }
