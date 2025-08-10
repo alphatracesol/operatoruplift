@@ -1583,6 +1583,26 @@
             </div>
         </div>
 
+        <!-- App Sidebar (minimal nav) -->
+        <aside id="appSidebar" class="app-sidebar" style="position:fixed;left:0;top:0;height:100dvh;width:64px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:flex-start;padding:16px 8px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
+            <a href="#" data-view="dashboard" class="nav-link active" title="Dashboard" aria-label="Dashboard" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📊</a>
+            <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏆</a>
+        </aside>
+
+        <!-- In-app loading overlay -->
+        <div id="appLoadingOverlay" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:10001;">
+            <div class="scene" style="width:64px;height:64px;perspective:600px;">
+                <div class="cube" style="width:64px;height:64px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(32px);"></div>
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);backface-visibility:hidden;transform:rotateY(90deg) translateZ(32px);"></div>
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);backface-visibility:hidden;transform:rotateY(180deg) translateZ(32px);"></div>
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);backface-visibility:hidden;transform:rotateY(-90deg) translateZ(32px);"></div>
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);backface-visibility:hidden;transform:rotateX(90deg) translateZ(32px);"></div>
+                    <div class="cube-face" style="position:absolute;width:64px;height:64px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);backface-visibility:hidden;transform:rotateX(-90deg) translateZ(32px);"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Dashboard View -->
         <div id="dashboardView" class="view-container">
             <!-- Dashboard Header -->
@@ -1767,6 +1787,28 @@
                             <button type="submit" class="btn-primary">Create Goal</button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals View (stub) -->
+        <div id="goalsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <p class="dashboard-subtitle">Manage your goals</p>
+                </div>
+                <div class="header-right">
+                    <button id="newGoalBtn" class="btn-primary">+ New Goal</button>
+                </div>
+            </div>
+            <div id="goalsList" class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Your Goals</h3></div>
+                    <div id="goalsEmpty" class="empty-state">
+                        <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        <p>No goals yet</p>
+                        <button class="btn-primary" id="goalsCreateCta">Create Your First Goal</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2113,44 +2155,39 @@
         // View management
         function showView(viewName) {
             console.log('🔄 showView called with:', viewName);
-            
-            // Hide all views
+
+            // Hide all views explicitly and show only the target view
             const views = document.querySelectorAll('.view-container');
-            console.log('📋 Found views:', views.length);
             views.forEach(view => {
-                view.classList.remove('active');
-                console.log('❌ Hidden view:', view.id);
+                const isTarget = view.id === `${viewName}View`;
+                view.classList.toggle('active', isTarget);
+                view.style.display = isTarget ? 'block' : 'none';
             });
-            
-            // Show target view
-            const targetView = document.getElementById(`${viewName}View`);
-            if (targetView) {
-                targetView.classList.add('active');
-                OperatorUplift.currentView = viewName;
-                console.log('✅ Activated view:', targetView.id);
 
-                // Update any nav links with data-view to reflect active state
-                const navLinks = document.querySelectorAll('[data-view]');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('data-view') === viewName) {
-                        link.classList.add('active');
-                    } else {
-                        link.classList.remove('active');
-                    }
-                });
-
-                // Update view title if present
-                const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
-                if (viewTitleEl) {
-                    const pretty = viewName.charAt(0).toUpperCase() + viewName.slice(1);
-                    viewTitleEl.textContent = pretty;
+            // Toggle sidebar visibility based on auth vs app views
+            const sidebar = document.getElementById('appSidebar');
+            if (sidebar) {
+                if (viewName === 'auth') {
+                    sidebar.style.display = 'none';
+                } else {
+                    sidebar.style.display = 'flex';
                 }
-            } else {
-                console.error('❌ Target view not found:', `${viewName}View`);
             }
-            
-            // Matrix rain is always visible - no need to control it per view
-            console.log('🌧️ Matrix rain remains visible for all views');
+
+            // Update any nav links with data-view to reflect active state
+            const navLinks = document.querySelectorAll('[data-view]');
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('data-view') === viewName);
+            });
+
+            // Update view title if present
+            const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
+            if (viewTitleEl) {
+                const pretty = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                viewTitleEl.textContent = pretty;
+            }
+
+            OperatorUplift.currentView = viewName;
         }
         
         // Register view management functions
@@ -2537,41 +2574,51 @@
             }
         }
 
-        // User data initialization
+        // User data initialization (robust schema + lastLogin merge)
         async function initializeUserData(user) {
             try {
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    OperatorUplift.userData = userData;
-                    console.log('📊 User data loaded:', userData);
+                const userRef = db.collection('users').doc(user.uid);
+                const snap = await userRef.get();
+                const baseDefaults = {
+                    uid: user.uid,
+                    name: user.displayName || (user.email ? user.email.split('@')[0] : 'Operator'),
+                    email: user.email || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    level: 1,
+                    experience: 0,
+                    stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0 },
+                    settings: { theme: 'dark', colorScheme: 'Firewall Flare', notifications: true },
+                    achievements: [],
+                };
+
+                if (snap.exists) {
+                    // Merge lastLogin and preserve existing
+                    await userRef.set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                    const data = { ...baseDefaults, ...snap.data() };
+                    OperatorUplift.userData = data;
+                    console.log('📊 User data loaded:', data);
                 } else {
-                    // Create user document if it doesn't exist
-                    console.log('🆕 Creating new user document for:', user.email);
-                    const userData = {
-                        name: user.displayName || user.email,
-                        email: user.email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        level: 1,
-                        experience: 0,
-                        goals: [],
-                        achievements: []
-                    };
-                    
-                    await db.collection('users').doc(user.uid).set(userData);
-                    OperatorUplift.userData = userData;
-                    console.log('✅ User document created:', userData);
+                    await userRef.set(baseDefaults, { merge: true });
+                    OperatorUplift.userData = baseDefaults;
+                    console.log('✅ User document created with defaults');
+                }
+
+                // Initialize dashboard after data ready
+                if (typeof initializeDashboard === 'function') {
+                    initializeDashboard();
                 }
             } catch (error) {
                 console.error('❌ Error loading/creating user data:', error);
-                // Create a basic user data object as fallback
-                OperatorUplift.userData = {
-                    name: user.displayName || user.email,
-                    email: user.email,
+                OperatorUplift.userData = OperatorUplift.userData || {
+                    uid: user.uid,
+                    name: user.displayName || user.email || 'Operator',
+                    email: user.email || '',
                     level: 1,
                     experience: 0,
-                    goals: [],
-                    achievements: []
+                    stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0 },
+                    settings: { theme: 'dark', colorScheme: 'Firewall Flare', notifications: true },
+                    achievements: [],
                 };
             }
         }
@@ -2579,12 +2626,20 @@
         // Utility functions
         function showError(message) {
             // Route errors through toast UI
-            showToast('error', typeof message === 'string' ? message : (message?.message || 'Unexpected error'));
+            if (OperatorUplift?.ui?.showToast) {
+                OperatorUplift.ui.showToast(typeof message === 'string' ? message : (message?.message || 'Unexpected error'), 'error');
+            } else {
+                showToast('error', typeof message === 'string' ? message : (message?.message || 'Unexpected error'));
+            }
         }
 
         function showSuccess(message) {
             // Route success through toast UI
-            showToast('success', typeof message === 'string' ? message : (message?.message || 'Success'));
+            if (OperatorUplift?.ui?.showToast) {
+                OperatorUplift.ui.showToast(typeof message === 'string' ? message : (message?.message || 'Success'), 'success');
+            } else {
+                showToast('success', typeof message === 'string' ? message : (message?.message || 'Success'));
+            }
         }
 
         // Toast notifications (lightweight)
@@ -2676,6 +2731,22 @@
         window.showLoginForm = showLoginForm;
         window.showRegisterForm = showRegisterForm;
         window.showForgotPassword = showForgotPassword;
+
+        // Expose UI helpers
+        OperatorUplift.ui = OperatorUplift.ui || {};
+        OperatorUplift.ui.showToast = (message, type = 'info', opts) => showToast(type, message, opts);
+        OperatorUplift.ui.showOverlay = (label = 'Loading...') => {
+            const overlay = document.getElementById('appLoadingOverlay');
+            if (!overlay) return;
+            overlay.style.display = 'flex';
+            const labelEl = overlay.querySelector('.loading-text');
+            if (labelEl) labelEl.textContent = label;
+        };
+        OperatorUplift.ui.hideOverlay = () => {
+            const overlay = document.getElementById('appLoadingOverlay');
+            if (!overlay) return;
+            overlay.style.display = 'none';
+        };
 
         // ===== DASHBOARD SYSTEM - PHASE 3 =====
         
@@ -2940,6 +3011,23 @@
                 }
             });
         }
+
+        // Sidebar nav links
+        (function setupSidebarNav() {
+            const sidebar = document.getElementById('appSidebar');
+            if (!sidebar) return;
+            sidebar.addEventListener('click', (e) => {
+                const link = e.target.closest('[data-view]');
+                if (!link) return;
+                e.preventDefault();
+                const view = link.getAttribute('data-view');
+                showView(view);
+            });
+            // Hide sidebar on initial auth view
+            if (OperatorUplift.currentView === 'auth') {
+                sidebar.style.display = 'none';
+            }
+        })();
 
         // Navigation functions
         function showAIChat() {
