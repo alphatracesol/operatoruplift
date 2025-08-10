@@ -394,7 +394,7 @@
         .status-paused { background: rgba(245,158,11,.12); color:#fbbf24; border-color: rgba(245,158,11,.35); }
         .status-tbd { background: rgba(148,163,184,.15); color:#cbd5e1; }
         /* Address display */
-        .address-wrap { display:flex; align-items:center; gap:.5rem; background: rgba(255,255,255,.05); border:1px solid var(--border-color); border-radius:10px; padding:.5rem .6rem; }
+        .address-wrap { display:flex; align-items:center; gap:.5rem; background: rgba(255,255,255,.05); border:1px solid var(--border-color); border-radius:10px; padding:.5rem .6rem; flex:1; min-width:0; }
         .addr { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing:.2px; }
         .addr.expanded { white-space:normal; word-break:break-all; }
         /* Reveal on scroll */
@@ -406,7 +406,8 @@
         .site-footer { margin-top: auto; }
         /* Weekly visualizer */
         .week { display:grid; grid-template-columns: repeat(7,1fr); gap:.5rem; width:100%; overflow:hidden; }
-        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:.75rem; min-height:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; }
+        .day { background: rgba(255,255,255,.04); border:1px solid var(--border-color); border-radius:10px; padding:.75rem; min-height:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-width:0; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
+        .day:hover { transform: translateY(-3px); background: rgba(255,255,255,.06); border-color: var(--accent-color); box-shadow: 0 6px 20px rgba(249, 115, 22, .15); }
         .day .name { color: var(--text-muted); font-size:clamp(.75rem, 1.8vw, .95rem); font-weight:600; }
         .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid var(--border-color); background: rgba(255,255,255,.06); white-space:nowrap; }
         /* Gradient sweep hover for small badges/chips/buttons */
@@ -673,7 +674,7 @@
                 <h3 style="margin-top:1rem;">2) Architecture</h3>
                 <ul class="muted" style="padding-left:1rem; list-style:disc;">
                     <li><strong>Client</strong>: Gamified SPA with AI agents and progression systems.</li>
-                    <li><strong>Services</strong>: Auth, Firestore user graph, event pipelines, analytics.</li>
+                    <li><strong>Services</strong>: Auth, user data graph, event pipelines, analytics.</li>
                     <li><strong>Token</strong>: Value capture via creator fees and in-app $UPLIFT usage.</li>
                 </ul>
                 <h3 style="margin-top:1rem;">3) Value Accrual</h3>
@@ -777,23 +778,23 @@
             </div>
 
             <div class="wallets" style="margin-top:1rem;">
-                <div class="token-info-card">
+                <div class="token-info-card" style="display:flex; flex-direction:column; gap:.5rem;">
                     <h3>Treasury Wallet</h3>
                     <p class="muted">Used exclusively for app development, audits, and ecosystem grants.</p>
-                    <div class="row" style="margin-top:.5rem;">
-                         <div class="address-wrap"><span id="w-treasury" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
+                    <div class="row" style="margin-top:.5rem; align-items:stretch;">
+                        <div class="address-wrap"><span id="w-treasury" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
                         <button class="copy-btn" onclick="copyText('#w-treasury')">Copy</button>
-                         <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
+                        <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
                     </div>
                     <small class="muted">Schedule: weekly disbursement; proposal-approved spending only.</small>
                 </div>
-                <div class="token-info-card">
+                <div class="token-info-card" style="display:flex; flex-direction:column; gap:.5rem;">
                     <h3>Burn/Buyback Wallet</h3>
                     <p class="muted">Receives 50% of creator fees and 15% of $UPLIFT purchases for buybacks/burns.</p>
-                    <div class="row" style="margin-top:.5rem;">
-                         <div class="address-wrap"><span id="w-burn" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
+                    <div class="row" style="margin-top:.5rem; align-items:stretch;">
+                        <div class="address-wrap"><span id="w-burn" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
                         <button class="copy-btn" onclick="copyText('#w-burn')">Copy</button>
-                         <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
+                        <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
                     </div>
                     <small class="muted">Schedule: bi-weekly buybacks; monthly consolidated burns with proof links.</small>
                 </div>
@@ -1025,6 +1026,52 @@
         </div>
     </footer>
 
+    <!-- Legal Modals (copied to match index) -->
+    <div id="privacy-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Privacy Policy</h2><p>We respect your privacy and are committed to protecting your personal data. Our privacy policy explains how we collect, use, and safeguard your information when you use Operator Uplift.</p><h3>Information We Collect</h3><p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p><h3>How We Use Your Information</h3><ul><li>To provide and maintain our services</li><li>To personalize your experience</li><li>To communicate with you about updates and features</li><li>To improve our services and develop new features</li></ul><h3>Data Security</h3><p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p><h3>Contact Us</h3><p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@operatoruplift.com">privacy@operatoruplift.com</a></p></div></div>
+    <div id="terms-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Terms of Service</h2><p><strong>Last updated: July 28, 2025</strong></p><p>Welcome to Operator Uplift. These Terms of Service ("Terms") govern your access to and use of the Operator Uplift website and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.</p><h3>Acceptance of Terms</h3><p>By accessing or using Operator Uplift, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this service.</p><h3>Description of Service</h3><p>Operator Uplift is an AI-powered self-progression platform that helps users set, track, and achieve their goals through gamification, community features, and personalized AI assistance.</p><h3>Contact Information</h3><p>For questions about these Terms of Service, please contact us at <a href="mailto:legal@operatoruplift.com">legal@operatoruplift.com</a></p></div></div>
+    <div id="support-modal" class="overlay-page"><div class="modal-content-wrapper"><button class="close-overlay-btn" aria-label="Close modal">×</button><h2>Support</h2><p>Need help? We're here to assist you on your journey to achieving your goals!</p><h3>Contact Information</h3><ul><li><strong>Email:</strong> <a href="mailto:support@operatoruplift.com">support@operatoruplift.com</a></li><li><strong>Response Time:</strong> Within 24 hours</li></ul></div></div>
+
+    <style>
+      /* Modal & Legal Page Styles (matched to index.html) */
+      .overlay-page { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(10,10,10,.85); opacity: 0; visibility: hidden; transition: opacity .25s ease; padding: 0 1rem; }
+      .overlay-page.is-scrollable { align-items: flex-start; padding-top: 5vh; }
+      .overlay-page.active { opacity: 1; visibility: visible; }
+      .modal-content-wrapper { background: rgba(24,24,27,.95); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 2rem; max-width: 760px; width: 92vw; max-height: 90vh; overflow-y: auto; transform: scale(.98); opacity: .98; transition: transform .2s ease, opacity .2s ease; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+      .overlay-page.active .modal-content-wrapper { transform: scale(1); opacity: 1; }
+      .modal-content-wrapper h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: .75rem; color: var(--text-color); }
+      .modal-content-wrapper h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: .5rem; color: var(--text-color); }
+      .modal-content-wrapper p, .modal-content-wrapper ul { color: var(--text-muted-color); margin-bottom: 1rem; }
+      .modal-content-wrapper ul { margin-left: 1.25rem; list-style: disc; }
+      .modal-content-wrapper a { color: var(--accent-hover); text-decoration: underline; }
+      .modal-content-wrapper a:hover { color: var(--text-color); }
+      .modal-content-wrapper::-webkit-scrollbar { width: 8px; }
+      .modal-content-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,.1); border-radius: 10px; }
+      .modal-content-wrapper::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
+      .modal-content-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
+      .close-overlay-btn { position:absolute; top: 1rem; right: 1rem; background:none; border:none; color: #cbd5e1; font-size: 2rem; cursor: pointer; padding: .25rem .5rem; border-radius: 8px; }
+      .close-overlay-btn:hover { background: rgba(255,255,255,.1); color: var(--text-color); }
+      @media (max-width: 768px) { .overlay-page { padding: 1rem .5rem; } .modal-content-wrapper { padding: 1.25rem; margin: 0 .25rem; } .close-overlay-btn { top: .5rem; right: .75rem; } }
+    </style>
+
+    <script>
+      // Basic legal modal open/close
+      (function(){
+        const links = document.querySelectorAll('.legal-link');
+        const modals = document.querySelectorAll('.overlay-page');
+        const closeBtns = document.querySelectorAll('.close-overlay-btn');
+        links.forEach(l=>{
+          l.addEventListener('click', e=>{
+            e.preventDefault();
+            const id = l.getAttribute('href').replace('#','');
+            const modal = document.getElementById(id);
+            if(modal){ modal.classList.add('active'); document.body.style.overflow='hidden'; }
+          });
+        });
+        closeBtns.forEach(b=> b.addEventListener('click',()=>{ modals.forEach(m=>m.classList.remove('active')); document.body.style.overflow=''; }));
+        modals.forEach(m=> m.addEventListener('click', e=>{ if(e.target===m){ m.classList.remove('active'); document.body.style.overflow=''; }}));
+        document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ modals.forEach(m=>m.classList.remove('active')); document.body.style.overflow=''; }});
+      })();
+    </script>
     <script>
         // Ripple effect copied from index for header text and buttons
         document.addEventListener('DOMContentLoaded', () => {
