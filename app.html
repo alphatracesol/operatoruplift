@@ -1617,6 +1617,7 @@
                             <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
                     </button>
+                    <button id="logoutBtn" class="btn-secondary">Logout</button>
                 </div>
             </div>
 
@@ -1816,6 +1817,75 @@
         <!-- AI Chat View -->
         <div id="aiChatView" class="view-container">
             <!-- AI Chat content will be added in next chunk -->
+        </div>
+
+        <!-- Goal Details View -->
+        <div id="goalDetailsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h2 id="goalDetailsTitle">Goal</h2>
+                </div>
+                <div class="header-right">
+                    <button class="btn-secondary" onclick="showView('dashboard')">Back</button>
+                </div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Overview</h3>
+                        <div class="card-actions">
+                            <span class="badge" id="goalDetailsCategory">Category</span>
+                            <span class="badge" id="goalDetailsStatus">Active</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="goalDetailsProgressBar" style="width:0%"></div>
+                        </div>
+                        <div style="margin-top:6px;">Progress: <span id="goalDetailsProgress">0%</span></div>
+                        <p id="goalDetailsDescription" style="margin-top:10px;">No description provided</p>
+                        <p class="text-muted" style="margin-top:8px;">Created: <span id="goalDetailsCreated">—</span> • Due: <span id="goalDetailsDeadline">—</span></p>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Tasks</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="goalTasksList" class="tasks-list"></div>
+                        <div class="form-row" style="margin-top:10px;gap:8px;display:flex;">
+                            <input id="newTaskInput" type="text" placeholder="New task..." style="flex:1;">
+                            <button class="btn-primary" onclick="addTaskToGoal()">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settingsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h2>Settings</h2>
+                </div>
+                <div class="header-right">
+                    <button class="btn-secondary" onclick="showView('dashboard')">Back</button>
+                </div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Appearance</h3></div>
+                    <div class="card-body">
+                        <button class="btn-secondary" onclick="ThemeManager.toggleTheme()">Toggle Theme</button>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Account</h3></div>
+                    <div class="card-body">
+                        <p class="text-muted">Signed in as: <span id="settingsUserEmail"></span></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3121,6 +3191,21 @@
             // User menu button
             document.getElementById('userMenuBtn').addEventListener('click', showUserMenu);
             
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        await auth.signOut();
+                        OperatorUplift.ui?.showToast?.('Signed out', 'success');
+                        showView('auth');
+                    } catch (e) {
+                        console.error('Logout failed:', e);
+                        OperatorUplift.ui?.showToast?.('Logout failed', 'error');
+                    }
+                });
+            }
+            
             // Modal backdrop click to close
             document.getElementById('addGoalModal').addEventListener('click', (e) => {
                 if (e.target.id === 'addGoalModal') {
@@ -3157,8 +3242,9 @@
         }
 
         function showSettings() {
-            // Will be implemented in later phases
-            showSuccess('Settings coming soon!');
+            const emailEl = document.getElementById('settingsUserEmail');
+            if (emailEl) emailEl.textContent = OperatorUplift.currentUser?.email || '';
+            showView('settings');
         }
 
         function showAllGoals() {
@@ -3172,8 +3258,8 @@
         }
 
         function showUserMenu() {
-            // Will be implemented in later phases
-            showSuccess('User menu coming soon!');
+            // Minimal user menu via toast for now
+            showSuccess('Profile menu coming soon. Use Settings for theme.');
         }
 
         function viewGoal(goalId) {
