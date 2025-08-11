@@ -1054,12 +1054,15 @@
             background: var(--glass-bg-heavy);
             border: 1px solid var(--border-glass);
         }
-        /* Dashboard Grid */
+        /* Dashboard Grid - normalized rhythm */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
-            margin-bottom: 30px;
+            gap: clamp(16px, 2.5vw, 24px);
+            margin-bottom: clamp(16px, 3vw, 28px);
+        }
+        @media (max-width: 640px) {
+            .dashboard-grid { gap: 16px; }
         }
 
         /* Dashboard Cards */
@@ -1068,7 +1071,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 16px;
-            padding: 24px;
+            padding: clamp(14px, 2.4vw, 20px);
             box-shadow: var(--shadow-lg);
             transition: var(--transition-fast);
         }
@@ -1132,7 +1135,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: clamp(8px, 1.4vw, 12px);
         }
 
         .card-header h3 {
@@ -1144,6 +1147,18 @@
         .card-actions {
             display: flex;
             gap: 8px;
+        }
+
+        /* Iconography: unify to currentColor */
+        .app-sidebar svg,
+        .dashboard-card svg,
+        .btn-icon svg,
+        .action-btn svg {
+            color: var(--text-color);
+            fill: currentColor;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            vector-effect: non-scaling-stroke;
         }
 
         /* Sidebar icon sizing */
@@ -1507,7 +1522,7 @@
     <canvas id="matrix-rain-canvas"></canvas>
     
     <!-- Loading Screen -->
-        <div id="loadingScreen" class="loading-screen">
+    <div id="loadingScreen" class="loading-screen">
             <div class="scene" style="width:72px;height:72px;perspective:600px;">
                 <div class="cube" style="width:72px;height:72px;position:relative;transform-style:preserve-3d;animation:cube-spin 3s linear infinite;">
                     <div class="cube-face" style="position:absolute;width:72px;height:72px;background:rgba(249,115,22,.08);border:2px solid var(--accent-color);display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform:rotateY(0deg) translateZ(36px);">
@@ -2945,7 +2960,7 @@
         // View management
         function showView(viewName) {
             console.log('🔄 showView called with:', viewName);
-
+            
             // Hide all views explicitly and show only the target view
             const views = document.querySelectorAll('.view-container');
             views.forEach(view => {
@@ -2964,20 +2979,20 @@
                 }
             }
 
-            // Update any nav links with data-view to reflect active state
+                // Update any nav links with data-view to reflect active state
             const sidebarEl = document.getElementById('appSidebar');
             const navLinks = sidebarEl ? sidebarEl.querySelectorAll('[data-view]') : document.querySelectorAll('[data-view]');
-            navLinks.forEach(link => {
+                navLinks.forEach(link => {
                 link.classList.toggle('active', link.getAttribute('data-view') === viewName);
-            });
+                });
 
-            // Update view title if present
-            const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
-            if (viewTitleEl) {
-                const pretty = viewName.charAt(0).toUpperCase() + viewName.slice(1);
-                viewTitleEl.textContent = pretty;
+                // Update view title if present
+                const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
+                if (viewTitleEl) {
+                    const pretty = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                    viewTitleEl.textContent = pretty;
             }
-
+            
             OperatorUplift.currentView = viewName;
         }
         
@@ -3105,7 +3120,7 @@
                     if (auth && auth.currentUser) {
                         showView('dashboard');
                     } else {
-                        showView('auth');
+                    showView('auth');
                     }
                     // Soft ambient audio on login page
                     try {
@@ -3199,7 +3214,7 @@
                     OperatorUplift.currentUser = user;
                     // Only switch to dashboard if currently on auth
                     if (OperatorUplift.currentView !== 'dashboard') {
-                        showView('dashboard');
+                    showView('dashboard');
                     }
                     initializeUserData(user);
                 }
@@ -3219,7 +3234,7 @@
                 // Direct view transition without loading screen
                 console.log('🔄 Transitioning to dashboard...');
                 if (OperatorUplift.currentView !== 'dashboard') {
-                    showView('dashboard');
+                showView('dashboard');
                 }
                 console.log('✅ Dashboard view activated');
                 
@@ -3391,10 +3406,10 @@
                     uid: user.uid,
                     name: user.displayName || (user.email ? user.email.split('@')[0] : 'Operator'),
                     email: user.email || '',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                    level: 1,
-                    experience: 0,
+                        level: 1,
+                        experience: 0,
                     stats: { points: 0, level: 1, currentStreak: 0, totalGoals: 0, completedGoals: 0, aiCredits: 50 },
                     settings: { theme: 'dark', colorScheme: 'Firewall Flare', notifications: true },
                     achievements: [],
@@ -3442,7 +3457,7 @@
             if (OperatorUplift?.ui?.showToast) {
                 OperatorUplift.ui.showToast(typeof message === 'string' ? message : (message?.message || 'Unexpected error'), 'error');
             } else {
-                showToast('error', typeof message === 'string' ? message : (message?.message || 'Unexpected error'));
+            showToast('error', typeof message === 'string' ? message : (message?.message || 'Unexpected error'));
             }
         }
 
@@ -3451,7 +3466,7 @@
             if (OperatorUplift?.ui?.showToast) {
                 OperatorUplift.ui.showToast(typeof message === 'string' ? message : (message?.message || 'Success'), 'success');
             } else {
-                showToast('success', typeof message === 'string' ? message : (message?.message || 'Success'));
+            showToast('success', typeof message === 'string' ? message : (message?.message || 'Success'));
             }
         }
 
@@ -3976,7 +3991,7 @@
             container.innerHTML = goals.map(goal => `
                 <div class="dashboard-card">
                     <div class="card-header">
-                        <h3>${goal.title}</h3>
+                        <h3 contenteditable="true" onblur="inlineRenameGoal('${goal.id}', this.textContent)" title="Click to rename">${goal.title}</h3>
                         <div class="card-actions">
                             ${goal.status !== 'completed' ? `<button class="btn-secondary" onclick="completeGoal('${goal.id}')">Mark Complete</button>` : '<span class="badge">Completed</span>'}
                             <button class="btn-secondary" onclick="openEditGoalModal('${goal.id}')">Edit</button>
@@ -3985,10 +4000,46 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted">${goal.category} • ${goal.difficulty} • Due ${formatDate(goal.deadline)}</p>
-                        ${goal.description ? `<p style="margin-top:6px;">${goal.description}</p>` : ''}
+                        ${goal.description ? `<p style=\"margin-top:6px;\" contenteditable=\"true\" onblur=\"inlineEditDescription('${goal.id}', this.textContent)\">${goal.description}</p>` : '<p class="text-muted" contenteditable="true" onblur="inlineEditDescription(\''+goal.id+'\', this.textContent)">Add a description…</p>'}
+                        <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+                            <button class="btn-secondary" onclick="aiSummarizeGoal('${goal.id}')">AI Summarize</button>
+                            <button class="btn-secondary" onclick="aiBreakdownGoal('${goal.id}')">AI Breakdown</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Inline goal edits
+        async function inlineRenameGoal(goalId, newTitle) {
+            try {
+                newTitle = (newTitle||'').trim();
+                if (!newTitle) return;
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('goals').doc(goalId).set({ title: newTitle, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                const g = dashboardData.goals.find(x=>x.id===goalId); if (g) g.title = newTitle;
+                updateGoalsList();
+            } catch (e) { console.error('Inline rename failed', e); }
+        }
+        async function inlineEditDescription(goalId, newDesc) {
+            try {
+                newDesc = (newDesc||'').trim();
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('goals').doc(goalId).set({ description: newDesc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                const g = dashboardData.goals.find(x=>x.id===goalId); if (g) g.description = newDesc;
+            } catch (e) { console.error('Inline desc failed', e); }
+        }
+
+        // AI quick actions (uses existing proxy plumbing)
+        async function aiSummarizeGoal(goalId) {
+            const g = dashboardData.goals.find(x=>x.id===goalId); if (!g) return;
+            const prompt = `Summarize this goal in 2 lines with key steps: ${g.title}. Details: ${g.description||''}`;
+            const out = await callDeepSeekAI([{ role: 'user', content: prompt }]).catch(()=>null);
+            if (out?.text) OperatorUplift.ui?.showToast?.('AI: ' + out.text.slice(0,80) + '…', 'success');
+        }
+        async function aiBreakdownGoal(goalId) {
+            const g = dashboardData.goals.find(x=>x.id===goalId); if (!g) return;
+            const prompt = `Break this goal into 3-5 actionable steps: ${g.title}. Details: ${g.description||''}`;
+            const out = await callDeepSeekAI([{ role: 'user', content: prompt }]).catch(()=>null);
+            if (out?.text) OperatorUplift.ui?.showToast?.('AI: ' + out.text.slice(0,80) + '…', 'success');
         }
 
         // Complete goal action
@@ -4013,7 +4064,7 @@
 
                 updateGoalsList();
                 updateStats();
-                OperatorUplift.ui?.showToast?.('Goal marked complete! +'+xp+' XP', 'success');
+                OperatorUplift.ui?.showToast?.('Goal complete ✓  +'+xp+' XP', 'success');
                 // Re-render goals view if visible
                 if (OperatorUplift.currentView === 'goals') {
                     renderGoalsViewList();
@@ -4642,10 +4693,31 @@
                 arr.push(g);
                 goalsByDay.set(day, arr);
             });
+            // Inject legend + filter chips
+            let legendEl = document.getElementById('calendarLegend');
+            if (!legendEl) {
+                legendEl = document.createElement('div');
+                legendEl.id = 'calendarLegend';
+                legendEl.style.margin = '8px 0';
+                legendEl.style.display = 'flex';
+                legendEl.style.gap = '6px';
+                legendEl.style.flexWrap = 'wrap';
+                grid.parentElement?.insertBefore(legendEl, grid);
+            }
+            const categories = Array.from(new Set((dashboardData.goals||[]).map(g=>g.category||'general')));
+            const active = grid.dataset.filter || 'all';
+            legendEl.innerHTML = ['all', ...categories].map(c=>`<button class="btn-secondary${active===c?' active':''}" data-cal-filter="${c}">${c}</button>`).join('');
+            legendEl.onclick = (e)=>{
+                const b = e.target.closest('[data-cal-filter]'); if (!b) return;
+                grid.dataset.filter = b.getAttribute('data-cal-filter') || 'all';
+                renderCalendar();
+            };
+
             const cells = [];
             for (let i = 0; i < firstWeekday; i++) cells.push('<div></div>');
             for (let day = 1; day <= daysInMonth; day++) {
-                const items = goalsByDay.get(day) || [];
+                let items = goalsByDay.get(day) || [];
+                if (active !== 'all') items = items.filter(g=> (g.category||'') === active);
                 const badges = items.slice(0, 3).map(it => `<div class=\"badge\">${it.category || 'goal'}</div>`).join('');
                 const click = items.length ? `onclick=\"openCalendarDayModal('${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}')\"` : '';
                 cells.push(`
