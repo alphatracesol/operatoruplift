@@ -336,6 +336,12 @@
             color: var(--text-muted);
             line-height: 1.6;
         }
+        /* Mobile overflow guards */
+        * { box-sizing: border-box; }
+        .section, .token-chart, .token-info-section, .viz-grid, .tokenomics-grid, .roadmap, .wallets { max-width: 100%; }
+        .card, .token-info-card, .roadmap-item { max-width: 100%; overflow: hidden; }
+        table { width: 100%; table-layout: fixed; }
+        th, td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Tokenomics, Litepaper, Roadmap */
         .section {
@@ -929,7 +935,7 @@
                         <button class="copy-btn" id="burn-feed-refresh" type="button">Reload</button>
                     </div>
                     <div style="margin-top:.5rem; overflow:auto;">
-                        <table style="width:100%; border-collapse:collapse;">
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
                             <thead><tr><th style="text-align:left; padding:.4rem;">Wallet</th><th style="text-align:right; padding:.4rem;">Amount</th><th style="text-align:left; padding:.4rem;">Time</th><th style="padding:.4rem;">Tx</th></tr></thead>
                             <tbody id="burn-feed-body"></tbody>
                         </table>
@@ -1407,12 +1413,12 @@
                     background: { color: { value: 'transparent' } },
                     fpsLimit: 45,
                     particles: {
-                        number: { value: 35, density: { enable: true, area: 800 } },
+                        number: { value: 16, density: { enable: true, area: 900 } },
                         color: { value: '#f97316' },
-                        opacity: { value: 0.25 },
-                        size: { value: { min: 1, max: 3 } },
-                        links: { enable: true, color: '#f97316', opacity: 0.15, distance: 140 },
-                        move: { enable: true, speed: 0.6 }
+                        opacity: { value: 0.2 },
+                        size: { value: { min: 1, max: 2 } },
+                        links: { enable: true, color: '#f97316', opacity: 0.12, distance: 130 },
+                        move: { enable: true, speed: 0.45 }
                     },
                     interactivity: {
                         events: { onHover: { enable: false }, onClick: { enable: false }, resize: true },
@@ -1629,8 +1635,8 @@
                         const w = b.wallet || '';
                         return `<tr>
                             <td style="padding:.35rem .4rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${w}</td>
-                            <td style="padding:.35rem .4rem; text-align:right;">${amt}</td>
-                            <td style="padding:.35rem .4rem;">${when}</td>
+                            <td style="padding:.35rem .4rem; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${amt}</td>
+                            <td style="padding:.35rem .4rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${when}</td>
                             <td style="padding:.35rem .4rem; text-align:center;"><a class="pill" href="https://solscan.io/tx/${sig}" target="_blank" rel="noopener">View</a></td>
                         </tr>`;
                     }).join('');
