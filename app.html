@@ -4820,6 +4820,10 @@
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const label = document.getElementById('calMonthLabel');
+            if (!grid || !label) return;
+            // Overflow guard for mobile
+            grid.style.maxWidth = '100%';
+            grid.style.overflow = 'hidden';
             const prev = document.getElementById('calPrevBtn');
             const next = document.getElementById('calNextBtn');
             const modeMonthBtn = document.getElementById('calModeMonth');

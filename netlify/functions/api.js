@@ -9,7 +9,14 @@ const { Connection, PublicKey } = require('@solana/web3.js');
 const app = express();
 app.use(bodyParser.json());
 const corsOrigins = process.env.CORS_ALLOWED_ORIGINS ? process.env.CORS_ALLOWED_ORIGINS.split(',') : true;
-app.use(cors({ origin: corsOrigins }));
+app.use(cors({ origin: corsOrigins.split ? corsOrigins : (o, cb)=> {
+  // support array and exact string matching
+  if (corsOrigins === true) return cb(null, true);
+  const origin = o || '';
+  const allowed = Array.isArray(corsOrigins) ? corsOrigins : String(corsOrigins||'').split(',');
+  if (!origin || allowed.includes(origin)) return cb(null, true);
+  return cb(new Error('CORS not allowed'), false);
+} }));
 
 // Simple rate limiter (per IP) using Redis when available, or in-memory fallback
 const RATE_WINDOW = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
