@@ -2426,6 +2426,10 @@
                     <button class="btn-secondary" id="calPrevBtn">←</button>
                     <div id="calMonthLabel" class="text-muted" style="min-width:140px;text-align:center;">Month YYYY</div>
                     <button class="btn-secondary" id="calNextBtn">→</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-secondary" id="calModeMonth">Month</button>
+                        <button class="btn-secondary" id="calModeWeek">Week</button>
+                    </div>
                 </div>
             </div>
             <div class="dashboard-card">
@@ -3697,7 +3701,32 @@
             const chapterBar = document.getElementById('chapterProgressBar');
             if (chapterText) chapterText.textContent = `${currentXP}/${xpForNextLevel} XP`;
             if (chapterBar) chapterBar.style.width = progressPercent + '%';
+            // Treasure chest progress
+            const txt = document.getElementById('chestProgressText');
+            const openBtn = document.getElementById('openChestBtn');
+            const completedCount = (dashboardData.goals||[]).filter(g => g.status === 'completed').length;
+            const target = 5;
+            const remaining = Math.max(0, target - (completedCount % target));
+            if (txt) txt.textContent = remaining === 0 ? 'Chest ready to open!' : `${remaining} completions to next chest`;
+            if (openBtn) openBtn.style.display = remaining === 0 ? 'inline-flex' : 'none';
         }
+
+        // Treasure chest open handler
+        (function bindChestOpen(){
+            const btn = document.getElementById('openChestBtn');
+            if (!btn || btn.dataset.bound) return; btn.dataset.bound = '1';
+            btn.addEventListener('click', async () => {
+                try {
+                    const points = Number(OperatorUplift.userData?.stats?.points || 0);
+                    const award = 25;
+                    await db.collection('users').doc(OperatorUplift.currentUser.uid).set({ stats: { points: points + award } }, { merge: true });
+                    OperatorUplift.userData.stats = OperatorUplift.userData.stats || {};
+                    OperatorUplift.userData.stats.points = points + award;
+                    OperatorUplift.ui?.showToast?.(`Treasure opened! +${award} Essence`, 'success');
+                    updateProgressStats();
+                } catch (e) { console.error('Open chest failed', e); }
+            });
+        })();
 
         async function addExperience(dpToAdd) {
             try {
@@ -4020,6 +4049,15 @@
                 updateGoalsList();
             } catch (e) { console.error('Inline rename failed', e); }
         }
+        // Keyboard shortcuts for goals: Enter to blur/save, Esc to revert
+        document.addEventListener('keydown', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
+            if (target.matches('[contenteditable="true"]')) {
+                if (e.key === 'Enter') { e.preventDefault(); target.blur(); }
+                if (e.key === 'Escape') { e.preventDefault(); document.execCommand && document.execCommand('undo'); target.blur(); }
+            }
+        });
         async function inlineEditDescription(goalId, newDesc) {
             try {
                 newDesc = (newDesc||'').trim();
@@ -4670,15 +4708,18 @@
             const label = document.getElementById('calMonthLabel');
             const prev = document.getElementById('calPrevBtn');
             const next = document.getElementById('calNextBtn');
+            const modeMonthBtn = document.getElementById('calModeMonth');
+            const modeWeekBtn = document.getElementById('calModeWeek');
             if (!grid || !label) return;
             // Track month offset in dataset
             const offset = Number(grid.dataset.offset || 0);
+            const mode = grid.dataset.mode || 'month';
             const today = new Date();
             const viewDate = new Date(today.getFullYear(), today.getMonth() + offset, 1);
             const year = viewDate.getFullYear();
             const month = viewDate.getMonth();
             const monthName = viewDate.toLocaleString('default', { month: 'long' });
-            label.textContent = `${monthName} ${year}`;
+            label.textContent = mode === 'week' ? `${monthName} ${year} (Week)` : `${monthName} ${year}`;
             // Build calendar cells
             const firstWeekday = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -4715,7 +4756,10 @@
 
             const cells = [];
             for (let i = 0; i < firstWeekday; i++) cells.push('<div></div>');
-            for (let day = 1; day <= daysInMonth; day++) {
+            // Week mode: start from current week within the month
+            const startDay = mode === 'week' ? Math.max(1, today.getDate() - today.getDay()) : 1;
+            const endDay = mode === 'week' ? Math.min(daysInMonth, startDay + 6) : daysInMonth;
+            for (let day = startDay; day <= endDay; day++) {
                 let items = goalsByDay.get(day) || [];
                 if (active !== 'all') items = items.filter(g=> (g.category||'') === active);
                 const badges = items.slice(0, 3).map(it => `<div class=\"badge\">${it.category || 'goal'}</div>`).join('');
@@ -4730,6 +4774,8 @@
             grid.innerHTML = cells.join('');
             if (prev) prev.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) - 1); renderCalendar(); };
             if (next) next.onclick = () => { grid.dataset.offset = String((Number(grid.dataset.offset||0)) + 1); renderCalendar(); };
+            if (modeMonthBtn) modeMonthBtn.onclick = () => { grid.dataset.mode = 'month'; renderCalendar(); };
+            if (modeWeekBtn) modeWeekBtn.onclick = () => { grid.dataset.mode = 'week'; renderCalendar(); };
         }
         function openCalendarDayModal(dateStr) {
             const modalId = 'calendarDayModal';
