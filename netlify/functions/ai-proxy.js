@@ -171,33 +171,35 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Call AI provider
+    // Call AI provider with fallback chain
     let response;
-    switch (provider.toLowerCase()) {
-      case 'claude':
-        response = await callClaude(messages);
-        break;
-      case 'gemini':
-        response = await callGemini(messages);
-        break;
-      case 'perplexity':
-        response = await callPerplexity(messages);
-        break;
-      case 'xai':
-        response = await callXAI(messages);
-        break;
-      case 'deepseek':
-        response = await callDeepSeek(messages);
-        break;
-      case 'deepseek-hf':
-        response = await callDeepSeekHuggingFace(messages);
-        break;
-      default:
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Unsupported AI provider' })
-        };
+    const chain = (() => {
+      const p = provider.toLowerCase();
+      if (p === 'deepseek') return ['deepseek', 'deepseek-hf', 'claude', 'gemini'];
+      if (p === 'deepseek-hf') return ['deepseek-hf', 'deepseek', 'claude', 'gemini'];
+      if (p === 'claude') return ['claude', 'gemini', 'deepseek'];
+      if (p === 'gemini') return ['gemini', 'claude', 'deepseek'];
+      if (p === 'perplexity') return ['perplexity', 'claude'];
+      if (p === 'xai') return ['xai', 'claude'];
+      return [p];
+    })();
+    let lastErr = null;
+    for (const p of chain) {
+      try {
+        if (p === 'claude') { response = await callClaude(messages); break; }
+        if (p === 'gemini') { response = await callGemini(messages); break; }
+        if (p === 'perplexity') { response = await callPerplexity(messages); break; }
+        if (p === 'xai') { response = await callXAI(messages); break; }
+        if (p === 'deepseek') { response = await callDeepSeek(messages); break; }
+        if (p === 'deepseek-hf') { response = await callDeepSeekHuggingFace(messages); break; }
+      } catch (err) {
+        lastErr = err;
+        console.warn(`AI provider ${p} failed, trying next...`, err?.message || err);
+        continue;
+      }
+    }
+    if (!response) {
+      return { statusCode: 502, headers, body: JSON.stringify({ error: 'All AI providers failed', details: String(lastErr||'') }) };
     }
 
     // Deduct AI credit
