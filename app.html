@@ -1813,6 +1813,7 @@
                     <p class="dashboard-subtitle">Level <span id="userLevel">1</span> • <span id="userExperience">0</span> XP</p>
                 </div>
                 <div class="header-right" style="display:flex;align-items:center;gap:8px;">
+                    <span id="burnBadge" class="badge" title="Total burned $UPLIFT" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--border-glass);padding:6px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--text-color);">BURN: —</span>
                     <span id="pointsBadge" class="badge" title="Points from $UPLIFT holdings" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--border-glass);padding:6px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--text-color);">PTS: 0</span>
                     <button id="connectWalletBtn" class="btn-secondary" title="Connect Solana Wallet">Connect Wallet</button>
                     <span id="aiCreditsBadge" class="badge" title="AI credits remaining">AI: 0</span>
@@ -3699,6 +3700,7 @@
         function setupWalletAndPoints() {
             const connectBtn = document.getElementById('connectWalletBtn');
             const pointsBadge = document.getElementById('pointsBadge');
+            const burnBadge = document.getElementById('burnBadge');
             const saved = localStorage.getItem('uplift:wallet');
             if (saved && pointsBadge) pointsBadge.textContent = 'PTS: …';
             if (connectBtn && !connectBtn.dataset.bound) {
@@ -3727,6 +3729,23 @@
                 fetchAndRenderPoints(saved);
                 setInterval(() => fetchAndRenderPoints(saved), 120000);
             }
+            // Burn total badge
+            (async function loadBurnTotal(){
+                try {
+                    if (burnBadge) burnBadge.textContent = 'BURN: …';
+                    const t = await fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' }).then(r=>r.json()).catch(()=>null);
+                    if (t && typeof t.total === 'number' && burnBadge) burnBadge.textContent = 'BURN: ' + Number(t.total).toLocaleString();
+                } catch {}
+            })();
+            try {
+                const es = new EventSource('/.netlify/functions/api/api/burn/stream');
+                es.addEventListener('snapshot', (e) => {
+                    try {
+                        const data = JSON.parse(e.data||'{}');
+                        if (typeof data.total === 'number' && burnBadge) burnBadge.textContent = 'BURN: ' + Number(data.total).toLocaleString();
+                    } catch {}
+                });
+            } catch {}
         }
 
         async function fetchAndRenderPoints(address) {
@@ -3775,6 +3794,15 @@
             if (levelProgressTextElement) {
                 levelProgressTextElement.textContent = `${currentXP}/${xpForNextLevel} XP`;
             }
+            // Header stat badges
+            try {
+                const pointsBadge = document.getElementById('pointsBadge');
+                if (pointsBadge && localStorage.getItem('uplift:wallet')) {
+                    // keep as-is; fetch happens separately
+                }
+                const creditsEl = document.getElementById('aiCreditsBadge');
+                if (creditsEl) creditsEl.textContent = `AI: ${OperatorUplift?.userData?.stats?.aiCredits ?? 0}`;
+            } catch {}
             // Mirror values into chapter progress card
             const chapterText = document.getElementById('chapterProgressText');
             const chapterBar = document.getElementById('chapterProgressBar');
