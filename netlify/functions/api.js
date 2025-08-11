@@ -4,6 +4,7 @@ const serverless = require('serverless-http');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { getBurnTotalStore } = require('../../src/utils/store');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -46,8 +47,26 @@ app.get('/api/burn/stream', async (req, res) => {
 
 // Placeholder points endpoint returning 0 until wallet lookup worker is added
 app.get('/api/user/:wallet/points', async (req, res) => {
-  const rate = Number(process.env.POINTS_RATE || 100);
-  res.json({ wallet: req.params.wallet, uplift: 0, points: 0, rate });
+  try {
+    const rate = Number(process.env.POINTS_RATE || 100);
+    const rpc = process.env.HELIUS_RPC_URL || 'https://api.mainnet-beta.solana.com';
+    const mintStr = process.env.UPLIFT_MINT;
+    const decimals = Number(process.env.UPLIFT_DECIMALS || 9);
+    const owner = new PublicKey(req.params.wallet);
+    const mint = new PublicKey(mintStr);
+    const conn = new Connection(rpc, 'confirmed');
+    const accts = await conn.getTokenAccountsByOwner(owner, { mint });
+    let raw = 0n;
+    for (const { pubkey } of accts.value) {
+      const bal = await conn.getTokenAccountBalance(pubkey);
+      raw += BigInt(bal.value.amount);
+    }
+    const uplift = Number(raw) / Math.pow(10, decimals);
+    const points = Math.floor(uplift * rate);
+    res.json({ wallet: String(owner), uplift, points, rate });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
 });
 
 module.exports.handler = serverless(app);

@@ -1532,6 +1532,13 @@
                 const overlay = document.getElementById('burn-loading');
                 if (overlay) overlay.style.display = 'flex';
                 try {
+                    // Prefer backend burn total for accuracy
+                    try {
+                        const t = await fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' }).then(r=>r.json());
+                        if (t && typeof t.total === 'number') {
+                            if (elTotal) elTotal.textContent = formatNum(t.total);
+                        }
+                    } catch {}
                     // Supply via Solscan public API
                     // Docs: public-api.solscan.io (supply endpoints may vary; placeholder logic shown)
                     // Try: token meta to get decimals; supply calculations require on-chain data
@@ -1596,6 +1603,18 @@
                 }
             }
             if (btnRefresh) btnRefresh.addEventListener('click', (e)=>{ e.preventDefault(); loadBurnData(); });
+            // SSE live updates from backend
+            try {
+                const es = new EventSource('/.netlify/functions/api/api/burn/stream');
+                es.addEventListener('snapshot', (e) => {
+                    try {
+                        const data = JSON.parse(e.data||'{}');
+                        if (typeof data.total === 'number' && elTotal) {
+                            elTotal.textContent = formatNum(data.total);
+                        }
+                    } catch {}
+                });
+            } catch {}
 
             async function loadBurnFeed(){
                 if (!elFeedBody) return;
