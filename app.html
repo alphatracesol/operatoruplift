@@ -1084,6 +1084,20 @@
             .view-container:not(#authView) { padding-left: 236px; }
         }
 
+        .app-sidebar .nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text-color); text-decoration: none; background: var(--card-bg-glass); }
+        .app-sidebar .nav-link .nav-icon { width: 22px; height: 22px; display:grid; place-items:center; }
+        .app-sidebar .nav-link .nav-text { display:none; font-size:14px; }
+        .app-sidebar .nav-link.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .app-sidebar .nav-tooltip { position: absolute; left: 64px; background: var(--card-bg-glass); border:1px solid var(--border-glass); padding:4px 8px; border-radius:6px; font-size:12px; display:none; white-space:nowrap; }
+        .app-sidebar .nav-item { position: relative; width:100%; }
+        .app-sidebar .nav-item:hover .nav-tooltip { display: block; }
+        /* Expanded vs Collapsed */
+        @media (min-width: 1024px) { .app-sidebar:not([data-collapsed="true"]) .nav-link .nav-text { display:inline; } }
+        .app-sidebar[data-collapsed="true"] { width:72px !important; }
+        .app-sidebar:not([data-collapsed="true"]) { width:220px !important; }
+        body.sidebar-collapsed .view-container:not(#authView) { padding-left: 84px; }
+        body.sidebar-expanded .view-container:not(#authView) { padding-left: 236px; }
+
         /* Enforce card and modal glass inside app wrapper */
         /* Strong specificity to avoid login/landing styles leaking in */
         #appShell .view-container .dashboard-card,
@@ -1506,7 +1520,7 @@
     </div>
 
     <!-- Main App Container -->
-    <div id="appContainer" class="app-container">
+    <div id="appShell" class="app-container">
         <!-- Authentication View -->
         <div id="authView" class="view-container">
             <div class="auth-container">
@@ -1625,19 +1639,101 @@
             </div>
         </div>
 
-        <!-- App Sidebar (minimal nav) -->
-        <aside id="appSidebar" class="app-sidebar" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:flex-start;padding:16px 8px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
-            <a href="#" data-view="dashboard" class="nav-link active" title="Dashboard" aria-label="Dashboard" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📊</a>
-            <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏆</a>
-            <a href="#" data-view="habits" class="nav-link" title="Habits" aria-label="Habits" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">✅</a>
-            <a href="#" data-view="focus" class="nav-link" title="Focus" aria-label="Focus" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">⏱️</a>
-            <a href="#" data-view="analytics" class="nav-link" title="Analytics" aria-label="Analytics" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📈</a>
-            <a href="#" data-view="calendar" class="nav-link" title="Calendar" aria-label="Calendar" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📅</a>
-            <a href="#" data-view="community" class="nav-link" title="Community" aria-label="Community" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">👥</a>
-            <a href="#" data-view="finance" class="nav-link" title="Finance" aria-label="Finance" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">💰</a>
-            <a href="#" data-view="shop" class="nav-link" title="Shop" aria-label="Shop" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🛒</a>
-            <a href="#" data-view="achievements" class="nav-link" title="Achievements" aria-label="Achievements" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏅</a>
-            <a href="#" data-view="journeys" class="nav-link" title="Journeys" aria-label="Journeys" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🧭</a>
+        <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
+        <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:10px;align-items:stretch;justify-content:flex-start;padding:12px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zm0 7L2 4v13l10 5 10-5V4l-10 5z"/></svg>
+                    <span class="nav-text" style="font-weight:700;">Uplift</span>
+                </div>
+                <button id="sidebarToggle" class="btn-icon" title="Collapse sidebar" aria-label="Collapse sidebar"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6h2v12H7V6zm8 0l-6 6 6 6V6z"/></svg></button>
+            </div>
+            <nav style="display:flex;flex-direction:column;gap:8px;">
+                <div class="nav-item">
+                    <a href="#" data-view="dashboard" class="nav-link active" title="Dashboard" aria-label="Dashboard">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <div class="nav-tooltip">Dashboard</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15l-5-5 1.41-1.41L13 14.17l5.59-5.59L20 10l-7 7z"/></svg></span>
+                        <span class="nav-text">Goals</span>
+                    </a>
+                    <div class="nav-tooltip">Goals</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="habits" class="nav-link" title="Habits" aria-label="Habits">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M7 3h10v2H7V3zm0 4h10v2H7V7zm0 4h10v2H7v-2zm0 4h6v2H7v-2z"/></svg></span>
+                        <span class="nav-text">Habits</span>
+                    </a>
+                    <div class="nav-tooltip">Habits</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="focus" class="nav-link" title="Focus" aria-label="Focus">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8a4 4 0 100 8 4 4 0 000-8zm10 3h-3a7 7 0 00-7-7V1h-2v3a7 7 0 00-7 7H1v2h3a7 7 0 007 7v3h2v-3a7 7 0 007-7h3v-2z"/></svg></span>
+                        <span class="nav-text">Focus</span>
+                    </a>
+                    <div class="nav-tooltip">Focus</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="analytics" class="nav-link" title="Analytics" aria-label="Analytics">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17h2v-7H3v7zm4 0h2V7H7v10zm4 0h2v-4h-2v4zm4 0h2V4h-2v13zm4 2H3v2h18v-2z"/></svg></span>
+                        <span class="nav-text">Analytics</span>
+                    </a>
+                    <div class="nav-tooltip">Analytics</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="missions" class="nav-link" title="Missions" aria-label="Missions">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-7z"/></svg></span>
+                        <span class="nav-text">Missions</span>
+                    </a>
+                    <div class="nav-tooltip">Missions</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="calendar" class="nav-link" title="Calendar" aria-label="Calendar">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v13c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm0 17H5V9h14v12zm0-14H5V6h14v1z"/></svg></span>
+                        <span class="nav-text">Calendar</span>
+                    </a>
+                    <div class="nav-tooltip">Calendar</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="community" class="nav-link" title="Community" aria-label="Community">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V20h14v-3.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V20h6v-3.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
+                        <span class="nav-text">Community</span>
+                    </a>
+                    <div class="nav-tooltip">Community</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="finance" class="nav-link" title="Finance" aria-label="Finance">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M21 7H3V5h18v2zm0 2H3c-1.1 0-2 .9-2 2v6h2v-2h18v2h2v-6c0-1.1-.9-2-2-2zm0 4H3v-2h18v2z"/></svg></span>
+                        <span class="nav-text">Finance</span>
+                    </a>
+                    <div class="nav-tooltip">Finance</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="shop" class="nav-link" title="Shop" aria-label="Shop">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M16 6V4a4 4 0 00-8 0v2H4v2h1l1.6 10.39A2 2 0 008.57 20h6.86a2 2 0 001.97-1.61L19 8h1V6h-4zm-6-2a2 2 0 014 0v2h-4V4z"/></svg></span>
+                        <span class="nav-text">Shop</span>
+                    </a>
+                    <div class="nav-tooltip">Shop</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="achievements" class="nav-link" title="Achievements" aria-label="Achievements">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M17 3H7v4H3v6c0 2.21 1.79 4 4 4h1l-1 4 5-4h5c2.21 0 4-1.79 4-4V7h-4V3z"/></svg></span>
+                        <span class="nav-text">Achievements</span>
+                    </a>
+                    <div class="nav-tooltip">Achievements</div>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-view="journeys" class="nav-link" title="Journeys" aria-label="Journeys">
+                        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L1 21h22L12 2zm0 4.84L18.93 19H5.07L12 6.84zM11 10h2v5h-2v-5zm0 6h2v2h-2v-2z"/></svg></span>
+                        <span class="nav-text">Journeys</span>
+                    </a>
+                    <div class="nav-tooltip">Journeys</div>
+                </div>
+            </nav>
         </aside>
 
         <!-- In-app loading overlay -->
@@ -2109,6 +2205,15 @@
                             <input type="text" id="habitName" required placeholder="e.g., Read 20 minutes">
                         </div>
                         <div class="form-group">
+                            <label for="habitProtocol">Protocol Category</label>
+                            <select id="habitProtocol" required>
+                                <option value="study">Study</option>
+                                <option value="workout">Workout</option>
+                                <option value="meditate">Meditate</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="habitFrequency">Frequency</label>
                             <select id="habitFrequency" required>
                                 <option value="daily">Daily</option>
@@ -2253,6 +2358,10 @@
                     <div class="card-header"><h3>Productivity Trends</h3></div>
                     <div class="card-body"><div class="chart-container"><canvas id="productivityChart"></canvas></div></div>
                 </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Productivity Heatmap</h3></div>
+                        <div class="card-body"><div class="chart-container"><canvas id="productivityHeatmap"></canvas></div></div>
+                    </div>
                 <div class="dashboard-card">
                     <div class="card-header"><h3>Category Distribution</h3></div>
                     <div class="card-body"><div class="chart-container"><canvas id="categoryChart"></canvas></div></div>
@@ -2261,6 +2370,10 @@
                     <div class="card-header"><h3>Task Velocity</h3></div>
                     <div class="card-body"><div class="chart-container"><canvas id="velocityChart"></canvas></div></div>
                 </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3>Cumulative XP</h3></div>
+                        <div class="card-body"><div class="chart-container"><canvas id="xpChart"></canvas></div></div>
+                    </div>
                 <div class="dashboard-card">
                     <div class="card-header"><h3>Habit Tracking</h3></div>
                     <div class="card-body"><div class="chart-container"><canvas id="habitChart"></canvas></div></div>
@@ -2442,8 +2555,13 @@
                     <div class="card-body" id="missionsList"></div>
                 </div>
                 <div class="dashboard-card">
+                    <div class="card-header"><h3>My Missions</h3></div>
+                    <div class="card-body" id="myMissions"></div>
+                </div>
+                <div class="dashboard-card">
                     <div class="card-header"><h3>Weekly Protocol</h3></div>
                     <div class="card-body" id="weeklyProtocol">
+                        <div class="text-muted" style="margin-bottom:6px;">Week resets: <span id="protoResetDate">—</span></div>
                         <div>Study: <span id="protoStudy">0</span> / <span id="protoStudyTarget">3</span></div>
                         <div>Workout: <span id="protoWorkout">0</span> / <span id="protoWorkoutTarget">3</span></div>
                         <div>Meditate: <span id="protoMeditate">0</span> / <span id="protoMeditateTarget">3</span></div>
@@ -2810,7 +2928,8 @@
             }
 
             // Update any nav links with data-view to reflect active state
-            const navLinks = document.querySelectorAll('[data-view]');
+            const sidebarEl = document.getElementById('appSidebar');
+            const navLinks = sidebarEl ? sidebarEl.querySelectorAll('[data-view]') : document.querySelectorAll('[data-view]');
             navLinks.forEach(link => {
                 link.classList.toggle('active', link.getAttribute('data-view') === viewName);
             });
@@ -3799,7 +3918,7 @@
         async function renderGoalsViewList() {
             const container = document.getElementById('goalsList');
             if (!container) return;
-            OperatorUplift.ui?.showOverlay?.('Loading goals...');
+            // Removed overlay to avoid unnecessary loading screen
             const goals = await loadAllUserGoals();
             OperatorUplift.ui?.hideOverlay?.();
             if (!goals.length) {
@@ -4002,6 +4121,22 @@
         (function setupSidebarNav() {
             const sidebar = document.getElementById('appSidebar');
             if (!sidebar) return;
+            // Toggle control
+            const toggle = document.getElementById('sidebarToggle');
+            const applyState = () => {
+                const collapsed = sidebar.getAttribute('data-collapsed') === 'true';
+                document.body.classList.toggle('sidebar-collapsed', collapsed);
+                document.body.classList.toggle('sidebar-expanded', !collapsed);
+            };
+            if (toggle) {
+                applyState();
+                toggle.addEventListener('click', () => {
+                    const collapsed = sidebar.getAttribute('data-collapsed') === 'true';
+                    sidebar.setAttribute('data-collapsed', (!collapsed).toString());
+                    toggle.setAttribute('title', collapsed ? 'Collapse sidebar' : 'Expand sidebar');
+                    applyState();
+                });
+            }
             sidebar.addEventListener('click', (e) => {
                 const link = e.target.closest('[data-view]');
                 if (!link) return;
@@ -4242,13 +4377,75 @@
                     });
                 }
             }
+
+            // Productivity Heatmap: 7x14 grid (Sun..Sat x last 14 days)
+            const heatEl = document.getElementById('productivityHeatmap');
+            if (heatEl) {
+                const ctx = heatEl.getContext('2d');
+                if (heatEl._chart) heatEl._chart.destroy();
+                const days = 14;
+                const grid = Array.from({ length: 7 }, () => new Array(days).fill(0));
+                // Map completions to grid
+                const all = goals;
+                for (let i = 0; i < days; i++) {
+                    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (days - 1 - i));
+                    const key = d.toDateString();
+                    const count = all.filter(g => (g.completedAt?.toDate ? g.completedAt.toDate().toDateString() : null) === key).length;
+                    const dow = d.getDay();
+                    grid[dow][i] = count;
+                }
+                // Build dataset as stacked bars per weekday with tiny thickness
+                const labels = Array.from({ length: days }, (_, i) => `D-${days - i - 1}`);
+                const datasets = grid.map((row, r) => ({
+                    label: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][r],
+                    data: row,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.06)',
+                    backgroundColor: row.map(v => `rgba(16,185,129,${Math.min(0.1 + v*0.15, 0.85)})`),
+                    barPercentage: 1.0,
+                    categoryPercentage: 1.0
+                }));
+                heatEl._chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets },
+                    options: { indexAxis: 'y', plugins: { legend: { display: true, position: 'bottom' } }, scales: { x: { stacked: true, ticks: { precision: 0 } }, y: { stacked: true } } }
+                });
+            }
+
+            // Cumulative XP line chart (uses userData.experience history approximation)
+            const xpEl = document.getElementById('xpChart');
+            if (xpEl) {
+                const ctx = xpEl.getContext('2d');
+                if (xpEl._chart) xpEl._chart.destroy();
+                // Build a simple cumulative XP series from recent goals (reward map) and focus/habits approximations
+                const xpMap = { easy: 10, medium: 25, hard: 50, epic: 100 };
+                const days = 14;
+                const labels = [];
+                const series = [];
+                let total = 0;
+                for (let i = days - 1; i >= 0; i--) {
+                    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+                    labels.push(`${d.getMonth()+1}/${d.getDate()}`);
+                    const key = d.toDateString();
+                    const gained = goals.filter(g => (g.completedAt?.toDate ? g.completedAt.toDate().toDateString() : null) === key)
+                        .reduce((sum, g) => sum + (xpMap[g.difficulty || 'easy'] || 10), 0);
+                    total += gained;
+                    series.push(total);
+                }
+                xpEl._chart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Cumulative XP', data: series, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.25)', fill: true, tension: 0.3 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } } }
+                });
+            }
         }
 
         // Missions
         const MISSION_TEMPLATES = [
             { id: 'CAREER_CLARITY_1', title: 'Career Clarity', desc: 'Journal your ideal career vision once.', rewardDP: 50, type: 'counter', target: 1, checkKey: 'journalCount', linkedAchievement: 'FIRST_JOURNAL' },
             { id: 'HEALTH_WORKOUT_3', title: 'Energy Boost', desc: 'Complete 3 workouts this week.', rewardDP: 75, type: 'protocol', target: 3, checkKey: 'workoutTaskCount' },
-            { id: 'KNOWLEDGE_STUDY_3', title: 'Curiosity Quest', desc: 'Do 3 study sessions this week.', rewardDP: 50, type: 'protocol', target: 3, checkKey: 'studyTaskCount' }
+            { id: 'KNOWLEDGE_STUDY_3', title: 'Curiosity Quest', desc: 'Do 3 study sessions this week.', rewardDP: 50, type: 'protocol', target: 3, checkKey: 'studyTaskCount' },
+            { id: 'STREAK_STARTER_7', title: 'Streak Starter', desc: 'Log habits 7 days this week.', rewardDP: 100, type: 'streak', target: 7 }
         ];
         async function renderMissions() {
             const list = document.getElementById('missionsList');
@@ -4277,15 +4474,56 @@
                     </div>
                 </div>`;
             }).join('');
+            // Render My Missions with progress bars
+            const my = document.getElementById('myMissions');
+            if (my) {
+                const items = Array.from(accepted.values());
+                if (!items.length) {
+                    my.innerHTML = '<div class="text-muted">No accepted missions yet.</div>';
+                } else {
+                    my.innerHTML = items.map(m => {
+                        const pct = Math.min(100, Math.floor(((m.progress||0) / (m.target||1)) * 100));
+                        return `<div class="list-item" style="flex-direction:column;align-items:stretch;gap:8px;">
+                            <div style="display:flex;justify-content:space-between;">
+                                <div style="font-weight:600;">${m.id.replaceAll('_',' ')}</div>
+                                <div class="text-muted">${m.progress||0}/${m.target||0}</div>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                        </div>`;
+                    }).join('');
+                }
+            }
             // Weekly protocol UI
             const study = OperatorUplift.userData?.protocol?.studyCount || 0;
             const workout = OperatorUplift.userData?.protocol?.workoutCount || 0;
             const meditate = OperatorUplift.userData?.protocol?.meditateCount || 0;
-            const studyTarget = 3, workoutTarget = 3, meditateTarget = 3;
+            // Per-level protocol targets
+            const level = Number(OperatorUplift.userData?.level || 1);
+            const studyTarget = 2 + Math.floor(Math.min(5, (level-1)/3));
+            const workoutTarget = 2 + Math.floor(Math.min(5, (level-1)/4));
+            const meditateTarget = 2 + Math.floor(Math.min(5, (level-1)/5));
             const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
             setText('protoStudy', study); setText('protoStudyTarget', studyTarget);
             setText('protoWorkout', workout); setText('protoWorkoutTarget', workoutTarget);
             setText('protoMeditate', meditate); setText('protoMeditateTarget', meditateTarget);
+            // Show reset date (next Monday)
+            const now = new Date();
+            const day = now.getDay();
+            const daysUntilMonday = (8 - day) % 7 || 7;
+            const nextMon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilMonday);
+            const rd = document.getElementById('protoResetDate');
+            if (rd) rd.textContent = nextMon.toLocaleDateString();
+            // Update accepted streak missions based on user streak if present
+            try {
+                const streakMissions = Array.from(accepted.values()).filter(m => m.type === 'streak');
+                if (streakMissions.length) {
+                    const userDoc = await userRef.get();
+                    const streakVal = Number(userDoc.data()?.stats?.currentStreak || 0);
+                    for (const m of streakMissions) {
+                        await userRef.collection('missions').doc(m.id).set({ progress: Math.min(streakVal, m.target||streakVal) }, { merge: true });
+                    }
+                }
+            } catch {}
         }
         async function acceptMission(id) {
             try {
@@ -4323,6 +4561,22 @@
                 db.collection('users').doc(OperatorUplift.currentUser.uid).set({ protocol: u.protocol }, { merge: true });
             } catch {}
         }
+        // Weekly reset: run once per app load to ensure protocol counters align to weeks
+        (function ensureWeeklyProtocolReset(){
+            try {
+                const now = new Date();
+                const lastResetStr = OperatorUplift.userData?.protocol?.lastReset;
+                const lastReset = lastResetStr ? new Date(lastResetStr) : null;
+                const day = now.getDay();
+                const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((day + 6) % 7));
+                if (!lastReset || lastReset < monday) {
+                    const proto = Object.assign({}, OperatorUplift.userData?.protocol || {});
+                    proto.studyCount = 0; proto.workoutCount = 0; proto.meditateCount = 0; proto.lastReset = monday.toISOString();
+                    db.collection('users').doc(OperatorUplift.currentUser?.uid).set({ protocol: proto }, { merge: true });
+                    OperatorUplift.userData.protocol = proto;
+                }
+            } catch {}
+        })();
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const label = document.getElementById('calMonthLabel');
@@ -4846,7 +5100,7 @@
             if (!OperatorUplift.currentUser) return;
             const container = document.getElementById('habitsList');
             if (!container) return;
-            OperatorUplift.ui?.showOverlay?.('Loading habits...');
+            // Removed overlay to avoid unnecessary loading screen
             try {
                 const snap = await db.collection('users')
                     .doc(OperatorUplift.currentUser.uid)
@@ -4894,6 +5148,7 @@
                 if (!OperatorUplift.currentUser) return;
                 const name = document.getElementById('habitName').value.trim();
                 const frequency = document.getElementById('habitFrequency').value;
+                const protocol = document.getElementById('habitProtocol')?.value || 'none';
                 if (!name) return;
                 try {
                     await db.collection('users')
@@ -4902,6 +5157,7 @@
                         .add({
                             name,
                             frequency,
+                            protocol,
                             streak: 0,
                             lastDone: null,
                             completedOn: [],
@@ -4933,14 +5189,27 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 OperatorUplift.ui?.showToast?.('Nice! Habit logged', 'success');
-                // Heuristics to map habit to protocol buckets
-                const name = (snap.data()?.name||'').toLowerCase();
-                if (name.includes('study') || name.includes('read')) incrementProtocolCounter('studyCount');
-                if (name.includes('workout') || name.includes('run') || name.includes('push')) incrementProtocolCounter('workoutCount');
-                if (name.includes('meditate')) incrementProtocolCounter('meditateCount');
+                // Protocol mapper: use explicit category field if present
+                const proto = (snap.data()?.protocol||'none');
+                if (proto === 'study') incrementProtocolCounter('studyCount');
+                if (proto === 'workout') incrementProtocolCounter('workoutCount');
+                if (proto === 'meditate') incrementProtocolCounter('meditateCount');
                 // Award small DP for habit completion
                 await addExperience(5);
                 renderHabitsList();
+                // If mission types depend on protocol, bump progress for accepted protocol-type missions
+                try {
+                    const missionsSnap = await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('missions').get();
+                    const batch = db.batch();
+                    missionsSnap.forEach(doc => {
+                        const m = doc.data();
+                        if (m && m.type === 'protocol') {
+                            // naive increment; more granular logic can be added per proto
+                            batch.set(doc.ref, { progress: (m.progress||0) + 1 }, { merge: true });
+                        }
+                    });
+                    await batch.commit();
+                } catch {}
             } catch (e) {
                 console.error('Habit mark failed:', e);
                 OperatorUplift.ui?.showToast?.('Failed to mark habit', 'error');
