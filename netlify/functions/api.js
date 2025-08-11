@@ -3,13 +3,59 @@ const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { getBurnTotalStore } = require('../../src/utils/store');
+const { getBurnTotalStore, incrBurnTotal } = require('../../src/utils/store');
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 const app = express();
 app.use(bodyParser.json());
 const corsOrigins = process.env.CORS_ALLOWED_ORIGINS ? process.env.CORS_ALLOWED_ORIGINS.split(',') : true;
 app.use(cors({ origin: corsOrigins }));
+
+// Simple rate limiter (per IP) using Redis when available, or in-memory fallback
+const RATE_WINDOW = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+const RATE_MAX = Number(process.env.RATE_LIMIT_MAX || 120);
+let rlMem = new Map();
+async function rateLimiter(req, res, next) {
+  try {
+    const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').toString();
+    const now = Date.now();
+    const key = `rl:${ip}`;
+    // Try Redis via store internals (not exported). Fallback to memory.
+    if (process.env.REDIS_URL) {
+      try {
+        const { createClient } = require('redis');
+        if (!global.__rlredis) {
+          const client = createClient({ url: process.env.REDIS_URL });
+          client.on('error', () => {});
+          await client.connect();
+          global.__rlredis = client;
+        }
+        const client = global.__rlredis;
+        const ttlKey = `${key}:${Math.floor(now / RATE_WINDOW)}`;
+        const count = await client.incr(ttlKey);
+        if (count === 1) await client.pExpire(ttlKey, RATE_WINDOW);
+        if (count > RATE_MAX) return res.status(429).json({ error: 'rate_limited' });
+        return next();
+      } catch (e) { /* fall through to memory */ }
+    }
+    // Memory fallback
+    const bucketKey = `${key}:${Math.floor(now / RATE_WINDOW)}`;
+    const count = (rlMem.get(bucketKey) || 0) + 1;
+    rlMem.set(bucketKey, count);
+    // housekeeping
+    if (rlMem.size > 1000) {
+      const cutoff = now - RATE_WINDOW * 2;
+      for (const k of rlMem.keys()) {
+        const ts = Number(k.split(':').pop()) * RATE_WINDOW;
+        if (ts < cutoff) rlMem.delete(k);
+      }
+    }
+    if (count > RATE_MAX) return res.status(429).json({ error: 'rate_limited' });
+    next();
+  } catch { next(); }
+}
+
+app.use('/api/', rateLimiter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, cluster: process.env.SOLANA_CLUSTER || 'mainnet' });
@@ -64,6 +110,45 @@ app.get('/api/user/:wallet/points', async (req, res) => {
     const uplift = Number(raw) / Math.pow(10, decimals);
     const points = Math.floor(uplift * rate);
     res.json({ wallet: String(owner), uplift, points, rate });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// Helius Smart Webhook endpoint for burn ingestion
+app.post('/api/webhooks/helius', async (req, res) => {
+  try {
+    const secret = process.env.HELIUS_WEBHOOK_SECRET;
+    if (secret) {
+      const hdr = req.headers['x-helius-secret'] || req.headers['x-webhook-secret'] || req.headers['authorization'];
+      const token = Array.isArray(hdr) ? hdr[0] : (hdr || '').toString().replace('Bearer ','');
+      if (token !== secret) return res.status(401).json({ error: 'unauthorized' });
+    }
+    const mint = process.env.UPLIFT_MINT;
+    const decimals = Number(process.env.UPLIFT_DECIMALS || 9);
+    const body = req.body;
+    let totalRaw = 0;
+    const scan = (obj) => {
+      if (!obj || typeof obj !== 'object') return;
+      if (obj.type && String(obj.type).toLowerCase().includes('burn')) {
+        const info = obj.info || obj.parsed?.info || {};
+        if (info.mint === mint) {
+          const amt = Number(info.amount ?? info.tokenAmount ?? 0);
+          if (!Number.isNaN(amt)) totalRaw += amt;
+        }
+      }
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (Array.isArray(v)) v.forEach(scan);
+        else if (v && typeof v === 'object') scan(v);
+      }
+    };
+    if (Array.isArray(body)) body.forEach(scan); else scan(body);
+    if (totalRaw > 0) {
+      const human = totalRaw / Math.pow(10, decimals);
+      await incrBurnTotal(human);
+    }
+    res.json({ ok: true, added: totalRaw });
   } catch (e) {
     res.status(500).json({ error: e.message || 'server_error' });
   }
