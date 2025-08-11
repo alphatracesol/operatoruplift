@@ -5080,11 +5080,28 @@
                             const d = new Date(t.date?.toDate ? t.date.toDate() : t.date).toISOString().slice(0,10);
                             rows.push([d, t.type, t.category, String(t.amount||0), (t.note||'').replace(/\n/g,' ')]);
                         });
-                        const csv = rows.map(r=> r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+                        const dec = (1.1).toLocaleString().includes(',') ? ',' : '.';
+                        const csv = rows.map(r=> r.map((x,i)=>{
+                            if (i===3) { // amount column
+                                const s = String(x).replace('.', dec);
+                                return `"${s.replace(/"/g,'""')}"`;
+                            }
+                            return `"${String(x).replace(/"/g,'""')}"`;
+                        }).join(',')).join('\n');
                         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a'); a.href = url; a.download = 'transactions.csv'; a.click(); URL.revokeObjectURL(url);
                     } catch (e) { console.error('CSV export failed', e); }
+                });
+            }
+            // Month persistence
+            if (monthSelect && !monthSelect.dataset.boundPersist) {
+                monthSelect.dataset.boundPersist = '1';
+                const savedMonth = localStorage.getItem('uplift:financeMonth');
+                if (savedMonth) monthSelect.value = savedMonth;
+                monthSelect.addEventListener('change', ()=>{
+                    if (monthSelect.value) localStorage.setItem('uplift:financeMonth', monthSelect.value);
+                    else localStorage.removeItem('uplift:financeMonth');
                 });
             }
             try {
