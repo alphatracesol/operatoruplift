@@ -3484,9 +3484,36 @@
                     OperatorUplift.userData.dp = dp;
                 });
                 updateProgressStats();
+                // Auto-award rank achievements
+                await maybeAwardRankAchievements();
             } catch (e) {
                 console.error('XP apply failed:', e);
             }
+        }
+
+        async function maybeAwardRankAchievements() {
+            try {
+                const level = OperatorUplift.userData?.level || 1;
+                const rankAch = [
+                    { id: 'RANK_OPERATOR', minLevel: 10, title: 'Operator' },
+                    { id: 'RANK_SPECIALIST', minLevel: 30, title: 'Specialist' },
+                    { id: 'RANK_ELITE', minLevel: 50, title: 'Elite' },
+                    { id: 'RANK_LEGEND', minLevel: 70, title: 'Legend' }
+                ];
+                const toAward = rankAch.filter(r => level >= r.minLevel);
+                if (!toAward.length || !OperatorUplift.currentUser) return;
+                const userRef = db.collection('users').doc(OperatorUplift.currentUser.uid);
+                const achCol = userRef.collection('achievements');
+                for (const r of toAward) {
+                    const ref = achCol.doc(r.id);
+                    const snap = await ref.get();
+                    if (!snap.exists) {
+                        await ref.set({ achievementId: r.id, unlockedAt: new Date(), title: r.title });
+                        OperatorUplift.ui?.showToast?.(`${r.title} unlocked!`, 'success');
+                    }
+                }
+                loadUserAchievements();
+            } catch (e) { console.error('Rank award failed', e); }
         }
 
         function updateStatsGrid() {
@@ -3760,7 +3787,7 @@
                 // Apply XP reward based on difficulty
                 const xpMap = { easy: 10, medium: 25, hard: 50, epic: 100 };
                 const xp = xpMap[(g?.difficulty || 'easy')] || 10;
-                await applyXP(xp);
+                await addExperience(xp);
 
                 updateGoalsList();
                 updateStats();
@@ -3777,30 +3804,7 @@
             }
         }
 
-        async function applyXP(xp) {
-            try {
-                const data = OperatorUplift.userData || { level: 1, experience: 0 };
-                let level = Number(data.level) || 1;
-                let exp = Number(data.experience) || 0;
-                exp += xp;
-                let leveledUp = false;
-                while (exp >= level * 100) {
-                    exp -= level * 100;
-                    level += 1;
-                    leveledUp = true;
-                }
-                data.level = level;
-                data.experience = exp;
-                OperatorUplift.userData = data;
-                updateProgressStats();
-                // Persist to Firestore
-                await db.collection('users').doc(OperatorUplift.currentUser.uid)
-                    .set({ level, experience: exp }, { merge: true });
-                if (leveledUp) OperatorUplift.ui?.showToast?.('Level Up! 🎉', 'success');
-            } catch (e) {
-                console.error('XP apply failed:', e);
-            }
-        }
+        // applyXP removed in favor of addExperience()
 
         // Update statistics
         function updateStats() {
@@ -4781,6 +4785,8 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 OperatorUplift.ui?.showToast?.('Nice! Habit logged', 'success');
+                // Award small DP for habit completion
+                await addExperience(5);
                 renderHabitsList();
             } catch (e) {
                 console.error('Habit mark failed:', e);
@@ -4837,6 +4843,9 @@
                     .doc(OperatorUplift.currentUser.uid)
                     .collection('focusSessions')
                     .add({ duration: focusSeconds, startTime: new Date(), final });
+                // Award DP for focused time (1 DP per 5 min saved)
+                const award = Math.floor((focusSeconds||0) / (5*60));
+                if (award > 0) await addExperience(award);
                 renderFocusSessions();
             } catch (e) {
                 console.error('Focus save failed:', e);
