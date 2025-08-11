@@ -1062,7 +1062,7 @@
             margin-bottom: clamp(16px, 3vw, 28px);
         }
         @media (max-width: 640px) {
-            .dashboard-grid { gap: 16px; }
+            .dashboard-grid { gap: 16px; grid-template-columns: 1fr; }
         }
 
         /* Dashboard Cards */
@@ -1074,6 +1074,7 @@
             padding: clamp(14px, 2.4vw, 20px);
             box-shadow: var(--shadow-lg);
             transition: var(--transition-fast);
+            overflow: hidden;
         }
         /* Ensure cards inside app views use the intended opacity */
         .view-container .dashboard-card { background: var(--card-bg-glass); }
@@ -1139,9 +1140,10 @@
         }
 
         .card-header h3 {
-            font-size: 1.25rem;
+            font-size: clamp(1rem, 2.2vw, 1.25rem);
             font-weight: 600;
             color: var(--text-color);
+            overflow-wrap: anywhere;
         }
 
         .card-actions {
@@ -1160,6 +1162,18 @@
             stroke-width: 1.5;
             vector-effect: non-scaling-stroke;
         }
+
+        /* Prevent text spill in cards on narrow screens */
+        .dashboard-card p,
+        .dashboard-card .label,
+        .dashboard-card .value,
+        .dashboard-card .badge,
+        .dashboard-card .list-item,
+        .dashboard-card h4 {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .view-container { overflow-x: hidden; }
 
         /* Sidebar icon sizing */
         .app-sidebar .nav-link {
