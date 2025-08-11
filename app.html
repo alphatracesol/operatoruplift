@@ -3438,10 +3438,10 @@
                 animateNumberInto(completionRateElement, stats.completionRate, { suffix: '%' });
             }
             
-            // Update level progress
-            const currentLevel = stats.level;
-            const currentXP = stats.experience;
-            const xpForNextLevel = currentLevel * 100;
+            // Update level progress (ported XP model)
+            const currentLevel = OperatorUplift.userData?.level || stats.level || 1;
+            const currentXP = OperatorUplift.userData?.dp ?? stats.experience ?? 0;
+            const xpForNextLevel = 100 + (currentLevel * 20);
             const progressPercent = Math.min((currentXP / xpForNextLevel) * 100, 100);
             
             if (levelProgressElement) {
@@ -3455,6 +3455,33 @@
             const chapterBar = document.getElementById('chapterProgressBar');
             if (chapterText) chapterText.textContent = `${currentXP}/${xpForNextLevel} XP`;
             if (chapterBar) chapterBar.style.width = progressPercent + '%';
+        }
+
+        async function addExperience(dpToAdd) {
+            try {
+                if (!OperatorUplift.currentUser) return;
+                const userRef = db.collection('users').doc(OperatorUplift.currentUser.uid);
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(userRef);
+                    const data = snap.exists ? snap.data() : {};
+                    let level = Number(data.level || 1);
+                    let dp = Number(data.dp || 0) + Number(dpToAdd || 0);
+                    let next = 100 + (level * 20);
+                    let leveled = false;
+                    while (dp >= next) {
+                        dp -= next;
+                        level += 1;
+                        next = 100 + (level * 20);
+                        leveled = true;
+                    }
+                    tx.set(userRef, { level, dp }, { merge: true });
+                    OperatorUplift.userData.level = level;
+                    OperatorUplift.userData.dp = dp;
+                });
+                updateProgressStats();
+            } catch (e) {
+                console.error('XP apply failed:', e);
+            }
         }
 
         function updateStatsGrid() {
