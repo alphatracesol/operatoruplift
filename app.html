@@ -1085,12 +1085,16 @@
         }
 
         /* Enforce card and modal glass inside app wrapper */
-        .view-container .dashboard-card,
-        .view-container .card,
-        .modal .modal-content {
+        /* Strong specificity to avoid login/landing styles leaking in */
+        #appShell .view-container .dashboard-card,
+        #appShell .view-container .card,
+        #appShell .modal .modal-content,
+        body .view-container .dashboard-card,
+        body .view-container .card,
+        body .modal .modal-content {
             background: var(--card-bg-glass) !important;
             border: 1px solid var(--border-glass) !important;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px) !important;
         }
 
         .card-header {
@@ -1109,6 +1113,22 @@
         .card-actions {
             display: flex;
             gap: 8px;
+        }
+
+        /* Sidebar icon sizing */
+        .app-sidebar .nav-link {
+            width: 56px !important;
+            height: 56px !important;
+            font-size: 24px !important;
+            display: grid;
+            place-items: center;
+        }
+        @media (min-width: 1024px) {
+            .app-sidebar .nav-link {
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 22px !important;
+            }
         }
 
         /* Progress Card */
@@ -2407,6 +2427,28 @@
             <div class="dashboard-card">
                 <div class="card-header"><h3>Your Achievements</h3></div>
                 <div class="achievements-grid" id="achievementsGridFull"></div>
+            </div>
+        </div>
+
+        <!-- Missions View -->
+        <div id="missionsView" class="view-container" style="display:none;">
+            <div class="dashboard-header">
+                <div class="header-left"><h2>Missions</h2></div>
+                <div class="header-right"></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Available Missions</h3></div>
+                    <div class="card-body" id="missionsList"></div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3>Weekly Protocol</h3></div>
+                    <div class="card-body" id="weeklyProtocol">
+                        <div>Study: <span id="protoStudy">0</span> / <span id="protoStudyTarget">3</span></div>
+                        <div>Workout: <span id="protoWorkout">0</span> / <span id="protoWorkoutTarget">3</span></div>
+                        <div>Meditate: <span id="protoMeditate">0</span> / <span id="protoMeditateTarget">3</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -3985,6 +4027,8 @@
                     renderShop();
                 } else if (view === 'achievements') {
                     renderAchievementsView();
+                } else if (view === 'missions') {
+                    renderMissions();
                 } else if (view === 'journeys') {
                     setupJourneys();
                 }
@@ -4198,6 +4242,86 @@
                     });
                 }
             }
+        }
+
+        // Missions
+        const MISSION_TEMPLATES = [
+            { id: 'CAREER_CLARITY_1', title: 'Career Clarity', desc: 'Journal your ideal career vision once.', rewardDP: 50, type: 'counter', target: 1, checkKey: 'journalCount', linkedAchievement: 'FIRST_JOURNAL' },
+            { id: 'HEALTH_WORKOUT_3', title: 'Energy Boost', desc: 'Complete 3 workouts this week.', rewardDP: 75, type: 'protocol', target: 3, checkKey: 'workoutTaskCount' },
+            { id: 'KNOWLEDGE_STUDY_3', title: 'Curiosity Quest', desc: 'Do 3 study sessions this week.', rewardDP: 50, type: 'protocol', target: 3, checkKey: 'studyTaskCount' }
+        ];
+        async function renderMissions() {
+            const list = document.getElementById('missionsList');
+            if (!list) return;
+            const user = OperatorUplift.currentUser;
+            if (!user) return;
+            // Load accepted missions
+            const userRef = db.collection('users').doc(user.uid);
+            const snap = await userRef.collection('missions').get();
+            const accepted = new Map();
+            snap.forEach(doc => accepted.set(doc.id, { id: doc.id, ...doc.data() }));
+            // Render list
+            list.innerHTML = MISSION_TEMPLATES.map(t => {
+                const a = accepted.get(t.id);
+                const progress = a?.progress || 0;
+                const complete = progress >= t.target;
+                return `<div class="list-item" style="align-items:flex-start;gap:8px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:700;">${t.title}</div>
+                        <div class="text-muted">${t.desc}</div>
+                        <div class="text-muted">Reward: ${t.rewardDP} DP • ${progress}/${t.target}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        ${a ? `<button class="btn-secondary" onclick="abandonMission('${t.id}')">Abandon</button>` : `<button class="btn-primary" onclick="acceptMission('${t.id}')">Accept</button>`}
+                        ${complete ? `<button class="btn-primary" onclick="claimMission('${t.id}')">Claim</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            // Weekly protocol UI
+            const study = OperatorUplift.userData?.protocol?.studyCount || 0;
+            const workout = OperatorUplift.userData?.protocol?.workoutCount || 0;
+            const meditate = OperatorUplift.userData?.protocol?.meditateCount || 0;
+            const studyTarget = 3, workoutTarget = 3, meditateTarget = 3;
+            const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            setText('protoStudy', study); setText('protoStudyTarget', studyTarget);
+            setText('protoWorkout', workout); setText('protoWorkoutTarget', workoutTarget);
+            setText('protoMeditate', meditate); setText('protoMeditateTarget', meditateTarget);
+        }
+        async function acceptMission(id) {
+            try {
+                const t = MISSION_TEMPLATES.find(x => x.id === id); if (!t) return;
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('missions').doc(id).set({ progress: 0, target: t.target, type: t.type, rewardDP: t.rewardDP, linkedAchievement: t.linkedAchievement||null });
+                renderMissions();
+            } catch (e) { console.error('Accept mission failed', e); }
+        }
+        async function abandonMission(id) {
+            try {
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('missions').doc(id).delete();
+                renderMissions();
+            } catch (e) { console.error('Abandon mission failed', e); }
+        }
+        async function claimMission(id) {
+            try {
+                const ref = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('missions').doc(id);
+                const snap = await ref.get(); if (!snap.exists) return;
+                const m = snap.data(); if ((m.progress||0) < (m.target||0)) return;
+                await addExperience(m.rewardDP||0);
+                if (m.linkedAchievement) {
+                    await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('achievements').doc(m.linkedAchievement).set({ achievementId: m.linkedAchievement, unlockedAt: new Date() }, { merge: true });
+                }
+                await ref.delete();
+                OperatorUplift.ui?.showToast?.('Mission complete! Reward granted.', 'success');
+                renderMissions();
+            } catch (e) { console.error('Claim mission failed', e); }
+        }
+
+        // Protocol counters updated from habits and focus: hook into existing flows
+        function incrementProtocolCounter(key) {
+            try {
+                const u = OperatorUplift.userData; if (!u) return;
+                u.protocol = u.protocol || {}; u.protocol[key] = (u.protocol[key]||0) + 1;
+                db.collection('users').doc(OperatorUplift.currentUser.uid).set({ protocol: u.protocol }, { merge: true });
+            } catch {}
         }
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
@@ -4809,6 +4933,11 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 OperatorUplift.ui?.showToast?.('Nice! Habit logged', 'success');
+                // Heuristics to map habit to protocol buckets
+                const name = (snap.data()?.name||'').toLowerCase();
+                if (name.includes('study') || name.includes('read')) incrementProtocolCounter('studyCount');
+                if (name.includes('workout') || name.includes('run') || name.includes('push')) incrementProtocolCounter('workoutCount');
+                if (name.includes('meditate')) incrementProtocolCounter('meditateCount');
                 // Award small DP for habit completion
                 await addExperience(5);
                 renderHabitsList();
