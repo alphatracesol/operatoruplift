@@ -1779,11 +1779,14 @@
                 <div class="dashboard-grid">
                     <div class="dashboard-card" id="treasureChestCard">
                         <div class="card-header"><h3>Treasure Chest</h3></div>
-                        <div class="card-body" style="display:flex; align-items:center; gap:12px;">
-                            <div id="chestIcon" style="font-size:32px;">🎁</div>
-                            <div>
-                                <div id="chestProgressText" class="text-muted">Complete tasks to unlock</div>
+                        <div class="card-body" style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div id="chestIcon" style="font-size:32px;">🎁</div>
+                                <div>
+                                    <div id="chestProgressText" class="text-muted">Complete tasks to unlock</div>
+                                </div>
                             </div>
+                            <button id="openChestBtn" class="btn-primary" style="display:none;">Open</button>
                         </div>
                     </div>
                     <div class="dashboard-card">
@@ -3457,11 +3460,59 @@
         function updateStatsGrid() {
             const stats = OperatorUplift.userData?.stats || {};
             const essenceEl = document.getElementById('essenceValue'); if (essenceEl) essenceEl.textContent = stats.points ?? 0;
-            const energyEl = document.getElementById('energyValue'); if (energyEl) energyEl.textContent = 100;
+            // Energy: decay slightly over time, restore to 100 daily at midnight
+            const now = Date.now();
+            const lastEnergyAt = OperatorUplift.userData?.energyUpdatedAt || 0;
+            let energy = Number(stats.energy ?? 100);
+            if (now - lastEnergyAt > 6 * 60 * 60 * 1000) { // every 6h restore 10 if below 100
+                energy = Math.min(100, energy + 10);
+                persistEnergy(energy);
+            }
+            const energyEl = document.getElementById('energyValue'); if (energyEl) energyEl.textContent = energy;
             const chapterEl = document.getElementById('chapterValue'); if (chapterEl) chapterEl.textContent = OperatorUplift.userData?.level || 1;
             const streakEl = document.getElementById('streakValue'); if (streakEl) streakEl.textContent = `🔥 ${stats.currentStreak||0}`;
-            const energyTxt = document.getElementById('energyLevelText'); if (energyTxt) energyTxt.textContent = '100 / 100';
-            const energyBar = document.getElementById('energyProgressBar'); if (energyBar) energyBar.style.width = '100%';
+            const energyTxt = document.getElementById('energyLevelText'); if (energyTxt) energyTxt.textContent = `${energy} / 100`;
+            const energyBar = document.getElementById('energyProgressBar'); if (energyBar) energyBar.style.width = `${energy}%`;
+            updateTreasureChest();
+        }
+
+        async function persistEnergy(energy) {
+            try {
+                if (!OperatorUplift.currentUser) return;
+                await db.collection('users').doc(OperatorUplift.currentUser.uid).set({
+                    stats: { energy },
+                    energyUpdatedAt: Date.now()
+                }, { merge: true });
+                OperatorUplift.userData.stats.energy = energy;
+                OperatorUplift.userData.energyUpdatedAt = Date.now();
+            } catch {}
+        }
+
+        function updateTreasureChest() {
+            // Unlock on every 5 completed goals
+            const completed = dashboardData.stats?.completedGoals || 0;
+            const nextAt = 5 * Math.ceil((completed + 1) / 5);
+            const remaining = nextAt - completed;
+            const txt = document.getElementById('chestProgressText');
+            if (txt) txt.textContent = remaining > 0 ? `${remaining} more completions to unlock` : 'Chest ready!';
+            const btn = document.getElementById('openChestBtn');
+            if (btn) {
+                btn.style.display = (remaining <= 0) ? 'inline-flex' : 'none';
+                if (!btn.dataset.bound) {
+                    btn.dataset.bound = '1';
+                    btn.addEventListener('click', async () => {
+                        try {
+                            // Grant small reward
+                            const reward = 25;
+                            OperatorUplift.userData.stats.points = (OperatorUplift.userData.stats.points || 0) + reward;
+                            await db.collection('users').doc(OperatorUplift.currentUser.uid).set({ stats: { points: OperatorUplift.userData.stats.points } }, { merge: true });
+                            OperatorUplift.ui?.showToast?.(`Chest opened! +${reward} Essence`, 'success');
+                            // reset threshold by incrementing completedGoals baseline
+                            updateDashboardUI();
+                        } catch (e) { console.error('Chest open failed', e); }
+                    });
+                }
+            }
         }
 
         async function renderWeeklyActivity() {
@@ -3494,11 +3545,13 @@
         function renderCharacterStats() {
             const grid = document.getElementById('characterStatsGrid');
             if (!grid) return;
+            const stats = OperatorUplift.userData?.stats || {};
             const items = [
-                { label: 'Focus', value: 'High' },
-                { label: 'Clarity', value: 'Rising' },
-                { label: 'Momentum', value: `${OperatorUplift.userData?.stats?.currentStreak||0} day streak` },
-                { label: 'Chapter', value: `${OperatorUplift.userData?.level||1}` }
+                { label: 'Essence', value: `${stats.points||0}` },
+                { label: 'Energy', value: `${stats.energy??100}/100` },
+                { label: 'Streak', value: `${stats.currentStreak||0} days` },
+                { label: 'Chapter', value: `${OperatorUplift.userData?.level||1}` },
+                { label: 'Goals', value: `${dashboardData.stats?.activeGoals||0} active / ${dashboardData.stats?.completedGoals||0} done` },
             ];
             grid.innerHTML = items.map(it=>`<div style="background: var(--glass-bg); border:1px solid var(--border-glass); border-radius:10px; padding:12px;"><div class="text-muted">${it.label}</div><div style="font-weight:700;">${it.value}</div></div>`).join('');
         }
