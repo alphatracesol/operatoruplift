@@ -923,6 +923,18 @@
                     <ol id="burn-tx-list" class="muted" style="padding-left:1.25rem; display:grid; gap:.35rem;"></ol>
                     <div class="embers"></div>
                 </div>
+                <div class="card reveal" style="overflow:auto;">
+                    <div class="row" style="justify-content:space-between; align-items:center;">
+                        <strong>Live Burn Feed (RPC)</strong>
+                        <button class="copy-btn" id="burn-feed-refresh" type="button">Reload</button>
+                    </div>
+                    <div style="margin-top:.5rem; overflow:auto;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead><tr><th style="text-align:left; padding:.4rem;">Wallet</th><th style="text-align:right; padding:.4rem;">Amount</th><th style="text-align:left; padding:.4rem;">Time</th><th style="padding:.4rem;">Tx</th></tr></thead>
+                            <tbody id="burn-feed-body"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <small class="muted">Data integrity: totals computed from configured initial supply and on-chain supply. Burn history: <a href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener">View recent burns</a>.</small>
         </section>
@@ -1491,6 +1503,8 @@
             const elTotal = document.getElementById('burn-total');
             const elLast = document.getElementById('burn-last-time');
             const elList = document.getElementById('burn-tx-list');
+            const elFeedBody = document.getElementById('burn-feed-body');
+            const btnFeedRefresh = document.getElementById('burn-feed-refresh');
             const btnRefresh = document.getElementById('burn-refresh');
             const viewWallet = document.getElementById('burn-view-wallet');
             if (viewWallet && CONFIG.burnWallet && !CONFIG.burnWallet.includes('HERE')) {
@@ -1582,9 +1596,36 @@
                 }
             }
             if (btnRefresh) btnRefresh.addEventListener('click', (e)=>{ e.preventDefault(); loadBurnData(); });
+
+            async function loadBurnFeed(){
+                if (!elFeedBody) return;
+                try {
+                    const res = await fetch(`/.netlify/functions/burn-feed?mint=${CONFIG.tokenMint}&limit=20`, { cache: 'no-store' });
+                    if (!res.ok) throw new Error('feed http '+res.status);
+                    const data = await res.json();
+                    const rows = (data?.burns||[]).map(b => {
+                        const when = b.blockTime ? timeAgo(new Date(b.blockTime)) : '';
+                        const amt = typeof b.amount === 'number' ? b.amount.toLocaleString(undefined, { maximumFractionDigits: 9 }) : String(b.amount);
+                        const sig = b.signature || '';
+                        const w = b.wallet || '';
+                        return `<tr>
+                            <td style="padding:.35rem .4rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${w}</td>
+                            <td style="padding:.35rem .4rem; text-align:right;">${amt}</td>
+                            <td style="padding:.35rem .4rem;">${when}</td>
+                            <td style="padding:.35rem .4rem; text-align:center;"><a class="pill" href="https://solscan.io/tx/${sig}" target="_blank" rel="noopener">View</a></td>
+                        </tr>`;
+                    }).join('');
+                    elFeedBody.innerHTML = rows || `<tr><td colspan="4" class="muted" style="padding:.5rem;">No recent burns detected</td></tr>`;
+                } catch (e) {
+                    elFeedBody.innerHTML = `<tr><td colspan="4" class="muted" style="padding:.5rem;">Feed unavailable</td></tr>`;
+                }
+            }
+            if (btnFeedRefresh) btnFeedRefresh.addEventListener('click', (e)=>{ e.preventDefault(); loadBurnFeed(); });
             // Initial load + hourly refresh
             loadBurnData();
             setInterval(loadBurnData, 60*60*1000);
+            loadBurnFeed();
+            setInterval(loadBurnFeed, 60*1000);
         });
     </script>
 </body>
