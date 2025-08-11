@@ -10,7 +10,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+  external_node_modules = ["firebase-admin", "ws", "redis", "express", "serverless-http", "cors", "body-parser"]
 
 [[redirects]]
   from = "/app/*"
@@ -64,6 +64,7 @@
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
     Expires = "0"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "*.mp3"
