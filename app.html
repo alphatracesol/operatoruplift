@@ -1922,6 +1922,11 @@
                 <!-- Stats Grid (Essence, Energy, Chapter, Streak) -->
                 <div class="dashboard-grid" id="statsGrid">
                     <div class="dashboard-card stat-card">
+                        <div class="value" id="burnTotalValue">—</div>
+                        <div class="label">🔥 Burned</div>
+                        <div class="stat-trend" id="burnTrend">Live</div>
+                    </div>
+                    <div class="dashboard-card stat-card">
                         <div class="value" id="essenceValue">0</div>
                         <div class="label">💰 Essence</div>
                         <div class="stat-trend" id="essenceTrend">+0 today</div>
@@ -3896,6 +3901,20 @@
         function updateStatsGrid() {
             const stats = OperatorUplift.userData?.stats || {};
             const essenceEl = document.getElementById('essenceValue'); if (essenceEl) essenceEl.textContent = stats.points ?? 0;
+            // Mirror live burn total into grid
+            const burnEl = document.getElementById('burnTotalValue');
+            if (burnEl) {
+                // Prefer header badge value if present
+                const head = document.getElementById('burnBadge');
+                if (head && head.textContent.includes(':')) {
+                    burnEl.textContent = head.textContent.split(':')[1].trim();
+                } else {
+                    // fallback fetch
+                    fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' })
+                        .then(r=>r.json()).then(t=>{ if (typeof t.total === 'number') burnEl.textContent = Number(t.total).toLocaleString(); })
+                        .catch(()=>{});
+                }
+            }
             // Energy: decay slightly over time, restore to 100 daily at midnight
             const now = Date.now();
             const lastEnergyAt = OperatorUplift.userData?.energyUpdatedAt || 0;
