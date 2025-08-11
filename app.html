@@ -794,9 +794,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            z-index: 0; /* keep behind everything */
             pointer-events: none;
-            opacity: 0.5;
+            opacity: 0.35; /* slightly reduced to avoid washout */
         }
 
         /* Light mode white overlay to keep background truly white under matrix */
@@ -804,7 +804,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.2); /* lighter overlay so cards remain readable */
             pointer-events: none;
         }
 
@@ -1084,10 +1084,12 @@
             .view-container:not(#authView) { padding-left: 236px; }
         }
 
-        .app-sidebar .nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text-color); text-decoration: none; background: var(--card-bg-glass); }
+        .app-sidebar { background: var(--glass-bg); border-right:1px solid var(--border-glass); }
+        .app-sidebar .nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text-color); text-decoration: none; background: var(--card-bg-glass); width:100%; min-height:44px; }
         .app-sidebar .nav-link .nav-icon { width: 22px; height: 22px; display:grid; place-items:center; }
-        .app-sidebar .nav-link .nav-text { display:none; font-size:14px; }
+        .app-sidebar .nav-link .nav-text { display:none; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .app-sidebar .nav-link.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .app-sidebar .nav-link:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .app-sidebar .nav-tooltip { position: absolute; left: 64px; background: var(--card-bg-glass); border:1px solid var(--border-glass); padding:4px 8px; border-radius:6px; font-size:12px; display:none; white-space:nowrap; }
         .app-sidebar .nav-item { position: relative; width:100%; }
         .app-sidebar .nav-item:hover .nav-tooltip { display: block; }
@@ -1103,8 +1105,8 @@
         #appShell .view-container .dashboard-card,
         #appShell .view-container .card,
         #appShell .modal .modal-content,
-        body .view-container .dashboard-card,
-        body .view-container .card,
+        body .view-container:not(#authView) .dashboard-card,
+        body .view-container:not(#authView) .card,
         body .modal .modal-content {
             background: var(--card-bg-glass) !important;
             border: 1px solid var(--border-glass) !important;
@@ -1646,7 +1648,7 @@
                     <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zm0 7L2 4v13l10 5 10-5V4l-10 5z"/></svg>
                     <span class="nav-text" style="font-weight:700;">Uplift</span>
                 </div>
-                <button id="sidebarToggle" class="btn-icon" title="Collapse sidebar" aria-label="Collapse sidebar"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6h2v12H7V6zm8 0l-6 6 6 6V6z"/></svg></button>
+                <button id="sidebarToggle" class="btn-icon" title="Collapse sidebar" aria-label="Collapse sidebar" style="color:var(--text-color);"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6h2v12H7V6zm8 0l-6 6 6 6V6z"/></svg></button>
             </div>
             <nav style="display:flex;flex-direction:column;gap:8px;">
                 <div class="nav-item">
