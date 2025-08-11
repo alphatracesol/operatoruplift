@@ -5,6 +5,12 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { getBurnTotalStore, incrBurnTotal } = require('../../src/utils/store');
 const { Connection, PublicKey } = require('@solana/web3.js');
+const nacl = require('tweetnacl');
+const bs58 = require('bs58');
+const admin = require('firebase-admin');
+try { if (!admin.apps.length) admin.initializeApp(); } catch {}
+const adminAuth = admin.auth();
+const adminDb = admin.firestore();
 
 const app = express();
 app.use(bodyParser.json());
@@ -156,6 +162,72 @@ app.post('/api/webhooks/helius', async (req, res) => {
       await incrBurnTotal(human);
     }
     res.json({ ok: true, added: totalRaw });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// ===== Phantom Auth (nonce / verify / link) =====
+const NONCE_TTL_MS = 5 * 60 * 1000;
+global.__phantom_nonces = global.__phantom_nonces || new Map();
+
+app.get('/api/auth/phantom/nonce', (req, res) => {
+  const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const message = `Operator Uplift login\nNonce: ${nonce}\nTime: ${new Date().toISOString()}`;
+  global.__phantom_nonces.set(nonce, Date.now());
+  res.json({ nonce, message });
+});
+
+app.post('/api/auth/phantom/verify', async (req, res) => {
+  try {
+    const { address, signature, nonce } = req.body || {};
+    if (!address || !signature || !nonce) return res.status(400).json({ error: 'missing_params' });
+    const issued = global.__phantom_nonces.get(nonce);
+    if (!issued || Date.now() - issued > NONCE_TTL_MS) return res.status(400).json({ error: 'nonce_expired' });
+    global.__phantom_nonces.delete(nonce);
+    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}\nTime: `);
+    const sigBytes = bs58.decode(signature);
+    const pubkey = new PublicKey(address);
+    const verified = nacl.sign.detached.verify(message, sigBytes, pubkey.toBytes());
+    if (!verified) return res.status(401).json({ error: 'invalid_signature' });
+    // Wallet link lookup
+    const linkDoc = await adminDb.collection('walletLinks').doc(address).get();
+    let uid = null;
+    if (linkDoc.exists && linkDoc.data()?.uid) uid = linkDoc.data().uid;
+    if (!uid) uid = `solana_${address}`;
+    const customToken = await adminAuth.createCustomToken(uid, { provider: 'phantom', address });
+    res.json({ token: customToken, linked: !!linkDoc.exists });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+app.post('/api/auth/phantom/link', async (req, res) => {
+  try {
+    const authz = req.headers.authorization || '';
+    const idToken = authz.replace('Bearer ','');
+    if (!idToken) return res.status(401).json({ error: 'missing_token' });
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    const currentUid = decoded.uid;
+    const { address, signature, nonce } = req.body || {};
+    if (!address || !signature || !nonce) return res.status(400).json({ error: 'missing_params' });
+    const issued = global.__phantom_nonces.get(nonce);
+    if (!issued || Date.now() - issued > NONCE_TTL_MS) return res.status(400).json({ error: 'nonce_expired' });
+    global.__phantom_nonces.delete(nonce);
+    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}\nTime: `);
+    const sigBytes = bs58.decode(signature);
+    const pubkey = new PublicKey(address);
+    const verified = nacl.sign.detached.verify(message, sigBytes, pubkey.toBytes());
+    if (!verified) return res.status(401).json({ error: 'invalid_signature' });
+    const ref = adminDb.collection('walletLinks').doc(address);
+    const snap = await ref.get();
+    if (snap.exists && snap.data()?.uid !== currentUid) {
+      return res.status(409).json({ error: 'address_already_linked' });
+    }
+    await ref.set({ uid: currentUid, linkedAt: admin.firestore.FieldValue.serverTimestamp() });
+    // also note on user doc
+    await adminDb.collection('users').doc(currentUid).set({ walletAddress: address }, { merge: true });
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message || 'server_error' });
   }
