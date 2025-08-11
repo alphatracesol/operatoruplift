@@ -3414,6 +3414,11 @@
                 updateStatsGrid();
                 renderWeeklyActivity();
                 renderCharacterStats();
+                // Update rank subtitle
+                const level = userData.level || 1;
+                const rankName = level >= 70 ? 'Legend' : level >= 50 ? 'Elite' : level >= 30 ? 'Specialist' : level >= 10 ? 'Operator' : 'Recruit';
+                const subtitle = document.querySelector('.dashboard-subtitle');
+                if (subtitle) subtitle.textContent = `Level ${level} • ${rankName}`;
             }
         }
 
@@ -6123,10 +6128,12 @@ Focus on actionable insights and encouragement.
                 const el = document.createElement('div');
                 el.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
                 el.innerHTML = `
-                    <div class="achievement-icon">${isUnlocked ? achievement.icon : '🔒'}</div>
+                    <div class="achievement-icon">${isUnlocked ? (achievement.icon||achievement.emoji||'🏆') : '🔒'}</div>
                     <div class="achievement-content">
-                        <h3 class="achievement-title">${achievement.title}</h3>
-                        <p class="achievement-description">${achievement.description}</p>
+                        <h3 class="achievement-title">${achievement.title||achievement.name}</h3>
+                        <p class="achievement-description">${achievement.description||''}</p>
+                        ${achievement.dp ? `<div class="text-muted">DP: ${achievement.dp}</div>` : ''}
+                        ${achievement.rank ? `<div class="text-muted">Rank: ${achievement.rank}</div>` : ''}
                         ${isUnlocked ? `<span class="achievement-date">Unlocked: ${achievement.unlockedAt}</span>` : ''}
                     </div>
                 `;
