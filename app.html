@@ -773,6 +773,12 @@
                 padding: 10px;
             }
         }
+        /* Normalize main content container and scrolling */
+        #appShell .view-container { max-width: 1200px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
+        html, body { height: 100%; }
+        body { overflow: hidden; }
+        #appShell { min-height: 100%; }
+        #appShell .view-container { overflow-y: auto; overflow-x: hidden; max-height: 100dvh; }
 
         /* ===== AUTHENTICATION STYLES ===== */
         
@@ -1175,6 +1181,9 @@
         }
         .view-container { overflow-x: hidden; }
 
+        /* Chart container clamp height */
+        .chart-container { position: relative; height: clamp(180px, 28vw, 260px); width: 100%; overflow: hidden; }
+
         /* Sidebar icon sizing */
         .app-sidebar .nav-link {
             width: 56px !important;
@@ -1194,9 +1203,9 @@
         /* Progress Card */
         .progress-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .stat-item {
@@ -1957,7 +1966,7 @@
                     </div>
                     <div class="dashboard-card">
                         <div class="card-header"><h3>Operator Profile</h3></div>
-                        <div class="card-body" id="characterStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;"></div>
+                        <div class="card-body" id="characterStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:16px;"></div>
                     </div>
                 </div>
 
@@ -3728,7 +3737,11 @@
             const target = 5;
             const remaining = Math.max(0, target - (completedCount % target));
             if (txt) txt.textContent = remaining === 0 ? 'Chest ready to open!' : `${remaining} completions to next chest`;
-            if (openBtn) openBtn.style.display = remaining === 0 ? 'inline-flex' : 'none';
+            if (openBtn) {
+                openBtn.style.display = remaining === 0 ? 'inline-flex' : 'none';
+                const icon = document.getElementById('chestIcon');
+                if (icon) icon.style.animation = remaining === 0 ? 'pulse 1.5s infinite' : 'none';
+            }
         }
 
         // Treasure chest open handler
@@ -3809,8 +3822,11 @@
             const now = Date.now();
             const lastEnergyAt = OperatorUplift.userData?.energyUpdatedAt || 0;
             let energy = Number(stats.energy ?? 100);
-            if (now - lastEnergyAt > 6 * 60 * 60 * 1000) { // every 6h restore 10 if below 100
-                energy = Math.min(100, energy + 10);
+            // Decay a little every hour of inactivity, recover on activity (simplified)
+            const hours = Math.floor((now - lastEnergyAt) / (60 * 60 * 1000));
+            if (hours >= 1) {
+                const decay = Math.min(10, hours * 2); // up to -10
+                energy = Math.max(0, energy - decay);
                 persistEnergy(energy);
             }
             const energyEl = document.getElementById('energyValue'); if (energyEl) energyEl.textContent = energy;
