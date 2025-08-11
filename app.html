@@ -1813,6 +1813,8 @@
                     <p class="dashboard-subtitle">Level <span id="userLevel">1</span> • <span id="userExperience">0</span> XP</p>
                 </div>
                 <div class="header-right" style="display:flex;align-items:center;gap:8px;">
+                    <span id="pointsBadge" class="badge" title="Points from $UPLIFT holdings" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--border-glass);padding:6px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--text-color);">PTS: 0</span>
+                    <button id="connectWalletBtn" class="btn-secondary" title="Connect Solana Wallet">Connect Wallet</button>
                     <span id="aiCreditsBadge" class="badge" title="AI credits remaining">AI: 0</span>
                     <button id="addCreditsBtn" class="btn-secondary">Add Credits</button>
                     <button id="addGoalBtn" class="btn-primary">+ Add Goal</button>
@@ -3632,6 +3634,7 @@
             loadUserAchievements();
             setupDashboardEventListeners();
             maybeShowOnboarding();
+            setupWalletAndPoints();
             // Quick Win generator
             const quickBtn = document.getElementById('quickWinBtn');
             const quickIn = document.getElementById('quickWinInput');
@@ -3689,6 +3692,53 @@
                 const rankName = level >= 70 ? 'Legend' : level >= 50 ? 'Elite' : level >= 30 ? 'Specialist' : level >= 10 ? 'Operator' : 'Recruit';
                 const subtitle = document.querySelector('.dashboard-subtitle');
                 if (subtitle) subtitle.textContent = `Level ${level} • ${rankName}`;
+            }
+        }
+
+        // ===== Wallet + Points (Solana) =====
+        function setupWalletAndPoints() {
+            const connectBtn = document.getElementById('connectWalletBtn');
+            const pointsBadge = document.getElementById('pointsBadge');
+            const saved = localStorage.getItem('uplift:wallet');
+            if (saved && pointsBadge) pointsBadge.textContent = 'PTS: …';
+            if (connectBtn && !connectBtn.dataset.bound) {
+                connectBtn.dataset.bound = '1';
+                connectBtn.addEventListener('click', async () => {
+                    try {
+                        if (!window.solana || !window.solana.isPhantom) {
+                            window.open('https://phantom.app/', '_blank');
+                            return;
+                        }
+                        const resp = await window.solana.connect({ onlyIfTrusted: false });
+                        const pubkey = resp?.publicKey?.toString?.();
+                        if (pubkey) {
+                            localStorage.setItem('uplift:wallet', pubkey);
+                            connectBtn.textContent = pubkey.slice(0,4)+'…'+pubkey.slice(-4);
+                            fetchAndRenderPoints(pubkey);
+                        }
+                    } catch (e) {
+                        console.error('wallet connect failed', e);
+                        OperatorUplift.ui?.showToast?.('Wallet connect failed', 'error');
+                    }
+                });
+            }
+            if (saved) {
+                if (connectBtn) connectBtn.textContent = saved.slice(0,4)+'…'+saved.slice(-4);
+                fetchAndRenderPoints(saved);
+                setInterval(() => fetchAndRenderPoints(saved), 120000);
+            }
+        }
+
+        async function fetchAndRenderPoints(address) {
+            try {
+                const pointsBadge = document.getElementById('pointsBadge');
+                if (pointsBadge) pointsBadge.textContent = 'PTS: …';
+                const res = await fetch(`/.netlify/functions/api/api/user/${encodeURIComponent(address)}/points`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('http '+res.status);
+                const data = await res.json();
+                if (pointsBadge) pointsBadge.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
+            } catch (e) {
+                console.error('points fetch failed', e);
             }
         }
 
