@@ -1048,6 +1048,12 @@
             background: var(--button-hover);
             border-color: var(--border-color-light);
         }
+        /* Ensure readable buttons inside cards */
+        #appShell .dashboard-card .btn-secondary,
+        #appShell .dashboard-card .btn-icon {
+            background: var(--glass-bg-heavy);
+            border: 1px solid var(--border-glass);
+        }
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
@@ -1072,6 +1078,15 @@
         .dashboard-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* List items within cards: make them less transparent */
+        #appShell .dashboard-card .list .list-item,
+        #appShell .dashboard-card .list-item {
+            background: var(--glass-bg-light);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 10px;
         }
 
         /* Layout fixes: sidebar width and content padding */
@@ -2314,7 +2329,12 @@
                 <div class="dashboard-card">
                     <div class="card-header"><h3>Appearance</h3></div>
                     <div class="card-body">
-                        <button class="btn-secondary" onclick="ThemeManager.toggleTheme()">Toggle Theme</button>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                            <button class="btn-secondary" onclick="ThemeManager.toggleTheme()">Toggle Theme</button>
+                            <label for="accentPicker" class="text-muted">Accent</label>
+                            <input id="accentPicker" type="color" value="#f97316" style="width:40px;height:32px;border:1px solid var(--border-glass);border-radius:6px;background:transparent;">
+                            <button class="btn-secondary" onclick="ThemeManager.applyAccentFromPicker()">Apply</button>
+                        </div>
                     </div>
                 </div>
                 <div class="dashboard-card">
@@ -2792,6 +2812,9 @@
                 
                 // Apply current theme
                 this.applyTheme(this.currentTheme);
+                // Load saved accent and apply
+                const savedAccent = localStorage.getItem('operatorUpliftAccent');
+                if (savedAccent) this.applyAccent(savedAccent);
                 
                 // Set up theme toggle functionality
                 this.setupThemeToggle();
@@ -2825,6 +2848,18 @@
                 
                 console.log('✅ Theme applied:', themeName);
                 return true;
+            },
+            // Accent color control
+            applyAccent: function(color) {
+                if (!color) return;
+                const root = document.documentElement;
+                root.style.setProperty('--accent-color', color);
+                localStorage.setItem('operatorUpliftAccent', color);
+            },
+            applyAccentFromPicker: function() {
+                const input = document.getElementById('accentPicker');
+                if (!input || !input.value) return;
+                this.applyAccent(input.value);
             },
             
             // Toggle between dark and light themes
