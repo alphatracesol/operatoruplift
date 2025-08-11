@@ -397,6 +397,11 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        /* Ensure app views have left padding to clear sidebar; auth stays centered */
+        .view-container:not(#authView) { padding-left: 84px; }
+        @media (min-width: 1024px) {
+            .view-container:not(#authView) { padding-left: 236px; }
+        }
 
         /* Center auth view vertically and respect safe areas */
         #authView.view-container {
@@ -1069,6 +1074,25 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
+        /* Layout fixes: sidebar width and content padding */
+        .app-sidebar { width: 72px !important; }
+        @media (min-width: 1024px) {
+            .app-sidebar { width: 220px !important; }
+        }
+        .view-container:not(#authView) { padding-left: 84px; }
+        @media (min-width: 1024px) {
+            .view-container:not(#authView) { padding-left: 236px; }
+        }
+
+        /* Enforce card and modal glass inside app wrapper */
+        .view-container .dashboard-card,
+        .view-container .card,
+        .modal .modal-content {
+            background: var(--card-bg-glass) !important;
+            border: 1px solid var(--border-glass) !important;
+            backdrop-filter: blur(10px);
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -1582,7 +1606,7 @@
         </div>
 
         <!-- App Sidebar (minimal nav) -->
-        <aside id="appSidebar" class="app-sidebar" style="position:fixed;left:0;top:0;height:100dvh;width:64px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:flex-start;padding:16px 8px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
+        <aside id="appSidebar" class="app-sidebar" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:flex-start;padding:16px 8px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
             <a href="#" data-view="dashboard" class="nav-link active" title="Dashboard" aria-label="Dashboard" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">📊</a>
             <a href="#" data-view="goals" class="nav-link" title="Goals" aria-label="Goals" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">🏆</a>
             <a href="#" data-view="habits" class="nav-link" title="Habits" aria-label="Habits" style="display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border-glass);background:var(--card-bg-glass);color:var(--text-color);text-decoration:none;">✅</a>
