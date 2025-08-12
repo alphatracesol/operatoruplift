@@ -2914,6 +2914,11 @@
     </style>
 </head>
         <body>
+  <!-- Global header points badge (hidden on auth app screen) -->
+  <div id="landingPoints" style="position:fixed;right:16px;top:14px;z-index:20;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);padding:6px 10px;border-radius:10px;">
+    <span aria-hidden="true" style="font-size:18px">🟠</span>
+    <span id="landingPointsText" style="font-weight:600;">PTS: 0</span>
+  </div>
             <!-- Skip to main content link for accessibility -->
             <a href="#main-content" class="skip-link sr-only">Skip to main content</a>
             
@@ -4865,5 +4870,20 @@
             animation: iconFloat 3s ease-in-out infinite;
         }
     </style>
+<script>
+  (function() {
+    try {
+      const badge = document.getElementById('landingPointsText');
+      if (!badge) return;
+      const saved = localStorage.getItem('uplift:wallet');
+      if (!saved) return;
+      badge.textContent = 'PTS: …';
+      fetch('/.netlify/functions/api/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+        .then(r=>r.ok?r.json():null)
+        .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
+        .catch(()=>{});
+    } catch {}
+  })();
+</script>
 </body>
 </html>

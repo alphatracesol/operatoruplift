@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift OS</title>
+    
+    <!-- PWA and Mobile App Icon Configuration -->
+    <link rel="icon" id="favicon-link" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z' stroke='%23D97706' stroke-width='4' fill='none'/%3E%3Cpath d='M30 60 L50 50 L70 60' stroke='%23D97706' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M50 50 L50 20' stroke='%23D97706' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" id="manifest-link" href="">
+    <link rel="apple-touch-icon" id="apple-touch-icon-link" href="">
+    <meta name="theme-color" id="theme-color-meta" content="#D97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Operator OS">
+
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isoWeek.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isToday.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/dayOfYear.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #F5F5F5;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #D97706; /* Amber 600 */
+            --accent-primary-hover: #B45309; /* Amber 700 */
+            --destructive-primary: #DC2626; /* Red 600 */
+            --destructive-primary-hover: #B91C1C; /* Red 700 */
+            --success-primary: #16A34A; /* Green 600 */
+        }
+        
+        .theme-teal { --accent-primary: #0D9488; --accent-primary-hover: #0F766E; }
+        .theme-blue { --accent-primary: #2563EB; --accent-primary-hover: #1D4ED8; }
+        .theme-crimson { --accent-primary: #DC2626; --accent-primary-hover: #B91C1C; }
+        .theme-cyan { --accent-primary: #0891B2; --accent-primary-hover: #0E7490; }
+        .theme-green { --accent-primary: #16A34A; --accent-primary-hover: #15803D; }
+
+        html, body { background-color: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', sans-serif; }
+        input, textarea, select { background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid #4a4a4a; border-radius: 0.375rem; padding: 0.5rem; width: 100%; }
+        textarea::placeholder, input::placeholder { color: var(--text-secondary); }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; }
+
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer; text-align: center; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .btn-primary { background-color: var(--accent-primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-primary-hover); box-shadow: 0 0 15px var(--accent-primary-hover); }
+        .btn-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--bg-tertiary); }
+        .btn-secondary:hover:not(:disabled) { background-color: #3a3a3a; }
+        .btn-destructive { background-color: var(--destructive-primary); color: white; }
+        .btn-destructive:hover:not(:disabled) { background-color: var(--destructive-primary-hover); }
+        
+        /* Sidebar & Nav */
+        .sidebar-nav-item, .mobile-nav-item { transition: all 0.2s; }
+        .sidebar-nav-item.active { background-color: var(--accent-primary); color: white; font-weight: 600; }
+        .sidebar-nav-item.active svg { stroke: white; }
+        .sidebar-nav-item:hover:not(.active) { background-color: var(--bg-tertiary); color: var(--accent-primary); }
+        .sidebar-nav-item:hover:not(.active) svg { stroke: var(--accent-primary); }
+        .bottom-nav { background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px); border-top: 1px solid rgba(55, 55, 55, 0.5); }
+        .mobile-nav-item.active svg, .mobile-nav-item.active span { color: var(--accent-primary); }
+
+        /* Modal */
+        #modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 40; display: none; backdrop-filter: blur(4px); }
+        #modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; width: 90%; max-width: 550px; display: none; }
+        .modal-content { background-color: var(--bg-secondary); border: 1px solid var(--bg-tertiary); border-radius: 0.75rem; padding: 1.5rem; max-height: 85vh; overflow-y: auto; }
+        
+        /* General UI */
+        .loading-spinner { border: 4px solid var(--bg-tertiary); border-top: 4px solid var(--accent-primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .progress-bar-bg { background-color: var(--bg-tertiary); }
+        .progress-bar-fg { background-color: var(--accent-primary); }
+        .bento-box { background-color: var(--bg-secondary); border: 1px solid var(--bg-tertiary); border-radius: 0.75rem; padding: 1.5rem; transition: all 0.2s ease-in-out; }
+        .bento-box-interactive:hover { transform: translateY(-5px); box-shadow: 0 0 20px color-mix(in srgb, var(--accent-primary) 25%, transparent); border-color: color-mix(in srgb, var(--accent-primary) 50%, transparent); }
+        .text-accent-primary { color: var(--accent-primary); }
+        .task-checkbox { accent-color: var(--accent-primary); }
+        .task-item-completed { text-decoration: line-through; opacity: 0.6; }
+
+        /* Assessment & Chat Styles */
+        #page-assessment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        #page-assessment::before { /* Animated Grid Background */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, color-mix(in srgb, var(--accent-primary) 8%, transparent) 1px, transparent 1px),
+                linear-gradient(to bottom, color-mix(in srgb, var(--accent-primary) 8%, transparent) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            animation: pulse-grid 8s ease-in-out infinite;
+        }
+        #page-assessment::after { /* Scanline */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to bottom, color-mix(in srgb, var(--accent-primary) 50%, transparent) 0%, transparent 100%);
+            opacity: 0.5;
+            animation: scan-vertical 7s linear infinite;
+        }
+        @keyframes pulse-grid {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.02); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+        @keyframes scan-vertical {
+            0% { transform: translateY(-20px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        .chat-container::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+        
+        .chat-bubble-ai {
+            background-color: var(--bg-secondary);
+            color: #e5e7eb;
+            border-radius: 20px 20px 20px 5px;
+            border: 1px solid var(--accent-primary);
+            box-shadow: 0 0 10px color-mix(in srgb, var(--accent-primary) 20%, transparent);
+        }
+        .chat-bubble-user { background-color: var(--accent-primary); color: white; border-radius: 20px 20px 5px 20px; }
+        .typing-indicator span { height: 8px; width: 8px; margin: 0 1px; background-color: #9ca3af; display: inline-block; border-radius: 50%; animation: typing-bounce 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        /* Analysis Loading Screen Styles */
+        #analysis-loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-primary);
+            z-index: 100;
+        }
+        #analysis-loading-text {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            z-index: 1;
+        }
+        
+        /* Other styles */
+        .notification-popup { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); color: white; font-weight: 600; z-index: 100; animation: slide-in-out 3s forwards; }
+        .notification-popup.success { background-color: var(--success-primary); }
+        .notification-popup.error { background-color: var(--destructive-primary); }
+        @keyframes slide-in-out { 0% { transform: translateX(110%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(110%); opacity: 0; } }
+        .log-container { max-height: 400px; overflow-y: auto; }
+        .log-item-clickable { cursor: pointer; transition: all 0.2s; }
+        .log-item-clickable:hover { background-color: var(--bg-tertiary); box-shadow: 0 0 15px color-mix(in srgb, var(--accent-primary) 20%, transparent); border-color: color-mix(in srgb, var(--accent-primary) 40%, transparent); }
+        .achievement-locked { filter: grayscale(1); opacity: 0.5; cursor: pointer; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+        
+        /* Flip Card Styles */
+        .flip-card { background-color: transparent; width: 100%; height: 120px; perspective: 1000px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { box-sizing: border-box; position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 0.75rem; border: 1px solid var(--bg-tertiary); cursor: pointer; }
+        .flip-card-front { background-color: var(--bg-secondary); }
+        .flip-card-back { background-color: var(--bg-tertiary); transform: rotateY(180deg); padding: 0.75rem; }
+        
+        .protocol-week-btn { background-color: var(--bg-tertiary); }
+        .protocol-week-btn:not(.selected):hover { background-color: var(--accent-primary-hover); color: white; }
+        .protocol-week-btn.selected { background-color: var(--accent-primary); color: white; box-shadow: 0 0 15px var(--accent-primary); transform: scale(1.05); }
+    </style>
+</head>
+<body class="bg-primary text-primary">
+
+    <!-- Landing Page (for initial login) -->
+    <div id="page-landing" class="page active">
+         <div class="flex flex-col items-center justify-center min-h-screen text-center bg-primary p-4">
+            <div class="w-24 h-24 text-accent-primary mb-4">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <h1 class="text-5xl font-black tracking-tighter mb-2">OPERATOR UPLIFT</h1>
+            <p class="text-lg text-secondary mb-8 max-w-md">Discipline is the weapon. This system is your training ground.</p>
+            <button id="init-system-btn" class="btn btn-primary px-12 py-4 text-lg">INITIALIZE SYSTEM</button>
+            <div id="init-error-container" class="mt-4"></div>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app-container" class="hidden">
+        <div class="flex h-screen">
+            <!-- Sidebar Navigation (Desktop) -->
+            <nav id="sidebar-nav" class="bg-secondary p-4 w-64 flex-shrink-0 flex-col hidden md:flex">
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto pb-20 md:pb-0">
+                <div id="page-assessment" class="page h-full"></div>
+                <div id="page-dashboard" class="page p-4 md:p-8"></div>
+                <div id="page-protocol" class="page p-4 md:p-8"></div>
+                <div id="page-doctrine" class="page p-4 md:p-8"></div>
+                <div id="page-armory" class="page p-4 md:p-8"></div>
+                <div id="page-tradelog" class="page p-4 md:p-8"></div>
+                <div id="page-journal" class="page p-4 md:p-8"></div>
+                <div id="page-finance" class="page p-4 md:p-8"></div>
+                <div id="page-asvab" class="page p-4 md:p-8"></div>
+                <div id="page-achievements" class="page p-4 md:p-8"></div>
+                <div id="page-settings" class="page p-4 md:p-8"></div>
+                <div id="page-intel" class="page p-4 md:p-8"></div>
+            </main>
+        </div>
+        
+        <!-- Bottom Navigation (Mobile) -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 h-20 bottom-nav z-30 flex md:hidden">
+        </nav>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-backdrop"></div>
+    <div id="modal-container"><div id="modal-content-host" class="modal-content"></div></div>
+
+    <script type="module">
+        // Firebase SDK Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut, EmailAuthProvider, linkWithCredential, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, writeBatch, query, where, getDocs, deleteDoc, serverTimestamp, runTransaction, orderBy, limit, addDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const App = {
+            // Application state, holds all dynamic data
+            state: {
+                isAuthReady: false,
+                userId: null,
+                appId: 'operator-uplift-unified',
+                auth: null,
+                db: null,
+                currentPage: 'landing',
+                currentDate: null,
+                userData: null,
+                dailyTasks: [],
+                statsRadarChart: null,
+                notificationQueue: [],
+                isNotifying: false,
+                unsubscribe: { userData: null, tasks: null, logs: null, journal: null, transactions: null },
+                uiState: {
+                    protocolSelectedWeek: 1,
+                    journalEntryText: '',
+                    journalPrompt: '',
+                    tradeThesisText: '',
+                    tradeAiAnalysis: ''
+                },
+            },
+
+            // Static configuration data
+            config: {
+                ranks: [
+                    { name: 'Recruit', minLevel: 1 }, { name: 'Operator', minLevel: 10 },
+                    { name: 'Specialist', minLevel: 30 }, { name: 'Elite', minLevel: 50 }, { name: 'Legend', minLevel: 70 }
+                ],
+                riseSchedule: {
+                    1: { '30 minutes study': { text: '30 minutes study', stat: 'INT', dp: 10, freq: 2 }, '15 push ups': { text: '15 push ups', stat: 'STR', dp: 5, freq: 2 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 68 oz water': { text: 'Drink 68 oz water', stat: 'STR', dp: 5, freq: 7 }, 'Meditate 5 minutes': { text: 'Meditate 5 minutes', stat: 'DIS', dp: 10, freq: 2 }, 'No more than 4 hours social media': { text: 'No more than 4 hours social media', stat: 'DIS', dp: 15, freq: 7 }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7 }, 'Run 1.6 miles': { text: 'Run 1.6 miles', stat: 'STR', dp: 15, freq: 2 }, 'Wake up at 8:30 AM': { text: 'Wake up at 8:30 AM', stat: 'DIS', dp: 10, freq: 7 }, 'Workout for 45 minutes': { text: 'Workout for 45 minutes', stat: 'STR', dp: 20, freq: 2 } },
+                    2: { '30 minutes study': { text: '30 minutes study', stat: 'INT', dp: 10, freq: 3 }, '20 push ups': { text: '20 push ups', stat: 'STR', dp: 7, freq: 3 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 68 oz water': { text: 'Drink 68 oz water', stat: 'STR', dp: 5, freq: 7 }, 'Meditate 10 minutes': { text: 'Meditate 10 minutes', stat: 'DIS', dp: 12, freq: 3 }, 'No more than 3h 45m social media': { text: 'No more than 3h 45m social media', stat: 'DIS', dp: 15, freq: 7 }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7 }, 'Run 1.9 miles': { text: 'Run 1.9 miles', stat: 'STR', dp: 18, freq: 3 }, 'Wake up at 8:15 AM': { text: 'Wake up at 8:15 AM', stat: 'DIS', dp: 12, freq: 7 }, 'Workout for 1 hour': { text: 'Workout for 1 hour', stat: 'STR', dp: 25, freq: 3 } },
+                    3: { '1 hour study': { text: '1 hour study', stat: 'INT', dp: 15, freq: 4 }, '25 push ups': { text: '25 push ups', stat: 'STR', dp: 10, freq: 4 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 85 oz water': { text: 'Drink 85 oz water', stat: 'STR', dp: 7, freq: 7 }, 'Meditate 15 minutes': { text: 'Meditate 15 minutes', stat: 'DIS', dp: 15, freq: 4 }, 'No more than 3h 30m social media': { text: 'No more than 3h 30m social media', stat: 'DIS', dp: 18, freq: 7 }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7 }, 'Run 2.2 miles': { text: 'Run 2.2 miles', stat: 'STR', dp: 20, freq: 4 }, 'Wake up at 8:00 AM': { text: 'Wake up at 8:00 AM', stat: 'DIS', dp: 15, freq: 7 }, 'Workout for 75 minutes': { text: 'Workout for 75 minutes', stat: 'STR', dp: 30, freq: 4 } },
+                    4: { '1 hour study': { text: '1 hour study', stat: 'INT', dp: 15, freq: 5 }, '20 push ups': { text: '20 push ups', stat: 'STR', dp: 7, freq: 5 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 85 oz water': { text: 'Drink 85 oz water', stat: 'STR', dp: 7, freq: 7 }, 'Meditate 20 minutes': { text: 'Meditate 20 minutes', stat: 'DIS', dp: 18, freq: 5 }, 'No more than 3h 15m social media': { text: 'No more than 3h 15m social media', stat: 'DIS', dp: 20, freq: 7 }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7 }, 'Run 1.9 miles': { text: 'Run 1.9 miles', stat: 'STR', dp: 18, freq: 5 }, 'Wake up at 7:45 AM': { text: 'Wake up at 7:45 AM', stat: 'DIS', dp: 18, freq: 7 }, 'Workout for 1 hour': { text: 'Workout for 1 hour', stat: 'STR', dp: 25, freq: 5 } },
+                    5: { '1.5 hours study': { text: '1.5 hours study', stat: 'INT', dp: 20, freq: 6 }, '35 push ups': { text: '35 push ups', stat: 'STR', dp: 12, freq: 6 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 101 oz water': { text: 'Drink 101 oz water', stat: 'STR', dp: 10, freq: 7 }, 'Meditate 25 minutes': { text: 'Meditate 25 minutes', stat: 'DIS', dp: 20, freq: 6 }, 'No more than 3 hours social media': { text: 'No more than 3 hours social media', stat: 'DIS', dp: 22, freq: 7 }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7 }, 'Run 2.8 miles': { text: 'Run 2.8 miles', stat: 'STR', dp: 25, freq: 6 }, 'Wake up at 7:30 AM': { text: 'Wake up at 7:30 AM', stat: 'DIS', dp: 20, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 6 } },
+                    6: { '1.5 hours study': { text: '1.5 hours study', stat: 'INT', dp: 20, freq: 6 }, '40 push ups': { text: '40 push ups', stat: 'STR', dp: 15, freq: 6 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 101 oz water': { text: 'Drink 101 oz water', stat: 'STR', dp: 10, freq: 7 }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 6 }, 'No more than 2h 45m social media': { text: 'No more than 2h 45m social media', stat: 'DIS', dp: 25, freq: 7 }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7 }, 'Run 3.1 miles': { text: 'Run 3.1 miles', stat: 'STR', dp: 28, freq: 6 }, 'Wake up at 7:15 AM': { text: 'Wake up at 7:15 AM', stat: 'DIS', dp: 22, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 6 } },
+                    7: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7 }, '45 push ups': { text: '45 push ups', stat: 'STR', dp: 18, freq: 7 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7 }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7 }, 'No more than 2h 30m social media': { text: 'No more than 2h 30m social media', stat: 'DIS', dp: 28, freq: 7 }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7 }, 'Run 3.4 miles': { text: 'Run 3.4 miles', stat: 'STR', dp: 30, freq: 7 }, 'Wake up at 7:00 AM': { text: 'Wake up at 7:00 AM', stat: 'DIS', dp: 25, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7 } },
+                    8: { '2 hours study': { text: '2 hours study', stat: 'INT', dp: 22, freq: 7 }, '35 push ups': { text: '35 push ups', stat: 'STR', dp: 12, freq: 7 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7 }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7 }, 'No more than 2h 15m social media': { text: 'No more than 2h 15m social media', stat: 'DIS', dp: 30, freq: 7 }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7 }, 'Run 2.8 miles': { text: 'Run 2.8 miles', stat: 'STR', dp: 25, freq: 7 }, 'Wake up at 6:45 AM': { text: 'Wake up at 6:45 AM', stat: 'DIS', dp: 28, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7 } },
+                    9: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7 }, '55 push ups': { text: '55 push ups', stat: 'STR', dp: 20, freq: 7 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7 }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7 }, 'No more than 2 hours social media': { text: 'No more than 2 hours social media', stat: 'DIS', dp: 35, freq: 7 }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7 }, 'Run 4 miles': { text: 'Run 4 miles', stat: 'STR', dp: 35, freq: 7 }, 'Wake up at 6:30 AM': { text: 'Wake up at 6:30 AM', stat: 'DIS', dp: 30, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7 } },
+                    10: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7 }, '60 push ups': { text: '60 push ups', stat: 'STR', dp: 25, freq: 7 }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7 }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7 }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7 }, 'No more than 1h 45m social media': { text: 'No more than 1h 45m social media', stat: 'DIS', dp: 40, freq: 7 }, 'Read 50 pages': { text: 'Read 50 pages', stat: 'INT', dp: 20, freq: 7 }, 'Run 4.3 miles': { text: 'Run 4.3 miles', stat: 'STR', dp: 40, freq: 7 }, 'Wake up at 6:15 AM': { text: 'Wake up at 6:15 AM', stat: 'DIS', dp: 35, freq: 7 }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7 } }
+                },
+                defaultTasks: [
+                    { text: "Review Trading Plan", stat: "INT", dp: 10 },
+                    { text: "5-minute Journal Entry", stat: "CRE", dp: 5 },
+                    { text: "Plan Tomorrow's Priorities", stat: "DIS", dp: 5 },
+                ],
+                achievements: { 
+                    'FIRST_DAY': { name: 'Day One Done', emoji: '✅', description: 'Complete your first day of tasks.', dp: 10, check: (data, prevData, dailyTasks) => dailyTasks.length > 0 && dailyTasks.every(t => t.completed) },
+                    'STREAK_3': { name: 'Getting Started', emoji: '🔥', description: 'Maintain a 3-day streak.', dp: 25, check: (data) => data.currentStreak >= 3 },
+                    'STREAK_7': { name: 'On a Roll', emoji: '🚀', description: 'Maintain a 7-day streak.', dp: 50, check: (data) => data.currentStreak >= 7 },
+                    'STREAK_14': { name: 'Consistent Operator', emoji: '💯', description: 'Maintain a 14-day streak.', dp: 100, check: (data) => data.currentStreak >= 14 },
+                    'STREAK_30': { name: 'Unstoppable Force', emoji: '🔱', description: 'Maintain a 30-day streak.', dp: 250, check: (data) => data.currentStreak >= 30 },
+                    'STREAK_60': { name: 'Habitual Victory', emoji: '🎖️', description: 'Maintain a 60-day streak.', dp: 500, check: (data) => data.currentStreak >= 60 },
+                    'RANK_OPERATOR': { name: 'Operator', emoji: '🧑‍🚀', description: 'Reach Level 10.', dp: 100, check: (data) => data.level >= 10 },
+                    'RANK_SPECIALIST': { name: 'Specialist', emoji: '🌟', description: 'Reach Level 30.', dp: 300, check: (data) => data.level >= 30 },
+                    'RANK_ELITE': { name: 'Elite', emoji: '💎', description: 'Reach Level 50.', dp: 500, check: (data) => data.level >= 50 },
+                    'RANK_LEGEND': { name: 'Legend', emoji: '👑', description: 'Reach Level 70.', dp: 1000, check: (data) => data.level >= 70 },
+                    'FIRST_LOG': { name: 'First Blood', emoji: '🩸', description: 'Log your first trade.', dp: 20, check: (data) => (data.logCount || 0) >= 1 },
+                    'LOG_10': { name: 'Veteran Trader', emoji: '📈', description: 'Log 10 trades.', dp: 100, check: (data) => (data.logCount || 0) >= 10 },
+                    'LOG_50': { name: 'Market Analyst', emoji: '📊', description: 'Log 50 trades.', dp: 250, check: (data) => (data.logCount || 0) >= 50 },
+                    'FIRST_JOURNAL': { name: 'Scribe', emoji: '✍️', description: 'Write your first journal entry.', dp: 10, check: (data) => (data.journalCount || 0) >= 1 },
+                    'JOURNAL_10': { name: 'Chronicler', emoji: '📜', description: 'Write 10 journal entries.', dp: 50, check: (data) => (data.journalCount || 0) >= 10 },
+                    'JOURNAL_50': { name: 'Historian', emoji: '📚', description: 'Write 50 journal entries.', dp: 250, check: (data) => (data.journalCount || 0) >= 50 },
+                    'FIRST_FINANCE': { name: 'Accountant', emoji: '💰', description: 'Add your first financial goal or debt.', dp: 10, check: (data) => (data.finance?.debts?.length > 0 || data.finance?.goals?.length > 0) },
+                    'FIRST_QUIZ': { name: 'Bootcamp', emoji: '🧠', description: 'Complete your first ASVAB quiz.', dp: 10, check: (data) => (data.quizCount || 0) >= 1 },
+                    'QUIZ_10': { name: 'Scholar', emoji: '🎓', description: 'Complete 10 ASVAB quizzes.', dp: 75, check: (data) => (data.quizCount || 0) >= 10 },
+                    'PERFECT_WEEK': { name: 'Perfect Week', emoji: '🎯', description: 'Complete 100% of tasks for 7 consecutive days.', dp: 150, check: (data) => (data.perfectWeeks || 0) >= 1 },
+                    'DIS_LVL_10': { name: 'Unflinching', emoji: '🧘', description: 'Reach Discipline Level 10.', dp: 75, check: (data) => data.stats.DIS >= 10 },
+                    'INT_LVL_10': { name: 'Strategist', emoji: '♟️', description: 'Reach Intellect Level 10.', dp: 75, check: (data) => data.stats.INT >= 10 },
+                    'STR_LVL_10': { name: 'Brawler', emoji: '💪', description: 'Reach Strength Level 10.', dp: 75, check: (data) => data.stats.STR >= 10 },
+                    'CHA_LVL_10': { name: 'Influencer', emoji: '🗣️', description: 'Reach Charisma Level 10.', dp: 75, check: (data) => data.stats.CHA >= 10 },
+                    'RES_LVL_10': { name: 'Indomitable', emoji: '🛡️', description: 'Reach Resilience Level 10.', dp: 75, check: (data) => data.stats.RES >= 10 },
+                    'CRE_LVL_10': { name: 'Innovator', emoji: '💡', description: 'Reach Creativity Level 10.', dp: 75, check: (data) => data.stats.CRE >= 10 },
+                    'DEBT_FREE': { name: 'Debt Zero', emoji: '💸', description: 'Pay off a tracked debt completely.', dp: 200, check: (data) => data.finance?.debts?.some(d => d.paid >= d.total) },
+                    'GOAL_ACHIEVED': { name: 'Objective Complete', emoji: '🏆', description: 'Fully fund a financial objective.', dp: 200, check: (data) => data.finance?.goals?.some(g => g.saved >= g.target) },
+                    'PHOENIX': { name: 'Phoenix Protocol', emoji: '🕊️', description: 'Recover from a Hard Mode reset and achieve a new 7-day streak.', dp: 300, check: (data) => (data.resets > 0 && data.currentStreak >= 7) },
+                    'AI_ASSIST_10': { name: 'AI Co-pilot', emoji: '🤖', description: 'Use the "Fortify Thesis" feature 10 times.', dp: 50, check: (data) => (data.aiAssistCount || 0) >= 10 },
+                    'AI_PROMPT_10': { name: 'Prompt Engineer', emoji: '✨', description: 'Use the "Get Prompt" feature 10 times.', dp: 50, check: (data) => (data.aiPromptCount || 0) >= 10 },
+                    'BAL_100K': { name: 'Centurion', emoji: '🤑', description: 'Reach a combined balance of $100,000.', dp: 500, check: (data) => (data.finance?.balances?.bank + data.finance?.balances?.crypto) >= 100000 },
+                    'THEME_CHANGER': { name: 'New Coat of Paint', emoji: '🎨', description: 'Change your UI theme for the first time.', dp: 5, check: (data) => data.settings.theme !== 'default' },
+                    'HARD_MODE_ON': { name: 'Challenge Accepted', emoji: '⚔️', description: 'Enable Hard Mode.', dp: 25, check: (data) => data.settings.hardMode },
+                    'WEEK_1_COMPLETE': { name: 'Week 1 Cleared', emoji: '1️⃣', description: 'Complete Week 1 of the RISE Protocol.', dp: 100, check: (data) => data.protocolCompletion?.week_1 },
+                    'WEEK_10_COMPLETE': { name: 'RISE Graduate', emoji: '🎓', description: 'Complete all 10 weeks of the RISE Protocol.', dp: 1000, check: (data) => data.protocolCompletion?.week_10 },
+                    'NIGHT_OWL': { name: 'Night Owl', emoji: '🦉', description: 'Complete a task after 10 PM.', dp: 10, check: () => dayjs().hour() >= 22 },
+                    'EARLY_BIRD': { name: 'Early Bird', emoji: '🌅', description: 'Complete a task before 6 AM.', dp: 10, check: () => dayjs().hour() < 6 },
+                    'WAR_CHEST': { name: 'War Chest', emoji: '🏦', description: 'Reach a bank balance of $25,000.', dp: 100, check: (data) => data.finance?.balances?.bank >= 25000 },
+                    'CRYPTO_WHALE': { name: 'Crypto Whale', emoji: '🐳', description: 'Reach a crypto balance of $25,000.', dp: 100, check: (data) => data.finance?.balances?.crypto >= 25000 },
+                    'DEBT_SLAYER': { name: 'Debt Slayer', emoji: '⚔️', description: 'Pay off 5 debts.', dp: 300, check: (data) => data.finance?.debts?.filter(d => d.paid >= d.total).length >= 5 },
+                    'GOAL_GETTER': { name: 'Goal Getter', emoji: '🏁', description: 'Achieve 5 financial goals.', dp: 300, check: (data) => data.finance?.goals?.filter(g => g.saved >= g.target).length >= 5 },
+                    'DOCTRINE_MASTER': { name: 'Doctrine Master', emoji: '📜', description: 'Complete all 3 default Major Objectives.', dp: 150, check: (data) => data.doctrine?.majorObjectives?.slice(0, 3).every(o => o.completed) },
+                    'PERFECT_SCORE': { name: 'Perfect Score', emoji: '💯', description: 'Get 100% on an ASVAB quiz.', dp: 50, check: (data, prevData) => (data.lastQuizScore === 100 && prevData.lastQuizScore !== 100) },
+                    'ALL_STATS_10': { name: 'Well Rounded', emoji: '🌐', description: 'Get all core stats to level 10.', dp: 200, check: (data) => Object.values(data.stats).every(s => s >= 10) },
+                    'ALL_STATS_25': { name: 'Polymath', emoji: '🧠', description: 'Get all core stats to level 25.', dp: 500, check: (data) => Object.values(data.stats).every(s => s >= 25) },
+                    'FIRST_TRANSFER': { name: 'Liquid', emoji: '↔️', description: 'Make your first internal fund transfer.', dp: 15, check: (data) => (data.transferCount || 0) >= 1 },
+                    'MAX_STREAK': { name: 'Personal Best', emoji: '📈', description: 'Beat your longest streak.', dp: 100, check: (data, prevData) => data.currentStreak > prevData.longestStreak && prevData.longestStreak > 0 },
+                    'CENTURY_MARK': { name: 'Century Mark', emoji: 'C', description: 'Reach Level 100.', dp: 2000, check: (data) => data.level >= 100 },
+                    'MEGA_STREAK': { name: 'Living Legend', emoji: '🗿', description: 'Maintain a 100-day streak.', dp: 2500, check: (data) => data.currentStreak >= 100 },
+                    'FINANCIAL_SOVEREIGNTY': { name: 'Financial Sovereignty', emoji: '👑', description: 'Reach a combined balance of $1,000,000.', dp: 5000, check: (data) => (data.finance?.balances?.bank + data.finance?.balances?.crypto) >= 1000000 },
+                    'CURIOSITY': { name: 'Curiosity', emoji: '🤔', description: 'You just had to click, didn\'t you?', dp: 1, check: () => false }, // Easter Egg
+                },
+                doctrine: {
+                    tradingMantras: [
+                        "The market is a river of probabilities, not a crystal ball of certainties.",
+                        "My strategy is my shield; my discipline is my sword.",
+                        "I will not let FOMO be my commander, nor FUD be my jailer.",
+                        "A losing trade is a lesson paid for; a winning trade is a lesson applied.",
+                        "Capital preservation is the foundation upon which all victories are built."
+                    ],
+                    sops: [
+                        "Assess the battlefield: Analyze market structure and higher timeframe context.",
+                        "Formulate the plan: Define entry, invalidation (stop-loss), and targets.",
+                        "Execute with precision: Enter the trade according to the plan, without hesitation.",
+                        "Manage the engagement: Monitor the trade, adjust stops if necessary, and take profits as planned."
+                    ],
+                    preEntryBrakeCheck: [
+                        "Is this trade aligned with my core strategy?",
+                        "Have I defined my risk and is it acceptable?",
+                        "Is my emotional state neutral and objective?",
+                        "Am I reacting to a plan or to market noise?",
+                        "Do I have a clear exit plan for both profit and loss?"
+                    ]
+                },
+                themeColorMap: {
+                    'default': '#D97706',
+                    'theme-teal': '#0D9488',
+                    'theme-blue': '#2563EB',
+                    'theme-crimson': '#DC2626',
+                    'theme-cyan': '#0891B2',
+                    'theme-green': '#16A34A'
+                },
+                assessmentQuestions: [
+                    { id: 'start', text: "Welcome to Operator Uplift. I'm here to build your operational baseline. This is a secure channel for brutal honesty. Are you ready to begin?", type: 'text' },
+                    { id: 'rapport_1', text: "Affirmative. Let's start warm. What's one small victory you secured recently?", type: 'text' },
+                    { id: 'finance_1', text: "Copy. Now, finances. On a scale of 1 to 10, what's your level of control over your capital?", type: 'scale', min: 1, max: 10 },
+                    { id: 'finance_2', text: "What's the primary mental obstacle blocking your financial advancement? (e.g., 'risk aversion,' 'lack of knowledge,' 'undeserving mindset.')", type: 'text' },
+                    { id: 'career_1', text: "Moving to your career. Are you executing a mission, working a job, or pursuing a calling? Your honest assessment.", type: 'text' },
+                    { id: 'career_2', text: "Define your ideal career objective if all constraints were removed.", type: 'text' },
+                    { id: 'relationships_1', text: "Evaluate your key relationships. Are they assets providing strategic support, or liabilities draining resources?", type: 'text' },
+                    { id: 'health_1', text: "Let's analyze your physical chassis. Rate your daily energy levels, 1 to 10.", type: 'scale', min: 1, max: 10 },
+                    { id: 'health_2', text: "Identify one health protocol you know is critical but consistently fail to implement.", type: 'text' },
+                    { id: 'mental_1', text: "And your mental state? What's the dominant emotional frequency you've been operating on this past week?", type: 'text' },
+                    { id: 'learning_1', text: "What's the last piece of intel you acquired purely out of intellectual curiosity?", type: 'text' },
+                    { id: 'productivity_1', text: "Describe your relationship with time. Is it a strategic asset or a tactical adversary?", type: 'text' },
+                    { id: 'values_1', text: "Identify one core value in your personal doctrine that is non-negotiable.", type: 'text' },
+                    { id: 'obstacles_1', text: "What is the single greatest obstacle currently impeding your advance to the next operational level?", type: 'text' },
+                    { id: 'strengths_1', text: "Finally, what is your most potent, yet underutilized, natural talent?", type: 'text' },
+                    { id: 'end', text: "Calibration complete. Analyzing data to construct your Operator Profile. Stand by...", type: 'end' },
+                ],
+                tutorialSteps: [
+                    { title: "Welcome, Operator", content: "Your calibration is complete. This is your command center. Let's run through a quick system orientation." },
+                    { title: "The Dashboard", content: "This is your primary view. 'Today\'s Orders' are your daily tasks. Completing them earns you Discipline Points (DP) to level up and boosts your core stats." },
+                    { title: "Core Stats", content: "Your stats (Discipline, Intellect, Strength, etc.) reflect your progress. They grow as you complete relevant tasks." },
+                    { title: "Navigation", content: "Use the sidebar (or the bottom navigation on mobile) to access different system modules like the Armory, Protocol, and your Log." },
+                    { title: "The Armory", content: "The Armory displays your overall progress, rank, and stats. It's where you can view your achievements and get a high-level overview of your profile." },
+                    { title: "The Protocol", content: "The RISE Protocol contains your weekly challenges. Completing these provides significant DP boosts. Check in weekly to see your new objectives." },
+                    { title: "Ready to Go", content: "That's the basic rundown. The rest is up to you to explore. Your first set of orders for today has been generated. Execute." }
+                ],
+            },
+
+            /**
+             * Initializes the application, sets up dayjs, Firebase, and event listeners.
+             */
+            init() {
+                dayjs.extend(window.dayjs_plugin_utc);
+                dayjs.extend(window.dayjs_plugin_timezone);
+                dayjs.extend(window.dayjs_plugin_isoWeek);
+                dayjs.extend(window.dayjs_plugin_isToday);
+                dayjs.extend(window.dayjs_plugin_dayOfYear);
+                dayjs.tz.setDefault("America/New_York");
+                this.state.currentDate = dayjs();
+
+                this.showNotification = this.showNotification.bind(this);
+                this.processNotificationQueue = this.processNotificationQueue.bind(this);
+
+                this.initFirebase();
+                this.initEventListeners();
+            },
+
+            /**
+             * Initializes Firebase app, auth, and Firestore, and sets up auth state listener.
+             */
+            initFirebase() {
+                 const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config !== '{}'
+                    ? JSON.parse(__firebase_config)
+                    : null;
+                
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    console.error("Firebase config is missing or incomplete.");
+                    const errContainer = document.getElementById('init-error-container');
+                    if(errContainer) errContainer.innerHTML = `<p class="text-destructive-primary">System Error: Could not load configuration. Please refresh.</p>`;
+                    return;
+                }
+                
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    this.state.auth = getAuth(app);
+                    this.state.db = getFirestore(app);
+                    
+                    onAuthStateChanged(this.state.auth, async (user) => {
+                        if (user) {
+                            this.state.userId = user.uid;
+                            this.state.isAuthReady = true;
+                            await this.loadUserData();
+                        } else {
+                            this.state.isAuthReady = true;
+                            this.navigateTo('landing');
+                        }
+                    });
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    this.showNotification("System configuration error.", 'error');
+                }
+            },
+
+            /**
+             * Sets up all major event listeners for the application.
+             */
+            initEventListeners() {
+                document.getElementById('init-system-btn').addEventListener('click', () => this.handleAnonymousLogin());
+                
+                document.getElementById('sidebar-nav').addEventListener('click', (e) => {
+                    const navLink = e.target.closest('.sidebar-nav-item');
+                    if (navLink) {
+                        e.preventDefault();
+                        this.navigateTo(navLink.dataset.page);
+                    }
+                });
+
+                document.getElementById('bottom-nav').addEventListener('click', (e) => {
+                    const navLink = e.target.closest('.mobile-nav-item');
+                    if (navLink) {
+                        e.preventDefault();
+                        this.navigateTo(navLink.dataset.page);
+                    }
+                });
+            },
+            
+            /**
+             * Handles anonymous user login.
+             */
+            async handleAnonymousLogin() {
+                if (!this.state.isAuthReady) return;
+                try {
+                    await signInAnonymously(this.state.auth);
+                } catch (error) {
+                    this.showNotification("System initialization failed.", 'error');
+                }
+            },
+
+            /**
+             * Loads user data from Firestore, creating a new user if one doesn't exist.
+             */
+            async loadUserData() {
+                if (!this.state.userId) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+
+                if (this.state.unsubscribe.userData) this.state.unsubscribe.userData();
+
+                const docSnap = await getDoc(userDocRef);
+                if (!docSnap.exists()) {
+                    await this.createNewUser(userDocRef);
+                }
+                
+                this.state.unsubscribe.userData = onSnapshot(userDocRef, (doc) => {
+                    if (doc.exists()) {
+                        const hadUserData = !!this.state.userData;
+                        const previousData = this.state.userData || {};
+                        this.state.userData = doc.data();
+                        
+                        if (!hadUserData) { 
+                            this.checkForDailyLogin();
+                            this.checkForWeeklyReset();
+                            this.listenToDailyTasks(this.state.currentDate);
+                        }
+                        
+                        this.checkAllAchievements(previousData, this.state.userData, this.state.dailyTasks);
+                        this.applyTheme(this.state.userData.settings.theme);
+                        
+                        // State transition logic
+                        if (!this.state.userData.assessmentComplete) {
+                            this.navigateTo('assessment');
+                        } else if (!this.state.userData.tutorialCompleted) {
+                           if (this.state.currentPage !== 'dashboard') {
+                               this.navigateTo('dashboard'); // Render dashboard in background
+                           }
+                           if (document.getElementById('modal-container').style.display === 'none') {
+                                this.startTutorial();
+                           }
+                        } else if (this.state.currentPage === 'landing' || this.state.currentPage === 'assessment') {
+                            this.navigateTo('dashboard');
+                        } else {
+                            this.render(); // Just re-render the current page
+                        }
+                    }
+                });
+            },
+            
+            /**
+             * Creates a new user document in Firestore with default values.
+             */
+            async createNewUser(userDocRef) {
+                const isAnonymous = this.state.auth.currentUser.isAnonymous;
+                const newUser = {
+                    operatorName: `Operator-${this.state.userId.substring(0, 4)}`,
+                    level: 1, dp: 0,
+                    stats: { DIS: 0, INT: 0, STR: 0, CHA: 0, RES: 0, CRE: 0 },
+                    settings: { theme: 'default', hardMode: false },
+                    immunityPasses: 1, currentDay: 1, missionStartDate: serverTimestamp(),
+                    lastLoginDate: dayjs().subtract(1, 'day').format('YYYY-MM-DD'),
+                    currentStreak: 0, longestStreak: 0, achievements: {},
+                    protocolCompletion: {},
+                    protocolProgress: { missionWeek: 1, tasks: {} },
+                    finance: { balances: { bank: 0, crypto: 0 }, debts: [], goals: [] },
+                    doctrine: { 
+                        majorObjectives: [
+                            { text: "Achieve financial freedom", completed: false },
+                            { text: "Master a high-value skill", completed: false },
+                            { text: "Build a resilient physique and mind", completed: false },
+                        ],
+                        preEntryChecklist: this.config.doctrine.preEntryBrakeCheck.map(text => ({ text, completed: false }))
+                    },
+                    logCount: 0, journalCount: 0, quizCount: 0, aiAssistCount: 0, aiPromptCount: 0,
+                    transferCount: 0, isAnonymous: isAnonymous,
+                    assessmentComplete: false,
+                    tutorialCompleted: false,
+                    assessmentResponses: {},
+                    assessmentState: { assessmentStarted: false, currentQuestionIndex: 0 }
+                };
+                await setDoc(userDocRef, newUser);
+            },
+            
+            async checkForDailyLogin() {
+                const todayStr = dayjs().format('YYYY-MM-DD');
+                if (this.state.userData.lastLoginDate !== todayStr) {
+                    const yesterdayStr = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
+                    let newStreak = this.state.userData.currentStreak;
+                    
+                    if (this.state.userData.lastLoginDate === yesterdayStr) {
+                        newStreak++;
+                    } else {
+                        newStreak = 0; // Streak broken
+                    }
+
+                    const updates = {
+                        lastLoginDate: todayStr,
+                        currentStreak: newStreak,
+                        longestStreak: Math.max(this.state.userData.longestStreak, newStreak)
+                    };
+
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, updates);
+                }
+            },
+
+            async checkForWeeklyReset() {
+                 if (!this.state.userData.missionStartDate || !this.state.userData.missionStartDate.toDate) return;
+                 const missionStart = dayjs(this.state.userData.missionStartDate.toDate());
+                 const currentMissionWeek = dayjs().diff(missionStart, 'week') + 1;
+                 
+                 if (this.state.userData.protocolProgress?.missionWeek !== currentMissionWeek) {
+                     await updateDoc(doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId), {
+                         'protocolProgress.missionWeek': currentMissionWeek,
+                         'protocolProgress.tasks': {}
+                     });
+                 }
+            },
+            
+            listenToDailyTasks(date) {
+                if (this.state.unsubscribe.tasks) this.state.unsubscribe.tasks(); 
+                
+                const dateStr = date.format('YYYY-MM-DD');
+                const tasksColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks");
+                const q = query(tasksColRef, where("date", "==", dateStr));
+
+                this.state.unsubscribe.tasks = onSnapshot(q, async (snapshot) => {
+                    if (snapshot.empty && date.isSame(dayjs(), 'day')) {
+                        await this.generateAndSaveDailyTasks(date);
+                    } else {
+                        this.state.dailyTasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        this.checkAllAchievements(this.state.userData, this.state.userData, this.state.dailyTasks);
+                        if(this.state.currentPage === 'dashboard' || this.state.currentPage === 'protocol') this.render();
+                    }
+                }, error => {
+                    console.error("Error listening to daily tasks:", error);
+                    this.showNotification("Error loading daily tasks.", "error");
+                });
+            },
+            
+            async generateAndSaveDailyTasks(date) {
+                const missionStart = this.state.userData.missionStartDate?.toDate() ? dayjs(this.state.userData.missionStartDate.toDate()) : dayjs();
+                const missionDay = date.diff(missionStart, 'day');
+                const weekNumber = Math.max(1, Math.floor(missionDay / 7) + 1);
+                const dayOfWeek = date.isoWeekday(); // Monday=1, Sunday=7
+
+                let tasksToGenerate = [...this.config.defaultTasks.map(t => ({...t, completed: false}))];
+
+                const weekSchedule = this.config.riseSchedule[Math.min(weekNumber, 10)]; // Cap at week 10 schedule
+                if (weekSchedule) {
+                    const scheduleDays = { 
+                        2: [1, 4], 3: [1, 3, 5], 4: [1, 2, 4, 5], 
+                        5: [1, 2, 3, 5, 6], 6: [1, 2, 3, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7]
+                    };
+                    Object.values(weekSchedule).forEach(task => {
+                        const days = scheduleDays[task.freq] || [];
+                        if (task.freq === 7 || days.includes(dayOfWeek)) {
+                            if (!tasksToGenerate.some(t => t.text === task.text)) {
+                                tasksToGenerate.push({ ...task, completed: false });
+                            }
+                        }
+                    });
+                }
+
+                 const batch = writeBatch(this.state.db);
+                 const tasksColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks");
+                 tasksToGenerate.forEach(task => {
+                     const newTaskRef = doc(tasksColRef);
+                     batch.set(newTaskRef, { date: date.format('YYYY-MM-DD'), ...task });
+                 });
+                 await batch.commit();
+            },
+
+            navigateTo(page) {
+                if (this.state.userData && !this.state.userData.assessmentComplete && page !== 'assessment') {
+                    this.showNotification("Calibration in progress. Complete the assessment.", "error");
+                    return; 
+                }
+                this.state.currentPage = page;
+                this.render();
+            },
+
+            render() {
+                if (!this.state.isAuthReady) return;
+
+                if (!this.state.userId) {
+                    document.getElementById('page-landing').classList.add('active');
+                    document.getElementById('app-container').classList.add('hidden');
+                    return; 
+                }
+                
+                document.getElementById('page-landing').classList.remove('active');
+                document.getElementById('app-container').classList.remove('hidden');
+
+                const assessmentComplete = this.state.userData.assessmentComplete;
+
+                const sidebar = document.getElementById('sidebar-nav');
+                const bottomNav = document.getElementById('bottom-nav');
+                
+                if (assessmentComplete) {
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('md:flex');
+                    bottomNav.classList.remove('hidden');
+                    bottomNav.classList.add('flex', 'md:hidden');
+                    this.renderSidebar();
+                    this.renderMobileNav();
+                } else {
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('md:flex'); // FIX: Ensure sidebar is removed from flow
+                    bottomNav.classList.add('hidden');
+                }
+
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                const activePage = document.getElementById(`page-${this.state.currentPage}`);
+                if (activePage) activePage.classList.add('active');
+
+                if (this.state.currentPage === 'intel' && assessmentComplete) {
+                    this.renderIntelHub();
+                    return;
+                }
+
+                switch (this.state.currentPage) {
+                    case 'assessment': this.renderAssessmentPage(); break;
+                    case 'dashboard': this.renderDashboard(); break;
+                    case 'protocol': this.renderProtocol(); break;
+                    case 'doctrine': this.renderDoctrinePage(); break;
+                    case 'armory': this.renderArmory(); break;
+                    case 'tradelog': this.renderTradeLogPage(); break;
+                    case 'journal': this.renderJournalPage(); break;
+                    case 'finance': this.renderFinancePage(); break;
+                    case 'asvab': this.renderAsvabPage(); break;
+                    case 'achievements': this.renderAchievementsPage(); break;
+                    case 'settings': this.renderSettings(); break;
+                }
+            },
+
+            renderSidebar() {
+                const nav = document.getElementById('sidebar-nav');
+                if (!this.state.userData) {
+                    nav.innerHTML = ''; return;
+                }
+                const { operatorName, level, dp } = this.state.userData;
+                const rank = this.config.ranks.slice().reverse().find(r => level >= r.minLevel)?.name || 'Recruit';
+                const dpForNextLevel = 100 + (level * 20);
+                const dpProgress = dpForNextLevel > 0 ? (dp / dpForNextLevel) * 100 : 0;
+
+                nav.innerHTML = `
+                    <div>
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 text-accent-primary flex-shrink-0">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-lg text-primary">${operatorName}</h1>
+                                <p class="text-sm text-secondary font-mono">Lvl ${level} ${rank}</p>
+                            </div>
+                        </div>
+                        <div class="mb-8">
+                            <div class="flex justify-between font-mono text-xs text-secondary mb-1">
+                                <span>LEVEL PROGRESS</span>
+                                <span class="font-bold text-accent-primary">${dp} / ${dpForNextLevel}</span>
+                            </div>
+                            <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${dpProgress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 flex-grow">
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="dashboard"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>Dashboard</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="armory"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Armory</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="protocol"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>Protocol</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="tradelog"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Operator's Log</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="journal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>Journal</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="finance"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="1" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Finance Center</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="asvab"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>ASVAB Trainer</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="achievements"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2h4"></path><path d="M12 18h4a2 2 0 002-2v-2a2 2 0 00-2-2h-4v6z"></path><path d="M18 12V8a2 2 0 012-2h0a2 2 0 012 2v4"></path><path d="M22 12v2a2 2 0 01-2 2h-2"></path></svg>Achievements</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="doctrine"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>Doctrine</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="settings"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>Settings</a></li>
+                    </ul>
+                `;
+                nav.querySelector(`.sidebar-nav-item[data-page='${this.state.currentPage}']`)?.classList.add('active');
+            },
+
+            renderMobileNav() {
+                const nav = document.getElementById('bottom-nav');
+                const intelPages = ['protocol', 'doctrine', 'tradelog', 'journal', 'finance', 'asvab', 'achievements'];
+                const isIntelActive = intelPages.includes(this.state.currentPage);
+
+                nav.innerHTML = `
+                    <div class="flex justify-around items-center h-full w-full">
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'dashboard' ? 'active' : ''}" data-page="dashboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                            <span class="text-xs mt-1">Dashboard</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'armory' ? 'active' : ''}" data-page="armory">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            <span class="text-xs mt-1">Armory</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${isIntelActive ? 'active' : ''}" data-page="intel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            <span class="text-xs mt-1">Intel</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'settings' ? 'active' : ''}" data-page="settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <span class="text-xs mt-1">Settings</span>
+                        </button>
+                    </div>
+                `;
+            },
+            
+            renderIntelHub() {
+                const container = document.getElementById('page-intel');
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Intel Hub</h1>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${this.renderIntelButton('protocol', 'Protocol', 'Weekly Protocol Objectives')}
+                        ${this.renderIntelButton('doctrine', 'Doctrine', 'Core Mantras & SOPs')}
+                        ${this.renderIntelButton('tradelog', "Operator's Log", 'Log and review trades')}
+                        ${this.renderIntelButton('journal', 'Journal', 'Log daily thoughts & debriefs')}
+                        ${this.renderIntelButton('finance', 'Finance Center', 'Track goals and balances')}
+                        ${this.renderIntelButton('asvab', 'ASVAB Trainer', 'Sharpen your knowledge')}
+                        ${this.renderIntelButton('achievements', 'Achievements', 'View your commendations')}
+                    </div>
+                `;
+                container.querySelectorAll('.intel-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.navigateTo(btn.dataset.page));
+                });
+            },
+
+            renderIntelButton(page, title, subtitle) {
+                return `
+                    <button class="intel-btn bento-box text-left bento-box-interactive" data-page="${page}">
+                        <h3 class="font-bold text-lg">${title}</h3>
+                        <p class="text-sm text-secondary">${subtitle}</p>
+                    </button>
+                `;
+            },
+
+            renderDashboard() {
+                const container = document.getElementById('page-dashboard');
+                if (!this.state.userData) {
+                    container.innerHTML = `<div class="flex justify-center items-center h-64"><div class="loading-spinner"></div></div>`;
+                    return;
+                }
+
+                const { operatorName, level, dp, stats } = this.state.userData;
+                const isToday = this.state.currentDate.isSame(dayjs(), 'day');
+                const rank = this.config.ranks.slice().reverse().find(r => level >= r.minLevel)?.name || 'Recruit';
+                const dpForNextLevel = 100 + (level * 20);
+
+                const tasksHTML = this.state.dailyTasks.map(task => `
+                    <div id="${task.id}" class="task-item flex items-center bg-secondary p-4 rounded-lg ${task.completed ? 'task-item-completed' : ''}">
+                        <input type="checkbox" class="task-checkbox h-6 w-6 rounded bg-tertiary border-gray-500 focus:ring-accent-primary" data-task-id="${task.id}" ${task.completed ? 'checked' : ''} ${!isToday ? 'disabled' : ''}>
+                        <div class="ml-4 flex-grow">
+                            <p class="font-semibold">${task.text}</p>
+                            <p class="text-xs text-secondary font-mono"><span class="text-accent-primary font-bold">+${task.dp} DP / +1 ${task.stat}</span></p>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-secondary text-center py-8">No orders for this day. Stand by.</p>';
+
+                const statOrder = ['DIS', 'INT', 'STR', 'CHA', 'RES', 'CRE'];
+                const statsHTML = statOrder.map(key => {
+                    const value = stats[key] || 0;
+                    return `
+                        <div class="flex justify-between items-center py-2 border-b border-tertiary">
+                            <span class="font-semibold">${this.getStatFullName(key)}</span>
+                            <span class="font-mono">${value} SP</span>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <div class="md:hidden mb-6 bento-box">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 text-accent-primary flex-shrink-0">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-lg text-primary">${operatorName}</h1>
+                                <p class="text-sm text-secondary font-mono">Lvl ${level} ${rank}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-mono text-xs text-secondary mb-1">
+                                <span>LEVEL PROGRESS</span>
+                                <span class="font-bold text-accent-primary">${dp} / ${dpForNextLevel}</span>
+                            </div>
+                            <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${(dp / dpForNextLevel) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>Dashboard</h1>
+                         <div class="flex gap-2">
+                            <button id="prev-day-btn" class="p-2 rounded-full bg-secondary hover:bg-tertiary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <button id="next-day-btn" class="p-2 rounded-full bg-secondary hover:bg-tertiary" ${isToday ? 'disabled' : ''}>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                             <div class="bento-box">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold">${isToday ? "Today's Orders" : `Orders: ${this.state.currentDate.format('MMM D, YY')}`}</h2>
+                                    ${isToday ? '<button id="daily-debrief-btn" class="btn btn-secondary btn-sm">✨ Generate Daily Debrief</button>' : ''}
+                                </div>
+                                <div class="space-y-3">${tasksHTML}</div>
+                             </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bento-box">
+                                <h3 class="font-mono text-xl font-bold mb-4">CORE STATS</h3>
+                                <div class="space-y-1">${statsHTML}</div>
+                            </div>
+                            <div id="quote-bento-box" class="bento-box">
+                                <div class="flex justify-center items-center h-24"><div class="loading-spinner"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelectorAll('.task-checkbox').forEach(box => {
+                    box.addEventListener('change', (e) => this.toggleTaskCompletion(e.target.dataset.taskId, e.target.checked));
+                });
+                document.getElementById('prev-day-btn').addEventListener('click', () => this.changeDay(-1));
+                document.getElementById('next-day-btn').addEventListener('click', () => this.changeDay(1));
+                
+                const debriefBtn = document.getElementById('daily-debrief-btn');
+                if (debriefBtn) {
+                    debriefBtn.addEventListener('click', () => this.generateDailyDebrief());
+                }
+                
+                this.fetchAndDisplayQuote();
+            },
+
+            // --- ONBOARDING & ASSESSMENT ---
+            renderAssessmentIntro() {
+                const page = document.getElementById('page-assessment');
+                page.classList.add('active');
+                page.innerHTML = `
+                    <div class="flex flex-col items-center text-center max-w-md p-4 z-10">
+                        <div class="w-24 h-24 text-accent-primary mb-4">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="animate-pulse"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <h1 class="text-3xl font-bold mb-2">Operator Calibration</h1>
+                        <p class="text-secondary mb-8">To optimize performance, we must first establish a baseline. The following calibration will be direct and comprehensive. Honesty is your only asset.</p>
+                        <button id="start-calibration-btn" class="btn btn-primary px-8 py-3">Begin Calibration</button>
+                    </div>
+                `;
+                document.getElementById('start-calibration-btn').addEventListener('click', async () => {
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { 'assessmentState.assessmentStarted': true });
+                });
+            },
+
+            renderAssessmentPage() {
+                const page = document.getElementById('page-assessment');
+                if (!this.state.userData || !this.state.userData.assessmentState) {
+                    this.navigateTo('landing'); // Failsafe
+                    return;
+                }
+                
+                if (!this.state.userData.assessmentState.assessmentStarted) {
+                    this.renderAssessmentIntro();
+                    return;
+                }
+
+                const progress = (this.state.userData.assessmentState.currentQuestionIndex / (this.config.assessmentQuestions.length - 1)) * 100;
+                
+                page.innerHTML = `
+                    <div class="w-full max-w-2xl mx-auto h-full flex flex-col z-10">
+                        <header class="p-4 flex justify-between items-center flex-shrink-0">
+                            <h1 class="text-xl font-bold text-white">Operator Calibration</h1>
+                            <div class="w-1/2">
+                                <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                    <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                        </header>
+                        <div id="chat-container" class="flex-1 overflow-y-auto mb-4 p-4 chat-container flex flex-col">
+                        </div>
+                        <div class="p-4 flex-shrink-0">
+                            <div id="scale-input-container" class="hidden"></div>
+                            <div id="input-container" class="flex items-center gap-2">
+                                <input type="text" id="input-box" class="w-full bg-tertiary border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-primary transition duration-300" placeholder="Type your response...">
+                                <button id="send-btn" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('send-btn').addEventListener('click', () => this.handleTextInput());
+                document.getElementById('input-box').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleTextInput();
+                });
+                
+                this.rebuildAssessmentChat();
+            },
+            
+            rebuildAssessmentChat() {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer) return;
+                chatContainer.innerHTML = '';
+                const responses = this.state.userData.assessmentResponses || {};
+                const maxIndex = this.state.userData.assessmentState.currentQuestionIndex;
+                for (let i = 0; i < maxIndex; i++) {
+                    this.addAssessmentMessage(this.config.assessmentQuestions[i].text, 'ai');
+                    const questionId = this.config.assessmentQuestions[i].id;
+                    if (responses[questionId]) {
+                        this.addAssessmentMessage(responses[questionId], 'user');
+                    }
+                }
+                this.askAssessmentQuestion();
+            },
+            
+            askAssessmentQuestion() {
+                const currentIndex = this.state.userData.assessmentState.currentQuestionIndex;
+                if (currentIndex >= this.config.assessmentQuestions.length) {
+                    this.processAssessment();
+                    return;
+                }
+
+                const question = this.config.assessmentQuestions[currentIndex];
+                const inputContainer = document.getElementById('input-container');
+                const scaleContainer = document.getElementById('scale-input-container');
+
+                this.showTypingIndicator();
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    this.addAssessmentMessage(question.text, 'ai');
+
+                    if (question.type === 'scale') {
+                        inputContainer.classList.add('hidden');
+                        scaleContainer.classList.remove('hidden');
+                        scaleContainer.innerHTML = `
+                            <div class="flex justify-center items-center gap-2 flex-wrap">
+                                ${Array.from({ length: question.max }, (_, i) => i + 1).map(num => 
+                                    `<button class="scale-btn btn btn-secondary w-10 h-10 p-0" data-value="${num}">${num}</button>`
+                                ).join('')}
+                            </div>
+                        `;
+                        scaleContainer.querySelectorAll('.scale-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => this.handleScaleInput(e.target.dataset.value, question.id));
+                        });
+                    } else {
+                        inputContainer.classList.remove('hidden');
+                        scaleContainer.classList.add('hidden');
+                        document.getElementById('input-box').focus();
+                    }
+
+                    if (question.type === 'end') {
+                         inputContainer.classList.add('hidden');
+                         scaleContainer.classList.add('hidden');
+                         setTimeout(() => this.processAssessment(), 1500);
+                    }
+
+                }, 1200);
+            },
+
+            handleTextInput() {
+                const inputBox = document.getElementById('input-box');
+                const text = inputBox.value.trim();
+                if (text === '') return;
+                const currentQuestion = this.config.assessmentQuestions[this.state.userData.assessmentState.currentQuestionIndex];
+                if (!currentQuestion || currentQuestion.type === 'end') return;
+                
+                this.handleGenericInput(text, currentQuestion.id);
+                inputBox.value = '';
+            },
+
+            handleScaleInput(value, questionId) {
+                this.handleGenericInput(value, questionId);
+            },
+
+            async handleGenericInput(value, questionId) {
+                this.addAssessmentMessage(value, 'user');
+                
+                const newIndex = this.state.userData.assessmentState.currentQuestionIndex + 1;
+                
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, {
+                    [`assessmentResponses.${questionId}`]: value,
+                    'assessmentState.currentQuestionIndex': newIndex
+                });
+            },
+
+            async processAssessment() {
+                await this.showAnalysisLoadingScreen();
+            },
+            
+            async showAnalysisLoadingScreen() {
+                const page = document.getElementById('page-assessment');
+                page.innerHTML = `
+                    <div id="analysis-loading-screen">
+                        <div class="w-24 h-24 text-accent-primary mb-4">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <p id="analysis-loading-text">INITIALIZING ANALYSIS...</p>
+                    </div>
+                `;
+
+                const loadingTexts = [
+                    "CALIBRATING PSYCH-PROFILE...",
+                    "ANALYZING OPERATIONAL PARAMETERS...",
+                    "CROSS-REFERENCING DOCTRINE...",
+                    "CONSTRUCTING BASELINE PROFILE...",
+                    "ANALYSIS COMPLETE."
+                ];
+                let textIndex = 0;
+                const textElement = document.getElementById('analysis-loading-text');
+
+                const intervalId = setInterval(() => {
+                    if (textIndex < loadingTexts.length) {
+                        if(textElement) textElement.textContent = loadingTexts[textIndex];
+                        textIndex++;
+                    } else {
+                        clearInterval(intervalId);
+                        setTimeout(() => {
+                            this.renderProfileAnalysis();
+                        }, 1000);
+                    }
+                }, 1500);
+            },
+
+            async renderProfileAnalysis() {
+                const responses = this.state.userData.assessmentResponses;
+                const analysisData = {
+                    labels: ['Finance', 'Career', 'Health', 'Mindset', 'Productivity'],
+                    datasets: [{
+                        label: 'Baseline',
+                        data: [
+                            parseInt(responses.finance_1 || 5),
+                            (responses.career_1 || '').toLowerCase().includes('calling') ? 9 : 5,
+                            parseInt(responses.health_1 || 5),
+                            (responses.mental_1 || '').toLowerCase().includes('positive') ? 8 : 4,
+                            (responses.productivity_1 || '').toLowerCase().includes('asset') ? 8 : 4,
+                        ],
+                        fill: true,
+                        backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                        borderColor: 'rgb(217, 119, 6)',
+                        pointBackgroundColor: 'rgb(217, 119, 6)',
+                    }]
+                };
+
+                const content = `
+                    <h2 class="text-2xl font-bold mb-2 text-center">Calibration Complete</h2>
+                    <p class="text-secondary text-center mb-6">Initial baseline established. This profile will serve as the foundation for your first set of missions.</p>
+                    <div class="relative h-64 md:h-80"><canvas id="profileAnalysisChart"></canvas></div>
+                    <button id="start-missions-btn" class="mt-8 w-full btn btn-primary">Proceed to Dashboard</button>
+                `;
+                this.showModal(content);
+                this.renderModalRadarChart('profileAnalysisChart', analysisData);
+                document.getElementById('start-missions-btn').addEventListener('click', async () => {
+                    this.hideModal();
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { assessmentComplete: true });
+                });
+            },
+            
+            async startTutorial() {
+                let currentStep = 0;
+                const steps = this.config.tutorialSteps;
+
+                const showTutorialStep = () => {
+                    if (currentStep >= steps.length) {
+                        this.hideModal();
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        updateDoc(userDocRef, { tutorialCompleted: true });
+                        return;
+                    }
+
+                    const step = steps[currentStep];
+                    const isLastStep = currentStep === steps.length - 1;
+                    const modalContent = `
+                        <h2 class="text-xl font-bold mb-2 text-center">${step.title}</h2>
+                        <p class="text-secondary text-center mb-6">${step.content}</p>
+                        <div class="flex justify-end">
+                            <button id="tutorial-next-btn" class="btn btn-primary">${isLastStep ? 'Finish' : 'Next'}</button>
+                        </div>
+                    `;
+                    this.showModal(modalContent);
+                    document.getElementById('tutorial-next-btn').addEventListener('click', () => {
+                        currentStep++;
+                        showTutorialStep();
+                    });
+                };
+
+                showTutorialStep();
+            },
+
+            // --- CORE PAGE RENDERS ---
+            async fetchAndDisplayQuote(){
+                const quoteBox = document.getElementById('quote-bento-box');
+                try {
+                    const response = await fetch('https://api.quotable.io/random?tags=technology|future|wisdom|self-help');
+                    const data = await response.json();
+                    quoteBox.innerHTML = `
+                        <p class="text-secondary italic">"${data.content}"</p>
+                        <p class="text-right font-semibold text-sm mt-2">- ${data.author}</p>
+                    `;
+                } catch(e) {
+                    quoteBox.innerHTML = `<p class="text-secondary">Could not fetch quote.</p>`;
+                }
+            },
+
+            renderProtocol(){
+                const container = document.getElementById('page-protocol');
+                if (!this.state.userData) return;
+
+                const { protocolProgress, missionStartDate } = this.state.userData;
+                const missionStart = missionStartDate?.toDate ? dayjs(missionStartDate.toDate()) : dayjs();
+                const currentMissionWeek = dayjs().diff(missionStart, 'week') + 1;
+                const selectedWeek = this.state.uiState.protocolSelectedWeek;
+
+                const weekSchedule = this.config.riseSchedule[selectedWeek];
+                const weekTasks = Object.values(weekSchedule || {});
+
+                const weekButtonsHTML = Object.keys(this.config.riseSchedule).map(weekNum => `
+                    <button class="protocol-week-btn p-2 rounded-lg flex-1 text-center ${parseInt(weekNum) === selectedWeek ? 'selected' : ''}" data-week="${weekNum}">
+                        Week ${weekNum}
+                    </button>
+                `).join('');
+                
+                const tasksHTML = weekTasks.map(task => {
+                    const completedCount = protocolProgress?.tasks?.[selectedWeek]?.[task.text] || 0;
+                    const isComplete = completedCount >= task.freq;
+                    return `
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front ${isComplete ? 'opacity-50' : ''}">
+                                    <p class="font-semibold text-lg px-4">${task.text}</p>
+                                    <p class="font-mono text-xl font-bold mt-2 ${isComplete ? 'text-green-500' : 'text-accent-primary'}">${completedCount} / ${task.freq}</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-semibold">${task.text}</p>
+                                    <p class="text-sm text-secondary">Frequency: ${task.freq}x per week</p>
+                                    <p class="text-sm font-mono text-accent-primary mt-2">+${task.dp} DP / +1 ${task.stat}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('') || '<p class="text-secondary text-center py-8">No objectives for this week.</p>';
+
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-2">RISE Protocol</h1>
+                    <p class="text-secondary mb-6">Weekly progressive overload for discipline. Current Mission Week: <span class="text-accent-primary font-bold">${currentMissionWeek}</span></p>
+                    
+                    <div class="bento-box mb-6">
+                        <h2 class="text-xl font-semibold mb-4">Select Week</h2>
+                        <div class="flex gap-2 flex-wrap">${weekButtonsHTML}</div>
+                    </div>
+
+                    <h2 class="text-2xl font-semibold mb-4 ml-1">Week ${selectedWeek} Objectives</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${tasksHTML}
+                    </div>
+                `;
+
+                container.querySelectorAll('.protocol-week-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.state.uiState.protocolSelectedWeek = parseInt(e.currentTarget.dataset.week);
+                        this.renderProtocol();
+                    });
+                });
+            },
+
+            renderArmory(){
+                const container = document.getElementById('page-armory');
+                if (!this.state.userData) return;
+
+                const { operatorName, level, dp, stats, currentStreak, longestStreak } = this.state.userData;
+                const rank = this.config.ranks.slice().reverse().find(r => level >= r.minLevel)?.name || 'Recruit';
+                const dpForNextLevel = 100 + (level * 20);
+                const dpProgress = (dp / dpForNextLevel) * 100;
+
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Operator Armory</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Profile Card -->
+                        <div class="md:col-span-1 bento-box flex flex-col items-center text-center">
+                            <div class="w-24 h-24 text-accent-primary mb-4">
+                               <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                            </div>
+                            <h2 class="text-2xl font-bold">${operatorName}</h2>
+                            <p class="font-mono text-accent-primary">${rank}</p>
+                            <div class="w-full my-6">
+                                <p class="font-mono text-sm text-secondary">Level ${level}</p>
+                                <div class="w-full progress-bar-bg rounded-full h-2.5 mt-1">
+                                    <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${dpProgress}%"></div>
+                                </div>
+                                <p class="font-mono text-xs text-secondary mt-1">${dp} / ${dpForNextLevel} DP</p>
+                            </div>
+                            <div class="flex justify-around w-full">
+                                <div>
+                                    <p class="text-2xl font-bold">${currentStreak}</p>
+                                    <p class="text-sm text-secondary">Streak</p>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold">${longestStreak}</p>
+                                    <p class="text-sm text-secondary">Best</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Radar Chart -->
+                        <div class="md:col-span-2 bento-box">
+                             <h3 class="text-xl font-semibold mb-4">Operator Stats</h3>
+                            <div class="relative h-80"><canvas id="statsRadarChart"></canvas></div>
+                        </div>
+                    </div>
+                `;
+                this.renderStatsRadarChart();
+            },
+
+            renderDoctrinePage(){
+                const container = document.getElementById('page-doctrine');
+                if (!this.state.userData) return;
+
+                const { majorObjectives, preEntryChecklist } = this.state.userData.doctrine;
+                const mantras = this.config.doctrine.tradingMantras;
+                const sops = this.config.doctrine.sops;
+
+                const objectivesHTML = majorObjectives.map((obj, index) => `
+                    <div class="flex items-center bg-secondary p-3 rounded-lg gap-3">
+                        <input type="checkbox" data-obj-index="${index}" class="major-obj-checkbox h-5 w-5 rounded bg-tertiary border-gray-500 focus:ring-accent-primary flex-shrink-0" ${obj.completed ? 'checked' : ''}>
+                        <p class="flex-grow ${obj.completed ? 'line-through text-secondary' : ''}">${obj.text}</p>
+                        <button class="delete-major-obj-btn text-secondary hover:text-destructive-primary text-2xl leading-none flex-shrink-0" data-obj-index="${index}">&times;</button>
+                    </div>
+                `).join('');
+
+                const preEntryChecklistHTML = (preEntryChecklist || []).map((item, index) => `
+                     <div class="flex items-center bg-secondary p-3 rounded-lg gap-3">
+                        <input type="checkbox" data-check-index="${index}" class="pre-entry-checkbox h-5 w-5 rounded bg-tertiary border-gray-500 focus:ring-accent-primary flex-shrink-0" ${item.completed ? 'checked' : ''}>
+                        <label class="flex-grow ${item.completed ? 'line-through text-secondary' : ''}">${item.text}</label>
+                    </div>
+                `).join('');
+
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Personal Doctrine</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bento-box space-y-4">
+                            <h2 class="text-xl font-semibold">Major Objectives</h2>
+                            <div id="major-objectives-list" class="space-y-2">${objectivesHTML}</div>
+                            <div class="flex gap-2">
+                                <input id="new-major-obj-input" type="text" class="flex-grow" placeholder="Define a new objective...">
+                                <button id="add-major-obj-btn" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                        <div class="bento-box space-y-4">
+                            <h2 class="text-xl font-semibold">Pre-Entry Brake Check</h2>
+                            <div id="pre-entry-checklist" class="space-y-2">${preEntryChecklistHTML}</div>
+                        </div>
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Trading Mantras</h2>
+                            <ul class="list-disc list-inside space-y-2 text-secondary">
+                                ${mantras.map(m => `<li>${m}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Standard Operating Procedures (SOPs)</h2>
+                            <ol class="list-decimal list-inside space-y-2">
+                                ${sops.map(s => `<li>${s}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners
+                container.querySelectorAll('.major-obj-checkbox').forEach(box => {
+                    box.addEventListener('change', e => this.toggleMajorObjective(e.target.dataset.objIndex, e.target.checked));
+                });
+                container.querySelectorAll('.delete-major-obj-btn').forEach(btn => {
+                    btn.addEventListener('click', e => this.deleteMajorObjective(e.target.dataset.objIndex));
+                });
+                document.getElementById('add-major-obj-btn').addEventListener('click', () => this.addMajorObjective());
+                container.querySelectorAll('.pre-entry-checkbox').forEach(box => {
+                    box.addEventListener('change', e => this.togglePreEntryCheck(e.target.dataset.checkIndex, e.target.checked));
+                });
+            },
+            
+            async toggleMajorObjective(index, isCompleted) {
+                if (!this.state.userData) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const newObjectives = [...this.state.userData.doctrine.majorObjectives];
+                if (newObjectives[index]) {
+                    newObjectives[index].completed = isCompleted;
+                    await updateDoc(userDocRef, { 'doctrine.majorObjectives': newObjectives });
+                    if(isCompleted) await this.checkAndGrantAchievement('DOCTRINE_MASTER');
+                }
+            },
+
+            async addMajorObjective() {
+                const input = document.getElementById('new-major-obj-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const newObjective = { text, completed: false };
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const newObjectives = [...this.state.userData.doctrine.majorObjectives, newObjective];
+                await updateDoc(userDocRef, { 'doctrine.majorObjectives': newObjectives });
+                input.value = '';
+            },
+
+            async deleteMajorObjective(index) {
+                if (!this.state.userData) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const newObjectives = [...this.state.userData.doctrine.majorObjectives];
+                newObjectives.splice(index, 1);
+                await updateDoc(userDocRef, { 'doctrine.majorObjectives': newObjectives });
+            },
+
+            async togglePreEntryCheck(index, isCompleted) {
+                if (!this.state.userData) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const newChecklist = [...this.state.userData.doctrine.preEntryChecklist];
+                if (newChecklist[index]) {
+                    newChecklist[index].completed = isCompleted;
+                    await updateDoc(userDocRef, { 'doctrine.preEntryChecklist': newChecklist });
+                }
+            },
+
+            renderAchievementsPage(){
+                const container = document.getElementById('page-achievements');
+                if (!this.state.userData) return;
+
+                const userAchievements = this.state.userData.achievements || {};
+                const achievementsHTML = Object.entries(this.config.achievements).map(([id, ach]) => {
+                    const unlocked = userAchievements[id];
+                    return `
+                        <div class="bento-box flex items-start gap-4 ${!unlocked ? 'achievement-locked' : ''}" ${!unlocked && id === 'CURIOSITY' ? `onclick="App.checkAndGrantAchievement('CURIOSITY', true)"` : ''}>
+                            <div class="text-4xl">${ach.emoji}</div>
+                            <div>
+                                <h3 class="font-bold text-lg">${ach.name}</h3>
+                                <p class="text-sm text-secondary">${ach.description}</p>
+                                ${unlocked ? `<p class="text-xs font-mono text-accent-primary mt-1">+${ach.dp} DP</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Achievements & Commendations</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${achievementsHTML}
+                    </div>
+                `;
+            },
+            
+            async renderTradeLogPage(){
+                 const container = document.getElementById('page-tradelog');
+                 container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Operator's Log</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div class="lg:col-span-3 space-y-6">
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Recent Logs</h2>
+                                <div id="log-container" class="space-y-3 log-container">
+                                    <div class="flex justify-center p-8"><div class="loading-spinner"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Log New Trade</h2>
+                                <form id="tradelog-form" class="space-y-4">
+                                    <input type="text" id="trade-asset" placeholder="Asset (e.g., BTC/USD)" required>
+                                    <select id="trade-type" required>
+                                        <option value="long">Long</option>
+                                        <option value="short">Short</option>
+                                    </select>
+                                    <select id="trade-outcome" required>
+                                        <option value="win">Win</option>
+                                        <option value="loss">Loss</option>
+                                        <option value="breakeven">Breakeven</option>
+                                    </select>
+                                    <input type="number" step="any" id="trade-pnl" placeholder="Profit/Loss ($)" required>
+                                    <textarea id="trade-thesis" rows="4" placeholder="Enter your trade thesis..."></textarea>
+                                    <button id="fortify-thesis-btn" type="button" class="w-full btn btn-secondary btn-sm">✨ Fortify Thesis with AI</button>
+                                    <div id="ai-analysis-container" class="hidden text-sm p-3 bg-tertiary rounded-lg"></div>
+                                    <button type="submit" class="w-full btn btn-primary">Log Trade</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                 `;
+                 
+                 document.getElementById('tradelog-form').addEventListener('submit', async (e) => {
+                     e.preventDefault();
+                     const formData = {
+                         asset: document.getElementById('trade-asset').value,
+                         type: document.getElementById('trade-type').value,
+                         outcome: document.getElementById('trade-outcome').value,
+                         pnl: parseFloat(document.getElementById('trade-pnl').value),
+                         thesis: document.getElementById('trade-thesis').value,
+                         aiAnalysis: this.state.uiState.tradeAiAnalysis || '',
+                         timestamp: serverTimestamp()
+                     };
+                     
+                     const logCollectionRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "logs");
+                     await addDoc(logCollectionRef, formData);
+                     await this.incrementCounter('logCount');
+                     this.showNotification("Trade logged successfully.", "success");
+                     e.target.reset();
+                     document.getElementById('ai-analysis-container').classList.add('hidden');
+                     this.state.uiState.tradeAiAnalysis = '';
+                 });
+                 
+                 document.getElementById('fortify-thesis-btn').addEventListener('click', async (e) => {
+                     const button = e.currentTarget;
+                     button.disabled = true;
+                     button.innerHTML = '<div class="loading-spinner w-5 h-5 mx-auto"></div>';
+                     const thesis = document.getElementById('trade-thesis').value;
+                     if (!thesis) {
+                         this.showNotification("Please enter a thesis first.", "error");
+                         button.disabled = false;
+                         button.textContent = '✨ Fortify Thesis with AI';
+                         return;
+                     }
+                     
+                     const prompt = `Analyze the following trading thesis. Provide a concise critique, identify potential risks, and suggest one area for improvement. Thesis: "${thesis}"`;
+                     const analysis = await this.callGemini(prompt);
+                     
+                     if (analysis) {
+                         this.state.uiState.tradeAiAnalysis = analysis;
+                         const analysisContainer = document.getElementById('ai-analysis-container');
+                         analysisContainer.textContent = analysis;
+                         analysisContainer.classList.remove('hidden');
+                         await this.incrementCounter('aiAssistCount');
+                     }
+                     
+                     button.disabled = false;
+                     button.textContent = '✨ Fortify Thesis with AI';
+                 });
+
+                 this.loadAndDisplayRecentLogs();
+            },
+
+            async renderJournalPage(){
+                const container = document.getElementById('page-journal');
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Operator's Journal</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div class="lg:col-span-3 space-y-6">
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Recent Entries</h2>
+                                <div id="journal-container" class="space-y-3 log-container">
+                                    <div class="flex justify-center p-8"><div class="loading-spinner"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">New Entry</h2>
+                                <form id="journal-form" class="space-y-4">
+                                    <div id="journal-prompt-container" class="text-secondary italic p-3 bg-tertiary rounded-lg hidden"></div>
+                                    <button id="get-prompt-btn" type="button" class="w-full btn btn-secondary btn-sm">✨ Get a Writing Prompt</button>
+                                    <textarea id="journal-entry" rows="10" placeholder="Debrief. Document your thoughts, wins, and lessons learned..."></textarea>
+                                    <button type="submit" class="w-full btn btn-primary">Save Entry</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('get-prompt-btn').addEventListener('click', async (e) => {
+                    const button = e.currentTarget;
+                    button.disabled = true;
+                    button.innerHTML = '<div class="loading-spinner w-5 h-5 mx-auto"></div>';
+                    
+                    const prompt = "Generate a single, concise, and thought-provoking journal prompt for a trader focused on self-improvement, discipline, and market psychology.";
+                    const journalPrompt = await this.callGemini(prompt);
+                    
+                    if (journalPrompt) {
+                        const promptContainer = document.getElementById('journal-prompt-container');
+                        promptContainer.textContent = journalPrompt;
+                        promptContainer.classList.remove('hidden');
+                        await this.incrementCounter('aiPromptCount');
+                    }
+                    
+                    button.disabled = false;
+                    button.textContent = '✨ Get a Writing Prompt';
+                });
+
+                document.getElementById('journal-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const entryText = document.getElementById('journal-entry').value;
+                    if (!entryText.trim()) {
+                        this.showNotification("Journal entry cannot be empty.", "error");
+                        return;
+                    }
+                    
+                    const entryData = {
+                        text: entryText,
+                        prompt: document.getElementById('journal-prompt-container').textContent || '',
+                        timestamp: serverTimestamp()
+                    };
+
+                    const journalCollectionRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "journal");
+                    await addDoc(journalCollectionRef, entryData);
+                    await this.incrementCounter('journalCount');
+                    this.showNotification("Journal entry saved.", "success");
+                    e.target.reset();
+                    document.getElementById('journal-prompt-container').classList.add('hidden');
+                });
+                
+                this.loadRecentJournalEntries();
+            },
+
+            async renderFinancePage(){
+                 const container = document.getElementById('page-finance');
+                 if(!this.state.userData.finance) return;
+                 
+                 const { balances, debts, goals } = this.state.userData.finance;
+
+                 const goalsHTML = goals.map((g, i) => `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span>${g.name}</span>
+                            <span class="font-mono">$${g.saved.toLocaleString()} / $${g.target.toLocaleString()}</span>
+                        </div>
+                        <div class="w-full progress-bar-bg rounded-full h-2.5">
+                            <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${ (g.saved / g.target) * 100}%"></div>
+                        </div>
+                    </div>
+                 `).join('') || '<p class="text-secondary text-sm">No financial goals set.</p>';
+
+                 const debtsHTML = debts.map((d, i) => `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span>${d.name}</span>
+                            <span class="font-mono">$${d.paid.toLocaleString()} / $${d.total.toLocaleString()}</span>
+                        </div>
+                        <div class="w-full progress-bar-bg rounded-full h-2.5">
+                            <div class="progress-bar-fg h-2.5 rounded-full bg-green-600" style="width: ${ (d.paid / d.total) * 100}%"></div>
+                        </div>
+                    </div>
+                 `).join('') || '<p class="text-secondary text-sm">No debts tracked.</p>';
+
+                 container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Finance Center</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Balances -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Balances</h2>
+                            <p class="text-3xl font-bold font-mono">$${((balances.bank || 0) + (balances.crypto || 0)).toLocaleString()}</p>
+                            <div class="mt-4 space-y-2 text-secondary">
+                                <p>Bank: $${(balances.bank || 0).toLocaleString()}</p>
+                                <p>Crypto: $${(balances.crypto || 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <!-- Goals -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Objectives</h2>
+                            ${goalsHTML}
+                            <button class="w-full mt-4 btn btn-secondary btn-sm" onclick="App.showFinanceItemModal('goal')">Add Goal</button>
+                        </div>
+                        <!-- Debts -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Debts</h2>
+                            ${debtsHTML}
+                            <button class="w-full mt-4 btn btn-secondary btn-sm" onclick="App.showFinanceItemModal('debt')">Add Debt</button>
+                        </div>
+                        <!-- Transactions -->
+                        <div class="md:col-span-2 bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Transaction Log</h2>
+                            <div id="transaction-log-container" class="space-y-2 log-container"></div>
+                        </div>
+                        <!-- Actions -->
+                        <div class="bento-box">
+                             <h2 class="text-xl font-semibold mb-4">Actions</h2>
+                             <div class="space-y-3">
+                                <button class="w-full btn btn-secondary" onclick="App.showTransactionModal('income')">Log Income</button>
+                                <button class="w-full btn btn-secondary" onclick="App.showTransactionModal('expense')">Log Expense</button>
+                                <button class="w-full btn btn-secondary" onclick="App.showTransactionModal('transfer')">Transfer Funds</button>
+                             </div>
+                        </div>
+                    </div>
+                 `;
+                 this.loadTransactions();
+            },
+
+            async renderAsvabPage(){
+                const container = document.getElementById('page-asvab');
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">ASVAB Trainer</h1>
+                    <div id="asvab-content"></div>
+                `;
+                this.renderAsvabHome();
+            },
+
+            renderSettings(){
+                const container = document.getElementById('page-settings');
+                if(!this.state.userData) return;
+                const { operatorName, settings, isAnonymous } = this.state.userData;
+
+                const themes = [
+                    { name: 'Default', class: 'default', color: '#D97706' },
+                    { name: 'Teal', class: 'theme-teal', color: '#0D9488' },
+                    { name: 'Blue', class: 'theme-blue', color: '#2563EB' },
+                    { name: 'Crimson', class: 'theme-crimson', color: '#DC2626' },
+                    { name: 'Cyan', class: 'theme-cyan', color: '#0891B2' },
+                    { name: 'Green', class: 'theme-green', color: '#16A34A' },
+                ];
+
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">System Settings</h1>
+                    <div class="max-w-2xl mx-auto space-y-8">
+                        <!-- Profile Settings -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Profile</h2>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="operatorName" class="block text-sm font-medium text-secondary mb-1">Operator Name</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="operatorName" value="${operatorName}" class="flex-grow">
+                                        <button id="save-name-btn" class="btn btn-primary">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Account Settings -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Account</h2>
+                             ${isAnonymous ? `
+                                <div>
+                                    <p class="text-secondary text-sm mb-4">You are currently using an anonymous account. Upgrade to a permanent account to save your progress across devices.</p>
+                                    <button id="upgrade-account-btn" class="w-full btn btn-secondary">Upgrade to Permanent Account</button>
+                                </div>
+                             ` : `
+                                <div class="space-y-4">
+                                    <h3 class="font-semibold">Account Recovery</h3>
+                                    <p class="text-secondary text-sm">Use this form to log in on a new device.</p>
+                                    <form id="login-form" class="space-y-3">
+                                        <input type="email" id="login-email" placeholder="Email" required>
+                                        <input type="password" id="login-password" placeholder="Password" required>
+                                        <button type="submit" class="btn btn-primary w-full">Login</button>
+                                    </form>
+                                </div>
+                             `}
+                        </div>
+
+                        <!-- Theme Settings -->
+                        <div class="bento-box">
+                            <h2 class="text-xl font-semibold mb-4">Theme</h2>
+                            <div class="grid grid-cols-3 gap-4">
+                                ${themes.map(theme => `
+                                    <button class="theme-btn p-4 rounded-lg border-2 ${settings.theme === theme.class ? 'border-accent-primary' : 'border-tertiary'}" data-theme="${theme.class}">
+                                        <div class="w-full h-8 rounded mb-2" style="background-color: ${theme.color};"></div>
+                                        <p>${theme.name}</p>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="bento-box border-destructive-primary/50">
+                             <h2 class="text-xl font-semibold mb-4 text-destructive-primary">Danger Zone</h2>
+                             <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-semibold">Hard Mode</h3>
+                                        <p class="text-sm text-secondary">If enabled, breaking a streak resets your level and stats to 1.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                      <input type="checkbox" id="hard-mode-toggle" class="sr-only peer" ${settings.hardMode ? 'checked' : ''}>
+                                      <div class="w-11 h-6 bg-tertiary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-primary"></div>
+                                    </label>
+                                </div>
+                                <hr class="border-tertiary"/>
+                                <button id="reset-account-btn" class="w-full btn btn-destructive">Reset Account</button>
+                                <button id="logout-btn" class="w-full btn btn-secondary">Logout</button>
+                             </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('save-name-btn').addEventListener('click', () => this.saveOperatorName());
+                document.querySelectorAll('.theme-btn').forEach(btn => btn.addEventListener('click', (e) => this.changeTheme(e.currentTarget.dataset.theme)));
+                document.getElementById('hard-mode-toggle').addEventListener('change', (e) => this.toggleHardMode(e.target.checked));
+                document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+                document.getElementById('reset-account-btn').addEventListener('click', () => this.showResetConfirmationModal());
+                
+                const upgradeBtn = document.getElementById('upgrade-account-btn');
+                if(upgradeBtn) upgradeBtn.addEventListener('click', () => this.showUpgradeAccountModal());
+
+                const loginForm = document.getElementById('login-form');
+                if(loginForm) loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleEmailLogin();
+                });
+            },
+
+            // --- GETTERS AND HELPERS ---
+            getStatFullName(key){
+                const names = { DIS: 'Discipline', INT: 'Intellect', STR: 'Strength', CHA: 'Charisma', RES: 'Resilience', CRE: 'Creativity' };
+                return names[key] || key;
+            },
+
+            renderStatsRadarChart(){
+                const ctx = document.getElementById('statsRadarChart')?.getContext('2d');
+                if (!ctx || !this.state.userData) return;
+                
+                if (this.state.statsRadarChart) {
+                    this.state.statsRadarChart.destroy();
+                }
+
+                const statOrder = ['DIS', 'INT', 'STR', 'CHA', 'RES', 'CRE'];
+                const data = statOrder.map(key => this.state.userData.stats[key] || 0);
+                const labels = statOrder.map(key => this.getStatFullName(key));
+
+                this.state.statsRadarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Stat Points',
+                            data: data,
+                            fill: true,
+                            backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                            borderColor: 'rgb(217, 119, 6)',
+                            pointBackgroundColor: 'rgb(217, 119, 6)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(217, 119, 6)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#F5F5F5', font: { size: 12 } },
+                                ticks: { backdropColor: 'transparent', color: '#a0a0a0' }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            changeDay(offset){
+                this.state.currentDate = this.state.currentDate.add(offset, 'day');
+                this.listenToDailyTasks(this.state.currentDate);
+                this.renderDashboard();
+            },
+
+            async toggleTaskCompletion(taskId, isCompleted){
+                const taskRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks", taskId);
+                await updateDoc(taskRef, { completed: isCompleted });
+                
+                const task = this.state.dailyTasks.find(t => t.id === taskId);
+                if (task) {
+                    const dpChange = isCompleted ? task.dp : -task.dp;
+                    const statPointChange = isCompleted ? 1 : -1;
+                    await this.addDP(dpChange, task.stat, statPointChange);
+                }
+            },
+            
+            applyTheme(themeName) {
+                document.documentElement.className = `dark ${themeName || 'default'}`;
+                this.updatePwaAssets(this.config.themeColorMap[themeName] || '#D97706');
+            },
+
+            updatePwaAssets(colorHex) {
+                const colorEncoded = encodeURIComponent(colorHex);
+                const svgIcon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z' stroke='${colorEncoded}' stroke-width='4' fill='none'/%3E%3Cpath d='M30 60 L50 50 L70 60' stroke='${colorEncoded}' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M50 50 L50 20' stroke='${colorEncoded}' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E`;
+                
+                document.getElementById('favicon-link').href = svgIcon;
+                document.getElementById('apple-touch-icon-link').href = svgIcon;
+                document.getElementById('theme-color-meta').content = colorHex;
+                
+                const manifest = {
+                    name: "Operator Uplift OS",
+                    short_name: "OperatorOS",
+                    start_url: "/",
+                    display: "standalone",
+                    background_color: "#121212",
+                    theme_color: colorHex,
+                    icons: [{ "src": svgIcon, "sizes": "192x192", "type": "image/svg+xml" }]
+                };
+                const manifestUrl = `data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
+                document.getElementById('manifest-link').href = manifestUrl;
+            },
+            
+            async saveOperatorName(){
+                const newName = document.getElementById('operatorName').value.trim();
+                if (newName && newName !== this.state.userData.operatorName) {
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { operatorName: newName });
+                    this.showNotification("Operator name updated.", "success");
+                }
+            },
+
+            async changeTheme(theme){
+                if (theme !== this.state.userData.settings.theme) {
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { 'settings.theme': theme });
+                    await this.checkAndGrantAchievement('THEME_CHANGER');
+                    this.showNotification("Theme updated.", "success");
+                }
+            },
+
+            async toggleHardMode(isEnabled){
+                 this.showWarningConfirmationModal(
+                    'Confirm Hard Mode',
+                    `Are you sure you want to ${isEnabled ? 'enable' : 'disable'} Hard Mode? When enabled, breaking a streak will reset your level and stats.`,
+                    async () => {
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        await updateDoc(userDocRef, { 'settings.hardMode': isEnabled });
+                        if(isEnabled) await this.checkAndGrantAchievement('HARD_MODE_ON');
+                        this.showNotification(`Hard Mode ${isEnabled ? 'enabled' : 'disabled'}.`, "success");
+                    },
+                    () => { // onCancel
+                        document.getElementById('hard-mode-toggle').checked = !isEnabled;
+                    }
+                );
+            },
+
+            async logout(){
+                await signOut(this.state.auth);
+                Object.values(this.state.unsubscribe).forEach(unsub => unsub && unsub());
+                this.state.userData = null;
+                this.state.userId = null;
+                this.state.isAuthReady = false; // Prevent race conditions on re-login
+                window.location.reload(); // Reload to clear state and listeners
+            },
+
+            showResetConfirmationModal(){
+                this.showWarningConfirmationModal(
+                    'Confirm Account Reset',
+                    'This action is irreversible. All your progress, stats, logs, and achievements will be permanently deleted. Are you absolutely sure?',
+                    () => this.executeReset()
+                );
+            },
+
+            async executeReset(){
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                // Delete subcollections first
+                await this.deleteCollection(collection(userDocRef, 'tasks'));
+                await this.deleteCollection(collection(userDocRef, 'logs'));
+                await this.deleteCollection(collection(userDocRef, 'journal'));
+                await this.deleteCollection(collection(userDocRef, 'asvabHistory'));
+                // Delete the main user document
+                await deleteDoc(userDocRef);
+                this.showNotification("Account reset. Re-initializing system.", "success");
+                await this.logout();
+            },
+
+            async deleteCollection(collectionRef){
+                const q = query(collectionRef);
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(this.state.db);
+                snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            },
+
+            showNotification(message, type = 'success'){
+                this.state.notificationQueue.push({ message, type });
+                this.processNotificationQueue();
+            },
+
+            processNotificationQueue(){
+                if (this.state.isNotifying || this.state.notificationQueue.length === 0) {
+                    return;
+                }
+                this.state.isNotifying = true;
+                const { message, type } = this.state.notificationQueue.shift();
+
+                const notification = document.createElement('div');
+                notification.className = `notification-popup ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                    this.state.isNotifying = false;
+                    this.processNotificationQueue();
+                }, 3000);
+            },
+
+            async checkAllAchievements(previousData, currentData, dailyTasks = []){
+                for (const id in this.config.achievements) {
+                    if (!currentData.achievements[id]) { // Only check if not already awarded
+                        const achievement = this.config.achievements[id];
+                        if (achievement.check(currentData, previousData, dailyTasks)) {
+                            await this.checkAndGrantAchievement(id);
+                        }
+                    }
+                }
+            },
+
+            async checkAndGrantAchievement(id, forceGrant = false){
+                if (!this.state.userData.achievements[id] || forceGrant) {
+                    const achievement = this.config.achievements[id];
+                    if (achievement) {
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        await updateDoc(userDocRef, {
+                            [`achievements.${id}`]: true,
+                            dp: increment(achievement.dp)
+                        });
+                        this.showNotification(`Achievement Unlocked: ${achievement.name}`, 'success');
+                    }
+                }
+            },
+
+            async incrementCounter(counterName){
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, { [counterName]: increment(1) });
+            },
+
+            async addDP(dpToAdd, statKey = null, statPoints = 0){
+                if (!this.state.userId) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                
+                await runTransaction(this.state.db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) throw "Document does not exist!";
+
+                    const data = userDoc.data();
+                    let { level, dp, stats } = data;
+                    dp += dpToAdd;
+                    let dpForNextLevel = 100 + (level * 20);
+
+                    while (dp >= dpForNextLevel) {
+                        level++;
+                        dp -= dpForNextLevel;
+                        dpForNextLevel = 100 + (level * 20);
+                        this.showNotification(`Level Up! Reached Level ${level}`, 'success');
+                    }
+
+                    if (statKey && stats.hasOwnProperty(statKey)) {
+                        stats[statKey] = Math.max(0, (stats[statKey] || 0) + statPoints);
+                    }
+
+                    transaction.update(userDocRef, { level, dp, stats });
+                });
+            },
+            
+            showWarningConfirmationModal(title, message, onConfirm, onCancel = () => {}, confirmText = "Confirm") {
+                const content = `
+                    <h2 class="text-xl font-bold mb-2 text-destructive-primary">${title}</h2>
+                    <p class="text-secondary mb-6">${message}</p>
+                    <div class="flex justify-end gap-3">
+                        <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                        <button id="modal-confirm-btn" class="btn btn-destructive">${confirmText}</button>
+                    </div>
+                `;
+                this.showModal(content);
+                document.getElementById('modal-confirm-btn').addEventListener('click', () => { onConfirm(); this.hideModal(); });
+                document.getElementById('modal-cancel-btn').addEventListener('click', () => { onCancel(); this.hideModal(); });
+            },
+
+            async loadAndDisplayRecentLogs(){
+                const container = document.getElementById('log-container');
+                if (!container) return;
+                
+                if (this.state.unsubscribe.logs) this.state.unsubscribe.logs();
+                
+                const logColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "logs");
+                const q = query(logColRef, orderBy("timestamp", "desc"), limit(10));
+
+                this.state.unsubscribe.logs = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p class="text-secondary text-center p-4">No trades logged yet.</p>';
+                        return;
+                    }
+                    container.innerHTML = snapshot.docs.map(doc => {
+                        const log = doc.data();
+                        const isWin = log.outcome === 'win';
+                        const isLoss = log.outcome === 'loss';
+                        const pnlColor = isWin ? 'var(--success-primary)' : isLoss ? 'var(--destructive-primary)' : 'text-secondary';
+                        return `
+                            <div class="log-item-clickable bg-tertiary p-3 rounded-lg" data-log-id="${doc.id}" data-log-type="trade">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold">${log.asset} <span class="text-xs uppercase font-mono text-secondary">${log.type}</span></span>
+                                    <span class="font-mono ${pnlColor}">${isWin ? '+' : ''}${log.pnl.toFixed(2)}</span>
+                                </div>
+                                <p class="text-xs text-secondary mt-1">${dayjs(log.timestamp?.toDate()).format('MMM D,YYYY h:mm A')}</p>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    container.querySelectorAll('.log-item-clickable').forEach(el => {
+                        el.addEventListener('click', (e) => this.showLogDetailModal('trade', e.currentTarget.dataset.logId));
+                    });
+                });
+            },
+
+            async loadRecentJournalEntries(){
+                const container = document.getElementById('journal-container');
+                if (!container) return;
+
+                if (this.state.unsubscribe.journal) this.state.unsubscribe.journal();
+
+                const journalColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "journal");
+                const q = query(journalColRef, orderBy("timestamp", "desc"), limit(10));
+                
+                this.state.unsubscribe.journal = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p class="text-secondary text-center p-4">No journal entries yet.</p>';
+                        return;
+                    }
+                    container.innerHTML = snapshot.docs.map(doc => {
+                        const entry = doc.data();
+                        return `
+                             <div class="log-item-clickable bg-tertiary p-3 rounded-lg" data-log-id="${doc.id}" data-log-type="journal">
+                                <p class="text-sm truncate">${entry.text}</p>
+                                <p class="text-xs text-secondary mt-1">${dayjs(entry.timestamp?.toDate()).format('MMM D,YYYY h:mm A')}</p>
+                            </div>
+                        `;
+                    }).join('');
+
+                    container.querySelectorAll('.log-item-clickable').forEach(el => {
+                        el.addEventListener('click', (e) => this.showLogDetailModal('journal', e.currentTarget.dataset.logId));
+                    });
+                });
+            },
+            
+            async showLogDetailModal(type, id){
+                const collectionName = type === 'trade' ? 'logs' : 'journal';
+                const docRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, collectionName, id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    let content = '';
+                    if (type === 'trade') {
+                        content = `
+                            <h2 class="text-xl font-bold mb-2">${data.asset} (${data.type})</h2>
+                            <p class="text-sm text-secondary mb-4">${dayjs(data.timestamp?.toDate()).format('MMM D,YYYY h:mm A')}</p>
+                            <p><strong>Outcome:</strong> <span class="capitalize">${data.outcome}</span></p>
+                            <p><strong>P/L:</strong> $${data.pnl.toFixed(2)}</p>
+                            <h3 class="font-semibold mt-4 mb-2">Thesis:</h3>
+                            <p class="text-secondary bg-tertiary p-3 rounded">${data.thesis || 'N/A'}</p>
+                             ${data.aiAnalysis ? `
+                                <h3 class="font-semibold mt-4 mb-2">AI Fortification:</h3>
+                                <p class="text-secondary bg-tertiary p-3 rounded">${data.aiAnalysis}</p>
+                             ` : ''}
+                        `;
+                    } else {
+                         content = `
+                            <p class="text-sm text-secondary mb-4">${dayjs(data.timestamp?.toDate()).format('MMM D,YYYY h:mm A')}</p>
+                            ${data.prompt ? `<p class="italic text-secondary bg-tertiary p-3 rounded mb-4">Prompt: ${data.prompt}</p>` : ''}
+                            <p class="whitespace-pre-wrap">${data.text}</p>
+                        `;
+                    }
+                    this.showModal(content + `<button id="delete-log-btn" class="btn btn-destructive btn-sm mt-6">Delete Entry</button>`);
+                    document.getElementById('delete-log-btn').addEventListener('click', async () => {
+                        await deleteDoc(docRef);
+                        this.hideModal();
+                        this.showNotification("Entry deleted.", "success");
+                    });
+                }
+            },
+
+            async loadTransactions(){
+                const container = document.getElementById('transaction-log-container');
+                if (!container) return;
+                
+                if (this.state.unsubscribe.transactions) this.state.unsubscribe.transactions();
+
+                const transColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "transactions");
+                const q = query(transColRef, orderBy("timestamp", "desc"), limit(15));
+                
+                this.state.unsubscribe.transactions = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p class="text-secondary text-center p-4">No transactions logged.</p>';
+                        return;
+                    }
+                    container.innerHTML = snapshot.docs.map(doc => {
+                        const t = doc.data();
+                        const color = t.type === 'income' ? 'var(--success-primary)' : t.type === 'expense' ? 'var(--destructive-primary)' : 'var(--text-secondary)';
+                        const sign = t.type === 'income' ? '+' : '-';
+                        return `
+                            <div class="flex justify-between items-center p-2 rounded bg-tertiary">
+                                <div>
+                                    <p class="font-semibold capitalize">${t.description}</p>
+                                    <p class="text-xs text-secondary">${dayjs(t.timestamp?.toDate()).format('MMM D,YYYY')}</p>
+                                </div>
+                                <p class="font-mono" style="color:${color};">${t.type === 'transfer' ? '' : sign}$${t.amount.toLocaleString()}</p>
+                            </div>
+                        `;
+                    }).join('');
+                });
+            },
+
+            showTransactionModal(type) {
+                const title = type.charAt(0).toUpperCase() + type.slice(1);
+                const content = `
+                    <h2 class="text-xl font-bold mb-4">Log ${title}</h2>
+                    <form id="transaction-form" class="space-y-4">
+                        <input type="text" id="trans-desc" placeholder="Description" required>
+                        <input type="number" id="trans-amount" placeholder="Amount" required>
+                        ${type === 'transfer' ? `
+                            <select id="trans-from" required><option value="bank">From Bank</option><option value="crypto">From Crypto</option></select>
+                            <select id="trans-to" required><option value="crypto">To Crypto</option><option value="bank">To Bank</option></select>
+                        ` : `
+                            <select id="trans-account" required><option value="bank">Bank</option><option value="crypto">Crypto</option></select>
+                        `}
+                        <button type="submit" class="btn btn-primary w-full">Log ${title}</button>
+                    </form>
+                `;
+                this.showModal(content);
+                document.getElementById('transaction-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if(type === 'transfer') this.executeTransfer();
+                    else this.addTransaction(type);
+                    this.hideModal();
+                });
+            },
+            
+            async addTransaction(type){
+                const amount = parseFloat(document.getElementById('trans-amount').value);
+                const description = document.getElementById('trans-desc').value;
+                const account = document.getElementById('trans-account').value;
+
+                if (isNaN(amount) || amount <= 0 || !description) {
+                    this.showNotification("Invalid input.", "error");
+                    return;
+                }
+
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const transColRef = collection(userDocRef, "transactions");
+                
+                const multiplier = type === 'income' ? 1 : -1;
+
+                await runTransaction(this.state.db, async (transaction) => {
+                    transaction.update(userDocRef, { [`finance.balances.${account}`]: increment(amount * multiplier) });
+                    transaction.set(doc(transColRef), { type, amount, description, account, timestamp: serverTimestamp() });
+                });
+                this.showNotification(`${type} logged.`, 'success');
+            },
+            
+            async executeTransfer(){
+                const amount = parseFloat(document.getElementById('trans-amount').value);
+                const from = document.getElementById('trans-from').value;
+                const to = document.getElementById('trans-to').value;
+                
+                if (isNaN(amount) || amount <= 0 || from === to) {
+                    this.showNotification("Invalid transfer.", "error");
+                    return;
+                }
+
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const transColRef = collection(userDocRef, "transactions");
+
+                await runTransaction(this.state.db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) throw "User not found";
+                    
+                    const currentBalance = userDoc.data().finance.balances[from];
+                    if(currentBalance < amount) throw "Insufficient funds";
+
+                    transaction.update(userDocRef, { 
+                        [`finance.balances.${from}`]: increment(-amount),
+                        [`finance.balances.${to}`]: increment(amount)
+                    });
+                    transaction.set(doc(transColRef), { 
+                        type: 'transfer', 
+                        amount, 
+                        description: `Transfer from ${from} to ${to}`, 
+                        timestamp: serverTimestamp() 
+                    });
+                    transaction.update(userDocRef, { transferCount: increment(1) });
+                });
+                this.showNotification("Transfer complete.", "success");
+            },
+
+            showFinanceItemModal(type) {
+                 const title = type.charAt(0).toUpperCase() + type.slice(1);
+                 const amountLabel = type === 'goal' ? 'Target Amount' : 'Total Amount';
+                 const content = `
+                    <h2 class="text-xl font-bold mb-4">Add New ${title}</h2>
+                    <form id="finance-item-form" class="space-y-4">
+                        <input type="text" id="item-name" placeholder="Name (e.g., Emergency Fund, Credit Card)" required>
+                        <input type="number" id="item-amount" placeholder="${amountLabel}" required>
+                        <button type="submit" class="btn btn-primary w-full">Add ${title}</button>
+                    </form>
+                 `;
+                 this.showModal(content);
+                 document.getElementById('finance-item-form').addEventListener('submit', (e) => {
+                     e.preventDefault();
+                     this.addFinanceItem(type);
+                     this.hideModal();
+                 });
+            },
+
+            async addFinanceItem(type){
+                const name = document.getElementById('item-name').value;
+                const amount = parseFloat(document.getElementById('item-amount').value);
+                if (!name || isNaN(amount) || amount <= 0) {
+                    this.showNotification("Invalid input.", "error"); return;
+                }
+
+                const newItem = type === 'goal' 
+                    ? { name, target: amount, saved: 0 }
+                    : { name, total: amount, paid: 0 };
+                
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const financeData = this.state.userData.finance;
+                const collectionKey = type === 'goal' ? 'goals' : 'debts';
+                financeData[collectionKey].push(newItem);
+
+                await updateDoc(userDocRef, { finance: financeData });
+                this.showNotification(`${type} added.`, 'success');
+            },
+
+            renderAsvabHome(){
+                const container = document.getElementById('asvab-content');
+                const topics = [
+                    { id: 'general_science', name: 'General Science' },
+                    { id: 'arithmetic_reasoning', name: 'Arithmetic Reasoning' },
+                    { id: 'word_knowledge', name: 'Word Knowledge' },
+                    { id: 'paragraph_comprehension', name: 'Paragraph Comprehension' },
+                    { id: 'mathematics_knowledge', name: 'Mathematics Knowledge' },
+                    { id: 'electronics_information', name: 'Electronics Information' },
+                    { id: 'auto_and_shop', name: 'Auto & Shop Information' },
+                    { id: 'mechanical_comprehension', name: 'Mechanical Comprehension' }
+                ];
+
+                container.innerHTML = `
+                    <p class="text-secondary mb-6">Select a topic to begin a 10-question quiz. Correct answers improve your Intellect stat.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        ${topics.map(topic => `
+                            <button class="asvab-topic-btn bento-box bento-box-interactive text-left" data-topic="${topic.id}">
+                                <h3 class="font-bold text-lg">${topic.name}</h3>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="bento-box">
+                        <h2 class="text-xl font-semibold mb-4">Recent Quiz History</h2>
+                        <div id="asvab-history-container" class="space-y-2"></div>
+                    </div>
+                `;
+                container.querySelectorAll('.asvab-topic-btn').forEach(btn => {
+                    btn.addEventListener('click', e => this.startAsvabQuiz(e.currentTarget.dataset.topic));
+                });
+                this.loadAsvabHistory();
+            },
+
+            async loadAsvabHistory(){
+                const container = document.getElementById('asvab-history-container');
+                if (!container) return;
+                const historyColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "asvabHistory");
+                const q = query(historyColRef, orderBy("timestamp", "desc"), limit(5));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-secondary">No quiz history.</p>';
+                    return;
+                }
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return `
+                        <div class="flex justify-between items-center p-2 rounded bg-tertiary">
+                            <span class="capitalize">${data.topic.replace(/_/g, ' ')}</span>
+                            <span class="font-mono">${data.score}%</span>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            async startAsvabQuiz(topic){
+                const container = document.getElementById('asvab-content');
+                container.innerHTML = `<div class="flex justify-center p-8"><div class="loading-spinner"></div></div>`;
+                
+                const prompt = `Generate a 10-question multiple-choice quiz on the topic of "${topic.replace(/_/g, ' ')}". For each question, provide 4 options (A, B, C, D) and indicate the correct answer. Format the output as a JSON array of objects. Each object should have "question", "options" (an object with A, B, C, D), and "answer" (the correct letter, e.g., "C").`;
+                
+                const responseSchema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            question: { type: "STRING" },
+                            options: { 
+                                type: "OBJECT",
+                                properties: {
+                                    A: { type: "STRING" },
+                                    B: { type: "STRING" },
+                                    C: { type: "STRING" },
+                                    D: { type: "STRING" }
+                                }
+                            },
+                            answer: { type: "STRING" }
+                        }
+                    }
+                };
+
+                const questions = await this.callGemini(prompt, responseSchema);
+
+                if (!questions || !Array.isArray(questions) || questions.length === 0) {
+                    this.showNotification("Failed to generate quiz.", "error");
+                    this.renderAsvabHome();
+                    return;
+                }
+
+                let currentQuestionIndex = 0;
+                let score = 0;
+                let userAnswers = [];
+
+                const renderQuestion = () => {
+                    const q = questions[currentQuestionIndex];
+                    container.innerHTML = `
+                        <p class="text-secondary mb-2">Question ${currentQuestionIndex + 1} of 10</p>
+                        <h2 class="text-xl font-semibold mb-6">${q.question}</h2>
+                        <div class="space-y-3">
+                            ${Object.entries(q.options).map(([key, value]) => `
+                                <button class="asvab-answer-btn w-full text-left p-4 rounded-lg bg-secondary hover:bg-tertiary border-2 border-transparent">
+                                    <span class="font-bold mr-4">${key}</span>${value}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.querySelectorAll('.asvab-answer-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const selectedAnswer = e.currentTarget.querySelector('span').textContent;
+                            userAnswers[currentQuestionIndex] = selectedAnswer;
+                            if (selectedAnswer === q.answer) {
+                                score++;
+                            }
+                            currentQuestionIndex++;
+                            if (currentQuestionIndex < questions.length) {
+                                renderQuestion();
+                            } else {
+                                finishQuiz();
+                            }
+                        });
+                    });
+                };
+                
+                const finishQuiz = async () => {
+                    const finalScore = (score / questions.length) * 100;
+                    const dpEarned = Math.floor(score * 1.5);
+                    const intEarned = Math.floor(score / 2);
+
+                    container.innerHTML = `
+                        <h2 class="text-2xl font-bold mb-4">Quiz Complete!</h2>
+                        <p class="text-4xl font-bold font-mono mb-6">${finalScore.toFixed(0)}%</p>
+                        <p class="text-secondary">You answered ${score} out of ${questions.length} questions correctly.</p>
+                        <p class="text-accent-primary font-bold">+${dpEarned} DP, +${intEarned} INT</p>
+                        <button id="back-to-asvab-home" class="btn btn-primary mt-8">Back to Trainer</button>
+                    `;
+                    document.getElementById('back-to-asvab-home').addEventListener('click', () => this.renderAsvabHome());
+
+                    await this.addDP(dpEarned, 'INT', intEarned);
+                    await this.incrementCounter('quizCount');
+                    const historyColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "asvabHistory");
+                    await addDoc(historyColRef, { topic, score: finalScore, timestamp: serverTimestamp() });
+                };
+
+                renderQuestion();
+            },
+
+            // --- ACCOUNT MANAGEMENT ---
+            async handleEmailLogin() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                if (!email || !password) {
+                    this.showNotification("Email and password are required.", "error");
+                    return;
+                }
+                try {
+                    await signInWithEmailAndPassword(this.state.auth, email, password);
+                    this.hideModal();
+                    this.showNotification("Login successful!", "success");
+                    // onAuthStateChanged will handle the rest
+                } catch (error) {
+                    console.error("Login error:", error);
+                    this.showNotification(error.message, "error");
+                }
+            },
+            
+            showUpgradeAccountModal() {
+                const content = `
+                    <h2 class="text-xl font-bold mb-4">Upgrade Account</h2>
+                    <p class="text-secondary mb-4">Create a permanent account to save your progress across devices. Your current progress will be linked to the new account.</p>
+                    <form id="upgrade-form" class="space-y-4">
+                        <input type="email" id="upgrade-email" placeholder="Email" required class="w-full">
+                        <input type="password" id="upgrade-password" placeholder="Password (min. 6 characters)" required class="w-full">
+                        <button type="submit" class="btn btn-primary w-full">Create & Link Account</button>
+                    </form>
+                `;
+                this.showModal(content);
+                document.getElementById('upgrade-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleAccountUpgrade();
+                });
+            },
+
+            async handleAccountUpgrade() {
+                const email = document.getElementById('upgrade-email').value;
+                const password = document.getElementById('upgrade-password').value;
+                if (!email || password.length < 6) {
+                    this.showNotification("Please provide a valid email and password.", "error");
+                    return;
+                }
+
+                try {
+                    const credential = EmailAuthProvider.credential(email, password);
+                    await linkWithCredential(this.state.auth.currentUser, credential);
+                    
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { isAnonymous: false });
+
+                    this.hideModal();
+                    this.showNotification("Account upgraded successfully!", "success");
+                } catch (error) {
+                    console.error("Account upgrade error:", error);
+                    this.showNotification(`Error: ${error.message}`, "error");
+                }
+            },
+
+            async generateDailyDebrief() {
+                const button = document.getElementById('daily-debrief-btn');
+                button.disabled = true;
+                button.innerHTML = '<div class="loading-spinner w-5 h-5 mx-auto"></div>';
+
+                const completedTasks = this.state.dailyTasks.filter(t => t.completed).map(t => t.text).join(', ');
+                const incompleteTasks = this.state.dailyTasks.filter(t => !t.completed).map(t => t.text).join(', ');
+
+                const prompt = `Based on the following daily tasks, generate a concise, encouraging, and analytical journal entry debrief.
+                Completed tasks: ${completedTasks || 'None'}.
+                Incomplete tasks: ${incompleteTasks || 'None'}.
+                Focus on acknowledging the effort, identifying patterns, and suggesting one tactical improvement for tomorrow.`;
+                
+                const debrief = await this.callGemini(prompt);
+
+                if (debrief) {
+                    const journalCollectionRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "journal");
+                    await addDoc(journalCollectionRef, {
+                        text: debrief,
+                        prompt: "AI Daily Debrief",
+                        timestamp: serverTimestamp()
+                    });
+                    await this.incrementCounter('journalCount');
+                    this.showNotification("AI debrief added to your journal.", "success");
+                    this.navigateTo('journal');
+                }
+                
+                button.disabled = false;
+                button.textContent = '✨ Generate Daily Debrief';
+            },
+
+            // --- UTILITY FUNCTIONS ---
+            showTypingIndicator() {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer || document.getElementById('typing-indicator')) return;
+                const typingBubble = document.createElement('div');
+                typingBubble.id = 'typing-indicator';
+                typingBubble.className = 'p-3 mb-3 max-w-lg w-fit shadow chat-bubble-ai self-start';
+                typingBubble.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                chatContainer.appendChild(typingBubble);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            },
+
+            hideTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+            },
+
+            addAssessmentMessage(text, sender) {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer) return;
+
+                const bubble = document.createElement('div');
+                bubble.classList.add('p-3', 'mb-3', 'max-w-lg', 'w-fit', 'shadow');
+                if (sender === 'ai') {
+                    bubble.classList.add('chat-bubble-ai', 'self-start');
+                } else {
+                    bubble.classList.add('chat-bubble-user', 'self-end');
+                }
+                bubble.textContent = text;
+                chatContainer.appendChild(bubble);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            },
+            
+            showModal(htmlContent) {
+                document.getElementById('modal-content-host').innerHTML = htmlContent;
+                document.getElementById('modal-backdrop').style.display = 'block';
+                document.getElementById('modal-container').style.display = 'block';
+                document.getElementById('modal-backdrop').addEventListener('click', () => this.hideModal(), { once: true });
+            },
+
+            hideModal() {
+                document.getElementById('modal-backdrop').style.display = 'none';
+                document.getElementById('modal-container').style.display = 'none';
+                document.getElementById('modal-content-host').innerHTML = '';
+            },
+
+            renderModalRadarChart(canvasId, chartData) {
+                const ctx = document.getElementById(canvasId);
+                if (!ctx) return;
+                
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#F5F5F5', font: { size: 12 } },
+                                ticks: { display: false }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            async callGemini(prompt, responseSchema = null) {
+                const apiKey = ""; // Leave empty, handled by environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: {}
+                };
+
+                if (responseSchema) {
+                    payload.generationConfig.responseMimeType = "application/json";
+                    payload.generationConfig.responseSchema = responseSchema;
+                }
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorBody}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        
+                        const text = result.candidates[0].content.parts[0].text;
+                        if (responseSchema) {
+                            return JSON.parse(text);
+                        }
+                        return text;
+                    } else {
+                        console.error("Unexpected API response structure:", result);
+                        this.showNotification("AI analysis failed: Unexpected response.", "error");
+                        return null;
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    this.showNotification("An error occurred while contacting the AI.", "error");
+                    return null;
+                }
+            }
+        };
+
+        // Initialize the application on window load
+        window.onload = () => {
+            // Make App globally accessible for inline event handlers
+            window.App = App;
+            App.init();
+        };
+
+    </script>
+</body>
+</html>

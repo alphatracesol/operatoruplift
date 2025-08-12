@@ -173,7 +173,7 @@ global.__phantom_nonces = global.__phantom_nonces || new Map();
 
 app.get('/api/auth/phantom/nonce', (req, res) => {
   const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
-  const message = `Operator Uplift login\nNonce: ${nonce}\nTime: ${new Date().toISOString()}`;
+  const message = `Operator Uplift login\nNonce: ${nonce}`;
   global.__phantom_nonces.set(nonce, Date.now());
   res.json({ nonce, message });
 });
@@ -185,8 +185,8 @@ app.post('/api/auth/phantom/verify', async (req, res) => {
     const issued = global.__phantom_nonces.get(nonce);
     if (!issued || Date.now() - issued > NONCE_TTL_MS) return res.status(400).json({ error: 'nonce_expired' });
     global.__phantom_nonces.delete(nonce);
-    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}\nTime: `);
-    const sigBytes = bs58.decode(signature);
+    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}`);
+    const sigBytes = Array.isArray(signature) ? new Uint8Array(signature) : bs58.decode(signature);
     const pubkey = new PublicKey(address);
     const verified = nacl.sign.detached.verify(message, sigBytes, pubkey.toBytes());
     if (!verified) return res.status(401).json({ error: 'invalid_signature' });
@@ -214,8 +214,8 @@ app.post('/api/auth/phantom/link', async (req, res) => {
     const issued = global.__phantom_nonces.get(nonce);
     if (!issued || Date.now() - issued > NONCE_TTL_MS) return res.status(400).json({ error: 'nonce_expired' });
     global.__phantom_nonces.delete(nonce);
-    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}\nTime: `);
-    const sigBytes = bs58.decode(signature);
+    const message = new TextEncoder().encode(`Operator Uplift login\nNonce: ${nonce}`);
+    const sigBytes = Array.isArray(signature) ? new Uint8Array(signature) : bs58.decode(signature);
     const pubkey = new PublicKey(address);
     const verified = nacl.sign.detached.verify(message, sigBytes, pubkey.toBytes());
     if (!verified) return res.status(401).json({ error: 'invalid_signature' });

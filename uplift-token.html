@@ -580,6 +580,10 @@
     <audio id="uplift-audio" src="Raindrops and Reverie.mp3" preload="auto" loop></audio>
 </head>
 <body>
+  <div id="landingPoints" style="position:fixed;right:16px;top:14px;z-index:20;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);padding:6px 10px;border-radius:10px;">
+    <span aria-hidden="true" style="font-size:18px">🟠</span>
+    <span id="landingPointsText" style="font-weight:600;">PTS: 0</span>
+  </div>
     <!-- Loading Screen -->
     <div id="loading-screen" style="position:fixed;inset:0;background:#0a0a0a;z-index:10000;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease-out;">
         <div class="scene" style="width:120px;height:120px;perspective:600px;">
@@ -1653,5 +1657,20 @@
             setInterval(loadBurnFeed, 60*1000);
         });
     </script>
+<script>
+  (function() {
+    try {
+      const badge = document.getElementById('landingPointsText');
+      if (!badge) return;
+      const saved = localStorage.getItem('uplift:wallet');
+      if (!saved) return;
+      badge.textContent = 'PTS: …';
+      fetch('/.netlify/functions/api/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+        .then(r=>r.ok?r.json():null)
+        .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
+        .catch(()=>{});
+    } catch {}
+  })();
+  </script>
 </body>
 </html>

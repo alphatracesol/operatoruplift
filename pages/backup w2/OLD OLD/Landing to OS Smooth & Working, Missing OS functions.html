@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Uplift OS</title>
+    
+    <!-- PWA and Mobile App Icon Configuration -->
+    <link rel="icon" id="favicon-link" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z' stroke='%23D97706' stroke-width='4' fill='none'/%3E%3Cpath d='M30 60 L50 50 L70 60' stroke='%23D97706' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M50 50 L50 20' stroke='%23D97706' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" id="manifest-link" href="">
+    <link rel="apple-touch-icon" id="apple-touch-icon-link" href="">
+    <meta name="theme-color" id="theme-color-meta" content="#D97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Operator OS">
+
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isoWeek.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isToday.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/dayOfYear.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #F5F5F5;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #D97706; /* Amber 600 */
+            --accent-primary-hover: #B45309; /* Amber 700 */
+            --destructive-primary: #DC2626; /* Red 600 */
+            --destructive-primary-hover: #B91C1C; /* Red 700 */
+            --success-primary: #16A34A; /* Green 600 */
+        }
+        
+        .theme-teal { --accent-primary: #0D9488; --accent-primary-hover: #0F766E; }
+        .theme-blue { --accent-primary: #2563EB; --accent-primary-hover: #1D4ED8; }
+        .theme-crimson { --accent-primary: #DC2626; --accent-primary-hover: #B91C1C; }
+        .theme-cyan { --accent-primary: #0891B2; --accent-primary-hover: #0E7490; }
+        .theme-green { --accent-primary: #16A34A; --accent-primary-hover: #15803D; }
+        .theme-pink { --accent-primary: #DB2777; --accent-primary-hover: #BE185D; }
+        .theme-purple { --accent-primary: #9333EA; --accent-primary-hover: #7E22CE; }
+        .theme-gold { --accent-primary: #F59E0B; --accent-primary-hover: #D97706; }
+
+
+        html, body { background-color: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow: hidden; }
+        input, textarea, select { background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid #4a4a4a; border-radius: 0.375rem; padding: 0.5rem; width: 100%; }
+        textarea::placeholder, input::placeholder { color: var(--text-secondary); }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; }
+
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer; text-align: center; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .btn-primary { background-color: var(--accent-primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-primary-hover); box-shadow: 0 0 15px var(--accent-primary-hover); }
+        .btn-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--bg-tertiary); }
+        .btn-secondary:hover:not(:disabled) { background-color: #3a3a3a; }
+        .btn-destructive { background-color: var(--destructive-primary); color: white; }
+        .btn-destructive:hover:not(:disabled) { background-color: var(--destructive-primary-hover); }
+        
+        /* Sidebar & Nav */
+        .sidebar-nav-item, .mobile-nav-item { transition: all 0.2s; }
+        .sidebar-nav-item.active { background-color: var(--accent-primary); color: white; font-weight: 600; }
+        .sidebar-nav-item.active svg { stroke: white; }
+        .sidebar-nav-item:hover:not(.active) { background-color: var(--bg-tertiary); color: var(--accent-primary); }
+        .sidebar-nav-item:hover:not(.active) svg { stroke: var(--accent-primary); }
+        .bottom-nav { background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px); border-top: 1px solid rgba(55, 55, 55, 0.5); }
+        .mobile-nav-item.active svg, .mobile-nav-item.active span { color: var(--accent-primary); }
+
+        /* Modal */
+        #modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 60; display: none; backdrop-filter: blur(4px); }
+        #modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 70; width: 90%; max-width: 550px; display: none; }
+        .modal-content { background-color: var(--bg-secondary); border: 1px solid var(--bg-tertiary); border-radius: 0.75rem; padding: 1.5rem; max-height: 85vh; overflow-y: auto; }
+        
+        /* General UI */
+        .loading-spinner { border: 4px solid var(--bg-tertiary); border-top: 4px solid var(--accent-primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .progress-bar-bg { background-color: var(--bg-tertiary); }
+        .progress-bar-fg { background-color: var(--accent-primary); }
+        .bento-box { background-color: var(--bg-secondary); border: 1px solid var(--bg-tertiary); border-radius: 0.75rem; padding: 1.5rem; transition: all 0.2s ease-in-out; }
+        .bento-box-interactive:hover { transform: translateY(-5px); box-shadow: 0 0 20px color-mix(in srgb, var(--accent-primary) 25%, transparent); border-color: color-mix(in srgb, var(--accent-primary) 50%, transparent); }
+        .text-accent-primary { color: var(--accent-primary); }
+        .task-checkbox { accent-color: var(--accent-primary); }
+        .task-item-completed { text-decoration: line-through; opacity: 0.6; }
+
+        /* Assessment & Chat Styles */
+        #assessment-content-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        #assessment-content-area::before { /* Animated Grid Background */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, color-mix(in srgb, var(--accent-primary) 8%, transparent) 1px, transparent 1px),
+                linear-gradient(to bottom, color-mix(in srgb, var(--accent-primary) 8%, transparent) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            animation: pulse-grid 8s ease-in-out infinite;
+        }
+        #assessment-content-area::after { /* Scanline */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to bottom, color-mix(in srgb, var(--accent-primary) 50%, transparent) 0%, transparent 100%);
+            opacity: 0.5;
+            animation: scan-vertical 7s linear infinite;
+        }
+        @keyframes pulse-grid {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.02); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+        @keyframes scan-vertical {
+            0% { transform: translateY(-20px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        .chat-container::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+        
+        .chat-bubble-ai {
+            background-color: var(--bg-secondary);
+            color: #e5e7eb;
+            border-radius: 20px 20px 20px 5px;
+            border: 1px solid var(--accent-primary);
+            box-shadow: 0 0 10px color-mix(in srgb, var(--accent-primary) 20%, transparent);
+        }
+        .chat-bubble-user { background-color: var(--accent-primary); color: white; border-radius: 20px 20px 5px 20px; }
+        .typing-indicator span { height: 8px; width: 8px; margin: 0 1px; background-color: #9ca3af; display: inline-block; border-radius: 50%; animation: typing-bounce 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        /* Other styles */
+        .notification-popup { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); color: white; font-weight: 600; z-index: 100; animation: slide-in-out 3s forwards; }
+        .notification-popup.success { background-color: var(--success-primary); }
+        .notification-popup.error { background-color: var(--destructive-primary); }
+        @keyframes slide-in-out { 0% { transform: translateX(110%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(110%); opacity: 0; } }
+        .log-container { max-height: 400px; overflow-y: auto; }
+        .log-item-clickable { cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+        .log-item-clickable:hover { background-color: var(--bg-tertiary); box-shadow: 0 0 15px color-mix(in srgb, var(--accent-primary) 20%, transparent); border-color: color-mix(in srgb, var(--accent-primary) 40%, transparent); }
+        .achievement-locked { filter: grayscale(1); opacity: 0.5; }
+        .achievement-unlocked:hover { transform: translateY(-3px); box-shadow: 0 0 15px var(--accent-primary); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+        
+        .flip-card { background-color: transparent; width: 100%; height: 140px; perspective: 1000px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { box-sizing: border-box; position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 0.75rem; border: 1px solid var(--bg-tertiary); cursor: pointer; }
+        .flip-card-front { background-color: var(--bg-secondary); }
+        .flip-card-back { background-color: var(--bg-tertiary); transform: rotateY(180deg); padding: 0.75rem; }
+        
+        .protocol-week-btn { background-color: var(--bg-tertiary); }
+        .protocol-week-btn:not(.selected):hover { background-color: var(--accent-primary-hover); color: white; }
+        .protocol-week-btn.selected { background-color: var(--accent-primary); color: white; box-shadow: 0 0 15px var(--accent-primary); transform: scale(1.05); }
+
+        .hard-mode-toggle-bg {
+            border: 2px solid var(--bg-tertiary);
+            transition: all 0.2s ease-in-out;
+        }
+        .peer:checked ~ .hard-mode-toggle-bg {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body class="bg-primary text-primary">
+
+    <!-- Initialization Layer: Handles login and assessment. Starts hidden. -->
+    <div id="initialization-layer" class="fixed inset-0 z-50 bg-primary transition-opacity duration-1000 ease-in-out opacity-0 pointer-events-none">
+        <!-- Content is rendered here by JS -->
+    </div>
+
+    <!-- Main OS Layer: Initially hidden, fades in after initialization. -->
+    <div id="app-container" class="opacity-0 transition-opacity duration-1000 ease-in-out">
+        <div class="flex h-screen">
+            <!-- Sidebar Navigation (Desktop) -->
+            <nav id="sidebar-nav" class="bg-secondary p-4 w-64 flex-shrink-0 flex-col hidden md:flex">
+            </nav>
+
+            <!-- Main Content Area -->
+            <main id="main-content" class="flex-1 overflow-y-auto pb-20 md:pb-0">
+                <!-- Pages are rendered here by JS -->
+            </main>
+        </div>
+        
+        <!-- Bottom Navigation (Mobile) -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 h-20 bottom-nav z-30 flex md:hidden">
+        </nav>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-backdrop"></div>
+    <div id="modal-container"><div id="modal-content-host" class="modal-content"></div></div>
+
+    <script type="module">
+        // Firebase SDK Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut, EmailAuthProvider, linkWithCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, writeBatch, query, where, getDocs, deleteDoc, serverTimestamp, runTransaction, orderBy, limit, addDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const App = {
+            // Application state, holds all dynamic data
+            state: {
+                isAuthReady: false,
+                userId: null,
+                appId: 'operator-uplift-unified',
+                auth: null,
+                db: null,
+                currentPage: 'landing',
+                currentDate: null,
+                userData: null,
+                dailyTasks: [],
+                statsRadarChart: null,
+                notificationQueue: [],
+                isNotifying: false,
+                hasTransitionedToOS: false,
+                unsubscribe: { userData: null, tasks: null, logs: null, journal: null, transactions: null },
+                uiState: {
+                    protocolSelectedWeek: 1,
+                    journalEntryText: '',
+                    journalPrompt: '',
+                    tradeLogForm: {}, // To preserve form state
+                    tradeAiAnalysis: ''
+                },
+                wallet: { provider: null, publicKey: null },
+            },
+
+            // Static configuration data
+            config: {
+                ranks: [
+                    { name: 'Recruit', minLevel: 1 }, { name: 'Operator', minLevel: 10 },
+                    { name: 'Specialist', minLevel: 30 }, { name: 'Elite', minLevel: 50 }, { name: 'Legend', minLevel: 70 }
+                ],
+                protocolSchedule: {
+                    1: { '30 minutes study': { text: '30 minutes study', stat: 'INT', dp: 10, freq: 2, icon: 'book-open' }, '15 push ups': { text: '15 push ups', stat: 'STR', dp: 5, freq: 2, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 68 oz water': { text: 'Drink 68 oz water', stat: 'STR', dp: 5, freq: 7, icon: 'droplet' }, 'Meditate 5 minutes': { text: 'Meditate 5 minutes', stat: 'DIS', dp: 10, freq: 2, icon: 'brain-circuit' }, 'No more than 4 hours social media': { text: 'No more than 4 hours social media', stat: 'DIS', dp: 15, freq: 7, icon: 'eye-off' }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7, icon: 'book' }, 'Run 1.6 miles': { text: 'Run 1.6 miles', stat: 'STR', dp: 15, freq: 2, icon: 'run' }, 'Wake up at 8:30 AM': { text: 'Wake up at 8:30 AM', stat: 'DIS', dp: 10, freq: 7, icon: 'sunrise' }, 'Workout for 45 minutes': { text: 'Workout for 45 minutes', stat: 'STR', dp: 20, freq: 2, icon: 'weight' } },
+                    2: { '30 minutes study': { text: '30 minutes study', stat: 'INT', dp: 10, freq: 3, icon: 'book-open' }, '20 push ups': { text: '20 push ups', stat: 'STR', dp: 7, freq: 3, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 68 oz water': { text: 'Drink 68 oz water', stat: 'STR', dp: 5, freq: 7, icon: 'droplet' }, 'Meditate 10 minutes': { text: 'Meditate 10 minutes', stat: 'DIS', dp: 12, freq: 3, icon: 'brain-circuit' }, 'No more than 3h 45m social media': { text: 'No more than 3h 45m social media', stat: 'DIS', dp: 15, freq: 7, icon: 'eye-off' }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7, icon: 'book' }, 'Run 1.9 miles': { text: 'Run 1.9 miles', stat: 'STR', dp: 18, freq: 3, icon: 'run' }, 'Wake up at 8:15 AM': { text: 'Wake up at 8:15 AM', stat: 'DIS', dp: 12, freq: 7, icon: 'sunrise' }, 'Workout for 1 hour': { text: 'Workout for 1 hour', stat: 'STR', dp: 25, freq: 3, icon: 'weight' } },
+                    3: { '1 hour study': { text: '1 hour study', stat: 'INT', dp: 15, freq: 4, icon: 'book-open' }, '25 push ups': { text: '25 push ups', stat: 'STR', dp: 10, freq: 4, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 85 oz water': { text: 'Drink 85 oz water', stat: 'STR', dp: 7, freq: 7, icon: 'droplet' }, 'Meditate 15 minutes': { text: 'Meditate 15 minutes', stat: 'DIS', dp: 15, freq: 4, icon: 'brain-circuit' }, 'No more than 3h 30m social media': { text: 'No more than 3h 30m social media', stat: 'DIS', dp: 18, freq: 7, icon: 'eye-off' }, 'Read 5 pages': { text: 'Read 5 pages', stat: 'INT', dp: 5, freq: 7, icon: 'book' }, 'Run 2.2 miles': { text: 'Run 2.2 miles', stat: 'STR', dp: 20, freq: 4, icon: 'run' }, 'Wake up at 8:00 AM': { text: 'Wake up at 8:00 AM', stat: 'DIS', dp: 15, freq: 7, icon: 'sunrise' }, 'Workout for 75 minutes': { text: 'Workout for 75 minutes', stat: 'STR', dp: 30, freq: 4, icon: 'weight' } },
+                    4: { '1 hour study': { text: '1 hour study', stat: 'INT', dp: 15, freq: 5, icon: 'book-open' }, '20 push ups': { text: '20 push ups', stat: 'STR', dp: 7, freq: 5, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 85 oz water': { text: 'Drink 85 oz water', stat: 'STR', dp: 7, freq: 7, icon: 'droplet' }, 'Meditate 20 minutes': { text: 'Meditate 20 minutes', stat: 'DIS', dp: 18, freq: 5, icon: 'brain-circuit' }, 'No more than 3h 15m social media': { text: 'No more than 3h 15m social media', stat: 'DIS', dp: 20, freq: 7, icon: 'eye-off' }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7, icon: 'book' }, 'Run 1.9 miles': { text: 'Run 1.9 miles', stat: 'STR', dp: 18, freq: 5, icon: 'run' }, 'Wake up at 7:45 AM': { text: 'Wake up at 7:45 AM', stat: 'DIS', dp: 18, freq: 7, icon: 'sunrise' }, 'Workout for 1 hour': { text: 'Workout for 1 hour', stat: 'STR', dp: 25, freq: 5, icon: 'weight' } },
+                    5: { '1.5 hours study': { text: '1.5 hours study', stat: 'INT', dp: 20, freq: 6, icon: 'book-open' }, '35 push ups': { text: '35 push ups', stat: 'STR', dp: 12, freq: 6, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 101 oz water': { text: 'Drink 101 oz water', stat: 'STR', dp: 10, freq: 7, icon: 'droplet' }, 'Meditate 25 minutes': { text: 'Meditate 25 minutes', stat: 'DIS', dp: 20, freq: 6, icon: 'brain-circuit' }, 'No more than 3 hours social media': { text: 'No more than 3 hours social media', stat: 'DIS', dp: 22, freq: 7, icon: 'eye-off' }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7, icon: 'book' }, 'Run 2.8 miles': { text: 'Run 2.8 miles', stat: 'STR', dp: 25, freq: 6, icon: 'run' }, 'Wake up at 7:30 AM': { text: 'Wake up at 7:30 AM', stat: 'DIS', dp: 20, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 6, icon: 'weight' } },
+                    6: { '1.5 hours study': { text: '1.5 hours study', stat: 'INT', dp: 20, freq: 6, icon: 'book-open' }, '40 push ups': { text: '40 push ups', stat: 'STR', dp: 15, freq: 6, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 101 oz water': { text: 'Drink 101 oz water', stat: 'STR', dp: 10, freq: 7, icon: 'droplet' }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 6, icon: 'brain-circuit' }, 'No more than 2h 45m social media': { text: 'No more than 2h 45m social media', stat: 'DIS', dp: 25, freq: 7, icon: 'eye-off' }, 'Read 20 pages': { text: 'Read 20 pages', stat: 'INT', dp: 10, freq: 7, icon: 'book' }, 'Run 3.1 miles': { text: 'Run 3.1 miles', stat: 'STR', dp: 28, freq: 6, icon: 'run' }, 'Wake up at 7:15 AM': { text: 'Wake up at 7:15 AM', stat: 'DIS', dp: 22, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 6, icon: 'weight' } },
+                    7: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7, icon: 'book-open' }, '45 push ups': { text: '45 push ups', stat: 'STR', dp: 18, freq: 7, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7, icon: 'droplet' }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7, icon: 'brain-circuit' }, 'No more than 2h 30m social media': { text: 'No more than 2h 30m social media', stat: 'DIS', dp: 28, freq: 7, icon: 'eye-off' }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7, icon: 'book' }, 'Run 3.4 miles': { text: 'Run 3.4 miles', stat: 'STR', dp: 30, freq: 7, icon: 'run' }, 'Wake up at 7:00 AM': { text: 'Wake up at 7:00 AM', stat: 'DIS', dp: 25, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7, icon: 'weight' } },
+                    8: { '2 hours study': { text: '2 hours study', stat: 'INT', dp: 22, freq: 7, icon: 'book-open' }, '35 push ups': { text: '35 push ups', stat: 'STR', dp: 12, freq: 7, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7, icon: 'droplet' }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7, icon: 'brain-circuit' }, 'No more than 2h 15m social media': { text: 'No more than 2h 15m social media', stat: 'DIS', dp: 30, freq: 7, icon: 'eye-off' }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7, icon: 'book' }, 'Run 2.8 miles': { text: 'Run 2.8 miles', stat: 'STR', dp: 25, freq: 7, icon: 'run' }, 'Wake up at 6:45 AM': { text: 'Wake up at 6:45 AM', stat: 'DIS', dp: 28, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7, icon: 'weight' } },
+                    9: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7, icon: 'book-open' }, '55 push ups': { text: '55 push ups', stat: 'STR', dp: 20, freq: 7, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7, icon: 'droplet' }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7, icon: 'brain-circuit' }, 'No more than 2 hours social media': { text: 'No more than 2 hours social media', stat: 'DIS', dp: 35, freq: 7, icon: 'eye-off' }, 'Read 35 pages': { text: 'Read 35 pages', stat: 'INT', dp: 15, freq: 7, icon: 'book' }, 'Run 4 miles': { text: 'Run 4 miles', stat: 'STR', dp: 35, freq: 7, icon: 'run' }, 'Wake up at 6:30 AM': { text: 'Wake up at 6:30 AM', stat: 'DIS', dp: 30, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7, icon: 'weight' } },
+                    10: { '2.5 hours study': { text: '2.5 hours study', stat: 'INT', dp: 25, freq: 7, icon: 'book-open' }, '60 push ups': { text: '60 push ups', stat: 'STR', dp: 25, freq: 7, icon: 'flame' }, 'Cold Shower': { text: 'Cold Shower', stat: 'RES', dp: 10, freq: 7, icon: 'snowflake' }, 'Drink 118 oz water': { text: 'Drink 118 oz water', stat: 'STR', dp: 12, freq: 7, icon: 'droplet' }, 'Meditate 30 minutes': { text: 'Meditate 30 minutes', stat: 'DIS', dp: 22, freq: 7, icon: 'brain-circuit' }, 'No more than 1h 45m social media': { text: 'No more than 1h 45m social media', stat: 'DIS', dp: 40, freq: 7, icon: 'eye-off' }, 'Read 50 pages': { text: 'Read 50 pages', stat: 'INT', dp: 20, freq: 7, icon: 'book' }, 'Run 4.3 miles': { text: 'Run 4.3 miles', stat: 'STR', dp: 40, freq: 7, icon: 'run' }, 'Wake up at 6:15 AM': { text: 'Wake up at 6:15 AM', stat: 'DIS', dp: 35, freq: 7, icon: 'sunrise' }, 'Workout for 1.5 hours': { text: 'Workout for 1.5 hours', stat: 'STR', dp: 35, freq: 7, icon: 'weight' } }
+                },
+                defaultTasks: [
+                    { text: "Review Trading Plan", stat: "INT", dp: 10 },
+                    { text: "5-minute Journal Entry", stat: "CRE", dp: 5 },
+                    { text: "Plan Tomorrow's Priorities", stat: "DIS", dp: 5 },
+                ],
+                achievements: { 
+                    'FIRST_DAY': { name: 'Day One Done', emoji: '✅', description: 'Complete your first day of tasks.', dp: 10, check: (data, prevData, dailyTasks) => dailyTasks.length > 0 && dailyTasks.every(t => t.completed) },
+                    'STREAK_3': { name: 'Getting Started', emoji: '🔥', description: 'Maintain a 3-day streak.', dp: 25, check: (data) => data.currentStreak >= 3 },
+                    'STREAK_7': { name: 'On a Roll', emoji: '🚀', description: 'Maintain a 7-day streak.', dp: 50, check: (data) => data.currentStreak >= 7 },
+                    'STREAK_14': { name: 'Consistent Operator', emoji: '💯', description: 'Maintain a 14-day streak.', dp: 100, check: (data) => data.currentStreak >= 14 },
+                    'STREAK_30': { name: 'Unstoppable Force', emoji: '🔱', description: 'Maintain a 30-day streak.', dp: 250, check: (data) => data.currentStreak >= 30 },
+                    'STREAK_60': { name: 'Habitual Victory', emoji: '🎖️', description: 'Maintain a 60-day streak.', dp: 500, check: (data) => data.currentStreak >= 60 },
+                    'RANK_OPERATOR': { name: 'Operator', emoji: '🧑‍🚀', description: 'Reach Level 10.', dp: 100, check: (data) => data.level >= 10 },
+                    'RANK_SPECIALIST': { name: 'Specialist', emoji: '🌟', description: 'Reach Level 30.', dp: 300, check: (data) => data.level >= 30 },
+                    'RANK_ELITE': { name: 'Elite', emoji: '💎', description: 'Reach Level 50.', dp: 500, check: (data) => data.level >= 50 },
+                    'RANK_LEGEND': { name: 'Legend', emoji: '👑', description: 'Reach Level 70.', dp: 1000, check: (data) => data.level >= 70 },
+                    'FIRST_LOG': { name: 'First Blood', emoji: '🩸', description: 'Log your first trade.', dp: 20, check: (data) => (data.logCount || 0) >= 1 },
+                    'LOG_10': { name: 'Veteran Trader', emoji: '📈', description: 'Log 10 trades.', dp: 100, check: (data) => (data.logCount || 0) >= 10 },
+                    'LOG_50': { name: 'Market Analyst', emoji: '📊', description: 'Log 50 trades.', dp: 250, check: (data) => (data.logCount || 0) >= 50 },
+                    'FIRST_JOURNAL': { name: 'Scribe', emoji: '✍️', description: 'Write your first journal entry.', dp: 10, check: (data) => (data.journalCount || 0) >= 1 },
+                    'JOURNAL_10': { name: 'Chronicler', emoji: '📜', description: 'Write 10 journal entries.', dp: 50, check: (data) => (data.journalCount || 0) >= 10 },
+                    'JOURNAL_50': { name: 'Historian', emoji: '📚', description: 'Write 50 journal entries.', dp: 250, check: (data) => (data.journalCount || 0) >= 50 },
+                    'FIRST_FINANCE': { name: 'Accountant', emoji: '💰', description: 'Add your first financial goal or debt.', dp: 10, check: (data) => (data.finance?.debts?.length > 0 || data.finance?.goals?.length > 0) },
+                    'FIRST_QUIZ': { name: 'Bootcamp', emoji: '🧠', description: 'Complete your first ASVAB quiz.', dp: 10, check: (data) => (data.quizCount || 0) >= 1 },
+                    'QUIZ_10': { name: 'Scholar', emoji: '🎓', description: 'Complete 10 ASVAB quizzes.', dp: 75, check: (data) => (data.quizCount || 0) >= 10 },
+                    'PERFECT_WEEK': { name: 'Perfect Week', emoji: '🎯', description: 'Complete 100% of tasks for 7 consecutive days.', dp: 150, check: (data) => (data.perfectWeeks || 0) >= 1 },
+                    'DIS_LVL_10': { name: 'Unflinching', emoji: '🧘', description: 'Reach Discipline Level 10.', dp: 75, check: (data) => data.stats.DIS >= 10 },
+                    'INT_LVL_10': { name: 'Strategist', emoji: '♟️', description: 'Reach Intellect Level 10.', dp: 75, check: (data) => data.stats.INT >= 10 },
+                    'STR_LVL_10': { name: 'Brawler', emoji: '💪', description: 'Reach Strength Level 10.', dp: 75, check: (data) => data.stats.STR >= 10 },
+                    'CHA_LVL_10': { name: 'Influencer', emoji: '🗣️', description: 'Reach Charisma Level 10.', dp: 75, check: (data) => data.stats.CHA >= 10 },
+                    'RES_LVL_10': { name: 'Indomitable', emoji: '🛡️', description: 'Reach Resilience Level 10.', dp: 75, check: (data) => data.stats.RES >= 10 },
+                    'CRE_LVL_10': { name: 'Innovator', emoji: '💡', description: 'Reach Creativity Level 10.', dp: 75, check: (data) => data.stats.CRE >= 10 },
+                    'DEBT_FREE': { name: 'Debt Zero', emoji: '💸', description: 'Pay off a tracked debt completely.', dp: 200, check: (data) => data.finance?.debts?.some(d => d.paid >= d.total) },
+                    'GOAL_ACHIEVED': { name: 'Objective Complete', emoji: '🏆', description: 'Fully fund a financial objective.', dp: 200, check: (data) => data.finance?.goals?.some(g => g.saved >= g.target) },
+                    'PHOENIX': { name: 'Phoenix Protocol', emoji: '🕊️', description: 'Recover from a Hard Mode reset and achieve a new 7-day streak.', dp: 300, check: (data) => (data.resets > 0 && data.currentStreak >= 7) },
+                    'AI_ASSIST_10': { name: 'AI Co-pilot', emoji: '🤖', description: 'Use the "Fortify Thesis" feature 10 times.', dp: 50, check: (data) => (data.aiAssistCount || 0) >= 10 },
+                    'AI_PROMPT_10': { name: 'Prompt Engineer', emoji: '✨', description: 'Use the "Get Prompt" feature 10 times.', dp: 50, check: (data) => (data.aiPromptCount || 0) >= 10 },
+                    'BAL_100K': { name: 'Centurion', emoji: '🤑', description: 'Reach a combined balance of $100,000.', dp: 500, check: (data) => (data.finance?.balances?.bank + data.finance?.balances?.crypto) >= 100000 },
+                    'THEME_CHANGER': { name: 'New Coat of Paint', emoji: '🎨', description: 'Change your UI theme for the first time.', dp: 5, check: (data) => data.settings.theme !== 'default' },
+                    'HARD_MODE_ON': { name: 'Challenge Accepted', emoji: '⚔️', description: 'Enable Hard Mode.', dp: 25, check: (data) => data.settings.hardMode },
+                    'WEEK_1_COMPLETE': { name: 'Week 1 Cleared', emoji: '1️⃣', description: 'Complete Week 1 of the Protocol.', dp: 100, check: (data) => data.protocolCompletion?.week_1 },
+                    'WEEK_10_COMPLETE': { name: 'Protocol Graduate', emoji: '🎓', description: 'Complete all 10 weeks of the Protocol.', dp: 1000, check: (data) => data.protocolCompletion?.week_10 },
+                    'NIGHT_OWL': { name: 'Night Owl', emoji: '🦉', description: 'Complete a task after 10 PM.', dp: 10, check: () => dayjs().hour() >= 22 },
+                    'EARLY_BIRD': { name: 'Early Bird', emoji: '🌅', description: 'Complete a task before 6 AM.', dp: 10, check: () => dayjs().hour() < 6 },
+                    'WAR_CHEST': { name: 'War Chest', emoji: '🏦', description: 'Reach a bank balance of $25,000.', dp: 100, check: (data) => data.finance?.balances?.bank >= 25000 },
+                    'CRYPTO_WHALE': { name: 'Crypto Whale', emoji: '🐳', description: 'Reach a crypto balance of $25,000.', dp: 100, check: (data) => data.finance?.balances?.crypto >= 25000 },
+                    'DEBT_SLAYER': { name: 'Debt Slayer', emoji: '⚔️', description: 'Pay off 5 debts.', dp: 300, check: (data) => data.finance?.debts?.filter(d => d.paid >= d.total).length >= 5 },
+                    'GOAL_GETTER': { name: 'Goal Getter', emoji: '🏁', description: 'Achieve 5 financial goals.', dp: 300, check: (data) => data.finance?.goals?.filter(g => g.saved >= g.target).length >= 5 },
+                    'DOCTRINE_MASTER': { name: 'Doctrine Master', emoji: '📜', description: 'Complete all 3 default Major Objectives.', dp: 150, check: (data) => data.doctrine?.majorObjectives?.slice(0, 3).every(o => o.completed) },
+                    'PERFECT_SCORE': { name: 'Perfect Score', emoji: '💯', description: 'Get 100% on an ASVAB quiz.', dp: 50, check: (data, prevData) => (data.lastQuizScore === 100 && prevData.lastQuizScore !== 100) },
+                    'ALL_STATS_10': { name: 'Well Rounded', emoji: '🌐', description: 'Get all core stats to level 10.', dp: 200, check: (data) => Object.values(data.stats).every(s => s >= 10) },
+                    'ALL_STATS_25': { name: 'Polymath', emoji: '🧠', description: 'Get all core stats to level 25.', dp: 500, check: (data) => Object.values(data.stats).every(s => s >= 25) },
+                    'FIRST_TRANSFER': { name: 'Liquid', emoji: '↔️', description: 'Make your first internal fund transfer.', dp: 15, check: (data) => (data.transferCount || 0) >= 1 },
+                    'MAX_STREAK': { name: 'Personal Best', emoji: '📈', description: 'Beat your longest streak.', dp: 100, check: (data, prevData) => data.currentStreak > prevData.longestStreak && prevData.longestStreak > 0 },
+                    'CENTURY_MARK': { name: 'Century Mark', emoji: 'C', description: 'Reach Level 100.', dp: 2000, check: (data) => data.level >= 100 },
+                    'MEGA_STREAK': { name: 'Living Legend', emoji: '🗿', description: 'Maintain a 100-day streak.', dp: 2500, check: (data) => data.currentStreak >= 100 },
+                    'FINANCIAL_SOVEREIGNTY': { name: 'Financial Sovereignty', emoji: '👑', description: 'Reach a combined balance of $1,000,000.', dp: 5000, check: (data) => (data.finance?.balances?.bank + data.finance?.balances?.crypto) >= 1000000 },
+                    'CURIOSITY': { name: 'Curiosity', emoji: '🤔', description: 'You just had to click, didn\'t you?', dp: 1, check: () => false }, // Easter Egg
+                },
+                themeColorMap: {
+                    'default': '#D97706',
+                    'theme-teal': '#0D9488',
+                    'theme-blue': '#2563EB',
+                    'theme-crimson': '#DC2626',
+                    'theme-cyan': '#0891B2',
+                    'theme-green': '#16A34A',
+                    'theme-pink': '#DB2777',
+                    'theme-purple': '#9333EA',
+                    'theme-gold': '#F59E0B'
+                },
+                fallbackQuotes: [
+                    { text: "The secret of change is to focus all of your energy not on fighting the old but on building the new.", author: "Socrates" },
+                    { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn"},
+                    { text: "Success is not final; failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill"},
+                    { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson"}
+                ],
+                assessmentQuestions: [
+                    { id: 'start', text: "Welcome to Operator Uplift. I'm here to build your operational baseline. This is a secure channel for brutal honesty. Are you ready to begin?", type: 'text' },
+                    { id: 'rapport_1', text: "Affirmative. Let's start warm. What's one small victory you secured recently?", type: 'text' },
+                    { id: 'finance_1', text: "Copy. Now, finances. On a scale of 1 to 10, what's your level of control over your capital?", type: 'scale', min: 1, max: 10 },
+                    { id: 'finance_2', text: "What's the primary mental obstacle blocking your financial advancement? (e.g., 'risk aversion,' 'lack of knowledge,' 'undeserving mindset.')", type: 'text' },
+                    { id: 'career_1', text: "Moving to your career. Are you executing a mission, working a job, or pursuing a calling? Your honest assessment.", type: 'text' },
+                    { id: 'career_2', text: "Define your ideal career objective if all constraints were removed.", type: 'text' },
+                    { id: 'relationships_1', text: "Evaluate your key relationships. Are they assets providing strategic support, or liabilities draining resources?", type: 'text' },
+                    { id: 'health_1', text: "Let's analyze your physical chassis. Rate your daily energy levels, 1 to 10.", type: 'scale', min: 1, max: 10 },
+                    { id: 'health_2', text: "Identify one health protocol you know is critical but consistently fail to implement.", type: 'text' },
+                    { id: 'mental_1', text: "And your mental state? What's the dominant emotional frequency you've been operating on this past week?", type: 'text' },
+                    { id: 'learning_1', text: "What's the last piece of intel you acquired purely out of intellectual curiosity?", type: 'text' },
+                    { id: 'productivity_1', text: "Describe your relationship with time. Is it a strategic asset or a tactical adversary?", type: 'text' },
+                    { id: 'values_1', text: "Identify one core value in your personal doctrine that is non-negotiable.", type: 'text' },
+                    { id: 'obstacles_1', text: "What is the single greatest obstacle currently impeding your advance to the next operational level?", type: 'text' },
+                    { id: 'strengths_1', text: "Finally, what is your most potent, yet underutilized, natural talent?", type: 'text' },
+                    { id: 'end', text: "Calibration complete. Analyzing data to construct your Operator Profile. Stand by...", type: 'end' },
+                ],
+                missionTemplates: [
+                    { id: 'FIN_BUDGET_7D', title: "Financial Foundation", desc: "Track every expense for 7 days in the Finance Center.", category: "Financial Building", icon: "📊", rewardDP: 100, type: 'action', target: 7, checkKey: 'expenseLogCount' },
+                    { id: 'CAREER_CLARITY_1', title: "Career Clarity", desc: "Write one journal entry about your ideal career vision.", category: "Personal Development", icon: "✍️", rewardDP: 50, type: 'counter', target: 1, checkKey: 'journalCount' },
+                    { id: 'HEALTH_HABIT_1', title: "Energy Boost", desc: "Complete one 'Workout' task from the daily protocol.", category: "Health & Wellness", icon: "🏃", rewardDP: 75, type: 'protocol', target: 1, checkKey: 'workoutTaskCount' },
+                    { id: 'CURIOSITY_QUEST_1', title: "Curiosity Quest", desc: "Complete one 'Study' task from the daily protocol.", category: "Knowledge Growth", icon: "📚", rewardDP: 50, type: 'protocol', target: 1, checkKey: 'studyTaskCount' },
+                    { id: 'STREAK_3D', title: "Build Momentum", desc: "Maintain a task completion streak for 3 consecutive days.", category: "Discipline", icon: "🔥", rewardDP: 100, type: 'streak', target: 3, checkKey: 'currentStreak' },
+                    { id: 'LOG_5_TRADES', title: "Market Engagement", desc: "Log your first 5 trades in the Operator's Log.", category: "Trading & Analysis", icon: "📈", rewardDP: 75, type: 'counter', target: 5, checkKey: 'logCount' },
+                ],
+                 missionCheckFunctions: {
+                    expenseLogCount: (data) => data.finance?.transactions?.filter(t => t.type === 'expense').length || 0,
+                    journalCount: (data) => data.journalCount || 0,
+                    workoutTaskCount: (data) => data.taskCompletionCounts?.['Workout for 45 minutes'] || 0,
+                    studyTaskCount: (data) => data.taskCompletionCounts?.['30 minutes study'] || 0,
+                    currentStreak: (data) => data.currentStreak || 0,
+                    logCount: (data) => data.logCount || 0,
+                },
+                tutorialSteps: [
+                    { title: "Welcome, Operator", content: "Your calibration is complete. This is your command center. Let's run through a quick system orientation." },
+                    { title: "The Dashboard", content: "This is your primary view. 'Today\'s Orders' are your daily tasks. Completing them earns you Discipline Points (DP) to level up and boosts your core stats." },
+                    { title: "Missions", content: "The Missions tab contains objectives based on your assessment. Accept a mission to activate it. Progress is tracked automatically." },
+                    { title: "Navigation", content: "Use the sidebar (or the bottom navigation on mobile) to access different system modules like the Protocol, your Logs, and more." },
+                    { title: "The Protocol", content: "The Protocol contains your weekly challenges. Completing these provides significant DP boosts. Check in weekly to see your new objectives." },
+                    { title: "Ready to Go", content: "That's the basic rundown. The rest is up to you to explore. Your first set of orders for today has been generated. Execute." }
+                ],
+            },
+
+            /**
+             * Initializes the application, sets up dayjs, Firebase, and event listeners.
+             */
+            init() {
+                dayjs.extend(window.dayjs_plugin_utc);
+                dayjs.extend(window.dayjs_plugin_timezone);
+                dayjs.extend(window.dayjs_plugin_isoWeek);
+                dayjs.extend(window.dayjs_plugin_isToday);
+                dayjs.extend(window.dayjs_plugin_dayOfYear);
+                dayjs.tz.setDefault("America/New_York");
+                this.state.currentDate = dayjs();
+
+                this.showNotification = this.showNotification.bind(this);
+                this.processNotificationQueue = this.processNotificationQueue.bind(this);
+
+                this.initFirebase();
+            },
+
+            /**
+             * Initializes Firebase app, auth, and Firestore, and sets up auth state listener.
+             */
+            initFirebase() {
+                 const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config !== '{}'
+                    ? JSON.parse(__firebase_config)
+                    : null;
+                
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    console.error("Firebase config is missing or incomplete.");
+                    const initLayer = document.getElementById('initialization-layer');
+                    if(initLayer) initLayer.innerHTML = `<div class="flex items-center justify-center h-full"><p class="text-destructive-primary text-center p-4">System Error: Could not load configuration. Please refresh.</p></div>`;
+                    return;
+                }
+                
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    this.state.auth = getAuth(app);
+                    this.state.db = getFirestore(app);
+                    
+                    onAuthStateChanged(this.state.auth, async (user) => {
+                        if (user) {
+                            this.state.userId = user.uid;
+                            this.state.isAuthReady = true;
+                            await this.loadUserData();
+                        } else {
+                            this.state.isAuthReady = true;
+                            this.renderLandingPage();
+                        }
+                    });
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    this.showNotification("System configuration error.", 'error');
+                }
+            },
+            
+            /**
+             * Handles anonymous user login.
+             */
+            async handleAnonymousLogin() {
+                if (!this.state.isAuthReady) return;
+                try {
+                    await signInAnonymously(this.state.auth);
+                } catch (error) {
+                    console.error("Anonymous sign-in failed:", error);
+                    this.showNotification("System initialization failed.", 'error');
+                }
+            },
+
+            /**
+             * Loads user data from Firestore, creating a new user if one doesn't exist.
+             */
+            async loadUserData() {
+                if (!this.state.userId) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+
+                if (this.state.unsubscribe.userData) this.state.unsubscribe.userData();
+
+                try {
+                    const docSnap = await getDoc(userDocRef);
+                    if (!docSnap.exists()) {
+                        await this.createNewUser(userDocRef);
+                    }
+                    
+                    this.state.unsubscribe.userData = onSnapshot(userDocRef, (doc) => {
+                        if (doc.exists()) {
+                            const hadUserData = !!this.state.userData;
+                            this.state.userData = doc.data();
+                            
+                            this.applyTheme(this.state.userData.settings.theme);
+
+                            if (!this.state.userData.assessmentComplete) {
+                                this.renderAssessmentPage();
+                            } else {
+                                if (!this.state.hasTransitionedToOS) {
+                                    this.transitionToOS();
+                                } else {
+                                    this.renderAppContent();
+                                }
+                            }
+                            
+                            if (!hadUserData) { 
+                                this.checkForDailyLogin();
+                                this.checkForWeeklyReset();
+                                this.listenToDailyTasks(this.state.currentDate);
+                                if(this.state.userData.walletAddress) this.reconnectWallet(this.state.userData.walletAddress);
+                            }
+                            
+                            this.checkAllAchievements(this.state.userData, this.state.userData, this.state.dailyTasks);
+                            this.checkMissionProgress();
+                        }
+                    }, (error) => {
+                        console.error("Error in user data snapshot listener:", error);
+                        this.showNotification("Error syncing user data.", "error");
+                    });
+
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                    this.showNotification("Failed to load operator profile.", "error");
+                }
+            },
+
+            /**
+             * Creates a new user document in Firestore with default values.
+             */
+            async createNewUser(userDocRef) {
+                const isAnonymous = this.state.auth.currentUser.isAnonymous;
+                const newUser = {
+                    operatorName: `Operator-${this.state.userId.substring(0, 4)}`,
+                    level: 1, dp: 0,
+                    stats: { DIS: 0, INT: 0, STR: 0, CHA: 0, RES: 0, CRE: 0 },
+                    settings: { theme: 'default', hardMode: false },
+                    immunityPasses: 1, currentDay: 1, missionStartDate: serverTimestamp(),
+                    lastLoginDate: dayjs().subtract(1, 'day').format('YYYY-MM-DD'),
+                    currentStreak: 0, longestStreak: 0, resets: 0,
+                    achievements: {},
+                    protocolCompletion: {},
+                    protocolProgress: {},
+                    taskCompletionCounts: {},
+                    finance: { balances: { bank: 0, crypto: 0 }, debts: [], goals: [] },
+                    logCount: 0, journalCount: 0, aiAssistCount: 0, aiPromptCount: 0,
+                    transferCount: 0, isAnonymous: isAnonymous,
+                    assessmentComplete: false,
+                    tutorialCompleted: false,
+                    assessmentResponses: {},
+                    assessmentState: { assessmentStarted: false, currentQuestionIndex: 0 },
+                    walletAddress: null,
+                    missions: { available: [], active: [], completed: [] },
+                };
+                await setDoc(userDocRef, newUser);
+            },
+            
+            async checkForDailyLogin() {
+                const todayStr = dayjs().format('YYYY-MM-DD');
+                if (this.state.userData.lastLoginDate !== todayStr) {
+                    const yesterdayStr = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
+                    let newStreak = this.state.userData.currentStreak;
+                    let immunityUsed = false;
+                    
+                    if (this.state.userData.lastLoginDate === yesterdayStr) {
+                        newStreak++;
+                    } else {
+                        // If last login wasn't today or yesterday, the streak is broken
+                        if(this.state.userData.immunityPasses > 0){
+                            immunityUsed = true;
+                            // Streak is maintained, not incremented
+                            this.showNotification("Streak saved by an Immunity Pass!", "success");
+                        } else {
+                           newStreak = 1; // Start a new streak today
+                           if(this.state.userData.settings.hardMode) {
+                               await this.executeHardModeReset();
+                               // After reset, the checkForDailyLogin logic is effectively done for this session
+                               return; 
+                           }
+                        }
+                    }
+
+                    const updates = {
+                        lastLoginDate: todayStr,
+                        currentStreak: newStreak,
+                        longestStreak: Math.max(this.state.userData.longestStreak, newStreak),
+                        ...(immunityUsed && { immunityPasses: increment(-1) })
+                    };
+
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, updates);
+                }
+            },
+
+            async executeHardModeReset() {
+                this.showNotification("HARD MODE: Streak broken. System reset initiated.", "error");
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, {
+                    level: 1,
+                    dp: 0,
+                    stats: { DIS: 0, INT: 0, STR: 0, CHA: 0, RES: 0, CRE: 0 },
+                    currentStreak: 1, // Start new streak today
+                    resets: increment(1)
+                });
+            },
+
+            async checkForWeeklyReset() {
+                 if (!this.state.userData.missionStartDate || !this.state.userData.missionStartDate.toDate) return;
+                 const missionStart = dayjs(this.state.userData.missionStartDate.toDate());
+                 const currentMissionWeek = dayjs().diff(missionStart, 'week') + 1;
+                 
+                 if (this.state.userData.protocolProgress?.missionWeek !== currentMissionWeek) {
+                     await updateDoc(doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId), {
+                         'protocolProgress.missionWeek': currentMissionWeek
+                     });
+                 }
+            },
+            
+            listenToDailyTasks(date) {
+                if (this.state.unsubscribe.tasks) this.state.unsubscribe.tasks(); 
+                
+                const dateStr = date.format('YYYY-MM-DD');
+                const tasksColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks");
+                const q = query(tasksColRef, where("date", "==", dateStr));
+
+                this.state.unsubscribe.tasks = onSnapshot(q, async (snapshot) => {
+                    if (snapshot.empty && date.isSame(dayjs(), 'day')) {
+                        await this.generateAndSaveDailyTasks(date);
+                    } else {
+                        this.state.dailyTasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        if(this.state.currentPage === 'dashboard' || this.state.currentPage === 'protocol') this.renderAppContent();
+                    }
+                }, error => {
+                    console.error("Error listening to daily tasks:", error);
+                    this.showNotification("Error loading daily tasks.", "error");
+                });
+            },
+            
+            async generateAndSaveDailyTasks(date) {
+                const missionStart = this.state.userData.missionStartDate?.toDate() ? dayjs(this.state.userData.missionStartDate.toDate()) : dayjs();
+                const weekNumber = date.diff(missionStart, 'week') + 1;
+                const dayOfWeek = date.isoWeekday(); // Monday=1, Sunday=7
+
+                let tasksToGenerate = [...this.config.defaultTasks.map(t => ({...t, completed: false}))];
+
+                const weekSchedule = this.config.protocolSchedule[Math.min(weekNumber, 10)]; // Cap at week 10 schedule
+                if (weekSchedule) {
+                    const scheduleDays = { 
+                        2: [1, 4], 3: [1, 3, 5], 4: [1, 2, 4, 5], 
+                        5: [1, 2, 3, 5, 6], 6: [1, 2, 3, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7]
+                    };
+                    Object.values(weekSchedule).forEach(task => {
+                        const days = scheduleDays[task.freq] || [];
+                        if (task.freq === 7 || days.includes(dayOfWeek)) {
+                            if (!tasksToGenerate.some(t => t.text === task.text)) {
+                                tasksToGenerate.push({ ...task, completed: false });
+                            }
+                        }
+                    });
+                }
+
+                 const batch = writeBatch(this.state.db);
+                 const tasksColRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks");
+                 tasksToGenerate.forEach(task => {
+                     const newTaskRef = doc(tasksColRef);
+                     batch.set(newTaskRef, { date: date.format('YYYY-MM-DD'), ...task });
+                 });
+                 await batch.commit();
+            },
+            
+            transitionToOS() {
+                this.state.hasTransitionedToOS = true;
+                
+                const initLayer = document.getElementById('initialization-layer');
+                const appContainer = document.getElementById('app-container');
+
+                initLayer.classList.add('opacity-0', 'pointer-events-none');
+                appContainer.classList.remove('opacity-0');
+                
+                // Clean up the initialization layer's content after the transition
+                setTimeout(() => {
+                    if (initLayer) initLayer.innerHTML = '';
+                }, 1000); // Match the CSS transition duration
+
+                this.initMainEventListeners();
+                this.navigateTo('dashboard');
+
+                if (!this.state.userData.tutorialCompleted) {
+                    setTimeout(() => this.startTutorial(), 1200); // Delay for fade transition
+                }
+            },
+
+            initMainEventListeners() {
+                document.getElementById('sidebar-nav').addEventListener('click', (e) => {
+                    const navLink = e.target.closest('.sidebar-nav-item');
+                    if (navLink) {
+                        e.preventDefault();
+                        this.navigateTo(navLink.dataset.page);
+                    }
+                });
+
+                document.getElementById('bottom-nav').addEventListener('click', (e) => {
+                    const navLink = e.target.closest('.mobile-nav-item');
+                    if (navLink) {
+                        e.preventDefault();
+                        this.navigateTo(navLink.dataset.page);
+                    }
+                });
+            },
+
+            navigateTo(page) {
+                if (this.state.userData && !this.state.userData.assessmentComplete && page !== 'assessment') {
+                    this.state.currentPage = 'assessment';
+                    this.render();
+                    return; 
+                }
+                this.state.currentPage = page;
+                this.renderAppContent();
+            },
+
+            renderAppContent() {
+                if (!this.state.userData || !this.state.hasTransitionedToOS) return;
+
+                this.renderAppShell();
+                
+                const mainContent = document.getElementById('main-content');
+                mainContent.innerHTML = `<div id="page-${this.state.currentPage}" class="page active p-4 md:p-6"></div>`;
+
+                switch (this.state.currentPage) {
+                    case 'dashboard': this.renderDashboard(); break;
+                    case 'missions': this.renderMissionsPage(); break;
+                    case 'protocol': this.renderProtocol(); break;
+                    case 'tradelog': this.renderTradeLogPage(); break;
+                    case 'journal': this.renderJournalPage(); break;
+                    case 'finance': this.renderFinancePage(); break;
+                    case 'achievements': this.renderAchievementsPage(); break;
+                    case 'settings': this.renderSettings(); break;
+                    case 'intel': this.renderIntelHub(); break;
+                    default: this.renderDashboard(); break;
+                }
+            },
+
+            renderAppShell() {
+                const sidebar = document.getElementById('sidebar-nav');
+                const bottomNav = document.getElementById('bottom-nav');
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('md:flex');
+                bottomNav.classList.remove('hidden');
+                bottomNav.classList.add('flex', 'md:hidden');
+                this.renderSidebar();
+                this.renderMobileNav();
+            },
+            
+            renderLandingPage() {
+                const initLayer = document.getElementById('initialization-layer');
+                initLayer.classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('app-container').classList.add('opacity-0');
+                initLayer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-screen text-center bg-primary p-4">
+                        <div class="w-24 h-24 text-accent-primary mb-4">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <h1 class="text-5xl font-black tracking-tighter mb-2">OPERATOR UPLIFT</h1>
+                        <p class="text-lg text-secondary mb-8 max-w-md">Discipline is the weapon. This system is your training ground.</p>
+                        <button id="auth-btn" class="btn btn-primary px-12 py-4 text-lg">Login / Signup</button>
+                    </div>
+                `;
+                document.getElementById('auth-btn').addEventListener('click', () => this.showAuthModal());
+            },
+
+            renderSidebar() {
+                const nav = document.getElementById('sidebar-nav');
+                if (!this.state.userData) {
+                    nav.innerHTML = ''; return;
+                }
+                const { operatorName, level, dp } = this.state.userData;
+                const rank = this.config.ranks.slice().reverse().find(r => level >= r.minLevel)?.name || 'Recruit';
+                const dpForNextLevel = 100 + (level * 20);
+                const dpProgress = dpForNextLevel > 0 ? (dp / dpForNextLevel) * 100 : 0;
+
+                nav.innerHTML = `
+                    <div>
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 text-accent-primary flex-shrink-0">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-lg text-primary">${operatorName}</h1>
+                                <p class="text-sm text-secondary font-mono">Lvl ${level} ${rank}</p>
+                            </div>
+                        </div>
+                        <div class="mb-8">
+                            <div class="flex justify-between font-mono text-xs text-secondary mb-1">
+                                <span>LEVEL PROGRESS</span>
+                                <span class="font-bold text-accent-primary">${dp} / ${dpForNextLevel}</span>
+                            </div>
+                            <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${dpProgress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 flex-grow">
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="dashboard"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>Dashboard</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="missions"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Missions</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="protocol"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>Protocol</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="tradelog"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Operator's Log</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="journal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>Journal</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="finance"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="1" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Finance Center</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="achievements"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2h4"></path><path d="M12 18h4a2 2 0 002-2v-2a2 2 0 00-2-2h-4v6z"></path><path d="M18 12V8a2 2 0 012-2h0a2 2 0 012 2v4"></path><path d="M22 12v2a2 2 0 01-2 2h-2"></path></svg>Achievements</a></li>
+                        <li><a href="#" class="sidebar-nav-item flex items-center gap-3 p-3 rounded-lg" data-page="settings"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>Settings</a></li>
+                    </ul>
+                `;
+                nav.querySelector(`.sidebar-nav-item[data-page='${this.state.currentPage}']`)?.classList.add('active');
+            },
+
+            renderMobileNav() {
+                const nav = document.getElementById('bottom-nav');
+                const intelPages = ['protocol', 'tradelog', 'journal', 'finance', 'achievements'];
+                const isIntelActive = intelPages.includes(this.state.currentPage);
+
+                nav.innerHTML = `
+                    <div class="flex justify-around items-center h-full w-full">
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'dashboard' ? 'active' : ''}" data-page="dashboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                            <span class="text-xs mt-1">Dashboard</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'missions' ? 'active' : ''}" data-page="missions">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            <span class="text-xs mt-1">Missions</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${isIntelActive ? 'active' : ''}" data-page="intel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            <span class="text-xs mt-1">Intel</span>
+                        </button>
+                        <button class="mobile-nav-item flex flex-col items-center text-secondary ${this.state.currentPage === 'settings' ? 'active' : ''}" data-page="settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <span class="text-xs mt-1">Settings</span>
+                        </button>
+                    </div>
+                `;
+            },
+            
+            renderIntelHub() {
+                const container = document.getElementById('page-intel');
+                if (!container) return;
+                container.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Intel Hub</h1>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${this.renderIntelButton('protocol', 'Protocol', 'Weekly Objectives')}
+                        ${this.renderIntelButton('tradelog', "Operator's Log", 'Log and review trades')}
+                        ${this.renderIntelButton('journal', 'Journal', 'Log daily thoughts & debriefs')}
+                        ${this.renderIntelButton('finance', 'Finance Center', 'Track goals and balances')}
+                        ${this.renderIntelButton('achievements', 'Achievements', 'View your commendations')}
+                    </div>
+                `;
+                container.querySelectorAll('.intel-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.navigateTo(btn.dataset.page));
+                });
+            },
+
+            renderIntelButton(page, title, subtitle) {
+                return `
+                    <button class="intel-btn bento-box text-left bento-box-interactive" data-page="${page}">
+                        <h3 class="font-bold text-lg">${title}</h3>
+                        <p class="text-sm text-secondary">${subtitle}</p>
+                    </button>
+                `;
+            },
+
+            renderDashboard() {
+                const container = document.getElementById('page-dashboard');
+                if (!container || !this.state.userData) return;
+
+                const { operatorName, level, dp, stats } = this.state.userData;
+                const isToday = this.state.currentDate.isSame(dayjs(), 'day');
+                const rank = this.config.ranks.slice().reverse().find(r => level >= r.minLevel)?.name || 'Recruit';
+                const dpForNextLevel = 100 + (level * 20);
+
+                const tasksHTML = this.state.dailyTasks.map(task => `
+                    <div id="${task.id}" class="task-item flex items-center bg-secondary p-4 rounded-lg ${task.completed ? 'task-item-completed' : ''}">
+                        <input type="checkbox" class="task-checkbox h-6 w-6 rounded bg-tertiary border-gray-500 focus:ring-accent-primary" data-task-id="${task.id}" ${task.completed ? 'checked' : ''} ${!isToday ? 'disabled' : ''}>
+                        <div class="ml-4 flex-grow">
+                            <p class="font-semibold">${task.text}</p>
+                            <p class="text-xs text-secondary font-mono"><span class="text-accent-primary font-bold">+${task.dp} DP / +1 ${task.stat}</span></p>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-secondary text-center py-8">No orders for this day. Stand by.</p>';
+
+                const statOrder = ['DIS', 'INT', 'STR', 'CHA', 'RES', 'CRE'];
+                const statsHTML = statOrder.map(key => {
+                    const value = stats[key] || 0;
+                    return `
+                        <div class="flex justify-between items-center py-2 border-b border-tertiary">
+                            <span class="font-semibold">${this.getStatFullName(key)}</span>
+                            <span class="font-mono">${value} SP</span>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <div class="md:hidden mb-6 bento-box">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 text-accent-primary flex-shrink-0">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-lg text-primary">${operatorName}</h1>
+                                <p class="text-sm text-secondary font-mono">Lvl ${level} ${rank}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-mono text-xs text-secondary mb-1">
+                                <span>LEVEL PROGRESS</span>
+                                <span class="font-bold text-accent-primary">${dp} / ${dpForNextLevel}</span>
+                            </div>
+                            <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${(dp / dpForNextLevel) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>Dashboard</h1>
+                         <div class="flex gap-2">
+                            <button id="prev-day-btn" class="p-2 rounded-full bg-secondary hover:bg-tertiary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <button id="next-day-btn" class="p-2 rounded-full bg-secondary hover:bg-tertiary" ${isToday ? 'disabled' : ''}>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                             <div class="bento-box">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold">${isToday ? "Today's Orders" : `Orders: ${this.state.currentDate.format('MMM D, YY')}`}</h2>
+                                    ${isToday ? '<button id="daily-debrief-btn" class="btn btn-secondary btn-sm">✨ Generate Daily Debrief</button>' : ''}
+                                </div>
+                                <div class="space-y-3">${tasksHTML}</div>
+                             </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bento-box">
+                                <h3 class="font-mono text-xl font-bold mb-4">CORE STATS</h3>
+                                <div class="space-y-1">${statsHTML}</div>
+                            </div>
+                            <div id="quote-bento-box" class="bento-box">
+                                <!-- Quote will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelectorAll('.task-checkbox').forEach(box => {
+                    box.addEventListener('change', (e) => this.toggleTaskCompletion(e.target.dataset.taskId, e.target.checked));
+                });
+                document.getElementById('prev-day-btn').addEventListener('click', () => this.changeDay(-1));
+                document.getElementById('next-day-btn').addEventListener('click', () => this.changeDay(1));
+                
+                const debriefBtn = document.getElementById('daily-debrief-btn');
+                if (debriefBtn) {
+                    debriefBtn.addEventListener('click', () => this.generateDailyDebrief());
+                }
+                
+                this.fetchAndDisplayQuote();
+            },
+
+            // --- ONBOARDING & ASSESSMENT ---
+            renderAssessmentPage() {
+                const container = document.getElementById('initialization-layer');
+                if (!container) return;
+                container.classList.remove('opacity-0', 'pointer-events-none');
+
+
+                if (!this.state.userData.assessmentState.assessmentStarted) {
+                    container.innerHTML = `
+                        <div id="assessment-content-area">
+                            <div class="flex flex-col items-center text-center max-w-md p-4 z-10">
+                                <div class="w-24 h-24 text-accent-primary mb-4">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="animate-pulse"><path d="M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z" stroke="currentColor" stroke-width="4" fill="none"/><path d="M30 60 L50 50 L70 60" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50 L50 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                                </div>
+                                <h1 class="text-3xl font-bold mb-2">Operator Calibration</h1>
+                                <p class="text-secondary mb-8">To optimize performance, we must first establish a baseline. The following calibration will be direct and comprehensive. Honesty is your only asset.</p>
+                                <button id="start-calibration-btn" class="btn btn-primary px-8 py-3">Begin Calibration</button>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('start-calibration-btn').addEventListener('click', async () => {
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        await updateDoc(userDocRef, { 'assessmentState.assessmentStarted': true });
+                    });
+                } else {
+                    const progress = (this.state.userData.assessmentState.currentQuestionIndex / (this.config.assessmentQuestions.length - 1)) * 100;
+                    container.innerHTML = `
+                        <div id="assessment-content-area">
+                            <div class="w-full max-w-2xl mx-auto h-full flex flex-col z-10">
+                                <header class="p-4 flex justify-between items-center flex-shrink-0">
+                                    <h1 class="text-xl font-bold text-white">Operator Calibration</h1>
+                                    <div class="w-1/2">
+                                        <div class="w-full progress-bar-bg rounded-full h-2.5">
+                                            <div class="progress-bar-fg h-2.5 rounded-full" style="width: ${progress}%"></div>
+                                        </div>
+                                    </div>
+                                </header>
+                                <div id="chat-container" class="flex-1 overflow-y-auto mb-4 p-4 chat-container flex flex-col">
+                                </div>
+                                <div class="p-4 flex-shrink-0">
+                                    <div id="scale-input-container" class="hidden"></div>
+                                    <div id="input-container" class="flex items-center gap-2">
+                                        <input type="text" id="input-box" class="w-full bg-tertiary border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-primary transition duration-300" placeholder="Type your response...">
+                                        <button id="send-btn" class="btn btn-primary">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('send-btn').addEventListener('click', () => this.handleTextInput());
+                    document.getElementById('input-box').addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.handleTextInput();
+                    });
+                    this.rebuildAssessmentChat();
+                }
+            },
+            
+            rebuildAssessmentChat() {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer) return;
+                chatContainer.innerHTML = '';
+                const responses = this.state.userData.assessmentResponses || {};
+                const maxIndex = this.state.userData.assessmentState.currentQuestionIndex;
+                for (let i = 0; i < maxIndex; i++) {
+                    this.addAssessmentMessage(this.config.assessmentQuestions[i].text, 'ai');
+                    const questionId = this.config.assessmentQuestions[i].id;
+                    if (responses[questionId]) {
+                        this.addAssessmentMessage(responses[questionId], 'user');
+                    }
+                }
+                this.askAssessmentQuestion();
+            },
+            
+            askAssessmentQuestion() {
+                const currentIndex = this.state.userData.assessmentState.currentQuestionIndex;
+                if (currentIndex >= this.config.assessmentQuestions.length) {
+                    this.processAssessment();
+                    return;
+                }
+
+                const question = this.config.assessmentQuestions[currentIndex];
+                const inputContainer = document.getElementById('input-container');
+                const scaleContainer = document.getElementById('scale-input-container');
+
+                this.showTypingIndicator();
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    this.addAssessmentMessage(question.text, 'ai');
+
+                    if (question.type === 'scale') {
+                        inputContainer.classList.add('hidden');
+                        scaleContainer.classList.remove('hidden');
+                        scaleContainer.innerHTML = `
+                            <div class="flex justify-center items-center gap-2 flex-wrap">
+                                ${Array.from({ length: question.max }, (_, i) => i + 1).map(num => 
+                                    `<button class="scale-btn btn btn-secondary w-10 h-10 p-0" data-value="${num}">${num}</button>`
+                                ).join('')}
+                            </div>
+                        `;
+                        scaleContainer.querySelectorAll('.scale-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => this.handleScaleInput(e.target.dataset.value, question.id));
+                        });
+                    } else {
+                        inputContainer.classList.remove('hidden');
+                        scaleContainer.classList.add('hidden');
+                        document.getElementById('input-box').focus();
+                    }
+
+                    if (question.type === 'end') {
+                         inputContainer.classList.add('hidden');
+                         scaleContainer.classList.add('hidden');
+                         setTimeout(() => this.processAssessment(), 1500);
+                    }
+
+                }, 1200);
+            },
+
+            handleTextInput() {
+                const inputBox = document.getElementById('input-box');
+                const text = inputBox.value.trim();
+                if (text === '') return;
+                const currentQuestion = this.config.assessmentQuestions[this.state.userData.assessmentState.currentQuestionIndex];
+                if (!currentQuestion || currentQuestion.type === 'end') return;
+                
+                this.handleGenericInput(text, currentQuestion.id);
+                inputBox.value = '';
+            },
+
+            handleScaleInput(value, questionId) {
+                this.handleGenericInput(value, questionId);
+            },
+
+            async handleGenericInput(value, questionId) {
+                this.addAssessmentMessage(value, 'user');
+                
+                const newIndex = this.state.userData.assessmentState.currentQuestionIndex + 1;
+                
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, {
+                    [`assessmentResponses.${questionId}`]: value,
+                    'assessmentState.currentQuestionIndex': newIndex
+                });
+            },
+
+            async processAssessment() {
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, { assessmentComplete: true });
+                this.generateInitialMissions();
+                this.showNotification("Assessment Complete! First missions assigned.", "success");
+                await this.addDP(50); // Reward for completion
+            },
+            
+            async startTutorial() {
+                let currentStep = 0;
+                const steps = this.config.tutorialSteps;
+
+                const showTutorialStep = () => {
+                    if (currentStep >= steps.length) {
+                        this.hideModal();
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        updateDoc(userDocRef, { tutorialCompleted: true });
+                        return;
+                    }
+
+                    const step = steps[currentStep];
+                    const isLastStep = currentStep === steps.length - 1;
+                    const modalContent = `
+                        <h2 class="text-xl font-bold mb-2 text-center">${step.title}</h2>
+                        <p class="text-secondary text-center mb-6">${step.content}</p>
+                        <div class="flex justify-end">
+                            <button id="tutorial-next-btn" class="btn btn-primary">${isLastStep ? 'Finish' : 'Next'}</button>
+                        </div>
+                    `;
+                    this.showModal(modalContent);
+                    document.getElementById('tutorial-next-btn').addEventListener('click', () => {
+                        currentStep++;
+                        showTutorialStep();
+                    });
+                };
+
+                showTutorialStep();
+            },
+
+            // --- CORE PAGE RENDERS ---
+            async fetchAndDisplayQuote(){
+                const quoteBox = document.getElementById('quote-bento-box');
+                if(!quoteBox) return;
+                try {
+                    const dayOfYear = dayjs().dayOfYear();
+                    const quote = this.config.fallbackQuotes[dayOfYear % this.config.fallbackQuotes.length];
+                    quoteBox.innerHTML = `
+                        <h3 class="font-mono text-lg font-bold mb-3 text-accent-primary">Daily Doctrine</h3>
+                        <p class="text-primary italic">"${quote.text}"</p>
+                        <p class="text-right text-secondary text-sm mt-3">- ${quote.author}</p>
+                    `;
+                } catch(e) {
+                    console.error("Error displaying quote:", e);
+                    quoteBox.innerHTML = `<p class="text-destructive-primary">Error loading daily doctrine.</p>`;
+                }
+            },
+
+            renderProtocol(){
+                const container = document.getElementById('page-protocol');
+                if (!container || !this.state.userData) return;
+
+                const { protocolProgress, missionStartDate, protocolCompletion } = this.state.userData;
+                const missionStart = missionStartDate?.toDate ? dayjs(missionStartDate.toDate()) : dayjs();
+                const currentMissionWeek = dayjs().diff(missionStart, 'week') + 1;
+                const selectedWeek = this.state.uiState.protocolSelectedWeek;
+
+                const weekSchedule = this.config.protocolSchedule[selectedWeek];
+                const weekTasks = Object.values(weekSchedule || {});
+
+                const weekButtonsHTML = Object.keys(this.config.protocolSchedule).map(weekNum => `
+                    <button class="protocol-week-btn p-2 rounded-lg flex-1 text-center ${parseInt(weekNum) === selectedWeek ? 'selected' : ''}" data-week="${weekNum}">
+                        Week ${weekNum}
+                    </button>
+                `).join('');
+                
+                const tasksHTML = weekTasks.map(task => {
+                    const weeklyProgress = protocolProgress?.[`week_${selectedWeek}`]?.tasks || {};
+                    const completedCount = weeklyProgress[task.text] || 0;
+                    const isComplete = completedCount >= task.freq;
+                    return `
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front ${isComplete ? 'opacity-50' : ''}">
+                                    <div class="text-accent-primary mb-2">${this.getIcon(task.icon, 'w-8 h-8')}</div>
+                                    <p class="font-semibold text-md px-2">${task.text}</p>
+                                    <p class="font-mono text-lg font-bold mt-2 ${isComplete ? 'text-green-500' : 'text-accent-primary'}">${completedCount} / ${task.freq}</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-semibold">${task.text}</p>
+                                    <p class="text-sm text-secondary">Frequency: ${task.freq}x per week</p>
+                                    <p class="text-sm font-mono text-accent-primary mt-2">+${task.dp} DP / +1 ${task.stat}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('') || '<p class="text-secondary text-center py-8">No objectives for this week.</p>';
+                
+                const allTasksForWeekComplete = weekTasks.every(task => (protocolProgress?.[`week_${selectedWeek}`]?.tasks?.[task.text] || 0) >= task.freq);
+                const canComplete = allTasksForWeekComplete && !protocolCompletion[`week_${selectedWeek}`];
+
+                container.innerHTML = `
+                    <div class="p-4 md:p-8">
+                        <h1 class="text-3xl font-bold mb-2">The Protocol</h1>
+                        <p class="text-secondary mb-6">Weekly progressive overload for discipline. Current Mission Week: <span class="text-accent-primary font-bold">${currentMissionWeek}</span></p>
+                        
+                        <div class="bento-box mb-6">
+                            <h2 class="text-xl font-semibold mb-4">Select Week</h2>
+                            <div class="flex gap-2 flex-wrap">${weekButtonsHTML}</div>
+                        </div>
+
+                        <h2 class="text-2xl font-semibold mb-4 ml-1">Week ${selectedWeek} Objectives</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${tasksHTML}
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button id="complete-week-btn" class="btn btn-primary" ${!canComplete ? 'disabled' : ''}>Mark Week ${selectedWeek} Complete</button>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelectorAll('.protocol-week-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.state.uiState.protocolSelectedWeek = parseInt(e.currentTarget.dataset.week);
+                        this.renderProtocol();
+                    });
+                });
+                
+                document.getElementById('complete-week-btn').addEventListener('click', () => this.markWeekAsComplete(selectedWeek));
+            },
+
+            async markWeekAsComplete(weekNumber) {
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, {
+                    [`protocolCompletion.week_${weekNumber}`]: true
+                });
+                this.showNotification(`Protocol Week ${weekNumber} marked as complete!`, 'success');
+                this.checkAndGrantAchievement(`WEEK_${weekNumber}_COMPLETE`);
+            },
+            
+            async renderTradeLogPage(){
+                 const container = document.getElementById('page-tradelog');
+                 if (!container) return;
+
+                 const checklistItems = ["Liquidity Verified", "Market Cap in Range", "No Malicious Holders", "Acceptable Risk/Reward", "Community Sentiment Checked"];
+                 const checklistHTML = checklistItems.map(item => `
+                    <label class="flex items-center gap-3 text-sm">
+                        <input type="checkbox" name="brakeCard" class="task-checkbox h-4 w-4">
+                        <span>${item}</span>
+                    </label>
+                 `).join('');
+
+                 container.innerHTML = `
+                    <div class="p-4 md:p-8">
+                        <h1 class="text-3xl font-bold mb-6">Operator's Log</h1>
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <div class="lg:col-span-3 space-y-6">
+                                <div class="bento-box">
+                                    <h2 class="text-xl font-semibold mb-4">Recent Logs</h2>
+                                    <div id="log-container" class="space-y-3 log-container">
+                                        <div class="flex justify-center p-8"><div class="loading-spinner"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 space-y-6">
+                                <div class="bento-box">
+                                    <h2 class="text-xl font-semibold mb-4">Log New Position</h2>
+                                    <form id="tradelog-form" class="space-y-4">
+                                        <input type="text" id="trade-ticker" placeholder="Token Ticker (e.g., SOL)" required>
+                                        <div class="flex gap-2">
+                                            <select id="trade-type" class="w-1/2" required>
+                                                <option value="buy">Buy</option>
+                                                <option value="sell">Sell</option>
+                                            </select>
+                                            <input type="number" id="trade-amount" class="w-1/2" placeholder="Amount ($)" required>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <select id="trade-outcome" class="w-1/2" required>
+                                                <option value="win">Win</option>
+                                                <option value="loss">Loss</option>
+                                                <option value="breakeven">Breakeven</option>
+                                            </select>
+                                            <input type="number" step="any" id="trade-pnl" class="w-1/2" placeholder="P/L ($)" required>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-sm mb-2 block">Pre-Entry Brake Card</h3>
+                                            <div class="space-y-2 p-3 bg-tertiary rounded-lg">${checklistHTML}</div>
+                                        </div>
+                                        <button type="submit" class="w-full btn btn-primary">Log Position</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 `;
+                 
+                 document.getElementById('tradelog-form').addEventListener('submit', async (e) => {
+                     e.preventDefault();
+                     const formData = {
+                         ticker: document.getElementById('trade-ticker').value,
+                         type: document.getElementById('trade-type').value,
+                         amount: parseFloat(document.getElementById('trade-amount').value),
+                         outcome: document.getElementById('trade-outcome').value,
+                         pnl: parseFloat(document.getElementById('trade-pnl').value),
+                         checklistComplete: Array.from(document.querySelectorAll('input[name="brakeCard"]')).every(cb => cb.checked),
+                         timestamp: serverTimestamp()
+                     };
+                     
+                     if (!formData.checklistComplete) {
+                         this.showNotification("Complete the pre-entry brake card first.", "error");
+                         return;
+                     }
+
+                     const logCollectionRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "logs");
+                     await addDoc(logCollectionRef, formData);
+                     await this.incrementCounter('logCount');
+                     this.showNotification("Position logged successfully.", "success");
+                     e.target.reset();
+                 });
+
+                 this.loadAndDisplayRecentLogs();
+            },
+
+            async renderJournalPage(){
+                const container = document.getElementById('page-journal');
+                if (!container) return;
+                container.innerHTML = `
+                    <div class="p-4 md:p-8">
+                        <h1 class="text-3xl font-bold mb-6">Operator's Journal</h1>
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <div class="lg:col-span-3 space-y-6">
+                                <div class="bento-box">
+                                    <h2 class="text-xl font-semibold mb-4">Recent Entries</h2>
+                                    <div id="journal-container" class="space-y-3 log-container">
+                                        <div class="flex justify-center p-8"><div class="loading-spinner"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 space-y-6">
+                                <div class="bento-box">
+                                    <h2 class="text-xl font-semibold mb-4">New Entry</h2>
+                                    <form id="journal-form" class="space-y-4">
+                                        <div id="journal-prompt-container" class="text-secondary italic p-3 bg-tertiary rounded-lg hidden"></div>
+                                        <button id="get-prompt-btn" type="button" class="w-full btn btn-secondary btn-sm">❓ Get a Writing Prompt</button>
+                                        <textarea id="journal-entry" rows="10" placeholder="Debrief. Document your thoughts, wins, and lessons learned..."></textarea>
+                                        <button type="submit" class="w-full btn btn-primary">Save Entry</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('get-prompt-btn').addEventListener('click', async (e) => {
+                    const button = e.currentTarget;
+                    button.disabled = true;
+                    button.innerHTML = '<div class="loading-spinner w-5 h-5 mx-auto"></div>';
+                    
+                    const prompt = "Generate a single, concise, and thought-provoking journal prompt for a trader focused on self-improvement, discipline, and market psychology.";
+                    const journalPrompt = await this.callGemini(prompt);
+                    
+                    if (journalPrompt) {
+                        const promptContainer = document.getElementById('journal-prompt-container');
+                        promptContainer.textContent = journalPrompt;
+                        promptContainer.classList.remove('hidden');
+                        await this.incrementCounter('aiPromptCount');
+                    }
+                    
+                    button.disabled = false;
+                    button.textContent = '❓ Get a Writing Prompt';
+                });
+
+                document.getElementById('journal-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const entryText = document.getElementById('journal-entry').value;
+                    if (!entryText.trim()) {
+                        this.showNotification("Journal entry cannot be empty.", "error");
+                        return;
+                    }
+                    
+                    const entryData = {
+                        text: entryText,
+                        prompt: document.getElementById('journal-prompt-container').textContent || '',
+                        timestamp: serverTimestamp()
+                    };
+
+                    const journalCollectionRef = collection(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "journal");
+                    await addDoc(journalCollectionRef, entryData);
+                    await this.incrementCounter('journalCount');
+                    this.showNotification("Journal entry saved.", "success");
+                    e.target.reset();
+                    document.getElementById('journal-prompt-container').classList.add('hidden');
+                });
+                
+                this.loadRecentJournalEntries();
+            },
+            
+            async renderSettings() {
+                const container = document.getElementById('page-settings');
+                if (!container || !this.state.userData) return;
+
+                const { operatorName, settings, isAnonymous, walletAddress } = this.state.userData;
+                
+                const themes = [
+                    { name: 'Default', class: 'default' }, { name: 'Teal', class: 'theme-teal' },
+                    { name: 'Blue', class: 'theme-blue' }, { name: 'Crimson', class: 'theme-crimson' },
+                    { name: 'Cyan', class: 'theme-cyan' }, { name: 'Green', class: 'theme-green' },
+                    { name: 'Pink', class: 'theme-pink' }, { name: 'Purple', class: 'theme-purple' },
+                    { name: 'Gold', class: 'theme-gold' },
+                ];
+
+                container.innerHTML = `
+                    <div class="p-4 md:p-8">
+                        <h1 class="text-3xl font-bold mb-6">System Settings</h1>
+                        <div class="max-w-2xl mx-auto space-y-8">
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Profile & Account</h2>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="operatorName" class="block text-sm font-medium text-secondary mb-1">Operator Name</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="operatorName" value="${operatorName}" class="flex-grow">
+                                            <button id="save-name-btn" class="btn btn-primary">Save</button>
+                                        </div>
+                                    </div>
+                                    ${isAnonymous ? `
+                                        <div>
+                                            <p class="text-secondary text-sm mb-4">You are currently using a guest account. Secure your progress by creating a permanent Operator ID.</p>
+                                            <button id="upgrade-account-btn" class="w-full btn btn-secondary">Create Permanent ID</button>
+                                        </div>
+                                    ` : `<p class="text-secondary text-sm">Your Operator ID is secure.</p>`}
+                                </div>
+                            </div>
+
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Wallet</h2>
+                                <div id="wallet-section">
+                                    ${walletAddress 
+                                        ? `<div class="text-center"><p class="font-semibold">Wallet Connected</p><p class="font-mono text-xs text-secondary truncate my-2">${walletAddress}</p><button id="disconnect-wallet-btn" class="w-full btn btn-secondary">Disconnect</button></div>`
+                                        : `<button id="connect-wallet-btn" class="w-full btn btn-secondary">Connect Phantom Wallet</button>`
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="bento-box">
+                                <h2 class="text-xl font-semibold mb-4">Theme</h2>
+                                <select id="theme-select" class="w-full">
+                                    ${themes.map(theme => `<option value="${theme.class}" ${settings.theme === theme.class ? 'selected' : ''}>${theme.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            
+                            <div class="bento-box border-destructive-primary/50">
+                                 <h2 class="text-xl font-semibold mb-4 text-destructive-primary">Danger Zone</h2>
+                                 <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <h3 class="font-semibold">Hard Mode</h3>
+                                            <p class="text-sm text-secondary">If enabled, breaking a streak will reset your level and stats.</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                          <input type="checkbox" id="hard-mode-toggle" class="sr-only peer" ${settings.hardMode ? 'checked' : ''}>
+                                          <div class="w-11 h-6 bg-tertiary rounded-full peer hard-mode-toggle-bg after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                                        </label>
+                                    </div>
+                                    <hr class="border-tertiary"/>
+                                    <button id="reset-account-btn" class="w-full btn btn-destructive">Reset Account</button>
+                                    <button id="logout-btn" class="w-full btn btn-secondary">Logout</button>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('save-name-btn').addEventListener('click', () => this.saveOperatorName());
+                document.getElementById('theme-select').addEventListener('change', (e) => this.changeTheme(e.target.value));
+                document.getElementById('hard-mode-toggle').addEventListener('change', (e) => this.toggleHardMode(e.target.checked));
+                document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+                document.getElementById('reset-account-btn').addEventListener('click', () => this.showResetConfirmationModal());
+                
+                const upgradeBtn = document.getElementById('upgrade-account-btn');
+                if(upgradeBtn) upgradeBtn.addEventListener('click', () => this.showAuthModal());
+
+                const connectBtn = document.getElementById('connect-wallet-btn');
+                if(connectBtn) connectBtn.addEventListener('click', () => this.connectWallet());
+
+                const disconnectBtn = document.getElementById('disconnect-wallet-btn');
+                if(disconnectBtn) disconnectBtn.addEventListener('click', () => this.disconnectWallet());
+            },
+
+            // --- GETTERS AND HELPERS ---
+            getStatFullName(key){
+                const names = { DIS: 'Discipline', INT: 'Intellect', STR: 'Strength', CHA: 'Charisma', RES: 'Resilience', CRE: 'Creativity' };
+                return names[key] || key;
+            },
+            
+            renderStatsRadarChart(){
+                const ctx = document.getElementById('statsRadarChart')?.getContext('2d');
+                if (!ctx || !this.state.userData) return;
+                
+                if (this.state.statsRadarChart) {
+                    this.state.statsRadarChart.destroy();
+                }
+
+                const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
+                const rgbaColor = this.hexToRgba(themeColor, 0.2);
+
+                const statOrder = ['DIS', 'INT', 'STR', 'CHA', 'RES', 'CRE'];
+                const data = statOrder.map(key => this.state.userData.stats[key] || 0);
+                const labels = statOrder.map(key => this.getStatFullName(key));
+
+                this.state.statsRadarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Stat Points',
+                            data: data,
+                            fill: true,
+                            backgroundColor: rgbaColor,
+                            borderColor: themeColor,
+                            pointBackgroundColor: themeColor,
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: themeColor
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#F5F5F5', font: { size: 12 } },
+                                ticks: { backdropColor: 'transparent', color: '#a0a0a0' }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            changeDay(offset){
+                this.state.currentDate = this.state.currentDate.add(offset, 'day');
+                this.listenToDailyTasks(this.state.currentDate);
+                this.renderDashboard();
+            },
+
+            async toggleTaskCompletion(taskId, isCompleted){
+                const taskRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId, "tasks", taskId);
+                const task = this.state.dailyTasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                const dpChange = isCompleted ? task.dp : -task.dp;
+                const statPointChange = isCompleted ? 1 : -1;
+                
+                await this.addDP(dpChange, task.stat, statPointChange);
+                await updateDoc(taskRef, { completed: isCompleted });
+
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                const updates = {
+                    [`taskCompletionCounts.${task.text}`]: increment(isCompleted ? 1 : -1)
+                };
+
+                // Update weekly protocol progress
+                if (this.state.userData.missionStartDate?.toDate) {
+                    const missionStart = dayjs(this.state.userData.missionStartDate.toDate());
+                    const currentMissionWeek = dayjs().diff(missionStart, 'week') + 1;
+                    updates[`protocolProgress.week_${currentMissionWeek}.tasks.${task.text}`] = increment(isCompleted ? 1 : -1);
+                }
+                
+                await updateDoc(userDocRef, updates);
+            },
+            
+            applyTheme(themeName) {
+                document.documentElement.className = `dark ${themeName || 'default'}`;
+                this.updatePwaAssets(this.config.themeColorMap[themeName] || '#D97706');
+                if(this.state.statsRadarChart) {
+                    this.renderStatsRadarChart();
+                }
+            },
+
+            updatePwaAssets(colorHex) {
+                const colorEncoded = encodeURIComponent(colorHex);
+                const svgIcon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L90 25 L90 75 L50 98 L10 75 L10 25 Z' stroke='${colorEncoded}' stroke-width='4' fill='none'/%3E%3Cpath d='M30 60 L50 50 L70 60' stroke='${colorEncoded}' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M50 50 L50 20' stroke='${colorEncoded}' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E`;
+                
+                document.getElementById('favicon-link').href = svgIcon;
+                document.getElementById('apple-touch-icon-link').href = svgIcon;
+                document.getElementById('theme-color-meta').content = colorHex;
+                
+                const manifest = {
+                    name: "Operator Uplift OS",
+                    short_name: "OperatorOS",
+                    start_url: "/",
+                    display: "standalone",
+                    background_color: "#121212",
+                    theme_color: colorHex,
+                    icons: [{ "src": svgIcon, "sizes": "192x192", "type": "image/svg+xml" }]
+                };
+                const manifestUrl = `data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
+                document.getElementById('manifest-link').href = manifestUrl;
+            },
+            
+            async saveOperatorName(){
+                const newName = document.getElementById('operatorName').value.trim();
+                if (newName && newName !== this.state.userData.operatorName) {
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { operatorName: newName });
+                    this.showNotification("Operator name updated.", "success");
+                }
+            },
+
+            async changeTheme(theme){
+                if (theme !== this.state.userData.settings.theme) {
+                    const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                    await updateDoc(userDocRef, { 'settings.theme': theme });
+                    this.checkAndGrantAchievement('THEME_CHANGER');
+                    this.showNotification("Theme updated.", "success");
+                }
+            },
+
+            async toggleHardMode(isEnabled){
+                 this.showWarningConfirmationModal(
+                    'Confirm Hard Mode',
+                    `Are you sure you want to ${isEnabled ? 'enable' : 'disable'} Hard Mode? When enabled, breaking a streak will reset your level and stats.`,
+                    async () => {
+                        const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                        await updateDoc(userDocRef, { 'settings.hardMode': isEnabled });
+                        if(isEnabled) this.checkAndGrantAchievement('HARD_MODE_ON');
+                        this.showNotification(`Hard Mode ${isEnabled ? 'enabled' : 'disabled'}.`, "success");
+                    },
+                    () => { // onCancel
+                        document.getElementById('hard-mode-toggle').checked = !isEnabled;
+                    }
+                );
+            },
+
+            async logout(){
+                await signOut(this.state.auth);
+                Object.values(this.state.unsubscribe).forEach(unsub => unsub && unsub());
+                this.state.userData = null;
+                this.state.userId = null;
+                this.state.isAuthReady = false;
+                window.location.reload();
+            },
+
+            showResetConfirmationModal(){
+                this.showWarningConfirmationModal(
+                    'Confirm Account Reset',
+                    'This action is irreversible. All your progress, stats, logs, and achievements will be permanently deleted. Are you absolutely sure?',
+                    () => this.executeReset()
+                );
+            },
+
+            async executeReset(){
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await this.deleteCollection(collection(userDocRef, 'tasks'));
+                await this.deleteCollection(collection(userDocRef, 'logs'));
+                await this.deleteCollection(collection(userDocRef, 'journal'));
+                await this.deleteCollection(collection(userDocRef, 'asvabHistory'));
+                await deleteDoc(userDocRef);
+                this.showNotification("Account reset. Re-initializing system.", "success");
+                await this.logout();
+            },
+
+            async deleteCollection(collectionRef){
+                const q = query(collectionRef);
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(this.state.db);
+                snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            },
+
+            showNotification(message, type = 'success'){
+                this.state.notificationQueue.push({ message, type });
+                this.processNotificationQueue();
+            },
+
+            processNotificationQueue(){
+                if (this.state.isNotifying || this.state.notificationQueue.length === 0) {
+                    return;
+                }
+                this.state.isNotifying = true;
+                const { message, type } = this.state.notificationQueue.shift();
+
+                const notification = document.createElement('div');
+                notification.className = `notification-popup ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                    this.state.isNotifying = false;
+                    this.processNotificationQueue();
+                }, 3000);
+            },
+
+            async checkAllAchievements(previousData, currentData, dailyTasks = []){
+                if (!previousData || !currentData) return;
+                for (const id in this.config.achievements) {
+                    if (!currentData.achievements[id]?.unlocked) {
+                        const achievement = this.config.achievements[id];
+                        try {
+                            if (achievement.check(currentData, previousData, dailyTasks)) {
+                                await this.checkAndGrantAchievement(id);
+                            }
+                        } catch (e) {
+                            console.error(`Error checking achievement ${id}:`, e);
+                        }
+                    }
+                }
+            },
+
+            async checkAndGrantAchievement(id, forceGrant = false){
+                if (!this.state.userData.achievements[id]?.unlocked || forceGrant) {
+                    const achievement = this.config.achievements[id];
+                    if (achievement) {
+                        await this.addDP(achievement.dp, null, 0, id);
+                        this.showNotification(`Achievement Unlocked: ${achievement.name}`, 'success');
+                    }
+                }
+            },
+
+            async incrementCounter(counterName){
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await updateDoc(userDocRef, { [counterName]: increment(1) });
+            },
+
+            async addDP(dpToAdd, statKey = null, statPoints = 0, achievementId = null){
+                if (!this.state.userId) return;
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                
+                try {
+                    await runTransaction(this.state.db, async (transaction) => {
+                        const userDoc = await transaction.get(userDocRef);
+                        if (!userDoc.exists()) throw "Document does not exist!";
+
+                        const data = userDoc.data();
+                        let { level, dp, stats, achievements } = data;
+                        dp += dpToAdd;
+                        let dpForNextLevel = 100 + (level * 20);
+
+                        while (dp >= dpForNextLevel) {
+                            level++;
+                            dp -= dpForNextLevel;
+                            dpForNextLevel = 100 + (level * 20);
+                            setTimeout(() => this.showNotification(`Level Up! Reached Level ${level}`, 'success'), 0);
+                        }
+
+                        if (statKey && stats.hasOwnProperty(statKey)) {
+                            stats[statKey] = Math.max(0, (stats[statKey] || 0) + statPoints);
+                        }
+                        
+                        const updates = { level, dp, stats };
+
+                        if (achievementId && !achievements[achievementId]?.unlocked) {
+                            updates[`achievements.${achievementId}`] = { unlocked: true, timestamp: serverTimestamp() };
+                        }
+
+                        transaction.update(userDocRef, updates);
+                    });
+                } catch (error) {
+                    console.error("DP Transaction failed: ", error);
+                    this.showNotification("Error updating progress.", "error");
+                }
+            },
+            
+            showWarningConfirmationModal(title, message, onConfirm, onCancel = () => {}, confirmText = "Confirm") {
+                const content = `
+                    <h2 class="text-xl font-bold mb-2 text-destructive-primary">${title}</h2>
+                    <p class="text-secondary mb-6">${message}</p>
+                    <div class="flex justify-end gap-3">
+                        <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                        <button id="modal-confirm-btn" class="btn btn-destructive">${confirmText}</button>
+                    </div>
+                `;
+                this.showModal(content);
+                document.getElementById('modal-confirm-btn').addEventListener('click', () => { onConfirm(); this.hideModal(); });
+                document.getElementById('modal-cancel-btn').addEventListener('click', () => { onCancel(); this.hideModal(); });
+            },
+            
+            // --- MISSIONS LOGIC ---
+            generateInitialMissions() {
+                const availableMissions = this.config.missionTemplates.map(template => ({
+                    ...template,
+                    progress: 0,
+                    status: 'available'
+                }));
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                updateDoc(userDocRef, { 'missions.available': availableMissions });
+            },
+            
+            async acceptMission(missionId) {
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                await runTransaction(this.state.db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) throw "User not found";
+                    
+                    const missions = userDoc.data().missions;
+                    const missionToAccept = missions.available.find(m => m.id === missionId);
+                    
+                    if (missionToAccept) {
+                        const newAvailable = missions.available.filter(m => m.id !== missionId);
+                        const newActive = [...missions.active, { ...missionToAccept, status: 'active' }];
+                        transaction.update(userDocRef, {
+                            'missions.available': newAvailable,
+                            'missions.active': newActive
+                        });
+                    }
+                });
+                this.showNotification("Mission Accepted!", "success");
+            },
+
+            async checkMissionProgress() {
+                if (!this.state.userData?.missions?.active?.length) return;
+
+                const userDocRef = doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId);
+                let missionsUpdated = false;
+
+                await runTransaction(this.state.db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) throw "User not found";
+
+                    const data = userDoc.data();
+                    const missions = data.missions;
+                    let activeMissions = [...missions.active];
+                    let completedMissions = [...missions.completed];
+                    let needsUpdate = false;
+
+                    for (let i = activeMissions.length - 1; i >= 0; i--) {
+                        const mission = activeMissions[i];
+                        const checkFunction = this.config.missionCheckFunctions[mission.checkKey];
+                        if (checkFunction) {
+                            const progress = checkFunction(data);
+                            mission.progress = progress;
+                            if (progress >= mission.target) {
+                                // Mission complete
+                                const completedMission = { ...mission, status: 'completed', completedAt: serverTimestamp() };
+                                completedMissions.push(completedMission);
+                                activeMissions.splice(i, 1);
+                                await this.addDP(mission.rewardDP);
+                                this.showNotification(`Mission Complete: ${mission.title}`, 'success');
+                                needsUpdate = true;
+                            }
+                        }
+                    }
+
+                    if (needsUpdate) {
+                        transaction.update(userDocRef, {
+                            'missions.active': activeMissions,
+                            'missions.completed': completedMissions
+                        });
+                    }
+                });
+            },
+
+            // --- WALLET LOGIC ---
+            async connectWallet() {
+                if ('phantom' in window) {
+                    const provider = window.phantom?.solana;
+                    if (provider?.isPhantom) {
+                        try {
+                            const resp = await provider.connect();
+                            const publicKey = resp.publicKey.toString();
+                            this.state.wallet = { provider, publicKey };
+                            await updateDoc(doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId), {
+                                walletAddress: publicKey
+                            });
+                            this.showNotification("Wallet connected successfully.", "success");
+                        } catch (err) {
+                            console.error("Wallet connection error:", err);
+                            this.showNotification("Wallet connection failed.", "error");
+                        }
+                    }
+                } else {
+                    window.open('https://phantom.app/', '_blank');
+                }
+            },
+
+            async disconnectWallet() {
+                if (this.state.wallet.provider) {
+                    await this.state.wallet.provider.disconnect();
+                }
+                this.state.wallet = { provider: null, publicKey: null };
+                await updateDoc(doc(this.state.db, "artifacts", this.state.appId, "users", this.state.userId), {
+                    walletAddress: null
+                });
+                this.showNotification("Wallet disconnected.", "success");
+            },
+
+            async reconnectWallet(address) {
+                if ('phantom' in window) {
+                    const provider = window.phantom?.solana;
+                    if (provider?.isPhantom) {
+                        try {
+                            await provider.connect({ onlyIfTrusted: true });
+                            if (provider.publicKey.toString() === address) {
+                                this.state.wallet = { provider, publicKey: address };
+                            }
+                        } catch (error) {
+                            console.log("Auto-reconnect failed. User will need to connect manually.");
+                        }
+                    }
+                }
+            },
+            
+            // --- AUTH LOGIC ---
+            showAuthModal() {
+                const content = `
+                    <div>
+                        <div class="flex border-b border-tertiary mb-4">
+                            <button id="login-tab" class="flex-1 py-2 font-semibold border-b-2 border-accent-primary">Login</button>
+                            <button id="signup-tab" class="flex-1 py-2 font-semibold border-b-2 border-transparent text-secondary">Sign Up</button>
+                        </div>
+                        <div id="auth-form-container">
+                            <!-- Login/Signup forms will be rendered here -->
+                        </div>
+                    </div>
+                `;
+                this.showModal(content);
+
+                const loginTab = document.getElementById('login-tab');
+                const signupTab = document.getElementById('signup-tab');
+                const formContainer = document.getElementById('auth-form-container');
+
+                const renderLoginForm = () => {
+                    loginTab.classList.remove('text-secondary', 'border-transparent');
+                    loginTab.classList.add('border-accent-primary');
+                    signupTab.classList.add('text-secondary', 'border-transparent');
+                    signupTab.classList.remove('border-accent-primary');
+
+                    formContainer.innerHTML = `
+                        <form id="login-form" class="space-y-4">
+                            <input type="email" id="login-email" placeholder="Email" required>
+                            <input type="password" id="login-password" placeholder="Password" required>
+                            <p id="auth-error" class="text-red-500 text-sm hidden"></p>
+                            <button type="submit" class="btn btn-primary w-full">Login</button>
+                            <button type="button" id="guest-btn" class="btn btn-secondary w-full">Continue as Guest</button>
+                        </form>
+                    `;
+                    document.getElementById('login-form').addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleEmailLogin();
+                    });
+                    document.getElementById('guest-btn').addEventListener('click', () => {
+                        this.handleAnonymousLogin();
+                        this.hideModal();
+                    });
+                };
+
+                const renderSignupForm = () => {
+                    signupTab.classList.remove('text-secondary', 'border-transparent');
+                    signupTab.classList.add('border-accent-primary');
+                    loginTab.classList.add('text-secondary', 'border-transparent');
+                    loginTab.classList.remove('border-accent-primary');
+
+                    formContainer.innerHTML = `
+                        <form id="signup-form" class="space-y-4">
+                            <input type="email" id="signup-email" placeholder="Email" required>
+                            <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
+                            <p id="auth-error" class="text-red-500 text-sm hidden"></p>
+                            <button type="submit" class="btn btn-primary w-full">Create Account</button>
+                        </form>
+                    `;
+                    document.getElementById('signup-form').addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleEmailSignup();
+                    });
+                };
+
+                loginTab.addEventListener('click', renderLoginForm);
+                signupTab.addEventListener('click', renderSignupForm);
+
+                renderLoginForm(); // Start with the login form
+            },
+
+            async handleEmailLogin() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('auth-error');
+                if (!email || !password) {
+                    errorEl.textContent = 'Email and password are required.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                errorEl.classList.add('hidden');
+
+                try {
+                    await signInWithEmailAndPassword(this.state.auth, email, password);
+                    this.hideModal();
+                } catch (error) {
+                    errorEl.textContent = 'Invalid credentials. Please try again.';
+                    errorEl.classList.remove('hidden');
+                    console.error("Login Error:", error);
+                }
+            },
+
+            async handleEmailSignup() {
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const errorEl = document.getElementById('auth-error');
+                if (!email || password.length < 6) {
+                    errorEl.textContent = 'Valid email and password (min. 6 chars) required.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                errorEl.classList.add('hidden');
+
+                try {
+                    const user = this.state.auth.currentUser;
+                    if (user && user.isAnonymous) {
+                        const credential = EmailAuthProvider.credential(email, password);
+                        await linkWithCredential(user, credential);
+                        await updateDoc(doc(this.state.db, "artifacts", this.state.appId, "users", user.uid), { isAnonymous: false });
+                        this.showNotification("Account upgraded successfully!", "success");
+                    } else {
+                        await createUserWithEmailAndPassword(this.state.auth, email, password);
+                    }
+                    this.hideModal();
+                } catch (error) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorEl.textContent = 'An account with this email already exists.';
+                    } else {
+                        errorEl.textContent = 'Could not create account. Please try again.';
+                    }
+                    errorEl.classList.remove('hidden');
+                    console.error("Signup Error:", error);
+                }
+            },
+            
+            showModal(htmlContent) {
+                document.getElementById('modal-content-host').innerHTML = htmlContent;
+                document.getElementById('modal-backdrop').style.display = 'block';
+                document.getElementById('modal-container').style.display = 'block';
+                document.getElementById('modal-backdrop').addEventListener('click', () => this.hideModal(), { once: true });
+            },
+
+            hideModal() {
+                document.getElementById('modal-backdrop').style.display = 'none';
+                document.getElementById('modal-container').style.display = 'none';
+                document.getElementById('modal-content-host').innerHTML = '';
+            },
+            
+            showTypingIndicator() {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer || document.getElementById('typing-indicator')) return;
+                const typingBubble = document.createElement('div');
+                typingBubble.id = 'typing-indicator';
+                typingBubble.className = 'p-3 mb-3 max-w-lg w-fit shadow chat-bubble-ai self-start';
+                typingBubble.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                chatContainer.appendChild(typingBubble);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            },
+
+            hideTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+            },
+            addAssessmentMessage(text, sender) {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer) return;
+
+                const bubble = document.createElement('div');
+                bubble.classList.add('p-3', 'mb-3', 'max-w-lg', 'w-fit', 'shadow');
+                if (sender === 'ai') {
+                    bubble.classList.add('chat-bubble-ai', 'self-start');
+                } else {
+                    bubble.classList.add('chat-bubble-user', 'self-end');
+                }
+                bubble.textContent = text;
+                chatContainer.appendChild(bubble);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            },
+        };
+
+        // Initialize the application on window load
+        window.onload = () => {
+            // Make App globally accessible for inline event handlers
+            window.App = App;
+            App.init();
+        };
+
+    </script>
+</body>
+</html>

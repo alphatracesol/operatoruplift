@@ -1,3 +1,46 @@
+const serverless = require('serverless-http');
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Simple provider switch: deepseek-hf (Hugging Face Inference)
+async function callProvider({ provider, messages, maxTokens = 2000, temperature = 0.7 }) {
+  provider = provider || 'deepseek-hf';
+  if (provider === 'deepseek-hf') {
+    const hfKey = process.env.HF_API_KEY;
+    const model = process.env.HF_MODEL || 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B';
+    if (!hfKey) throw new Error('Missing HF_API_KEY');
+    const prompt = messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n');
+    const res = await fetch(`https://api-inference.huggingface.co/models/${encodeURIComponent(model)}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${hfKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: maxTokens, temperature } })
+    });
+    if (!res.ok) throw new Error('HF request failed');
+    const data = await res.json();
+    const out = Array.isArray(data) ? (data[0]?.generated_text || '') : (data?.generated_text || data?.text || '');
+    return out || 'No response.';
+  }
+  // default fallback
+  return 'Provider not configured.';
+}
+
+app.post('/.netlify/functions/ai-proxy', async (req, res) => {
+  try {
+    const { provider, messages, maxTokens, temperature } = req.body || {};
+    if (!Array.isArray(messages) || messages.length === 0) return res.status(400).json({ error: 'missing_messages' });
+    const response = await callProvider({ provider, messages, maxTokens, temperature });
+    res.json({ response });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+module.exports.handler = serverless(app);
+
 const { initializeApp, getApps } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
