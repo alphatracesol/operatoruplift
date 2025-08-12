@@ -74,6 +74,41 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, cluster: process.env.SOLANA_CLUSTER || 'mainnet' });
 });
 
+// Public environment readiness check (safe, no secret values)
+app.get('/api/env/check', (req, res) => {
+  try {
+    const envKeys = [
+      'HELIUS_RPC_URL',
+      'HELIUS_API_KEY',
+      'UPLIFT_MINT',
+      'UPLIFT_DECIMALS',
+      'POINTS_RATE',
+      'CORS_ALLOWED_ORIGINS'
+    ];
+    const env = Object.fromEntries(envKeys.map(k => [k, Boolean(process.env[k])]))
+    const warnings = [];
+    if (!env.HELIUS_RPC_URL && !env.HELIUS_API_KEY) warnings.push('No Helius RPC configured; default Solana RPC will be used (may be rate-limited).');
+    if (!env.UPLIFT_MINT) warnings.push('UPLIFT_MINT not set; points and burn lookups may fail.');
+    res.json({ ok: true, env, warnings });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || 'server_error' });
+  }
+});
+
+// Public config (no secrets)
+app.get('/api/config/public', (req, res) => {
+  try {
+    const cfg = {
+      mint: process.env.UPLIFT_MINT || null,
+      decimals: Number(process.env.UPLIFT_DECIMALS || 9),
+      pointsRate: Number(process.env.POINTS_RATE || 100)
+    };
+    res.json(cfg);
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
 app.get('/api/burn/total', async (req, res) => {
   try {
     const total = await getBurnTotalStore();
