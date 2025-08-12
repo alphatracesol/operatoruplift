@@ -1673,7 +1673,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('uplift:wallet');
       if (!saved) return;
       badge.textContent = 'PTS: …';
-      fetch('/.netlify/functions/api/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+      fetch('/.netlify/functions/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
         .then(r=>r.ok?r.json():null)
         .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
         .catch(()=>{});

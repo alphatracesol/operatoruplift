@@ -430,9 +430,9 @@
             margin: 0 auto;
         }
         /* Ensure app views have left padding to clear sidebar; auth stays centered */
-        .view-container:not(#authView) { padding-left: 84px; }
+        .view-container:not(#authView) { padding-left: 84px; padding-right: 16px; }
         @media (min-width: 1024px) {
-            .view-container:not(#authView) { padding-left: 236px; }
+            .view-container:not(#authView) { padding-left: 236px; padding-right: 20px; }
         }
 
         /* Center auth view vertically and respect safe areas */
@@ -806,7 +806,7 @@
             }
         }
         /* Normalize main content container and scrolling */
-        #appShell .view-container { max-width: 1200px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
+        #appShell .view-container { max-width: 1320px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
         html, body { height: 100%; }
         body { overflow: hidden; }
         #appShell { min-height: 100%; }
@@ -1125,7 +1125,7 @@
         /* Dashboard Grid - normalized rhythm */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: clamp(16px, 2.8vw, 28px);
             margin-bottom: clamp(20px, 3.5vw, 32px);
         }
@@ -1770,9 +1770,9 @@
         <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
             <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
                     <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"/>
-                    <span class="nav-text" style="font-weight:700;">Uplift</span>
+                    <span class="nav-text" style="font-weight:700;">Operator Uplift</span>
                 </div>
                     <button id="sidebarToggle" class="btn-icon" title="Collapse sidebar" aria-label="Collapse sidebar" style="color:var(--text-color);"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6h2v12H7V6zm8 0l-6 6 6 6V6z"/></svg></button>
             </div>
@@ -3773,13 +3773,13 @@
                         if (!address) throw new Error('No wallet address');
 
                         // Get server nonce
-                        const n = await fetch('/.netlify/functions/api/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
+                        const n = await fetch('/.netlify/functions/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
                         const message = new TextEncoder().encode(n.message);
                         const signed = await window.solana.signMessage(message, 'utf8');
                         const signature = Array.from(signed.signature);
 
                         // Verify and get custom token
-                        const verifyRes = await fetch('/.netlify/functions/api/api/auth/phantom/verify', {
+                        const verifyRes = await fetch('/.netlify/functions/api/auth/phantom/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ address, signature, nonce: n.nonce })
@@ -4063,37 +4063,9 @@
 
         // Right-rail on wide screens to reduce whitespace
         function ensureRightRail() {
-            const vw = window.innerWidth || document.documentElement.clientWidth;
-            if (vw < 1400) return;
-            let rail = document.getElementById('rightRail');
-            if (!rail) {
-                rail = document.createElement('div');
-                rail.id = 'rightRail';
-                rail.className = 'dashboard-grid';
-                rail.style.gridTemplateColumns = '1fr';
-                rail.style.position = 'fixed';
-                rail.style.right = '16px';
-                rail.style.top = '96px';
-                rail.style.width = '360px';
-                rail.style.zIndex = '5';
-                rail.style.pointerEvents = 'auto';
-                document.body.appendChild(rail);
-            }
-            rail.innerHTML = `
-                <div class="dashboard-card">
-                    <div class="card-header"><h3>Upcoming Tasks</h3></div>
-                    <div class="list" id="railUpcoming"></div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="card-header"><h3>Suggested Habits</h3></div>
-                    <div class="list" id="railHabits"></div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="card-header"><h3>Recent Achievements</h3></div>
-                    <div class="list" id="railAchievements"></div>
-                </div>`;
-            // Populate with lightweight summaries
-            try { renderRailContent(); } catch {}
+            // Disable floating right rail to remove extra scrollbar/empty column
+            const existing = document.getElementById('rightRail');
+            if (existing && existing.parentElement) existing.parentElement.removeChild(existing);
         }
         async function renderRailContent() {
             const goals = await loadUserGoals().catch(()=>[]);
@@ -4145,12 +4117,12 @@
             (async function loadBurnTotal(){
                 try {
                     if (burnBadge) burnBadge.textContent = 'BURN: …';
-                    const t = await fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' }).then(r=>r.json()).catch(()=>null);
+                    const t = await fetch('/.netlify/functions/api/burn/total', { cache: 'no-store' }).then(r=>r.json()).catch(()=>null);
                     if (t && typeof t.total === 'number' && burnBadge) burnBadge.textContent = 'BURN: ' + Number(t.total).toLocaleString();
                 } catch {}
             })();
             try {
-                const es = new EventSource('/.netlify/functions/api/api/burn/stream');
+                const es = new EventSource('/.netlify/functions/api/burn/stream');
                 es.addEventListener('snapshot', (e) => {
                     try {
                         const data = JSON.parse(e.data||'{}');
@@ -4175,13 +4147,13 @@
                     if (!address) throw new Error('No wallet address');
 
                     // fresh nonce and sign
-                    const n = await fetch('/.netlify/functions/api/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
+                    const n = await fetch('/.netlify/functions/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
                     const message = new TextEncoder().encode(n.message);
                     const signed = await window.solana.signMessage(message, 'utf8');
                     const signature = Array.from(signed.signature);
 
                     const idToken = await auth.currentUser.getIdToken();
-                    const res = await fetch('/.netlify/functions/api/api/auth/phantom/link', {
+                    const res = await fetch('/.netlify/functions/api/auth/phantom/link', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
                         body: JSON.stringify({ address, signature, nonce: n.nonce })
@@ -4199,7 +4171,7 @@
             try {
                 const pointsBadge = document.getElementById('pointsBadge');
                 if (pointsBadge) pointsBadge.textContent = 'PTS: …';
-                const res = await fetch(`/.netlify/functions/api/api/user/${encodeURIComponent(address)}/points`, { cache: 'no-store' });
+                const res = await fetch(`/.netlify/functions/api/user/${encodeURIComponent(address)}/points`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('http '+res.status);
                 const data = await res.json();
                 if (pointsBadge) pointsBadge.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
@@ -4352,7 +4324,7 @@
                     burnEl.textContent = head.textContent.split(':')[1].trim();
                 } else {
                     // fallback fetch
-                    fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' })
+                    fetch('/.netlify/functions/api/burn/total', { cache: 'no-store' })
                         .then(r=>r.json()).then(t=>{ if (typeof t.total === 'number') burnEl.textContent = Number(t.total).toLocaleString(); })
                         .catch(()=>{});
                 }

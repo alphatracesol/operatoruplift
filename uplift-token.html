@@ -1544,7 +1544,7 @@
                 try {
                     // Prefer backend burn total for accuracy
                     try {
-                        const t = await fetch('/.netlify/functions/api/api/burn/total', { cache: 'no-store' }).then(r=>r.json());
+                        const t = await fetch('/.netlify/functions/api/burn/total', { cache: 'no-store' }).then(r=>r.json());
                         if (t && typeof t.total === 'number') {
                             if (elTotal) elTotal.textContent = formatNum(t.total);
                         }
@@ -1615,7 +1615,7 @@
             if (btnRefresh) btnRefresh.addEventListener('click', (e)=>{ e.preventDefault(); loadBurnData(); });
             // SSE live updates from backend
             try {
-                const es = new EventSource('/.netlify/functions/api/api/burn/stream');
+                const es = new EventSource('/.netlify/functions/api/burn/stream');
                 es.addEventListener('snapshot', (e) => {
                     try {
                         const data = JSON.parse(e.data||'{}');
@@ -1665,7 +1665,7 @@
       const saved = localStorage.getItem('uplift:wallet');
       if (!saved) return;
       badge.textContent = 'PTS: …';
-      fetch('/.netlify/functions/api/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+      fetch('/.netlify/functions/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
         .then(r=>r.ok?r.json():null)
         .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
         .catch(()=>{});
