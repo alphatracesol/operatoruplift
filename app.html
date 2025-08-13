@@ -6096,6 +6096,19 @@
                 const pointsBadge = document.getElementById('pointsBadge');
                 if (pointsBadge) pointsBadge.textContent = 'PTS: …';
                 const res = await fetch(`/.netlify/functions/api/user/${encodeURIComponent(address)}/points`, { cache: 'no-store' });
+                
+                // Handle service unavailable gracefully
+                if (res.status === 503) {
+                    const data = await res.json();
+                    if (pointsBadge) {
+                        pointsBadge.textContent = 'PTS: 0';
+                        pointsBadge.title = 'Points service temporarily unavailable';
+                    }
+                    const landing = document.getElementById('landingPointsText');
+                    if (landing) landing.textContent = 'PTS: 0';
+                    return 0;
+                }
+                
                 if (!res.ok) throw new Error('http '+res.status);
                 const data = await res.json();
                 if (pointsBadge) {
@@ -6107,11 +6120,14 @@
                     const landing = document.getElementById('landingPointsText');
                     if (landing) landing.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
                 } catch {}
+                return data.points || 0;
             } catch (e) {
                 const pointsBadge = document.getElementById('pointsBadge');
                 if (pointsBadge) { pointsBadge.textContent = 'PTS: —'; pointsBadge.title = 'Points unavailable'; }
                 const landing = document.getElementById('landingPointsText');
                 if (landing) landing.textContent = 'PTS: —';
+                if (DEBUG) console.log('Points fetch error:', e);
+                return 0;
             }
         }
 

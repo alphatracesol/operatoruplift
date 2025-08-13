@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Operator Uplift - Elite Performance Platform</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-lighter: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 100%);
+            --gradient-glow: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Loading Screen */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: var(--gradient-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .loading-spinner {
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(99, 102, 241, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main App Container */
+        #app {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #app.active {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--dark-lighter);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .toggle-sidebar:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 12px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+        }
+
+        .nav-item.active {
+            background: var(--gradient-primary);
+            color: var(--white);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: var(--white);
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        /* User Profile Section */
+        .sidebar-user {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed .user-info {
+            opacity: 0;
+            width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.125rem;
+        }
+
+        .user-level {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--dark-lighter);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Quick Stats Bar */
+        .quick-stats {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: var(--danger);
+            color: var(--white);
+            font-size: 0.625rem;
+            font-weight: 700;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--dark-lighter);
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--dark-lighter);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            color: var(--primary);
+        }
+
+        /* Burn Timer Card */
+        .burn-timer {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 999px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Social Feed */
+        .feed-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .feed-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .feed-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .feed-content {
+            flex: 1;
+        }
+
+        .feed-user {
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.25rem;
+        }
+
+        .feed-text {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feed-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .feed-action {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--gray);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .feed-action:hover {
+            color: var(--primary);
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .leaderboard-rank {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-radius: 8px;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: var(--dark); }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #808080); color: var(--dark); }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: var(--white); }
+
+        .leaderboard-user {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .leaderboard-score {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-xl);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--dark-lighter);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 1000;
+            }
+            
+            .sidebar.mobile-open {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .quick-stats {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .your-rank {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--dark-lighter);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 300px;
+            animation: toastSlideIn 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast-success { color: var(--success); }
+        .toast-error { color: var(--danger); }
+        .toast-warning { color: var(--warning); }
+        .toast-info { color: var(--primary); }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.125rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        /* AI Chat Widget */
+        .ai-chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 380px;
+            height: 500px;
+            background: var(--dark-lighter);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            display: none;
+            flex-direction: column;
+            z-index: 1500;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .ai-chat-widget.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        .ai-chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ai-message {
+            display: flex;
+            gap: 0.75rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .ai-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .ai-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .ai-message-content {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            max-width: 70%;
+        }
+
+        .ai-message.user .ai-message-content {
+            background: var(--gradient-primary);
+        }
+
+        .ai-chat-input {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .ai-input-field {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--white);
+            font-size: 0.875rem;
+        }
+
+        .ai-input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .ai-send-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .ai-send-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="loading-text">Initializing Mission Control...</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <div class="logo-icon">🚀</div>
+                    <span class="logo-text">Operator Uplift</span>
+                </a>
+                <button class="toggle-sidebar" onclick="app.toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" onclick="app.navigate('dashboard')">
+                    <span class="nav-icon"><i class="fas fa-home"></i></span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#burn" class="nav-item" onclick="app.navigate('burn')">
+                    <span class="nav-icon"><i class="fas fa-fire"></i></span>
+                    <span class="nav-text">Burn Timer</span>
+                    <span class="nav-badge">Live</span>
+                </a>
+                <a href="#goals" class="nav-item" onclick="app.navigate('goals')">
+                    <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
+                    <span class="nav-text">Goals</span>
+                </a>
+                <a href="#social" class="nav-item" onclick="app.navigate('social')">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span class="nav-text">Social</span>
+                    <span class="nav-badge" id="socialBadge">3</span>
+                </a>
+                <a href="#leaderboard" class="nav-item" onclick="app.navigate('leaderboard')">
+                    <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="#achievements" class="nav-item" onclick="app.navigate('achievements')">
+                    <span class="nav-icon"><i class="fas fa-medal"></i></span>
+                    <span class="nav-text">Achievements</span>
+                </a>
+                <a href="#wallet" class="nav-item" onclick="app.navigate('wallet')">
+                    <span class="nav-icon"><i class="fas fa-wallet"></i></span>
+                    <span class="nav-text">Wallet</span>
+                </a>
+                <a href="#analytics" class="nav-item" onclick="app.navigate('analytics')">
+                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#settings" class="nav-item" onclick="app.navigate('settings')">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-level" id="userLevel">Level 1</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title" id="pageTitle">Mission Control</h1>
+                </div>
+
+                <div class="header-right">
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">🔥</div>
+                            <div>
+                                <div class="stat-value" id="streakCount">0</div>
+                                <div class="stat-label">Streak</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">💎</div>
+                            <div>
+                                <div class="stat-value" id="tokenCount">0</div>
+                                <div class="stat-label">Tokens</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">⚡</div>
+                            <div>
+                                <div class="stat-value" id="pointsCount">0</div>
+                                <div class="stat-label">Points</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Header Actions -->
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="app.showNotifications()">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount">5</span>
+                        </button>
+                        <button class="header-btn" onclick="app.toggleAIChat()">
+                            <i class="fas fa-robot"></i>
+                        </button>
+                        <button class="header-btn" onclick="app.showProfile()">
+                            <i class="fas fa-user"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content" id="content">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view active">
+                    <div class="dashboard-grid">
+                        <!-- Burn Timer Card -->
+                        <div class="card burn-timer">
+                            <div class="timer-display" id="timerDisplay">00:00:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" onclick="app.startBurn()">
+                                    <i class="fas fa-play"></i> Start Burn
+                                </button>
+                                <button class="btn btn-secondary" onclick="app.quickBurn()">
+                                    <i class="fas fa-bolt"></i> Quick Burn
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Daily Progress Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Daily Progress</h3>
+                                <div class="card-icon">📊</div>
+                            </div>
+                            <div class="progress-section">
+                                <div class="progress-label">
+                                    <span>Goals Completed</span>
+                                    <span>3/5</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-section">
+                                <div class="progress-label">
+                                    <span>Burn Time</span>
+                                    <span>2h 30m / 4h</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 62.5%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Challenges Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Active Challenges</h3>
+                                <div class="card-icon">🎯</div>
+                            </div>
+                            <div class="challenges-list">
+                                <div class="challenge-item">
+                                    <span>5-Hour Focus Marathon</span>
+                                    <span class="challenge-reward">+500 tokens</span>
+                                </div>
+                                <div class="challenge-item">
+                                    <span>Beat Sarah's Record</span>
+                                    <span class="challenge-reward">+200 tokens</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Feed Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Activity Feed</h3>
+                                <div class="card-icon">🌐</div>
+                            </div>
+                            <div class="feed-container" id="feedContainer">
+                                <!-- Feed items will be dynamically added -->
+                            </div>
+                        </div>
+
+                        <!-- Leaderboard Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Friends Leaderboard</h3>
+                                <div class="card-icon">🏆</div>
+                            </div>
+                            <div class="leaderboard-list" id="leaderboardList">
+                                <!-- Leaderboard items will be dynamically added -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Quick Actions</h3>
+                                <div class="card-icon">⚡</div>
+                            </div>
+                            <div class="quick-actions">
+                                <button class="btn btn-primary" onclick="app.claimDailyReward()">
+                                    <i class="fas fa-gift"></i> Claim Daily Reward
+                                </button>
+                                <button class="btn btn-secondary" onclick="app.inviteFriend()">
+                                    <i class="fas fa-user-plus"></i> Invite Friend
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other views will be dynamically loaded -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" onclick="app.showQuickActions()">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- AI Chat Widget -->
+    <div class="ai-chat-widget" id="aiChatWidget">
+        <div class="ai-chat-header">
+            <h3>AI Assistant</h3>
+            <button class="modal-close" onclick="app.toggleAIChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-message">
+                <div class="ai-message-avatar">🤖</div>
+                <div class="ai-message-content">
+                    Hello! I'm your AI coach. How can I help you achieve your goals today?
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-input">
+            <input type="text" class="ai-input-field" id="aiInput" placeholder="Type your message...">
+            <button class="ai-send-btn" onclick="app.sendAIMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modals -->
+    <div class="modal" id="burnModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Burn Session Settings</h2>
+                <button class="modal-close" onclick="app.closeModal('burnModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Session Type</h3>
+                <div class="session-options">
+                    <button class="session-btn" onclick="app.setBurnDuration(25)">
+                        <i class="fas fa-fire"></i> Pomodoro (25 min)
+                    </button>
+                    <button class="session-btn" onclick="app.setBurnDuration(45)">
+                        <i class="fas fa-rocket"></i> Deep Focus (45 min)
+                    </button>
+                    <button class="session-btn" onclick="app.setBurnDuration(90)">
+                        <i class="fas fa-mountain"></i> Ultra Burn (90 min)
+                    </button>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Session Goal</h3>
+                <input type="text" class="modal-input" placeholder="What are you working on?" id="sessionGoal">
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="app.startCustomBurn()">
+                    Start Session
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="challengeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Challenge</h2>
+                <button class="modal-close" onclick="app.closeModal('challengeModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Challenge Type</h3>
+                <select class="modal-input">
+                    <option>Burn Duration Battle</option>
+                    <option>Token Race</option>
+                    <option>Streak Challenge</option>
+                    <option>Points Marathon</option>
+                </select>
+                <h3 style="margin-top: 1rem;">Challenge Friend</h3>
+                <select class="modal-input">
+                    <option>Phoenix</option>
+                    <option>Shadow</option>
+                    <option>Titan</option>
+                    <option>Nova</option>
+                </select>
+                <h3 style="margin-top: 1rem;">Stakes (Tokens)</h3>
+                <input type="number" class="modal-input" value="100" min="10" max="1000">
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="app.createChallenge()">
+                    Send Challenge
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-body {
+            padding: 1rem 0;
+        }
+        
+        .modal-body h3 {
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .session-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        
+        .session-btn {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .session-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .session-btn i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 1rem;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+    </style>
+
+    <script>
+        // Set demo mode
+        window.DEMO_MODE = true;
+        
+        // Main App Class - Simplified for Demo
+        class OperatorUpliftApp {
+            constructor() {
+                this.currentView = 'dashboard';
+                this.user = {
+                    name: 'Demo User',
+                    level: 15,
+                    tokens: 1250,
+                    points: 15420,
+                    streak: 7
+                };
+                this.timerInterval = null;
+                this.burnStartTime = null;
+                this.burnSeconds = 0;
+                
+                // Demo data
+                this.demoFeed = [
+                    { id: 1, user: 'Alex Chen', type: 'achievement', achievement: 'Speed Demon', likes: 12, comments: [] },
+                    { id: 2, user: 'Sarah Johnson', type: 'milestone', milestone: '30-Day Streak', likes: 45, comments: [] },
+                    { id: 3, user: 'Mike Williams', type: 'level_up', newLevel: 20, likes: 23, comments: [] },
+                    { id: 4, user: 'Emma Wilson', type: 'challenge_complete', challenge: '5-Hour Marathon', likes: 67, comments: [] },
+                    { id: 5, user: 'Tom Davis', type: 'achievement', achievement: 'Night Owl', likes: 8, comments: [] }
+                ];
+                
+                this.demoLeaderboard = [
+                    { rank: 1, username: 'Phoenix', score: 25420 },
+                    { rank: 2, username: 'Shadow', score: 23100 },
+                    { rank: 3, username: 'You', score: 15420, isYou: true },
+                    { rank: 4, username: 'Titan', score: 14200 },
+                    { rank: 5, username: 'Nova', score: 13500 }
+                ];
+                
+                this.aiResponses = [
+                    "Great progress! You're on a 7-day streak. Keep it up!",
+                    "Based on your patterns, morning sessions work best for you.",
+                    "You're 75% to your weekly goal. One more push!",
+                    "Time for a break? Short breaks boost productivity by 23%.",
+                    "Your consistency is impressive! You're in the top 20%."
+                ];
+                
+                this.notifications = 5;
+                this.socialBadge = 3;
+            }
+
+            async init() {
+                console.log('🚀 Initializing Operator Uplift (Demo Mode)...');
+                
+                // Skip onboarding for demo
+                localStorage.setItem('onboarding_complete', 'true');
+                
+                // Initialize demo data
+                this.initializeDemoData();
+                
+                // Setup UI
+                this.setupUI();
+                
+                // Hide loading screen
+                this.hideLoading();
+                
+                // Show welcome message
+                setTimeout(() => {
+                    this.showToast('Welcome to Demo Mode! All features are available to test.', 'info');
+                }, 1000);
+                
+                // Start real-time updates
+                this.startRealTimeUpdates();
+            }
+
+            initializeDemoData() {
+                // Set demo user data in localStorage
+                localStorage.setItem('user_tokens', this.user.tokens);
+                localStorage.setItem('user_points', this.user.points);
+                localStorage.setItem('current_streak', this.user.streak);
+                localStorage.setItem('user_level', this.user.level);
+            }
+
+            loadUserData() {
+                // Demo mode - already set in constructor
+                this.updateUserDisplay();
+            }
+
+            setupUI() {
+                // Setup event listeners
+                document.getElementById('aiInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendAIMessage();
+                    }
+                });
+                
+                // Load initial view
+                this.loadView('dashboard');
+                
+                // Update stats
+                this.updateStats();
+                
+                // Load social feed
+                this.loadSocialFeed();
+                
+                // Load leaderboard
+                this.loadLeaderboard();
+            }
+
+            hideLoading() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.getElementById('app').classList.add('active');
+                }, 500);
+            }
+
+            updateUserDisplay() {
+                document.getElementById('userName').textContent = this.user.name;
+                document.getElementById('userLevel').textContent = `Level ${this.user.level}`;
+                document.getElementById('userAvatar').textContent = this.user.name[0].toUpperCase();
+                document.getElementById('notificationCount').textContent = this.notifications;
+                document.getElementById('socialBadge').textContent = this.socialBadge;
+            }
+
+            updateStats() {
+                document.getElementById('streakCount').textContent = this.user.streak;
+                document.getElementById('tokenCount').textContent = this.user.tokens.toLocaleString();
+                document.getElementById('pointsCount').textContent = this.user.points.toLocaleString();
+            }
+
+            loadSocialFeed() {
+                const container = document.getElementById('feedContainer');
+                
+                container.innerHTML = this.demoFeed.map(item => `
+                    <div class="feed-item">
+                        <div class="feed-avatar">${item.user[0]}</div>
+                        <div class="feed-content">
+                            <div class="feed-user">${item.user}</div>
+                            <div class="feed-text">${this.getFeedText(item)}</div>
+                            <div class="feed-actions">
+                                <span class="feed-action" onclick="app.likeFeedItem(${item.id})">
+                                    <i class="fas fa-heart"></i> ${item.likes}
+                                </span>
+                                <span class="feed-action" onclick="app.commentOnFeed(${item.id})">
+                                    <i class="fas fa-comment"></i> ${item.comments.length}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getFeedText(item) {
+                const texts = {
+                    achievement: `unlocked "${item.achievement}"!`,
+                    milestone: `reached ${item.milestone}!`,
+                    level_up: `reached Level ${item.newLevel}!`,
+                    challenge_complete: `completed ${item.challenge}!`
+                };
+                return texts[item.type] || 'posted an update';
+            }
+
+            loadLeaderboard() {
+                const container = document.getElementById('leaderboardList');
+                
+                container.innerHTML = this.demoLeaderboard.map(entry => `
+                    <div class="leaderboard-item ${entry.isYou ? 'your-rank' : ''}">
+                        <div class="leaderboard-rank ${entry.rank <= 3 ? `rank-${entry.rank}` : ''}">${entry.rank}</div>
+                        <div class="leaderboard-user">${entry.username} ${entry.isYou ? '(You)' : ''}</div>
+                        <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+                    </div>
+                `).join('');
+            }
+
+            // Navigation
+            navigate(page) {
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.closest('.nav-item').classList.add('active');
+                
+                // Update page title
+                const titles = {
+                    dashboard: 'Mission Control',
+                    burn: 'Burn Timer',
+                    goals: 'Strategic Goals',
+                    social: 'Social Hub',
+                    leaderboard: 'Leaderboards',
+                    achievements: 'Achievements',
+                    wallet: 'Digital Wallet',
+                    analytics: 'Analytics',
+                    settings: 'Settings'
+                };
+                document.getElementById('pageTitle').textContent = titles[page] || page;
+                
+                // Load view
+                this.loadView(page);
+                
+                // Track navigation (demo mode)
+                console.log('Navigation:', page);
+            }
+
+            loadView(view) {
+                // Hide all views
+                document.querySelectorAll('.view').forEach(v => {
+                    v.style.display = 'none';
+                });
+                
+                // Create view if it doesn't exist
+                let viewElement = document.getElementById(`${view}View`);
+                if (!viewElement) {
+                    viewElement = this.createView(view);
+                    if (viewElement) {
+                        document.getElementById('content').appendChild(viewElement);
+                    }
+                }
+                
+                // Show selected view
+                if (viewElement) {
+                    viewElement.style.display = 'block';
+                } else {
+                    document.getElementById('dashboardView').style.display = 'block';
+                }
+                
+                this.currentView = view;
+            }
+            
+            createView(viewName) {
+                const view = document.createElement('div');
+                view.id = `${viewName}View`;
+                view.className = 'view';
+                
+                const views = {
+                    burn: `
+                        <div class="dashboard-grid">
+                            <div class="card burn-timer" style="grid-column: span 2;">
+                                <h2>Focus Session</h2>
+                                <div class="timer-display" style="font-size: 5rem;">00:00:00</div>
+                                <div class="timer-controls">
+                                    <button class="btn btn-primary" onclick="app.openModal('burnModal')">
+                                        <i class="fas fa-cog"></i> Session Settings
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="app.startBurn()">
+                                        <i class="fas fa-play"></i> Quick Start
+                                    </button>
+                                </div>
+                                <div style="margin-top: 2rem;">
+                                    <h3>Today's Sessions</h3>
+                                    <div class="session-list">
+                                        <div class="session-item">09:00 - 09:25 | Pomodoro | +125 tokens</div>
+                                        <div class="session-item">10:30 - 11:15 | Deep Focus | +450 tokens</div>
+                                        <div class="session-item">14:00 - 14:25 | Pomodoro | +125 tokens</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>Burn Stats</h3>
+                                <div class="stat-row"><span>Total Today:</span> <strong>2h 35m</strong></div>
+                                <div class="stat-row"><span>Weekly Average:</span> <strong>3h 12m</strong></div>
+                                <div class="stat-row"><span>Best Streak:</span> <strong>7 days</strong></div>
+                                <div class="stat-row"><span>Tokens Earned:</span> <strong>700</strong></div>
+                            </div>
+                        </div>
+                    `,
+                    goals: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Active Goals</h3>
+                                <div class="goal-item">
+                                    <div class="goal-header">
+                                        <span>Complete Project Alpha</span>
+                                        <span class="goal-progress">75%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="goal-item">
+                                    <div class="goal-header">
+                                        <span>100 Hour Burn Challenge</span>
+                                        <span class="goal-progress">42%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 42%"></div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                                    <i class="fas fa-plus"></i> Add New Goal
+                                </button>
+                            </div>
+                            <div class="card">
+                                <h3>Milestones</h3>
+                                <div class="milestone-item">🏆 First 1000 Tokens</div>
+                                <div class="milestone-item">🎯 10 Day Streak</div>
+                                <div class="milestone-item">⚡ Level 20 Reached</div>
+                                <div class="milestone-item">🔥 100 Hours Burned</div>
+                            </div>
+                        </div>
+                    `,
+                    social: `
+                        <div class="dashboard-grid">
+                            <div class="card" style="grid-column: span 2;">
+                                <h3>Friends & Teams</h3>
+                                <div class="friends-grid">
+                                    <div class="friend-card">
+                                        <div class="friend-avatar">P</div>
+                                        <div class="friend-name">Phoenix</div>
+                                        <div class="friend-status online">Online</div>
+                                    </div>
+                                    <div class="friend-card">
+                                        <div class="friend-avatar">S</div>
+                                        <div class="friend-name">Shadow</div>
+                                        <div class="friend-status offline">2h ago</div>
+                                    </div>
+                                    <div class="friend-card">
+                                        <div class="friend-avatar">T</div>
+                                        <div class="friend-name">Titan</div>
+                                        <div class="friend-status online">Online</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="app.openModal('challengeModal')">
+                                    <i class="fas fa-bolt"></i> Create Challenge
+                                </button>
+                            </div>
+                            <div class="card">
+                                <h3>Active Challenges</h3>
+                                <div class="challenge-item">
+                                    <span>vs Phoenix - Token Race</span>
+                                    <span class="challenge-status">Winning!</span>
+                                </div>
+                                <div class="challenge-item">
+                                    <span>Team Battle - Code Warriors</span>
+                                    <span class="challenge-status">2nd Place</span>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    leaderboard: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Global Leaderboard</h3>
+                                ${this.demoLeaderboard.map(entry => `
+                                    <div class="leaderboard-item ${entry.isYou ? 'your-rank' : ''}">
+                                        <div class="leaderboard-rank ${entry.rank <= 3 ? 'rank-' + entry.rank : ''}">${entry.rank}</div>
+                                        <div class="leaderboard-user">${entry.username} ${entry.isYou ? '(You)' : ''}</div>
+                                        <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="card">
+                                <h3>Weekly Champions</h3>
+                                <div class="champion-card">
+                                    <div class="champion-rank">🥇</div>
+                                    <div class="champion-name">DragonSlayer</div>
+                                    <div class="champion-score">8,420 pts</div>
+                                </div>
+                                <div class="champion-card">
+                                    <div class="champion-rank">🥈</div>
+                                    <div class="champion-name">NightHawk</div>
+                                    <div class="champion-score">7,200 pts</div>
+                                </div>
+                                <div class="champion-card">
+                                    <div class="champion-rank">🥉</div>
+                                    <div class="champion-name">You</div>
+                                    <div class="champion-score">6,850 pts</div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    achievements: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Recent Achievements</h3>
+                                <div class="achievement-item">
+                                    <span class="achievement-icon">🔥</span>
+                                    <div>
+                                        <div class="achievement-name">Burn Master</div>
+                                        <div class="achievement-desc">Complete 100 burn sessions</div>
+                                    </div>
+                                </div>
+                                <div class="achievement-item">
+                                    <span class="achievement-icon">⚡</span>
+                                    <div>
+                                        <div class="achievement-name">Speed Demon</div>
+                                        <div class="achievement-desc">Complete 5 tasks in one hour</div>
+                                    </div>
+                                </div>
+                                <div class="achievement-item">
+                                    <span class="achievement-icon">💎</span>
+                                    <div>
+                                        <div class="achievement-name">Token Collector</div>
+                                        <div class="achievement-desc">Earn 1000 tokens</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>Progress to Next</h3>
+                                <div class="next-achievement">
+                                    <span class="achievement-icon">🏆</span>
+                                    <div style="flex: 1;">
+                                        <div class="achievement-name">Elite Operator</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 65%"></div>
+                                        </div>
+                                        <div class="achievement-desc">65% Complete</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    wallet: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Token Balance</h3>
+                                <div class="wallet-balance">
+                                    <span class="balance-amount">${this.user.tokens.toLocaleString()}</span>
+                                    <span class="balance-label">UPLIFT Tokens</span>
+                                </div>
+                                <div class="wallet-actions">
+                                    <button class="btn btn-primary">Buy Tokens</button>
+                                    <button class="btn btn-secondary">Transfer</button>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>Transaction History</h3>
+                                <div class="transaction-item">
+                                    <span>Daily Reward</span>
+                                    <span class="transaction-amount positive">+250</span>
+                                </div>
+                                <div class="transaction-item">
+                                    <span>Burn Session</span>
+                                    <span class="transaction-amount positive">+50</span>
+                                </div>
+                                <div class="transaction-item">
+                                    <span>Challenge Stake</span>
+                                    <span class="transaction-amount negative">-100</span>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    analytics: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Performance Metrics</h3>
+                                <div class="metric-item">
+                                    <span>Average Daily Burn:</span>
+                                    <strong>3.5 hours</strong>
+                                </div>
+                                <div class="metric-item">
+                                    <span>Peak Performance Time:</span>
+                                    <strong>9:00 AM - 11:00 AM</strong>
+                                </div>
+                                <div class="metric-item">
+                                    <span>Productivity Score:</span>
+                                    <strong>87/100</strong>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>Weekly Trends</h3>
+                                <div class="trend-item">
+                                    <span>Focus Time</span>
+                                    <span class="trend-indicator up">↑ 12%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span>Tokens Earned</span>
+                                    <span class="trend-indicator up">↑ 25%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span>Challenges Won</span>
+                                    <span class="trend-indicator down">↓ 5%</span>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    settings: `
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <h3>Profile Settings</h3>
+                                <div class="setting-item">
+                                    <label>Username</label>
+                                    <input type="text" class="setting-input" value="${this.user.name}">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Email</label>
+                                    <input type="email" class="setting-input" value="demo@operatoruplift.com">
+                                </div>
+                                <button class="btn btn-primary">Save Changes</button>
+                            </div>
+                            <div class="card">
+                                <h3>Preferences</h3>
+                                <div class="setting-toggle">
+                                    <span>Dark Mode</span>
+                                    <input type="checkbox" checked>
+                                </div>
+                                <div class="setting-toggle">
+                                    <span>Notifications</span>
+                                    <input type="checkbox" checked>
+                                </div>
+                                <div class="setting-toggle">
+                                    <span>Sound Effects</span>
+                                    <input type="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                    `
+                };
+                
+                view.innerHTML = views[viewName] || '<div class="card"><h3>Coming Soon!</h3></div>';
+                
+                // Add styles for new elements
+                if (!document.getElementById('dynamicStyles')) {
+                    const style = document.createElement('style');
+                    style.id = 'dynamicStyles';
+                    style.textContent = `
+                        .stat-row, .goal-item, .milestone-item, .challenge-item, 
+                        .transaction-item, .metric-item, .trend-item, .setting-toggle {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 0.75rem 0;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                        }
+                        .session-list .session-item {
+                            padding: 0.5rem;
+                            background: rgba(255, 255, 255, 0.02);
+                            margin-bottom: 0.5rem;
+                            border-radius: 8px;
+                        }
+                        .friends-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                            gap: 1rem;
+                            margin: 1rem 0;
+                        }
+                        .friend-card {
+                            text-align: center;
+                            padding: 1rem;
+                            background: rgba(255, 255, 255, 0.05);
+                            border-radius: 12px;
+                        }
+                        .friend-avatar {
+                            width: 50px;
+                            height: 50px;
+                            margin: 0 auto 0.5rem;
+                            background: var(--gradient-primary);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 700;
+                            font-size: 1.25rem;
+                        }
+                        .friend-status.online { color: var(--success); }
+                        .friend-status.offline { color: var(--gray); }
+                        .achievement-item, .next-achievement {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 1rem 0;
+                        }
+                        .achievement-icon {
+                            font-size: 2rem;
+                        }
+                        .achievement-name {
+                            font-weight: 600;
+                            color: var(--white);
+                        }
+                        .achievement-desc {
+                            font-size: 0.875rem;
+                            color: var(--gray);
+                        }
+                        .wallet-balance {
+                            text-align: center;
+                            padding: 2rem 0;
+                        }
+                        .balance-amount {
+                            display: block;
+                            font-size: 3rem;
+                            font-weight: 700;
+                            color: var(--primary);
+                        }
+                        .wallet-actions {
+                            display: flex;
+                            gap: 1rem;
+                        }
+                        .wallet-actions .btn {
+                            flex: 1;
+                        }
+                        .transaction-amount.positive { color: var(--success); }
+                        .transaction-amount.negative { color: var(--danger); }
+                        .trend-indicator.up { color: var(--success); }
+                        .trend-indicator.down { color: var(--danger); }
+                        .setting-input {
+                            width: 100%;
+                            padding: 0.5rem;
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            border-radius: 8px;
+                            color: var(--white);
+                            margin-top: 0.5rem;
+                        }
+                        .champion-card {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 0.75rem;
+                            background: rgba(255, 255, 255, 0.05);
+                            border-radius: 12px;
+                            margin-bottom: 0.5rem;
+                        }
+                        .champion-rank { font-size: 1.5rem; }
+                        .champion-name { flex: 1; font-weight: 600; }
+                        .champion-score { color: var(--primary); }
+                        .challenge-status { 
+                            color: var(--success);
+                            font-weight: 600;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                return view;
+            }
+
+            // Timer Functions
+            startBurn() {
+                if (this.timerInterval) {
+                    this.stopBurn();
+                    return;
+                }
+                
+                this.burnStartTime = Date.now();
+                this.burnSeconds = 0;
+                this.timerInterval = setInterval(() => {
+                    this.burnSeconds++;
+                    this.updateTimer();
+                    
+                    // Award tokens every 10 seconds in demo
+                    if (this.burnSeconds % 10 === 0) {
+                        this.user.tokens += 10;
+                        this.updateStats();
+                        this.showFloatingReward('+10 tokens');
+                    }
+                }, 1000);
+                
+                this.showToast('🔥 Burn session started! Earn tokens every 10 seconds!', 'success');
+                
+                // Change button text
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-stop"></i> Stop Burn';
+            }
+
+            stopBurn() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                    
+                    const points = this.burnSeconds * 5;
+                    const tokens = Math.floor(this.burnSeconds / 2);
+                    
+                    this.user.points += points;
+                    this.user.tokens += tokens;
+                    this.updateStats();
+                    
+                    this.showToast(`🎉 Burn complete! +${points} points, +${tokens} tokens`, 'success');
+                    
+                    // Reset timer display
+                    this.burnSeconds = 0;
+                    this.updateTimer();
+                    
+                    // Change button text back
+                    document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-play"></i> Start Burn';
+                }
+            }
+
+            updateTimer() {
+                const hours = Math.floor(this.burnSeconds / 3600);
+                const minutes = Math.floor((this.burnSeconds % 3600) / 60);
+                const seconds = this.burnSeconds % 60;
+                
+                document.getElementById('timerDisplay').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            showFloatingReward(text) {
+                const reward = document.createElement('div');
+                reward.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 50px;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    z-index: 10000;
+                    animation: floatUp 2s ease-out forwards;
+                `;
+                reward.textContent = text;
+                document.body.appendChild(reward);
+                
+                setTimeout(() => reward.remove(), 2000);
+            }
+
+            quickBurn() {
+                // 30-second quick burn for demo
+                this.showToast('⚡ Starting 30-second Quick Burn!', 'info');
+                this.startBurn();
+                setTimeout(() => {
+                    this.stopBurn();
+                    this.showToast('🎯 Quick Burn complete! Great job!', 'success');
+                    this.createConfetti();
+                }, 30000);
+            }
+
+            // AI Chat
+            toggleAIChat() {
+                const widget = document.getElementById('aiChatWidget');
+                widget.classList.toggle('active');
+            }
+
+            sendAIMessage() {
+                const input = document.getElementById('aiInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                // Add user message to chat
+                this.addChatMessage(message, true);
+                input.value = '';
+                
+                // Simulate AI thinking
+                setTimeout(() => {
+                    // Get random AI response
+                    const response = this.aiResponses[Math.floor(Math.random() * this.aiResponses.length)];
+                    this.addChatMessage(response, false);
+                }, 1000);
+            }
+
+            addChatMessage(text, isUser) {
+                const container = document.getElementById('aiChatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `ai-message ${isUser ? 'user' : ''}`;
+                messageDiv.innerHTML = `
+                    <div class="ai-message-avatar">${isUser ? 'U' : '🤖'}</div>
+                    <div class="ai-message-content">${text}</div>
+                `;
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Daily Rewards
+            checkDailyRewards() {
+                // Always show reward available in demo
+                setTimeout(() => {
+                    this.showToast('🎁 Daily reward available! Click "Claim Daily Reward" to get it!', 'info');
+                }, 3000);
+            }
+
+            claimDailyReward() {
+                const reward = 100 + Math.floor(Math.random() * 400);
+                this.user.tokens += reward;
+                this.user.streak++;
+                this.updateStats();
+                
+                this.showToast(`🎉 Daily reward claimed! +${reward} tokens! Streak: ${this.user.streak} days`, 'success');
+                this.createConfetti();
+            }
+
+            // Social Functions
+            inviteFriend() {
+                this.showToast('📧 Invite link copied to clipboard!', 'success');
+                navigator.clipboard.writeText(window.location.origin + '?ref=demo');
+            }
+
+            likeFeedItem(itemId) {
+                const item = this.demoFeed.find(i => i.id === itemId);
+                if (item) {
+                    item.likes++;
+                    this.loadSocialFeed();
+                    this.showToast('❤️ Liked!', 'success');
+                }
+            }
+            
+            commentOnFeed(itemId) {
+                this.showToast('💬 Comment feature coming soon!', 'info');
+            }
+            
+            // Confetti effect
+            createConfetti() {
+                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: 10px;
+                        height: 10px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}%;
+                        top: -10px;
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 9999;
+                        animation: fall ${2 + Math.random() * 2}s ease-out forwards;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }
+            }
+
+            // Utility Functions
+            toggleSidebar() {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+            }
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} toast-icon toast-${type}"></i>
+                    <div class="toast-content">
+                        <div class="toast-message">${message}</div>
+                    </div>
+                `;
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            showNotifications() {
+                this.notifications = 0;
+                this.updateUserDisplay();
+                this.showToast('📬 You have new achievements and friend requests!', 'info');
+            }
+
+            showProfile() {
+                this.showToast(`👤 ${this.user.name} - Level ${this.user.level} Elite Operator`, 'info');
+            }
+
+            showQuickActions() {
+                const actions = ['Start Focus Session', 'Challenge Friend', 'Join Team', 'Claim Bonus'];
+                const action = actions[Math.floor(Math.random() * actions.length)];
+                this.showToast(`⚡ Quick Action: ${action}`, 'info');
+            }
+            
+            // Modal functions
+            openModal(modalId) {
+                document.getElementById(modalId).classList.add('active');
+            }
+            
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+            
+            setBurnDuration(minutes) {
+                this.burnDuration = minutes;
+                this.showToast(`⏱️ Session set to ${minutes} minutes`, 'info');
+                this.closeModal('burnModal');
+                this.startBurn();
+            }
+            
+            startCustomBurn() {
+                const goal = document.getElementById('sessionGoal').value || 'Focus Session';
+                this.showToast(`🎯 Starting session: ${goal}`, 'success');
+                this.closeModal('burnModal');
+                this.startBurn();
+            }
+            
+            createChallenge() {
+                this.showToast('⚔️ Challenge sent! Your opponent has been notified.', 'success');
+                this.closeModal('challengeModal');
+                
+                // Add to feed
+                const newChallenge = {
+                    id: Date.now(),
+                    user: 'You',
+                    type: 'challenge_sent',
+                    challenge: 'Token Race vs Phoenix',
+                    likes: 0,
+                    comments: []
+                };
+                this.demoFeed.unshift(newChallenge);
+                this.loadSocialFeed();
+            }
+
+            startRealTimeUpdates() {
+                // Simulate live updates
+                setInterval(() => {
+                    // Random notification
+                    if (Math.random() > 0.8) {
+                        this.notifications++;
+                        this.updateUserDisplay();
+                    }
+                }, 10000);
+                
+                // Add new feed items periodically
+                setInterval(() => {
+                    if (Math.random() > 0.7) {
+                        const newItem = {
+                            id: Date.now(),
+                            user: ['Lisa Park', 'John Doe', 'Amy Lee'][Math.floor(Math.random() * 3)],
+                            type: 'achievement',
+                            achievement: ['Early Bird', 'Night Owl', 'Speedster'][Math.floor(Math.random() * 3)],
+                            likes: Math.floor(Math.random() * 20),
+                            comments: []
+                        };
+                        this.demoFeed.unshift(newItem);
+                        this.demoFeed = this.demoFeed.slice(0, 10); // Keep max 10 items
+                        this.loadSocialFeed();
+                        this.showToast(`📢 ${newItem.user} just unlocked "${newItem.achievement}"!`, 'info');
+                    }
+                }, 15000);
+            }
+        }
+
+        // Initialize app when DOM is ready
+        window.app = new OperatorUpliftApp();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app.init();
+        });
+    </script>
+</body>
+</html>

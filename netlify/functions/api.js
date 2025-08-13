@@ -202,6 +202,16 @@ router.get('/burn/stream', async (req, res) => {
 // Points endpoint (reads SPL token balance and returns points)
 router.get('/user/:wallet/points', async (req, res) => {
   try {
+    // Check if required environment variables are set
+    if (!process.env.UPLIFT_MINT) {
+      return res.status(503).json({ 
+        error: 'Service temporarily unavailable', 
+        message: 'Token configuration not set',
+        points: 0,
+        wallet: req.params.wallet 
+      });
+    }
+    
     const rate = Number(process.env.POINTS_RATE || 100);
     const rpc = process.env.HELIUS_RPC_URL || 'https://api.mainnet-beta.solana.com';
     const mintStr = process.env.UPLIFT_MINT;
@@ -582,6 +592,16 @@ router.post('/auth/phantom/unlink', async (req, res) => {
 // Simple jobs status inspector (admin-lite)
 router.get('/jobs/status', async (req, res) => {
   try {
+    // Check if Firebase admin is configured
+    if (!adminDb) {
+      return res.status(503).json({ 
+        ok: false, 
+        error: 'Service temporarily unavailable',
+        message: 'Database configuration not set',
+        jobs: {} 
+      });
+    }
+    
     const keys = ['weekly-reset', 'redeem-fulfill'];
     const docs = await Promise.all(keys.map(k => adminDb.collection('jobs').doc(k).get()));
     const out = {};
