@@ -6157,8 +6157,11 @@
             } catch {}
         }
         // Weekly reset: run once per app load to ensure protocol counters align to weeks
-        (function ensureWeeklyProtocolReset(){
+        async function ensureWeeklyProtocolReset(){
             try {
+                // Only run if user is authenticated and data is loaded
+                if (!auth?.currentUser || !OperatorUplift.currentUser || !OperatorUplift.userData) return;
+                
                 const now = new Date();
                 const lastResetStr = OperatorUplift.userData?.protocol?.lastReset;
                 const lastReset = lastResetStr ? new Date(lastResetStr) : null;
@@ -6167,11 +6170,15 @@
                 if (!lastReset || lastReset < monday) {
                     const proto = Object.assign({}, OperatorUplift.userData?.protocol || {});
                     proto.studyCount = 0; proto.workoutCount = 0; proto.meditateCount = 0; proto.lastReset = monday.toISOString();
-                    if (auth?.currentUser) db.collection('users').doc(OperatorUplift.currentUser?.uid).set({ protocol: proto }, { merge: true });
+                    await db.collection('users').doc(OperatorUplift.currentUser.uid).set({ protocol: proto }, { merge: true });
                     OperatorUplift.userData.protocol = proto;
                 }
-            } catch {}
-        })();
+            } catch (e) {
+                console.error('Weekly protocol reset failed:', e);
+            }
+        }
+        // Defer execution until auth is ready
+        setTimeout(() => { if (auth?.currentUser) ensureWeeklyProtocolReset(); }, 2000);
         // Weekly mission reset on first app open of week
         (function ensureWeeklyMissionsReset(){
             try {
@@ -7001,10 +7008,18 @@
                 e.preventDefault();
                 if (!OperatorUplift.currentUser) return;
                 const name = document.getElementById('habitName').value.trim();
-                const frequency = document.getElementById('habitFrequency').value;
+                const frequency = document.getElementById('habitFrequency').value || 'daily';
                 const protocol = document.getElementById('habitProtocol')?.value || 'none';
-                const category = document.getElementById('habitCategory')?.value || 'other';
-                if (!name || !frequency || !category) { OperatorUplift.ui?.showToast?.('Missing fields', 'error'); return; }
+                // Ensure category is always provided
+                let category = document.getElementById('habitCategory')?.value || 'personal';
+                // Map protocol to category if category is missing
+                if (!category || category === 'other') {
+                    if (protocol === 'study') category = 'learning';
+                    else if (protocol === 'workout') category = 'health';
+                    else if (protocol === 'meditate') category = 'mindfulness';
+                    else category = 'personal';
+                }
+                if (!name || !frequency) { OperatorUplift.ui?.showToast?.('Missing fields', 'error'); return; }
                 try {
                     await db.collection('users')
                         .doc(OperatorUplift.currentUser.uid)
@@ -8947,8 +8962,18 @@ Focus on actionable insights and encouragement.
 
             // Streak Achievement
             const recentGoals = goals.filter(goal => {
-                const createdAt = goal.createdAt?.toDate ? goal.createdAt.toDate() : (goal.createdAt instanceof Date ? goal.createdAt : null);
-                if (!createdAt) return false;
+                // Handle Firebase Timestamp or Date object
+                let createdAt = null;
+                if (goal.createdAt) {
+                    if (typeof goal.createdAt.toDate === 'function') {
+                        createdAt = goal.createdAt.toDate();
+                    } else if (goal.createdAt instanceof Date) {
+                        createdAt = goal.createdAt;
+                    } else if (typeof goal.createdAt === 'string') {
+                        createdAt = new Date(goal.createdAt);
+                    }
+                }
+                if (!createdAt || isNaN(createdAt.getTime())) return false;
                 const daysSinceCreation = (Date.now() - createdAt.getTime()) / 86400000;
                 return daysSinceCreation <= 7;
             });
