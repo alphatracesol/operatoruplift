@@ -1756,7 +1756,7 @@
                         
                         <div class="form-group">
                             <label for="loginPassword">Password</label>
-                            <input type="password" id="loginPassword" required placeholder="Enter your password">
+                            <input type="password" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
                         </div>
                         
                         <button type="submit" class="btn-primary">Sign In</button>
@@ -1784,12 +1784,12 @@
                         
                         <div class="form-group">
                             <label for="registerPassword">Password</label>
-                            <input type="password" id="registerPassword" required placeholder="Create a password">
+                            <input type="password" id="registerPassword" required placeholder="Create a password" autocomplete="new-password">
                         </div>
                         
                         <div class="form-group">
                             <label for="confirmPassword">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                            <input type="password" id="confirmPassword" required placeholder="Confirm your password" autocomplete="new-password">
                         </div>
                         
                         <button type="submit" class="btn-primary">Create Account</button>
@@ -4684,7 +4684,10 @@
                     if (landing) landing.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
                 } catch {}
             } catch (e) {
-                console.error('points fetch failed', e);
+                const pointsBadge = document.getElementById('pointsBadge');
+                if (pointsBadge) { pointsBadge.textContent = 'PTS: —'; pointsBadge.title = 'Points unavailable'; }
+                const landing = document.getElementById('landingPointsText');
+                if (landing) landing.textContent = 'PTS: —';
             }
         }
 
@@ -6140,6 +6143,7 @@
         // Protocol counters updated from habits and focus: hook into existing flows
         function incrementProtocolCounter(key) {
             try {
+                if (!auth?.currentUser) return;
                 const u = OperatorUplift.userData; if (!u) return;
                 u.protocol = u.protocol || {}; u.protocol[key] = (u.protocol[key]||0) + 1;
                 db.collection('users').doc(OperatorUplift.currentUser.uid).set({ protocol: u.protocol }, { merge: true });
@@ -6156,7 +6160,7 @@
                 if (!lastReset || lastReset < monday) {
                     const proto = Object.assign({}, OperatorUplift.userData?.protocol || {});
                     proto.studyCount = 0; proto.workoutCount = 0; proto.meditateCount = 0; proto.lastReset = monday.toISOString();
-                    db.collection('users').doc(OperatorUplift.currentUser?.uid).set({ protocol: proto }, { merge: true });
+                    if (auth?.currentUser) db.collection('users').doc(OperatorUplift.currentUser?.uid).set({ protocol: proto }, { merge: true });
                     OperatorUplift.userData.protocol = proto;
                 }
             } catch {}
