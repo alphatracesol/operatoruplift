@@ -6294,7 +6294,7 @@
                     <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
                         <div style=\"flex:1;\">
                             <div class=\"text-muted\">${p.createdAt?.toDate ? new Date(p.createdAt.toDate()).toLocaleString() : ''}</div>
-                            <div>${p.text}</div>
+                            <div>${escapeHtml(p.text)}</div>
                         </div>
                         <div style=\"display:flex;gap:6px;\">
                             <button class=\"btn-secondary\" onclick=\"likePost('${p.id}')\">❤️ ${p.likes||0}</button>
@@ -7338,6 +7338,17 @@
             if (html.includes('<li>')) html = `<ul>${html}</ul>`;
             html = html.replace(/\n/g, '<br/>');
             return html;
+        }
+
+        // Escape for plain text insertion
+        function escapeHtml(input) {
+            const s = String(input ?? '');
+            return s
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function showAiTypingIndicator() {

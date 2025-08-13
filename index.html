@@ -4776,6 +4776,7 @@
             // Store connection state
             localStorage.setItem('phantomConnected', 'true');
             localStorage.setItem('phantomPublicKey', publicKey);
+            try { localStorage.setItem('uplift:wallet', publicKey); } catch {}
             
             console.log('Connected to Phantom wallet:', publicKey);
             

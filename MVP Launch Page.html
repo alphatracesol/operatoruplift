@@ -792,7 +792,8 @@
     <span aria-hidden="true" style="font-size:18px">🟠</span>
     <span id="landingPointsText" style="font-weight:600;">PTS: 0</span>
   </div>
-<body class="antialiased">
+<!-- Removed duplicate body tag to prevent DOM issues that may block points badge init -->
+<div class="antialiased">
     <style>
       @keyframes heart-beat { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.12); } 40% { transform: scale(0.98); } 60% { transform: scale(1.08); } 80% { transform: scale(0.99); } }
       .heartbeat { display:inline-block; animation: heart-beat 1.6s ease-in-out infinite; transform-origin:center; }
@@ -1680,5 +1681,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch {}
   })();
   </script>
+</div>
 </body>
 </html> 
