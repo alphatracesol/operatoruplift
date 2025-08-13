@@ -875,8 +875,15 @@
         #appShell .view-container { max-width: 1320px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
         html, body { height: 100%; }
         body { overflow: hidden; }
-        #appShell { min-height: 100%; }
-        #appShell .view-container { overflow-y: auto; overflow-x: hidden; max-height: 100dvh; }
+        #appShell { min-height: 100dvh; display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr; }
+        #appShell .app-sidebar { grid-column: 1; grid-row: 1; }
+        #appShell .app-main { grid-column: 2; grid-row: 1; min-height: 100dvh; display: flex; flex-direction: column; }
+        #appShell .view-container { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+        @media (max-width: 900px) {
+            #appShell { grid-template-columns: 1fr; }
+            #appShell .app-sidebar { position: fixed; }
+            #appShell .app-main { grid-column: 1; }
+        }
 
         /* ===== AUTHENTICATION STYLES ===== */
         
@@ -1853,7 +1860,7 @@
         </div>
 
         <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
-            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
+            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12; grid-column:1; grid-row:1;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
             <div style="display:flex;align-items:center;gap:8px;">
                     <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"/>
