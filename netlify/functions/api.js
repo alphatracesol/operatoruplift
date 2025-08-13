@@ -138,6 +138,7 @@ router.get('/config/public', (req, res) => {
       mint: process.env.UPLIFT_MINT || null,
       decimals: Number(process.env.UPLIFT_DECIMALS || 9),
       pointsRate: Number(process.env.POINTS_RATE || 100),
+      pointsPerUsd: Number(process.env.POINTS_PER_USD || 10),
       redemption: {
         mode: (process.env.REDEMPTION_MODE || 'fixed').toLowerCase(),
         pointUsd: Number(process.env.POINT_USD || 0.00001),
@@ -145,7 +146,22 @@ router.get('/config/public', (req, res) => {
         dailyCap: Number(process.env.DAILY_REDEEM_POINTS_CAP || 10000),
         weeklyCap: Number(process.env.WEEKLY_REDEEM_POINTS_CAP || 30000),
         cooldownHours: Number(process.env.REDEEM_COOLDOWN_HOURS || 24)
-      }
+      },
+      sinks: {
+        buyAndBurnPct: Number(process.env.SINK_BUY_BURN_PCT || 30),
+        treasuryLockPct: Number(process.env.SINK_TREASURY_PCT || 20),
+        perkDeliveryPct: Number(process.env.SINK_PERK_PCT || 50)
+      },
+      staking: {
+        requireLockForRedeem: String(process.env.REDEEM_REQUIRE_LOCK || '0') === '1',
+        tiers: {
+          bronze: Number(process.env.REDEEM_MIN_LOCK_BRONZE || 1000),
+          silver: Number(process.env.REDEEM_MIN_LOCK_SILVER || 5000),
+          gold: Number(process.env.REDEEM_MIN_LOCK_GOLD || 25000)
+        }
+      },
+      decay: { weeklyPct: Number(process.env.POINTS_DECAY_WEEKLY_PCT || 0) },
+      earnCaps: { weeklyUsd: Number(process.env.USD_WEEKLY_EARN_CAP || 2000) }
     };
     res.json(cfg);
   } catch (e) {
@@ -280,6 +296,29 @@ function getTierForUser(userDoc) {
   return 'base';
 }
 
+function computeStakeTier(lockedAmount) {
+  const bronze = Number(process.env.REDEEM_MIN_LOCK_BRONZE || 1000);
+  const silver = Number(process.env.REDEEM_MIN_LOCK_SILVER || 5000);
+  const gold = Number(process.env.REDEEM_MIN_LOCK_GOLD || 25000);
+  const amt = Number(lockedAmount || 0);
+  if (amt >= gold) return 'gold';
+  if (amt >= silver) return 'silver';
+  if (amt >= bronze) return 'bronze';
+  return 'none';
+}
+
+async function getStakeInfoForUser(uid) {
+  try {
+    const ref = adminDb.collection('users').doc(uid).collection('locks').doc('uplift');
+    const snap = await ref.get();
+    const locked = Number(snap.exists ? (snap.data()?.locked || 0) : 0);
+    const tier = computeStakeTier(locked);
+    return { locked, tier };
+  } catch {
+    return { locked: 0, tier: 'none' };
+  }
+}
+
 // Points: rate and redeem
 router.get('/points/rate', (req, res) => {
   const mode = (process.env.REDEMPTION_MODE || 'fixed').toLowerCase();
@@ -310,6 +349,7 @@ router.post('/points/redeem', async (req, res) => {
     const monthlyCap = Number(process.env.MONTHLY_ISSUANCE_UPLIFT_CAP || 50000000);
     const mode = (process.env.REDEMPTION_MODE || 'fixed').toLowerCase();
     const tierMultipliers = parseTierMultipliers(process.env.TIER_MULTIPLIERS || 'base:1.0;verified:1.1;vip:1.2');
+    const stakeTierMultipliers = parseTierMultipliers(process.env.STAKE_TIER_MULTIPLIERS || 'none:1.0;bronze:1.2;silver:1.5;gold:2.0');
 
     // Load user and points
     const userRef = adminDb.collection('users').doc(uid);
@@ -318,6 +358,17 @@ router.post('/points/redeem', async (req, res) => {
     const stats = userSnap.data()?.stats || {};
     const offchainPoints = Number(stats.points || 0);
     if (offchainPoints < points) return res.status(400).json({ error: 'insufficient_points' });
+
+    // Optional: require minimum stake/lock for redeem
+    const requireLock = String(process.env.REDEEM_REQUIRE_LOCK || '0') === '1';
+    let stakeInfo = { locked: 0, tier: 'none' };
+    if (requireLock) {
+      stakeInfo = await getStakeInfoForUser(uid);
+      if (stakeInfo.tier === 'none') return res.status(403).json({ error: 'stake_required' });
+    } else {
+      // Even if not required, compute for multiplier if configured
+      stakeInfo = await getStakeInfoForUser(uid);
+    }
 
     // Simple daily/weekly counters (by date keys)
     const now = new Date();
@@ -343,14 +394,15 @@ router.post('/points/redeem', async (req, res) => {
     // Compute uplift granted
     const tier = getTierForUser(userSnap);
     const tierMult = tierMultipliers[tier] || 1.0;
+    const stakeMult = stakeTierMultipliers[stakeInfo.tier] || 1.0;
     let upliftGranted = 0;
     if (mode === 'usd_pegged') {
       const pointUsd = Number(process.env.POINT_USD || 0.00001);
       const price = await getUpliftUsdPrice();
-      upliftGranted = Math.floor((points * pointUsd * tierMult) / Math.max(price, 1e-9));
+      upliftGranted = Math.floor((points * pointUsd * tierMult * stakeMult) / Math.max(price, 1e-9));
     } else {
       const rate = Number(process.env.REDEEM_UPLIFT_PER_POINT || 0.5) * tierMult;
-      upliftGranted = Math.floor(points * rate);
+      upliftGranted = Math.floor(points * rate * stakeMult);
     }
     if (upliftGranted <= 0) return res.status(400).json({ error: 'zero_grant' });
 
@@ -362,11 +414,24 @@ router.post('/points/redeem', async (req, res) => {
 
     // Deduct points and record redemption (vesting)
     const vestEnd = new Date(Date.now() + vestDays*86400000);
+    const sinkBuy = Number(process.env.SINK_BUY_BURN_PCT || 30);
+    const sinkTreasury = Number(process.env.SINK_TREASURY_PCT || 20);
+    const sinkPerk = Number(process.env.SINK_PERK_PCT || 50);
+    const pointUsd = Number(process.env.POINT_USD || 0.00001);
+    const impliedUsd = Number(points) * pointUsd * tierMult * stakeMult;
+
     const redemption = {
       uid, wallet: String(wallet), points, upliftGranted, tier, mode,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       vestingEnd: admin.firestore.Timestamp.fromDate(vestEnd),
       status: 'pending', // for on-chain fulfillment worker
+      stake: stakeInfo,
+      sinks: {
+        buyAndBurnPct: sinkBuy,
+        treasuryLockPct: sinkTreasury,
+        perkDeliveryPct: sinkPerk,
+        impliedUsd
+      }
     };
 
     await adminDb.runTransaction(async (tx) => {
@@ -384,6 +449,49 @@ router.post('/points/redeem', async (req, res) => {
     return res.json({ ok: true, pointsRedeemed: points, upliftGranted, status: 'pending', vestingDays: vestDays });
   } catch (e) {
     return res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// Earn points from verified USD spend (client-enabled only for MVP)
+router.post('/points/earn/purchase', async (req, res) => {
+  try {
+    if (String(process.env.ALLOW_CLIENT_EARN || '0') !== '1') {
+      return res.status(403).json({ error: 'disabled' });
+    }
+    const authz = req.headers.authorization || '';
+    const idToken = authz.replace('Bearer ', '');
+    if (!idToken) return res.status(401).json({ error: 'missing_token' });
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    const uid = decoded.uid;
+    const { usd = 0 } = req.body || {};
+    const amount = Number(usd);
+    if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: 'invalid_amount' });
+
+    // Weekly USD earn cap per user
+    const weeklyUsdCap = Number(process.env.USD_WEEKLY_EARN_CAP || 2000);
+    const now = new Date();
+    const weekKey = `${uid}_${now.getUTCFullYear()}W${Math.ceil((now.getUTCDate())/7)}`;
+    const capsRef = adminDb.collection('redeemCounters').doc(`earn_${weekKey}`);
+    const capSnap = await capsRef.get();
+    const usedUsd = Number(capSnap.exists ? (capSnap.data()?.usd || 0) : 0);
+    if ((usedUsd + amount) > weeklyUsdCap) return res.status(400).json({ error: 'weekly_earn_cap_exceeded' });
+
+    // Compute earn with stake multiplier
+    const pointsPerUsd = Number(process.env.POINTS_PER_USD || 10);
+    const stakeInfo = await getStakeInfoForUser(uid);
+    const stakeTierMultipliers = parseTierMultipliers(process.env.STAKE_TIER_MULTIPLIERS || 'none:1.0;bronze:1.2;silver:1.5;gold:2.0');
+    const stakeMult = stakeTierMultipliers[stakeInfo.tier] || 1.0;
+    const earned = Math.floor(amount * pointsPerUsd * stakeMult);
+    if (earned <= 0) return res.status(400).json({ error: 'zero_earn' });
+
+    const userRef = adminDb.collection('users').doc(uid);
+    await adminDb.runTransaction(async (tx) => {
+      tx.set(userRef, { stats: { points: admin.firestore.FieldValue.increment(earned) } }, { merge: true });
+      tx.set(capsRef, { usd: (usedUsd + amount), lastAt: Date.now() }, { merge: true });
+    });
+    res.json({ ok: true, earned, stakeTier: stakeInfo.tier });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
   }
 });
 router.get('/auth/phantom/nonce', (req, res) => {
