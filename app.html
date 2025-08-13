@@ -193,23 +193,32 @@
             box-sizing: border-box;
         }
         
-        html, body { 
+        html { 
             width: 100%;
             height: 100%;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body { 
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-color);
+            background: #0a0a0a;
         }
         
         .modal-open { 
             overflow: hidden; 
         }
         
-        /* MAIN APP CONTAINER - CLEAN ORANGE/BLACK THEME */
+        /* MAIN APP CONTAINER - FLEX LAYOUT LIKE CLEAN VERSION */
         #appShell {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            width: 100vw;
+            display: flex;
+            width: 100%;
             height: 100vh;
             background: #0a0a0a;
             position: relative;
@@ -491,6 +500,10 @@
         
         .view {
             display: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 1.5rem;
         }
         
         .view.active {
@@ -713,14 +726,9 @@
         }
         
         /* Theme-aware background initialization */
-        html, body {
-            background-color: var(--bg-color);
-            transition: background-color 0.3s ease;
-        }
-        
-        /* Ensure theme is applied immediately */
+        /* Background transitions */
         html[data-theme="light"] {
-            background-color: var(--bg-color);
+            background-color: #ffffff;
         }
         
         html[data-theme="dark"] {
@@ -2198,9 +2206,9 @@
         /* Main App Container */
         /* REMOVED - Duplicate #appShell definition */
         
-        /* SIDEBAR - CLEAN ORANGE/BLACK */
+        /* SIDEBAR - FLEX LAYOUT */
         .app-sidebar, #appSidebar { 
-            grid-column: 1;
+            width: 260px;
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
@@ -2209,14 +2217,18 @@
             background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
             border-right: 1px solid rgba(249, 115, 22, 0.2);
             transition: width 0.3s ease;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
         
-        .app-sidebar[data-collapsed="false"] { width: 260px !important; }
-        .app-sidebar[data-collapsed="true"] { width: 72px !important; }
+        .app-sidebar[data-collapsed="true"] { 
+            width: 72px !important; 
+        }
         
-        /* MAIN CONTENT - CLEAN */
+        /* MAIN CONTENT - FLEX LAYOUT */
         .view-container, .main-content, #mainContent { 
-            grid-column: 2;
+            flex: 1;
             overflow-y: auto; 
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
@@ -2224,12 +2236,14 @@
             position: relative;
             background: #0a0a0a;
             padding: 0;
+            display: flex;
+            flex-direction: column;
         }
         
         /* Mobile Responsive */
         @media (max-width: 900px) {
             #appShell {
-                grid-template-columns: 1fr;
+                flex-direction: column;
             }
             
             .app-sidebar, #appSidebar { 
@@ -2238,6 +2252,7 @@
                 top: 0;
                 z-index: 1000;
                 width: 260px;
+                height: 100vh;
                 transform: translateX(-100%);
             }
             
@@ -2245,9 +2260,9 @@
                 transform: translateX(0);
             }
             
-            .view-container, .main-content {
-                grid-column: 1;
+            .view-container, .main-content, #mainContent {
                 width: 100%;
+                height: 100vh;
             }
         }
 
