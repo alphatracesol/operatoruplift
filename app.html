@@ -116,9 +116,7 @@
         #appShell .header-right { flex-wrap: wrap; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         button, .btn-primary, .btn-secondary, .btn-icon { min-height: 44px; }
         @media (max-width: 640px) {
-            .view-container { padding-left: 12px; padding-right: 12px; }
-            .sidebar { width: 72px; }
-            .dashboard-grid { grid-template-columns: 1fr !important; gap: 14px; }
+            /* Mobile styles handled by main grid system */
             .modal .modal-content {
                 width: 100%;
                 max-width: none;
@@ -880,47 +878,66 @@
                 padding: 10px;
             }
         }
-        /* Normalize main content container and scrolling */
-        #appShell .view-container { max-width: 1320px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
-        html, body { height: 100%; }
-        body { overflow: hidden; }
-        /* Fixed App Shell Layout */
+        /* COMPLETE LAYOUT RESET AND FIX */
+        * { box-sizing: border-box; }
+        
+        html, body { 
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        /* Main App Container */
         #appShell { 
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            position: relative;
-        }
-        
-        #appShell .app-sidebar { 
-            position: sticky;
-            top: 0;
-            left: 0;
+            display: grid;
+            grid-template-columns: auto 1fr;
             height: 100vh;
-            height: 100dvh;
-            flex-shrink: 0;
-            overflow-y: auto;
-            z-index: 100;
+            width: 100vw;
+            overflow: hidden;
         }
         
+        /* Sidebar */
+        #appShell .app-sidebar { 
+            grid-column: 1;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+        
+        .app-sidebar[data-collapsed="false"] { width: 220px !important; }
+        .app-sidebar[data-collapsed="true"] { width: 72px !important; }
+        
+        /* Content Area */
         #appShell .view-container { 
-            flex: 1;
+            grid-column: 2;
             overflow-y: auto; 
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            min-width: 0; /* Prevent flex child from overflowing */
+            height: 100vh;
+            position: relative;
         }
         
+        /* Mobile Responsive */
         @media (max-width: 900px) {
+            #appShell {
+                grid-template-columns: 1fr;
+            }
+            
             #appShell .app-sidebar { 
                 position: fixed;
                 left: 0;
                 top: 0;
                 z-index: 1000;
+                width: 72px !important;
             }
             
-            #appShell {
-                padding-left: 72px; /* Space for collapsed sidebar */
+            #appShell .view-container {
+                grid-column: 1;
+                padding-left: 72px;
             }
         }
 
@@ -1265,16 +1282,18 @@
             #dashboardView .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
-        /* Dashboard Cards */
+        /* Dashboard Cards - Fixed */
         .dashboard-card {
             background: var(--card-bg-glass);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 16px;
-            padding: clamp(14px, 2.4vw, 20px);
+            padding: 20px;
             box-shadow: var(--shadow-lg);
             transition: var(--transition-fast);
-            overflow: hidden;
+            overflow: visible;
+            width: 100%;
+            box-sizing: border-box;
         }
         /* Ensure cards inside app views use the intended opacity */
         .view-container .dashboard-card { background: var(--card-bg-glass); }
@@ -1293,15 +1312,7 @@
             padding: 10px;
         }
 
-        /* Layout fixes: sidebar width and content padding */
-        .app-sidebar { width: 84px !important; }
-        @media (min-width: 1024px) {
-            .app-sidebar { width: 260px !important; }
-        }
-        .view-container:not(#authView) { padding-left: 96px; }
-        @media (min-width: 1024px) {
-            .view-container:not(#authView) { padding-left: 276px; }
-        }
+        /* Remove old layout fixes - handled by grid system */
 
         .app-sidebar { background: var(--glass-bg); border-right:1px solid var(--border-glass); }
         .app-sidebar .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text-color); text-decoration: none; background: var(--card-bg-glass); width:100%; min-height:52px; }
@@ -1907,7 +1918,7 @@
         </div>
 
         <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
-            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="width:220px;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);transition:width 0.3s ease;">
+            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
             <div style="display:flex;align-items:center;gap:8px;">
                     <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"/>
