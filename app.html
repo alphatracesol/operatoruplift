@@ -244,11 +244,14 @@
         /* Nia Button System */
         button, .btn-primary, .btn-secondary, .btn-icon { 
             min-height: 44px;
-            border-radius: 12px;
+            min-width: 44px;
+            border-radius: var(--radius-lg);
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             cursor: pointer;
+            touch-action: manipulation; /* Better touch responsiveness */
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
         }
         
         .btn-primary {
@@ -724,16 +727,17 @@
         
             /* --- ENHANCED GLOBAL STYLES & CSS VARIABLES --- */
         :root {
-                    /* === NIA CLEAN UI COLOR PALETTE === */
-        --primary-color: #6366f1;
-        --primary-dark: #4f46e5;
-        --primary-light: #818cf8;
-        --secondary-color: #8b5cf6;
-        --secondary-dark: #7c3aed;
-        --accent-color: #ec4899;
-        --accent-light: #f472b6;
-        --accent-hover: #db2777;
-        --accent-glow: rgba(99, 102, 241, 0.3);
+                    /* === ORANGE-BASED COLOR PALETTE (200-500 Tone Range) === */
+        /* Dark Theme (Default) */
+        --primary-color: #f97316;   /* Vibrant orange */
+        --primary-dark: #ea580c;    /* Darker orange */
+        --primary-light: #fb923c;   /* Light orange */
+        --secondary-color: #ff6b35; /* Complementary orange-red */
+        --secondary-dark: #dc2626;  /* Deep red-orange */
+        --accent-color: #fbbf24;    /* Golden accent */
+        --accent-light: #fcd34d;    /* Light gold */
+        --accent-hover: #f59e0b;    /* Hover gold */
+        --accent-glow: rgba(249, 115, 22, 0.3); /* Orange glow */
             
             /* === EXTENDED COLOR SYSTEM === */
             --success-color: #10b981;
@@ -744,6 +748,35 @@
             --danger-light: #f87171;
             --info-color: #3b82f6;
             --info-light: #60a5fa;
+        }
+        
+        /* Light Theme Palette */
+        [data-theme="light"] {
+            --primary-color: #ea580c;   /* Deeper orange for light mode */
+            --primary-dark: #c2410c;    /* Even darker for contrast */
+            --primary-light: #f97316;   /* Lighter orange */
+            --secondary-color: #dc2626; /* Deep red-orange */
+            --secondary-dark: #b91c1c;  /* Darker red */
+            --accent-color: #d97706;    /* Amber accent */
+            --accent-light: #f59e0b;    /* Light amber */
+            --accent-hover: #b45309;    /* Hover amber */
+            --accent-glow: rgba(234, 88, 12, 0.2); /* Softer glow for light mode */
+            
+            /* Light mode backgrounds */
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8fafc;
+            
+            /* Light mode text */
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            /* Light mode borders */
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
             --energy-color: #84cc16;
             --energy-light: #a3e635;
             
@@ -758,6 +791,15 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
+            
+            /* === CONSISTENT BORDER RADIUS SYSTEM === */
+            --radius-xs: 4px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-2xl: 20px;
+            --radius-full: 9999px;
             
             /* === NIA BACKGROUND SYSTEM === */
             --bg-color: #0f172a; /* Nia dark blue */
@@ -1042,6 +1084,252 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        /* === ENHANCED MICRO-INTERACTIONS === */
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Interactive Hover Classes */
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hover-glow {
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        
+        .click-scale {
+            transition: transform 0.1s ease;
+        }
+        
+        .click-scale:active {
+            transform: scale(0.95);
+        }
+        
+        /* === ACCESSIBILITY FOCUS STATES === */
+        *:focus {
+            outline: none;
+        }
+        
+        *:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+        
+        button:focus-visible,
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        /* Skip to content link for screen readers */
+        .skip-to-content {
+            position: absolute;
+            left: -9999px;
+            z-index: 999;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+        }
+        
+        .skip-to-content:focus {
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+        }
+        
+        /* === TOOLTIP SYSTEM === */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+        
+        [data-tooltip]::before,
+        [data-tooltip]::after {
+            position: absolute;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        [data-tooltip]::before {
+            content: attr(data-tooltip);
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            padding: 8px 12px;
+            background: var(--gray-900);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 250px;
+            text-align: center;
+        }
+        
+        [data-tooltip]::after {
+            content: '';
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            border: 4px solid transparent;
+            border-top-color: var(--gray-900);
+        }
+        
+        [data-tooltip]:hover::before,
+        [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Tooltip positions */
+        [data-tooltip-position="bottom"]::before {
+            bottom: auto;
+            top: calc(100% + 8px);
+        }
+        
+        [data-tooltip-position="bottom"]::after {
+            bottom: auto;
+            top: calc(100% + 4px);
+            border-top-color: transparent;
+            border-bottom-color: var(--gray-900);
+        }
+        
+        [data-tooltip-position="left"]::before {
+            bottom: auto;
+            left: auto;
+            right: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%) translateX(4px);
+        }
+        
+        [data-tooltip-position="left"]::after {
+            bottom: auto;
+            left: auto;
+            right: calc(100% + 4px);
+            top: 50%;
+            transform: translateY(-50%) translateX(4px);
+            border-top-color: transparent;
+            border-left-color: var(--gray-900);
+        }
+        
+        [data-tooltip-position="right"]::before {
+            bottom: auto;
+            left: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%) translateX(-4px);
+        }
+        
+        [data-tooltip-position="right"]::after {
+            bottom: auto;
+            left: calc(100% + 4px);
+            top: 50%;
+            transform: translateY(-50%) translateX(-4px);
+            border-top-color: transparent;
+            border-right-color: var(--gray-900);
+        }
+        
+        /* === SKELETON LOADING STATES === */
+        .skeleton {
+            animation: shimmer 2s infinite;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 75%
+            );
+            background-size: 200% 100%;
+            border-radius: 8px;
+        }
+        
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        
+        .skeleton-title {
+            height: 24px;
+            width: 60%;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        
+        .skeleton-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skeleton-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+        
+        .skeleton-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: pulse 1.5s infinite;
         }
 
         /* Ensure header auth cube uses the same animation as loaders */
@@ -1642,6 +1930,9 @@
         .form-group {
             margin-bottom: 20px;
             text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
         }
 
         .form-group label {
@@ -1650,6 +1941,7 @@
             color: var(--text-color);
             font-weight: 500;
             font-size: 0.9rem;
+            padding-left: 4px;
         }
 
         .form-group input {
@@ -3409,14 +3701,14 @@
                         <button class="btn-icon" onclick="closePersonalityAssessment()" title="Close assessment">✖</button>
                     </div>
                     <div class="modal-body">
-                        <p class="text-muted">Answer a few questions so your AI mentor can personalize guidance. <br><small>You can skip this and take it later from the AI Chat.</small></p>
+                        <p class="text-muted">Let's get to know you better! Just a few quick questions to help personalize your experience. <br><small>No worries if you're not ready - you can always come back to this later.</small></p>
                         <div id="paProgress" style="display:flex;gap:6px;margin:10px 0;"></div>
                         <div id="paQuestion"></div>
                     </div>
                     <div class="modal-actions">
-                        <button class="btn-secondary" onclick="skipPersonalityAssessment()">Skip Assessment</button>
-                        <button class="btn-secondary" onclick="prevPersonalityQuestion()">Back</button>
-                        <button class="btn-primary" onclick="nextPersonalityQuestion()" id="paNextBtn">Next</button>
+                        <button class="btn-secondary" onclick="skipPersonalityAssessment()">I'll Do This Later</button>
+                        <button class="btn-secondary" onclick="prevPersonalityQuestion()">Previous Question</button>
+                        <button class="btn-primary" onclick="nextPersonalityQuestion()" id="paNextBtn">Continue →</button>
                     </div>
                 </div>
             </div>
