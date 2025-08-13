@@ -42,6 +42,40 @@
             }
             console.log('🎨 Immediate theme set:', savedTheme);
         })();
+
+        // Optional rules test matrix (guarded). Enable by setting localStorage.runRulesTest = "1" and ensure user is authed.
+        async function runRulesTestMatrix() {
+            try {
+                if (!window.db || !window.auth || !auth.currentUser) { console.log('RulesTest: auth/db not ready'); return; }
+                const uid = auth.currentUser.uid;
+                const today = new Date();
+                const ymd = today.toISOString().slice(0,10).replace(/-/g,'');
+                const other = 'someone_else_uid_' + uid.slice(0,6);
+
+                const results = {};
+                // Own rewards (collection read)
+                try { await db.collection('users').doc(uid).collection('rewards').limit(1).get(); results.ownRewards = 'allow'; } catch (e) { results.ownRewards = 'deny:' + (e.code||e.message); }
+                // Other rewards (collection read)
+                try { await db.collection('users').doc(other).collection('rewards').limit(1).get(); results.otherRewards = 'allow'; } catch (e) { results.otherRewards = 'deny:' + (e.code||e.message); }
+                // Own missions
+                try { await db.collection('users').doc(uid).collection('missions').limit(1).get(); results.ownMissions = 'allow'; } catch (e) { results.ownMissions = 'deny:' + (e.code||e.message); }
+                // Other missions
+                try { await db.collection('users').doc(other).collection('missions').limit(1).get(); results.otherMissions = 'allow'; } catch (e) { results.otherMissions = 'deny:' + (e.code||e.message); }
+                // redeemCounters own docId startsWith(uid)
+                try { await db.collection('redeemCounters').doc(`${uid}_${ymd}`).get(); results.ownRedeemCounters = 'allow_or_notfound'; } catch (e) { results.ownRedeemCounters = 'deny:' + (e.code||e.message); }
+                // redeemCounters other doc
+                try { await db.collection('redeemCounters').doc(`${other}_${ymd}`).get(); results.otherRedeemCounters = 'allow_or_notfound'; } catch (e) { results.otherRedeemCounters = 'deny:' + (e.code||e.message); }
+
+                console.log('RulesTest results:', results);
+                try { OperatorUplift.ui?.showToast?.('Rules test done (see console)', 'success'); } catch {}
+            } catch (e) {
+                console.log('RulesTest error:', e);
+            }
+        }
+
+        (function maybeRunRulesTest(){
+            try { if (window.DEBUG && localStorage.getItem('runRulesTest') === '1') setTimeout(runRulesTestMatrix, 1500); } catch {}
+        })();
         // Bind quick add task form
         (function(){
             const form = document.getElementById('quickAddTaskForm');
