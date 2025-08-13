@@ -2724,35 +2724,37 @@
                 </div>
             </div>
 
-            <!-- Onboarding Assessment Modal (blocking for new users) -->
+            <!-- Onboarding Assessment Modal (optional for new users) -->
             <div id="onboardingAssessmentModal" class="modal">
                 <div class="modal-content" style="max-width:760px;">
                     <div class="modal-header">
-                        <h2>Welcome! Let’s personalize your AI</h2>
-                        <!-- No close button: required for new users -->
+                        <h2>Welcome! Let's personalize your AI</h2>
+                        <!-- Add close button for users who want to skip -->
+                        <button class="btn-icon" onclick="skipOnboardingAssessment()">✖</button>
                     </div>
                     <div class="modal-body">
                         <div id="onboardingMessages" style="display:flex;flex-direction:column;gap:12px;max-height:50vh;overflow:auto;border:1px solid var(--border-glass);border-radius:10px;padding:12px;background:var(--glass-bg);">
                             <div class="ai-message ai-message-ai">
                                 <div class="ai-avatar">🤖</div>
                                 <div class="message-content">
-                                    <div class="ai-message-text">I’ll ask a few quick questions to tailor my coaching. This takes ~2 minutes.</div>
+                                    <div class="ai-message-text">I'll ask a few quick questions to tailor my coaching. This takes ~2 minutes.</div>
                                 </div>
                             </div>
                             <div class="ai-message ai-message-ai">
                                 <div class="ai-avatar">🤖</div>
                                 <div class="message-content">
-                                    <div class="ai-message-text">What’s your primary “why” for using Operator Uplift right now?</div>
+                                    <div class="ai-message-text">What's your primary "why" for using Operator Uplift right now?</div>
                                 </div>
                             </div>
                         </div>
                         <div style="display:flex;gap:8px;margin-top:12px;">
-                            <input id="onboardingInput" type="text" placeholder="Type your answer…" style="flex:1;min-height:44px;" />
+                            <input id="onboardingInput" type="text" placeholder="Type your answer… (Press Enter to send)" style="flex:1;min-height:44px;" onkeypress="if(event.key==='Enter')sendOnboardingMessage()" />
                             <button class="btn-primary" onclick="sendOnboardingMessage()">Send</button>
                         </div>
-                        <p class="text-muted" style="margin-top:8px;">You’ll be able to confirm before saving.</p>
+                        <p class="text-muted" style="margin-top:8px;">You can skip this and personalize later in settings.</p>
                     </div>
                     <div class="modal-actions">
+                        <button class="btn-secondary" onclick="skipOnboardingAssessment()">Skip for now</button>
                         <button class="btn-primary" id="finishOnboardingBtn" onclick="finalizeOnboardingAssessment()" disabled>Save & Finish</button>
                     </div>
                 </div>
@@ -7934,10 +7936,38 @@ Focus on actionable insights and encouragement.
             if (m) m.classList.add('active');
             document.body.classList.add('modal-open');
             document.getElementById('finishOnboardingBtn')?.setAttribute('disabled','true');
+            
+            // Allow ESC key to skip onboarding
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    skipOnboardingAssessment();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
         }
         function closeOnboardingAssessment() {
             document.getElementById('onboardingAssessmentModal')?.classList.remove('active');
             document.body.classList.remove('modal-open');
+        }
+        async function skipOnboardingAssessment() {
+            try {
+                // Mark onboarding as completed even if skipped
+                const uid = auth?.currentUser?.uid;
+                if (uid && db) {
+                    await db.collection('users').doc(uid).set({ 
+                        onboardingCompleted: true,
+                        onboardingSkipped: true 
+                    }, { merge: true });
+                    OperatorUplift.userData.onboardingCompleted = true;
+                }
+                closeOnboardingAssessment();
+                OperatorUplift.ui?.showToast?.('You can personalize your AI anytime in settings', 'info');
+            } catch (e) {
+                console.error('Skip onboarding failed', e);
+                // Even if save fails, close the modal so user can use the app
+                closeOnboardingAssessment();
+            }
         }
         function appendOnboardingMessage(text, sender='ai') {
             const wrap = document.getElementById('onboardingMessages');
