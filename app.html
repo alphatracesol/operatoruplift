@@ -878,14 +878,27 @@
                 padding: 10px;
             }
         }
-        /* COMPLETE LAYOUT RESET AND FIX */
-        * { box-sizing: border-box; }
+        /* NIA-INSPIRED CLEAN FULL-SCREEN LAYOUT */
+        * { 
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         
-        html, body { 
-            height: 100%; 
+        html { 
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        body { 
+            height: 100vh;
+            width: 100vw;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         /* Main App Container */
