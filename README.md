@@ -1,6 +1,6 @@
-# Operator Uplift - Working Deployment Versions
+# Operator Uplift - Current Netlify Deployment
 
-This repository contains **four working deployment folders** of the Operator Uplift application, each representing different stages and versions of the app.
+This repository contains the **complete current deployment** of the Operator Uplift application as deployed on Netlify, including all working versions, assets, and documentation.
 
 ## 📁 Repository Structure
 
@@ -129,4 +129,48 @@ Operator Uplift - Elite Performance Platform
 
 ---
 
-**Repository**: https://github.com/Operator-Uplift/app-broken-copy-repository
+## 🚀 Main Application Files
+
+### Primary Entry Points:
+- **`app.html`** - Main application interface (current production)
+- **`index.html`** - Landing page
+- **`dashboard.html`** - Dashboard interface
+- **`MVP Launch Page.html`** - MVP version
+
+### Key Directories:
+- **`assets/`** - Images, CSS, JavaScript assets
+- **`netlify/`** - Netlify functions and configuration
+- **`docs/`** - Complete documentation
+- **`js/`** - JavaScript modules
+- **`css/`** - Stylesheets
+- **`tests/`** - Test suites
+- **`scripts/`** - Build and deployment scripts
+
+## 🌐 Live Deployment
+
+This exact codebase is currently deployed at:
+- **Netlify**: [operatoruplift.netlify.app](https://operatoruplift.netlify.app)
+
+## 📦 Deployment Instructions
+
+### Deploy to Netlify:
+1. Fork this repository
+2. Connect to Netlify
+3. Build settings:
+   - Build command: (leave empty)
+   - Publish directory: `.`
+4. Deploy!
+
+### Local Development:
+```bash
+# Clone the repository
+git clone https://github.com/Operator-Uplift/current-deploy.git
+cd current-deploy
+
+# Open in browser
+open app.html
+# or
+python -m http.server 8000
+```
+
+**Repository**: https://github.com/Operator-Uplift/current-deploy
