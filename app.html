@@ -498,17 +498,7 @@
             background: var(--bg-color);
         }
         
-        .view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-        
-        .view.active {
-            display: block;
-        }
+        /* View styles removed - using view-container instead */
         
         /* Nia Cards Enhanced */
         .dashboard-card {
@@ -2227,7 +2217,7 @@
         }
         
         /* MAIN CONTENT - FLEX LAYOUT */
-        .view-container, .main-content, #mainContent { 
+        .main-content, #mainContent { 
             flex: 1;
             overflow-y: auto; 
             overflow-x: hidden;
@@ -2238,6 +2228,19 @@
             padding: 0;
             display: flex;
             flex-direction: column;
+        }
+        
+        /* View containers inside main content */
+        .view-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .view-container.active {
+            display: block;
         }
         
         /* Mobile Responsive */
