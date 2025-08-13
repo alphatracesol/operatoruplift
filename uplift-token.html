@@ -722,8 +722,9 @@
                     <h3>Creator Fees Allocation</h3>
                     <p class="muted">100% of creator fees (<strong>2% of volume fees</strong>) are allocated as follows:</p>
                     <ul class="muted" style="margin-top:.5rem; padding-left:1rem; list-style: disc;">
-                        <li><strong>50%</strong> → Treasury for app development</li>
-                        <li><strong>50%</strong> → Burns and buybacks</li>
+                        <li><strong>25%</strong> → Marketing Wallet</li>
+                        <li><strong>25%</strong> → Development Fund (App)</li>
+                        <li><strong>50%</strong> → Buyback & Burn</li>
                     </ul>
                 </div>
                 <div class="token-info-card">
@@ -740,7 +741,7 @@
                 </div>
             </div>
             <div class="callout" style="margin-top:1rem;">
-                📌 Policy summary: <strong>2% volume fees</strong> → 50% Treasury / 50% Burns & Buybacks. Purchases with <strong>$UPLIFT</strong> → <strong>15%</strong> buyback & burn.
+                📌 Policy summary: <strong>2% volume fees</strong> → 25% Marketing / 25% Development / 50% Buyback & Burn. Purchases with <strong>$UPLIFT</strong> → <strong>15%</strong> buyback & burn.
             </div>
         </section>
 
@@ -761,7 +762,7 @@
                 </ul>
                 <h3 style="margin-top:1rem;">3) Value Accrual</h3>
                 <ul class="muted" style="padding-left:1rem; list-style:disc;">
-                    <li>2% creator fee on volume → 50% treasury / 50% buyback & burns.</li>
+                    <li>2% creator fee on volume → 25% marketing / 25% development / 50% buyback & burns.</li>
                     <li>In-app $UPLIFT spend → 15% buyback & burn allocation.</li>
                     <li>Public, verifiable execution via posted wallets and tx links.</li>
                 </ul>
@@ -832,8 +833,9 @@
                     <div class="value">2%</div>
                     <div class="label">Creator Fee on Volume</div>
                     <div class="row" style="justify-content:center; margin-top:.5rem;">
-                        <span class="pill">50% Treasury</span>
-                        <span class="pill">50% Burns/Buybacks</span>
+                        <span class="pill">25% Marketing</span>
+                        <span class="pill">25% Development</span>
+                        <span class="pill">50% Buyback & Burn</span>
                     </div>
                 </div>
                 <div class="card kpi">
@@ -845,8 +847,8 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="donut" style="animation: donut-in .7s ease-out both;"></div>
-                    <div class="donut-label">Fee Allocation: 50% Treasury / 50% Deflation</div>
+                    <div class="donut" style="animation: donut-in .7s ease-out both; background: conic-gradient(#60a5fa 0 25%, #22c55e 25% 50%, #f97316 50% 100%);"></div>
+                    <div class="donut-label">Fee Allocation: 25% Marketing / 25% Development / 50% Buyback & Burn</div>
                 </div>
                 <div class="card">
                     <h3 style="margin-bottom:.35rem;">Perks & Discounts</h3>
@@ -861,17 +863,25 @@
 
             <div class="wallets" style="margin-top:1rem;">
                 <div class="token-info-card" style="display:flex; flex-direction:column; gap:.5rem;">
-                    <h3>Treasury Wallet</h3>
-                    <p class="muted">Used exclusively for app development, audits, and ecosystem grants.</p>
+                    <h3>Marketing Wallet</h3>
+                    <p class="muted">Receives 25% of creator fees for growth, awareness, and partnerships.</p>
                     <div class="row" style="margin-top:.5rem; align-items:stretch;">
-                        <div class="address-wrap"><span id="w-treasury" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
-                        <button class="copy-btn" onclick="copyText('#w-treasury')">Copy</button>
+                        <div class="address-wrap"><span id="w-marketing" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
+                        <button class="copy-btn" onclick="copyText('#w-marketing')">Copy</button>
                         <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
                     </div>
-                    <small class="muted">Schedule: weekly disbursement; proposal-approved spending only.</small>
                 </div>
                 <div class="token-info-card" style="display:flex; flex-direction:column; gap:.5rem;">
-                    <h3>Burn/Buyback Wallet</h3>
+                    <h3>Development Fund (App)</h3>
+                    <p class="muted">Receives 25% of creator fees for app development, audits, and ecosystem grants.</p>
+                    <div class="row" style="margin-top:.5rem; align-items:stretch;">
+                        <div class="address-wrap"><span id="w-dev" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
+                        <button class="copy-btn" onclick="copyText('#w-dev')">Copy</button>
+                        <a class="pill" href="https://solscan.io/account/DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h#portfolio" target="_blank" rel="noopener">View</a>
+                    </div>
+                </div>
+                <div class="token-info-card" style="display:flex; flex-direction:column; gap:.5rem;">
+                    <h3>Buyback/Burn Wallet</h3>
                     <p class="muted">Receives 50% of creator fees and 15% of $UPLIFT purchases for buybacks/burns.</p>
                     <div class="row" style="margin-top:.5rem; align-items:stretch;">
                         <div class="address-wrap"><span id="w-burn" class="addr">DfB8RpxWSYbZcwwjsghQPdMTRX7jJEKimeUeetGysa7h</span></div>
@@ -1415,14 +1425,14 @@
             if (window.tsParticles) {
                 tsParticles.load('particles', {
                     background: { color: { value: 'transparent' } },
-                    fpsLimit: 45,
+                    fpsLimit: 36,
                     particles: {
-                        number: { value: 16, density: { enable: true, area: 900 } },
+                        number: { value: 10, density: { enable: true, area: 1200 } },
                         color: { value: '#f97316' },
-                        opacity: { value: 0.2 },
-                        size: { value: { min: 1, max: 2 } },
-                        links: { enable: true, color: '#f97316', opacity: 0.12, distance: 130 },
-                        move: { enable: true, speed: 0.45 }
+                        opacity: { value: 0.18 },
+                        size: { value: { min: 1, max: 1.6 } },
+                        links: { enable: true, color: '#f97316', opacity: 0.1, distance: 140 },
+                        move: { enable: true, speed: 0.32 }
                     },
                     interactivity: {
                         events: { onHover: { enable: false }, onClick: { enable: false }, resize: true },

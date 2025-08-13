@@ -67,6 +67,31 @@
         })();
     </script>
     <style>
+        /* Mobile-first fixes */
+        html, body { overflow-x: hidden; }
+        .modal-open { overflow: hidden; }
+        #appShell .header-right { flex-wrap: wrap; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        button, .btn-primary, .btn-secondary, .btn-icon { min-height: 44px; }
+        @media (max-width: 640px) {
+            .view-container { padding-left: 12px; padding-right: 12px; }
+            .sidebar { width: 72px; }
+            .dashboard-grid { grid-template-columns: 1fr !important; gap: 14px; }
+            .modal .modal-content {
+                width: 100%;
+                max-width: none;
+                height: 90vh;
+                max-height: 90vh;
+                margin: 0;
+                position: fixed;
+                left: 0; right: 0; bottom: 0;
+                border-radius: 16px 16px 0 0;
+                padding: 16px;
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
+            .btn-primary, .btn-secondary, .btn-icon { min-height: 44px; padding: 10px 14px; font-size: 16px; }
+            input, select, textarea, input[type="number"], input[type="text"], input[type="email"], input[type="password"] { min-height: 44px; font-size: 16px; }
+            .chart-container { height: clamp(160px, 45vh, 240px); }
+        }
         /* Theme-aware background initialization */
         html, body {
             background-color: var(--bg-color);
@@ -262,7 +287,7 @@
             --text-muted: #9ca3af;
             --text-muted-color: #9ca3af;
             --text-inverse: #0a0a0a;
-            --card-bg-glass: rgba(0, 0, 0, 0.75);
+            --card-bg-glass: rgba(0, 0, 0, 0.6);
             --border-glass: rgba(255, 255, 255, 0.1);
             --sidebar-bg: rgba(10, 10, 10, 0.8);
             --input-bg: rgba(0,0,0,0.2);
@@ -289,7 +314,7 @@
             --text-muted: #6b7280;
             --text-muted-color: #6b7280;
             --text-inverse: #ffffff;
-            --card-bg-glass: rgba(255, 255, 255, 0.85);
+            --card-bg-glass: rgba(255, 255, 255, 0.6);
             --border-glass: rgba(0, 0, 0, 0.08);
             --sidebar-bg: rgba(255, 255, 255, 0.92);
             --input-bg: rgba(255, 255, 255, 0.9);
@@ -496,7 +521,6 @@
             color: #3b82f6;
             font-weight: bold;
         }
-
         .score-average {
             color: #f59e0b;
             font-weight: bold;
@@ -798,7 +822,6 @@
         #authView.view-container.active {
             display: flex !important;
         }
-
         /* Responsive design */
         @media (max-width: 768px) {
             .view-container {
@@ -994,9 +1017,6 @@
         .social-login {
             margin-top: 22px;
         }
-
-
-
         .btn-social {
             width: 100%;
             padding: 12px 24px;
@@ -1129,6 +1149,13 @@
             gap: clamp(16px, 2.8vw, 28px);
             margin-bottom: clamp(20px, 3.5vw, 32px);
         }
+
+        @media (min-width: 1600px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
         @media (max-width: 640px) {
             .dashboard-grid { gap: 16px; grid-template-columns: 1fr; }
         }
@@ -1494,7 +1521,6 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -1767,6 +1793,22 @@
             </div>
         </div>
 
+        <!-- Quest Templates Modal -->
+        <div id="questTemplatesModal" class="modal">
+            <div class="modal-content" style="max-width:720px;">
+                <div class="modal-header">
+                    <h2>Quest Templates</h2>
+                    <button class="btn-icon" onclick="closeQuestTemplatesModal()">✖</button>
+                </div>
+                <div class="modal-body">
+                    <div id="questTemplatesList" class="list"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeQuestTemplatesModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
         <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
             <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
@@ -1877,7 +1919,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Dashboard View -->
         <div id="dashboardView" class="view-container">
             <!-- Dashboard Header -->
@@ -1914,6 +1955,38 @@
                     </div>
                     <div class="card-body">
                         <p id="aiMentorMessage" class="text-muted">Loading personalized guidance...</p>
+                        <div id="aiStyleSummary" class="text-muted" style="margin-top:8px; font-size:0.9rem;">Establishing AI style…</div>
+                    </div>
+                </div>
+
+                <!-- Redeem Points Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Redeem Points</h3>
+                        <div class="card-actions">
+                            <button class="btn-secondary" onclick="openRedeemModal()">Redeem</button>
+                            <button class="btn-link" onclick="scrollToRedemptions()">History</button>
+                            <button class="btn-icon" title="Learn about caps & cooldowns" onclick="openRedeemHelp()">❓</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted" id="redeemRateHelp">Fetching redemption rate…</p>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="shimmer-text">System Health</h3>
+                        <div class="card-actions">
+                            <button id="systemHealthRefreshBtn" class="btn-secondary" onclick="renderSystemHealth()">Refresh</button>
+                            <span id="systemHealthCheckedAt" class="text-muted" style="margin-left:8px;"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemHealthList" class="list">
+                            <div class="list-item"><div class="text-muted">Loading…</div></div>
+                        </div>
                     </div>
                 </div>
 
@@ -2093,12 +2166,21 @@
                         </div>
                         <div id="quickWinResult" class="text-muted" style="margin-top:8px;"></div>
                     </div>
+                    <div class="dashboard-card">
+                        <div class="card-header"><h3 class="shimmer-text">Pending Redemptions</h3></div>
+                        <div class="card-body" id="redemptionsList">
+                            <div class="text-muted">Loading…</div>
+                        </div>
+                    </div>
                 </div>
                 <!-- Recent Goals Card -->
                 <div class="dashboard-card goals-card">
                     <div class="card-header">
                         <h3>Recent Goals</h3>
+                        <div class="card-actions">
+                            <button class="btn-secondary" onclick="openQuestTemplatesModal()">Templates</button>
                         <button class="btn-link" onclick="showAllGoals()">View All</button>
+                        </div>
                     </div>
                     <div class="goals-list" id="recentGoalsList">
                         <div class="empty-state">
@@ -2125,6 +2207,31 @@
                             <p>No achievements yet</p>
                             <p class="text-muted">Complete goals to earn achievements</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redeem Modal -->
+            <div id="redeemModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Redeem Points</h3>
+                        <button class="btn-icon" onclick="closeRedeemModal()">✖</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="redeemAvailable" class="text-muted" style="margin-bottom:8px;">Available: —</div>
+                        <div id="redeemRateText" class="text-muted" style="margin-bottom:12px;">Loading rate…</div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label for="redeemPointsInput" class="text-label" style="flex:1;">Points to redeem</label>
+                            <button class="btn-secondary" id="redeemMaxBtn" type="button">Max</button>
+                        </div>
+                        <input id="redeemPointsInput" type="number" min="1" step="1" placeholder="e.g., 100" style="width:100%" />
+                        <div id="redeemPreview" class="text-muted" style="margin-top:8px;">—</div>
+                        <div id="redeemCaps" class="text-muted" style="margin-top:8px;">Daily/weekly caps apply.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeRedeemModal()">Cancel</button>
+                        <button id="redeemSubmitBtn" class="btn-primary" onclick="submitRedeem()">Redeem</button>
                     </div>
                 </div>
             </div>
@@ -2365,12 +2472,11 @@
                     </div>
                     <div class="modal-actions">
                         <button class="btn-secondary" onclick="closeProfileModal()">Close</button>
-                        <button class="btn-primary" onclick="openAISettings()">AI Settings</button>
+                        <!-- AI is auto-personalized; settings hidden by default -->
                         <button class="btn-primary" onclick="openAppSettings()">App Settings</button>
                     </div>
                 </div>
             </div>
-
             <!-- App Settings Modal -->
             <div id="appSettingsModal" class="modal">
                 <div class="modal-content" style="max-width:640px;">
@@ -2419,6 +2525,15 @@
                         <button class="btn-icon" onclick="closeAISettings()">✖</button>
                     </div>
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label for="aiCoachType">Coach Type</label>
+                            <select id="aiCoachType">
+                                <option value="coach">Coach</option>
+                                <option value="mentor">Mentor</option>
+                                <option value="trainer">Trainer</option>
+                                <option value="strategist">Strategist</option>
+                            </select>
+                        </div>
                         <div class="form-row">
                             <div class="form-group" style="min-width:220px;">
                                 <label for="aiProvider">Provider</label>
@@ -2443,10 +2558,80 @@
                             <label for="aiDetailLevel">Detail Level</label>
                             <input type="range" id="aiDetailLevel" min="1" max="10" value="6">
                         </div>
+                        <div class="form-row">
+                            <div class="form-group" style="min-width:220px;">
+                                <label for="aiTone">Tone</label>
+                                <select id="aiTone">
+                                    <option value="supportive">Supportive</option>
+                                    <option value="direct">Direct</option>
+                                    <option value="empathetic">Empathetic</option>
+                                    <option value="analytical">Analytical</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="min-width:220px;">
+                                <label for="aiHumor">Humor</label>
+                                <select id="aiHumor">
+                                    <option value="light">Light</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="min-width:220px;">
+                                <label for="aiAccountability">Accountability</label>
+                                <select id="aiAccountability">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="min-width:220px;">
+                                <label for="aiChallenge">Challenge Level</label>
+                                <select id="aiChallenge">
+                                    <option value="gentle">Gentle</option>
+                                    <option value="balanced" selected>Balanced</option>
+                                    <option value="intense">Intense</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-actions">
                         <button class="btn-secondary" onclick="closeAISettings()">Cancel</button>
                         <button class="btn-primary" onclick="saveAISettings()">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onboarding Assessment Modal (blocking for new users) -->
+            <div id="onboardingAssessmentModal" class="modal">
+                <div class="modal-content" style="max-width:760px;">
+                    <div class="modal-header">
+                        <h2>Welcome! Let’s personalize your AI</h2>
+                        <!-- No close button: required for new users -->
+                    </div>
+                    <div class="modal-body">
+                        <div id="onboardingMessages" style="display:flex;flex-direction:column;gap:12px;max-height:50vh;overflow:auto;border:1px solid var(--border-glass);border-radius:10px;padding:12px;background:var(--glass-bg);">
+                            <div class="ai-message ai-message-ai">
+                                <div class="ai-avatar">🤖</div>
+                                <div class="message-content">
+                                    <div class="ai-message-text">I’ll ask a few quick questions to tailor my coaching. This takes ~2 minutes.</div>
+                                </div>
+                            </div>
+                            <div class="ai-message ai-message-ai">
+                                <div class="ai-avatar">🤖</div>
+                                <div class="message-content">
+                                    <div class="ai-message-text">What’s your primary “why” for using Operator Uplift right now?</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:12px;">
+                            <input id="onboardingInput" type="text" placeholder="Type your answer…" style="flex:1;min-height:44px;" />
+                            <button class="btn-primary" onclick="sendOnboardingMessage()">Send</button>
+                        </div>
+                        <p class="text-muted" style="margin-top:8px;">You’ll be able to confirm before saving.</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-primary" id="finishOnboardingBtn" onclick="finalizeOnboardingAssessment()" disabled>Save & Finish</button>
                     </div>
                 </div>
             </div>
@@ -2738,10 +2923,10 @@
         <div id="analyticsView" class="view-container" style="display:none;">
             <div class="dashboard-header">
                 <div class="header-left"><h2>Analytics</h2></div>
-                <div class="header-right"></div>
+                <div class="header-right"><button id="analyticsRefreshBtn" class="btn-secondary" onclick="refreshAnalytics()">Refresh Data</button><span id="analyticsUpdatedAt" class="text-muted" style="margin-left:8px;"></span></div>
             </div>
             <div class="dashboard-grid">
-                <div class="dashboard-card">
+                <div class="dashboard-card" id="analyticsTopCard">
                     <div class="card-header"><h3 class="shimmer-text">Productivity Trends</h3></div>
                     <div class="card-body"><div class="chart-container"><canvas id="productivityChart"></canvas></div></div>
                 </div>
@@ -2816,9 +3001,16 @@
                     <div class="card-header"><h3 class="shimmer-text">Latest Posts</h3></div>
                     <div class="card-body" id="communityFeed"></div>
                 </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3 class="shimmer-text">Leaderboard</h3></div>
+                    <div class="card-body" id="leaderboardList"></div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header"><h3 class="shimmer-text">Challenges</h3></div>
+                    <div class="card-body" id="challengesList"></div>
+                </div>
             </div>
         </div>
-
         <!-- Finance View -->
         <div id="financeView" class="view-container" style="display:none;">
             <div class="dashboard-header">
@@ -2969,8 +3161,8 @@
     </div>
 
     <!-- Firebase Configuration -->
-    <!-- Chart.js for analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <!-- Chart.js time adapter for heatmap time scale -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3" crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
@@ -2992,7 +3184,6 @@
     </script>
     
     <script src="firebase-config.js"></script>
-    
     <!-- Main Application Script -->
     <script>
         // Foundation JavaScript - Phase 1
@@ -3313,11 +3504,9 @@
                 }, 500);
             }
         }
-        
         // Register core functions with the registry
         FunctionRegistry.register('core', 'updateLoadingProgress', updateLoadingProgress);
         FunctionRegistry.register('core', 'hideLoadingScreen', hideLoadingScreen);
-
         // View management
         function showView(viewName) {
             console.log('🔄 showView called with:', viewName);
@@ -3347,6 +3536,14 @@
                 link.classList.toggle('active', link.getAttribute('data-view') === viewName);
                 });
 
+            // Persist and apply collapse state preference on every view change
+            try {
+                const collapsed = sidebarEl?.getAttribute('data-collapsed') === 'true';
+                localStorage.setItem('uplift:sidebarCollapsed', collapsed ? '1' : '0');
+                document.body.classList.toggle('sidebar-collapsed', collapsed);
+                document.body.classList.toggle('sidebar-expanded', !collapsed);
+            } catch {}
+
                 // Update view title if present
                 const viewTitleEl = document.getElementById('viewTitle') || document.getElementById('view-title');
                 if (viewTitleEl) {
@@ -3355,6 +3552,7 @@
             }
             
             OperatorUplift.currentView = viewName;
+            try { localStorage.setItem('uplift:lastView', viewName); } catch {}
         }
         
         // Register view management functions
@@ -3374,7 +3572,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッんABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             const fontSize = 16;
             const columns = canvas.width / fontSize;
             const rainDrops = Array.from({ length: columns }).map(() => 1);
@@ -3483,6 +3681,8 @@
                     } else {
                     showView('auth');
                     }
+                    // Preload server public config for Redeem card
+                    try { preloadPublicConfig(); } catch {}
                     // Soft ambient audio on login page
                     try {
                         const audio = document.getElementById('vh-audio');
@@ -3758,7 +3958,7 @@
                 });
             }
 
-            // Phantom sign-in handler
+            // Phantom sign-in handler (mobile-safe)
             const phantomSignInBtn = document.getElementById('phantomSignIn');
             if (phantomSignInBtn && !phantomSignInBtn.dataset.bound) {
                 phantomSignInBtn.dataset.bound = '1';
@@ -3769,12 +3969,14 @@
                             return;
                         }
                         const resp = await window.solana.connect({ onlyIfTrusted: false });
+                        try { await window.solana.postMessage?.({ method: 'wallet_standard:request', params: { silent: false } }); } catch {}
                         const address = resp?.publicKey?.toString?.();
                         if (!address) throw new Error('No wallet address');
 
                         // Get server nonce
                         const n = await fetch('/.netlify/functions/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
                         const message = new TextEncoder().encode(n.message);
+                        // Ensure runs within click gesture for iOS Safari
                         const signed = await window.solana.signMessage(message, 'utf8');
                         const signature = Array.from(signed.signature);
 
@@ -3834,6 +4036,12 @@
                 if (typeof initializeDashboard === 'function') {
                     initializeDashboard();
                 }
+                // Enforce onboarding assessment for new users only once
+                try {
+                    if (!OperatorUplift.userData.onboardingCompleted) {
+                        openOnboardingAssessment();
+                    }
+                } catch {}
             } catch (error) {
                 console.error('❌ Error loading/creating user data:', error);
                 OperatorUplift.userData = OperatorUplift.userData || {
@@ -3996,6 +4204,7 @@
             loadUserGoals();
             loadUserAchievements();
             setupDashboardEventListeners();
+            try { renderSystemHealth(); } catch {}
             maybeShowOnboarding();
             setupWalletAndPoints();
             setupWalletLinking();
@@ -4017,6 +4226,22 @@
                     }
                 });
             }
+            // AI style summary (read-only)
+            (async ()=>{
+                try {
+                    const styleEl = document.getElementById('aiStyleSummary');
+                    if (!styleEl) return;
+                    let persona = await loadAiPersona();
+                    if (!persona) {
+                        const personalityDoc = await (async ()=>{ try { const uid = auth?.currentUser?.uid; if (!uid||!db) return null; const d = await db.collection('users').doc(uid).collection('aiProfile').doc('personality').get(); return d.exists? d.data(): null; } catch { return null; } })();
+                        const pref = (personalityDoc?.preferences||'').toLowerCase();
+                        const coachType = pref.includes('direct') ? 'trainer' : pref.includes('analytical') ? 'strategist' : pref.includes('empathetic') ? 'mentor' : 'coach';
+                        const tone = pref.includes('direct') ? 'direct' : pref.includes('analytical') ? 'analytical' : pref.includes('empathetic') ? 'empathetic' : 'supportive';
+                        persona = { coachType, tone };
+                    }
+                    styleEl.textContent = `AI style: ${persona.coachType || 'coach'} • Tone: ${persona.tone || 'supportive'}`;
+                } catch {}
+            })();
         }
 
         // Update dashboard UI with user data
@@ -4059,6 +4284,9 @@
                 // Optional right rail population on wide screens
                 ensureRightRail();
             }
+            // Load pending redemptions and start polling
+            renderPendingRedemptions();
+            try { if (!window.__redemptionsPoll) window.__redemptionsPoll = setInterval(renderPendingRedemptions, 120000); } catch {}
         }
 
         // Right-rail on wide screens to reduce whitespace
@@ -4095,6 +4323,7 @@
                             return;
                         }
                         const resp = await window.solana.connect({ onlyIfTrusted: false });
+                        try { await window.solana.postMessage?.({ method: 'wallet_standard:request', params: { silent: false } }); } catch {}
                         const pubkey = resp?.publicKey?.toString?.();
                         if (pubkey) {
                             localStorage.setItem('uplift:wallet', pubkey);
@@ -4132,6 +4361,214 @@
             } catch {}
         }
 
+        // ===== Redeem UI =====
+        let Redeem = { rate: null, mode: 'fixed', pointUsd: null, tierMult: 1.0 };
+        async function preloadPublicConfig() {
+            try {
+                const res = await fetch('/.netlify/functions/api/config/public', { cache: 'no-store' });
+                if (!res.ok) return;
+                const cfg = await res.json();
+                const r = cfg?.redemption || {};
+                try { localStorage.setItem('uplift:redeemDailyCap', String(r.dailyCap ?? '')); } catch {}
+                try { localStorage.setItem('uplift:redeemWeeklyCap', String(r.weeklyCap ?? '')); } catch {}
+                try { localStorage.setItem('uplift:redeemCooldownH', String(r.cooldownHours ?? '')); } catch {}
+                const help = document.getElementById('redeemRateHelp');
+                if (help) {
+                    const mode = (r.mode||'fixed');
+                    help.textContent = mode === 'fixed'
+                        ? `Current rate: 1 point = ${(cfg.pointsRate||0)} UPLIFT`
+                        : `Current rate: 1 point ≈ ${(r.pointUsd||0)} USD worth of UPLIFT`;
+                }
+                const caps = document.getElementById('redeemCaps');
+                if (caps) {
+                    const daily = Number(r.dailyCap||0);
+                    const weekly = Number(r.weeklyCap||0);
+                    const cooldownH = Number(r.cooldownHours||0);
+                    caps.textContent = `Daily cap: ${daily.toLocaleString()} pts • Weekly cap: ${weekly.toLocaleString()} pts • Cooldown: ${cooldownH}h`;
+                }
+            } catch {}
+        }
+        async function openRedeemModal() {
+            const m = document.getElementById('redeemModal');
+            if (m) m.classList.add('active');
+            document.body.classList.add('modal-open');
+            if (m) enableFocusTrap(m);
+            await loadRedeemRate();
+            try {
+                const wallet = localStorage.getItem('uplift:wallet');
+                if (wallet) {
+                    const res = await fetch(`/.netlify/functions/api/user/${encodeURIComponent(wallet)}/points`, { cache: 'no-store' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const av = document.getElementById('redeemAvailable');
+                        if (av) av.textContent = `Available: ${Number(data.points||0).toLocaleString()} pts`;
+                        // Compute a safe max under caps
+                        try {
+                            const pc = await fetch('/.netlify/functions/api/config/public', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null);
+                            const r = pc?.redemption || {};
+                            const daily = Number(r.dailyCap || localStorage.getItem('uplift:redeemDailyCap') || 10000);
+                            const weekly = Number(r.weeklyCap || localStorage.getItem('uplift:redeemWeeklyCap') || 30000);
+                            const available = Number(data.points||0);
+                            const max = Math.max(0, Math.min(available, daily, weekly));
+                            const maxBtn = document.getElementById('redeemMaxBtn');
+                            if (maxBtn && !maxBtn.dataset.bound) {
+                                maxBtn.dataset.bound = '1';
+                                maxBtn.addEventListener('click', ()=>{
+                                    const input = document.getElementById('redeemPointsInput');
+                                    if (input) { input.value = String(max|0); updateRedeemPreview(); }
+                                });
+                            }
+                        } catch {}
+                    }
+                }
+            } catch {}
+            updateRedeemPreview();
+            const input = document.getElementById('redeemPointsInput');
+            if (input && !input.dataset.bound) {
+                input.dataset.bound = '1';
+                input.addEventListener('input', updateRedeemPreview);
+                input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRedeem(); });
+            }
+        }
+        function closeRedeemModal() {
+            const m = document.getElementById('redeemModal');
+            m?.classList.remove('active');
+            document.body.classList.remove('modal-open');
+            if (m) disableFocusTrap(m);
+        }
+        function openRedeemHelp() {
+            const t = document.getElementById('redeemRateHelp')?.textContent || '';
+            const caps = document.getElementById('redeemCaps')?.textContent || '';
+            const msg = `Redemption overview\n\n${t}\n${caps}\n\nRules:\n- Daily/weekly caps limit how many points you can redeem in a period.\n- Cooldown prevents immediate consecutive redemptions.\n- Monthly issuance budgets may pause grants if reached.`;
+            try { OperatorUplift.ui?.showToast?.('Opening Redeem help…', 'success'); } catch {}
+            alert(msg);
+        }
+        function scrollToRedemptions() {
+            try { document.getElementById('redemptionsList')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {}
+        }
+        async function loadRedeemRate() {
+            try {
+                const res = await fetch('/.netlify/functions/api/points/rate', { cache: 'no-store' });
+                const data = await res.json();
+                Redeem.mode = data.type;
+                if (data.type === 'fixed') { Redeem.rate = Number(data.rate||0); } else { Redeem.pointUsd = Number(data.pointUsd||0); }
+                const t = document.getElementById('redeemRateText');
+                if (t) {
+                    t.textContent = data.type === 'fixed' ? `Current rate: 1 point = ${Redeem.rate} UPLIFT` : `Current rate: 1 point ≈ ${Redeem.pointUsd} USD worth of UPLIFT`;
+                }
+                // Show caps/cooldown help inline
+                const help = document.getElementById('redeemRateHelp');
+                const caps = document.getElementById('redeemCaps');
+                const pc = await fetch('/.netlify/functions/api/config/public', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null);
+                const r = pc?.redemption || {};
+                const daily = Number(r.dailyCap || localStorage.getItem('uplift:redeemDailyCap') || 10000);
+                const weekly = Number(r.weeklyCap || localStorage.getItem('uplift:redeemWeeklyCap') || 30000);
+                const cooldownH = Number(r.cooldownHours || localStorage.getItem('uplift:redeemCooldownH') || 24);
+                try { localStorage.setItem('uplift:redeemDailyCap', String(daily)); } catch {}
+                try { localStorage.setItem('uplift:redeemWeeklyCap', String(weekly)); } catch {}
+                try { localStorage.setItem('uplift:redeemCooldownH', String(cooldownH)); } catch {}
+                if (help) help.textContent = (t?.textContent||'');
+                if (caps) caps.textContent = `Daily cap: ${daily.toLocaleString()} pts • Weekly cap: ${weekly.toLocaleString()} pts • Cooldown: ${cooldownH}h`;
+            } catch {
+                const t = document.getElementById('redeemRateText');
+                if (t) t.textContent = 'Unable to load rate';
+            }
+        }
+
+        // ===== System Health (env + jobs) =====
+        async function renderSystemHealth() {
+            const list = document.getElementById('systemHealthList');
+            if (!list) return;
+            list.innerHTML = '<div class="list-item"><div class="text-muted">Loading…</div></div>';
+            try {
+                const btn = document.getElementById('systemHealthRefreshBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+                const [envRes, cfgRes, jobsRes] = await Promise.all([
+                    fetch('/.netlify/functions/api/env/check', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null),
+                    fetch('/.netlify/functions/api/config/public', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null),
+                    fetch('/.netlify/functions/api/jobs/status', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null),
+                ]);
+                const rows = [];
+                rows.push(`<div class="list-item"><div><strong>Env</strong><div class="text-muted">${envRes?.ok ? 'OK' : 'Check failed'}</div></div></div>`);
+                if (cfgRes?.redemption) {
+                    const r = cfgRes.redemption;
+                    rows.push(`<div class="list-item"><div><strong>Redemption</strong><div class="text-muted">Mode: ${r.mode} • Caps: ${Number(r.dailyCap||0).toLocaleString()}/${Number(r.weeklyCap||0).toLocaleString()} • Cooldown: ${Number(r.cooldownHours||0)}h</div></div></div>`);
+                }
+                if (jobsRes?.jobs) {
+                    const jr = jobsRes.jobs;
+                    const wf = jr['weekly-reset']?.lastRun ? new Date(jr['weekly-reset'].lastRun._seconds ? jr['weekly-reset'].lastRun._seconds*1000 : jr['weekly-reset'].lastRun).toLocaleString() : '—';
+                    const rf = jr['redeem-fulfill']?.lastRun ? new Date(jr['redeem-fulfill'].lastRun._seconds ? jr['redeem-fulfill'].lastRun._seconds*1000 : jr['redeem-fulfill'].lastRun).toLocaleString() : '—';
+                    rows.push(`<div class="list-item"><div><strong>Jobs</strong><div class="text-muted">Weekly Reset: ${wf} • Redeem Fulfill: ${rf}</div></div></div>`);
+                }
+                list.innerHTML = rows.join('') || '<div class="list-item"><div class="text-muted">No data</div></div>';
+                const ts = new Date().toLocaleTimeString();
+                const at = document.getElementById('systemHealthCheckedAt');
+                if (at) at.textContent = `Checked ${ts}`;
+                try { OperatorUplift.ui?.showToast?.('System health refreshed', 'success'); } catch {}
+            } catch (e) {
+                list.innerHTML = '<div class="list-item"><div class="text-muted">Failed to load</div></div>';
+                try { OperatorUplift.ui?.showToast?.('Failed to refresh system health', 'error'); } catch {}
+            } finally {
+                const btn = document.getElementById('systemHealthRefreshBtn');
+                if (btn) { btn.disabled = false; btn.textContent = 'Refresh'; }
+            }
+        }
+        function updateRedeemPreview() {
+            const input = document.getElementById('redeemPointsInput');
+            const preview = document.getElementById('redeemPreview');
+            const points = Math.max(0, Number(input?.value||0)|0);
+            try { if (input && String(points) !== String(input.value||'')) input.value = String(points); } catch {}
+            if (!preview || points <= 0) { if (preview) preview.textContent = '—'; return; }
+            if (Redeem.mode === 'fixed') {
+                const uplift = Math.floor(points * (Redeem.rate||0));
+                preview.textContent = `You will receive approximately ${uplift.toLocaleString()} UPLIFT (pending vesting).`;
+            } else {
+                // Without live price, show USD estimate only
+                const usd = points * (Redeem.pointUsd||0);
+                preview.textContent = `Estimated USD value: $${usd.toFixed(5)} worth of UPLIFT (final UPLIFT depends on current price).`;
+            }
+        }
+        async function submitRedeem() {
+            try {
+                if (!auth?.currentUser) { showError('Sign in first'); return; }
+                const input = document.getElementById('redeemPointsInput');
+                const points = Math.max(1, Number(input?.value||0)|0);
+                const wallet = localStorage.getItem('uplift:wallet');
+                if (!wallet) { showError('Connect your wallet first'); return; }
+                const idToken = await auth.currentUser.getIdToken();
+                const btn = document.getElementById('redeemSubmitBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+                const res = await fetch('/.netlify/functions/api/points/redeem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+                    body: JSON.stringify({ wallet, points })
+                });
+                const data = await res.json();
+                if (!res.ok || !data?.ok) {
+                    const err = String(data?.error||'redeem_failed');
+                    const map = {
+                        daily_cap_exceeded: 'Daily cap exceeded. Try a smaller amount or wait until tomorrow.',
+                        weekly_cap_exceeded: 'Weekly cap exceeded. Try next week or reduce the amount.',
+                        insufficient_points: 'You do not have enough points to redeem that amount.',
+                        monthly_cap_exceeded: 'Monthly issuance budget reached. Try again later.',
+                        zero_grant: 'The calculated grant was zero. Try a larger amount.',
+                        cooldown_active: 'Redemption cooldown active. Please try again later.',
+                        missing_token: 'You must be signed in to redeem points.',
+                        invalid_wallet: 'Wallet address is invalid. Reconnect your wallet and try again.',
+                        rate_unavailable: 'Redemption rate is temporarily unavailable.'
+                    };
+                    throw new Error(map[err] || err);
+                }
+                OperatorUplift.ui?.showToast?.(`Redemption queued: ${data.pointsRedeemed} pts → ${data.upliftGranted} UPLIFT (vests in ${data.vestingDays}d)`, 'success');
+                closeRedeemModal();
+                try { if (typeof renderPendingRedemptions === 'function') renderPendingRedemptions(); } catch {}
+                try { const saved = localStorage.getItem('uplift:wallet'); if (saved) fetchAndRenderPoints(saved); } catch {}
+                try { setTimeout(()=>scrollToRedemptions(), 300); } catch {}
+            } catch (e) {
+                console.error('redeem error', e);
+                OperatorUplift.ui?.showToast?.(String(e?.message||'Redeem failed'), 'error');
+            } finally { const btn = document.getElementById('redeemSubmitBtn'); if (btn) { btn.disabled = false; btn.textContent = 'Redeem'; } }
+        }
         // Link currently connected Phantom wallet to the signed-in Firebase user
         function setupWalletLinking() {
             const linkBtn = document.getElementById('linkWalletBtn');
@@ -4143,6 +4580,7 @@
                     if (!window.solana || !window.solana.isPhantom) { window.open('https://phantom.app/', '_blank'); return; }
                     const saved = localStorage.getItem('uplift:wallet');
                     const resp = saved ? { publicKey: { toString: ()=>saved } } : await window.solana.connect({ onlyIfTrusted: false });
+                    try { await window.solana.postMessage?.({ method: 'wallet_standard:request', params: { silent: false } }); } catch {}
                     const address = resp?.publicKey?.toString?.();
                     if (!address) throw new Error('No wallet address');
 
@@ -4158,7 +4596,16 @@
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
                         body: JSON.stringify({ address, signature, nonce: n.nonce })
                     }).then(r=>r.json());
-                    if (!res || res.error) throw new Error(res?.error || 'link_failed');
+                    if (!res || res.error) {
+                        const err = String(res?.error||'link_failed');
+                        const map = {
+                            address_already_linked: 'This wallet is already linked to another account.',
+                            nonce_expired: 'Security nonce expired. Please try again.',
+                            invalid_signature: 'Signature verification failed. Please approve the signature again.',
+                            missing_token: 'Please sign in first.'
+                        };
+                        throw new Error(map[err] || err);
+                    }
                     showSuccess('Wallet linked');
                 } catch (e) {
                     console.error('wallet link failed', e);
@@ -4174,7 +4621,15 @@
                 const res = await fetch(`/.netlify/functions/api/user/${encodeURIComponent(address)}/points`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('http '+res.status);
                 const data = await res.json();
-                if (pointsBadge) pointsBadge.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
+                if (pointsBadge) {
+                    const now = new Date();
+                    pointsBadge.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
+                    pointsBadge.title = `Points from $UPLIFT holdings • Last updated ${now.toLocaleTimeString()}`;
+                }
+                try {
+                    const landing = document.getElementById('landingPointsText');
+                    if (landing) landing.textContent = `PTS: ${Number(data.points||0).toLocaleString()}`;
+                } catch {}
             } catch (e) {
                 console.error('points fetch failed', e);
             }
@@ -4286,7 +4741,6 @@
                 console.error('XP apply failed:', e);
             }
         }
-
         async function maybeAwardRankAchievements() {
             try {
                 const level = OperatorUplift.userData?.level || 1;
@@ -4360,30 +4814,42 @@
             } catch {}
         }
 
-        function updateTreasureChest() {
-            // Unlock on every 5 completed goals
-            const completed = dashboardData.stats?.completedGoals || 0;
-            const nextAt = 5 * Math.ceil((completed + 1) / 5);
-            const remaining = nextAt - completed;
-            const txt = document.getElementById('chestProgressText');
-            if (txt) txt.textContent = remaining > 0 ? `${remaining} more completions to unlock` : 'Chest ready!';
-            const btn = document.getElementById('openChestBtn');
-            if (btn) {
-                btn.style.display = (remaining <= 0) ? 'inline-flex' : 'none';
+        async function updateTreasureChest() {
+            try {
+                const uid = OperatorUplift?.currentUser?.uid;
+                const txt = document.getElementById('chestProgressText');
+                const btn = document.getElementById('openChestBtn');
+                if (!uid || !txt || !btn) return;
+
+                const userRef = db.collection('users').doc(uid);
+                const treasureRef = userRef.collection('rewards').doc('treasure');
+
+                const [treasureSnap, completedSnap] = await Promise.all([
+                    treasureRef.get(),
+                    userRef.collection('goals').where('status', '==', 'completed').get()
+                ]);
+
+                const claimedCount = treasureSnap.exists ? Number(treasureSnap.data()?.claimedCount || 0) : 0;
+                const baselineCompleted = treasureSnap.exists && treasureSnap.data()?.completedSumAtClaim != null
+                    ? Number(treasureSnap.data().completedSumAtClaim)
+                    : (claimedCount * 5);
+                const completedTotal = completedSnap.size;
+                const completionsSince = Math.max(0, completedTotal - baselineCompleted);
+                const ready = completionsSince >= 5;
+                const toNext = ready ? 0 : Math.max(0, 5 - completionsSince);
+
+                txt.textContent = ready ? 'Chest ready!' : `${toNext} more completions to unlock`;
+                btn.style.display = ready ? 'inline-flex' : 'none';
+
                 if (!btn.dataset.bound) {
                     btn.dataset.bound = '1';
-                    btn.addEventListener('click', async () => {
-                        try {
-                            // Grant small reward
-                            const reward = 25;
-                            OperatorUplift.userData.stats.points = (OperatorUplift.userData.stats.points || 0) + reward;
-                            await db.collection('users').doc(OperatorUplift.currentUser.uid).set({ stats: { points: OperatorUplift.userData.stats.points } }, { merge: true });
-                            OperatorUplift.ui?.showToast?.(`Chest opened! +${reward} Essence`, 'success');
-                            // reset threshold by incrementing completedGoals baseline
-                            updateDashboardUI();
-                        } catch (e) { console.error('Chest open failed', e); }
+                    btn.addEventListener('click', () => {
+                        // Open modal; actual rewards handled by claimTreasure()
+                        openTreasureChest();
                     });
                 }
+            } catch (e) {
+                console.error('updateTreasureChest failed', e);
             }
         }
 
@@ -4617,14 +5083,14 @@
         async function aiSummarizeGoal(goalId) {
             const g = dashboardData.goals.find(x=>x.id===goalId); if (!g) return;
             const prompt = `Summarize this goal in 2 lines with key steps: ${g.title}. Details: ${g.description||''}`;
-            const out = await callDeepSeekAI([{ role: 'user', content: prompt }]).catch(()=>null);
-            if (out?.text) OperatorUplift.ui?.showToast?.('AI: ' + out.text.slice(0,80) + '…', 'success');
+            const out = await callDeepSeekAI(prompt).catch(()=>null);
+            if (out) OperatorUplift.ui?.showToast?.('AI: ' + String(out).slice(0,80) + '…', 'success');
         }
         async function aiBreakdownGoal(goalId) {
             const g = dashboardData.goals.find(x=>x.id===goalId); if (!g) return;
             const prompt = `Break this goal into 3-5 actionable steps: ${g.title}. Details: ${g.description||''}`;
-            const out = await callDeepSeekAI([{ role: 'user', content: prompt }]).catch(()=>null);
-            if (out?.text) OperatorUplift.ui?.showToast?.('AI: ' + out.text.slice(0,80) + '…', 'success');
+            const out = await callDeepSeekAI(prompt).catch(()=>null);
+            if (out) OperatorUplift.ui?.showToast?.('AI: ' + String(out).slice(0,80) + '…', 'success');
         }
 
         // Complete goal action
@@ -4732,14 +5198,15 @@
                 showError('Failed to create goal: ' + error.message);
             }
         });
-
         // Setup dashboard event listeners
         function setupDashboardEventListeners() {
             // Add goal button
-            document.getElementById('addGoalBtn').addEventListener('click', showAddGoalModal);
+            const addBtn = document.getElementById('addGoalBtn');
+            if (addBtn && !addBtn.dataset.bound) { addBtn.dataset.bound = '1'; addBtn.addEventListener('click', showAddGoalModal); }
             
             // User menu button
-            document.getElementById('userMenuBtn').addEventListener('click', showUserMenu);
+            const userMenu = document.getElementById('userMenuBtn');
+            if (userMenu && !userMenu.dataset.bound) { userMenu.dataset.bound = '1'; userMenu.addEventListener('click', showUserMenu); }
             
             // Logout button
             const logoutBtn = document.getElementById('logoutBtn');
@@ -4752,6 +5219,29 @@
                     } catch (e) {
                         console.error('Logout failed:', e);
                         OperatorUplift.ui?.showToast?.('Logout failed', 'error');
+                    }
+                });
+            }
+            // Mentor refresh button spinner + time
+            const mentorBtn = document.getElementById('mentorRefreshBtn');
+            if (mentorBtn && !mentorBtn.dataset.bound) {
+                mentorBtn.dataset.bound = '1';
+                mentorBtn.addEventListener('click', async ()=>{
+                    const msgEl = document.getElementById('aiMentorMessage');
+                    const original = mentorBtn.textContent;
+                    mentorBtn.textContent = 'Refreshing…';
+                    mentorBtn.disabled = true;
+                    try {
+                        const out = await callDeepSeekAI('Give one concise, high-leverage tip for the user based on their current goals and streak.');
+                        if (msgEl && out) msgEl.textContent = typeof out === 'string' ? out : String(out);
+                        const ts = new Date().toLocaleTimeString();
+                        const styleEl = document.getElementById('aiStyleSummary');
+                        if (styleEl) styleEl.textContent = (styleEl.textContent||'') + ` • Updated ${ts}`;
+                    } catch (e) {
+                        console.error('mentor refresh failed', e);
+                    } finally {
+                        mentorBtn.textContent = original;
+                        mentorBtn.disabled = false;
                     }
                 });
             }
@@ -4783,11 +5273,24 @@
             }
             
             // Modal backdrop click to close
-            document.getElementById('addGoalModal').addEventListener('click', (e) => {
-                if (e.target.id === 'addGoalModal') {
+            const addGoalModal = document.getElementById('addGoalModal');
+            if (addGoalModal && !addGoalModal.dataset.bound) {
+                addGoalModal.dataset.bound = '1';
+                addGoalModal.addEventListener('click', (e) => {
+                    if (e.target && e.target.id === 'addGoalModal') {
                     closeAddGoalModal();
                 }
             });
+        }
+
+            // Escape closes active modals
+            document.addEventListener('keydown', (ev)=>{
+                if (ev.key === 'Escape') {
+                    try { closeRedeemModal(); } catch {}
+                    try { closeProfileModal(); } catch {}
+                    try { closeAppSettings(); } catch {}
+                }
+            }, { passive: true });
 
             // Hook mood modal button states
             const moodModal = document.getElementById('moodModal');
@@ -4815,11 +5318,17 @@
                 document.body.classList.toggle('sidebar-expanded', !collapsed);
             };
             if (toggle) {
+                // Initialize from saved state
+                try {
+                    const saved = localStorage.getItem('uplift:sidebarCollapsed');
+                    if (saved === '1') sidebar.setAttribute('data-collapsed', 'true');
+                } catch {}
                 applyState();
                 toggle.addEventListener('click', () => {
                     const collapsed = sidebar.getAttribute('data-collapsed') === 'true';
                     sidebar.setAttribute('data-collapsed', (!collapsed).toString());
                     toggle.setAttribute('title', collapsed ? 'Collapse sidebar' : 'Expand sidebar');
+                    try { localStorage.setItem('uplift:sidebarCollapsed', (!collapsed) ? '1' : '0'); } catch {}
                     applyState();
                 });
             }
@@ -4842,6 +5351,8 @@
                     renderCalendar();
                 } else if (view === 'community') {
                     renderCommunity();
+                    renderLeaderboard();
+                    renderChallenges();
                 } else if (view === 'finance') {
                     renderFinance();
                 } else if (view === 'shop') {
@@ -4886,6 +5397,15 @@
             renderAchievementsView();
         }
 
+        function showShop() {
+            try {
+                showView('shop');
+                renderShop();
+            } catch (e) {
+                console.error('showShop failed', e);
+            }
+        }
+
         function showUserMenu() { openProfileModal(); }
         function openProfileModal() {
             try {
@@ -4894,15 +5414,45 @@
                 const name = data.name || u?.displayName || 'User';
                 const email = data.email || u?.email || '';
                 const a = (name||'U').charAt(0).toUpperCase();
-                const wallet = localStorage.getItem('uplift:wallet') || 'Not linked';
+                const rawWallet = localStorage.getItem('uplift:wallet') || '';
+                const maskedWallet = rawWallet ? (rawWallet.slice(0,4)+'…'+rawWallet.slice(-4)) : 'Not linked';
                 const credits = data?.stats?.aiCredits ?? 0;
                 const m = document.getElementById('profileModal');
                 if (m) {
                     m.querySelector('#profileAvatar').textContent = a;
                     m.querySelector('#profileName').textContent = name;
                     m.querySelector('#profileEmail').textContent = email;
-                    m.querySelector('#profileWallet').textContent = wallet;
+                    m.querySelector('#profileWallet').textContent = maskedWallet;
                     m.querySelector('#profileCredits').textContent = Number(credits).toLocaleString();
+                    // Ensure unlink button exists and is bound
+                    let unlink = m.querySelector('#unlinkWalletBtn');
+                    if (!unlink) {
+                        unlink = document.createElement('button');
+                        unlink.id = 'unlinkWalletBtn';
+                        unlink.className = 'btn-secondary';
+                        unlink.textContent = 'Unlink Wallet';
+                        const walletEl = m.querySelector('#profileWallet');
+                        walletEl?.parentNode?.appendChild(unlink);
+                    }
+                    unlink.onclick = async () => {
+                        try {
+                            const rawWallet = localStorage.getItem('uplift:wallet');
+                            if (auth?.currentUser && rawWallet) {
+                                const idToken = await auth.currentUser.getIdToken();
+                                const res = await fetch('/.netlify/functions/api/auth/phantom/unlink', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+                                    body: JSON.stringify({ address: rawWallet })
+                                });
+                                if (!res.ok) throw new Error('Unlink failed');
+                            }
+                        } catch (e) {
+                            console.warn('server unlink failed, falling back', e);
+                        }
+                        try { localStorage.removeItem('uplift:wallet'); } catch {}
+                        try { m.querySelector('#profileWallet').textContent = 'Not linked'; } catch {}
+                        OperatorUplift.ui?.showToast?.('Wallet unlinked', 'success');
+                    };
                 }
             } catch {}
             // Avatar upload
@@ -4931,9 +5481,12 @@
                     }
                 });
             }
-            document.getElementById('profileModal')?.classList.add('active');
+            const pmEl = document.getElementById('profileModal');
+            pmEl?.classList.add('active');
+            document.body.classList.add('modal-open');
+            if (pmEl) enableFocusTrap(pmEl);
         }
-        function closeProfileModal() { document.getElementById('profileModal')?.classList.remove('active'); }
+        function closeProfileModal() { document.getElementById('profileModal')?.classList.remove('active'); document.body.classList.remove('modal-open'); }
 
         // App Settings handlers
         function openAppSettings() {
@@ -4944,8 +5497,9 @@
             m.querySelector('#appDensity').value = saved.density || 'cozy';
             m.querySelector('#appNotifications').checked = !!saved.notifications;
             m.classList.add('active');
+            document.body.classList.add('modal-open');
         }
-        function closeAppSettings() { document.getElementById('appSettingsModal')?.classList.remove('active'); }
+        function closeAppSettings() { document.getElementById('appSettingsModal')?.classList.remove('active'); document.body.classList.remove('modal-open'); }
         function applyAppSettings(settings) {
             // Density
             document.documentElement.dataset.density = settings.density || 'cozy';
@@ -4971,6 +5525,14 @@
             OperatorUplift.ui?.showToast?.('Settings saved', 'success');
             closeAppSettings();
         }
+
+        // Persist last view to improve mobile UX
+        (function persistLastViewInit(){
+            try {
+                const saved = localStorage.getItem('uplift:lastView');
+                if (saved && saved !== 'auth') showView(saved);
+            } catch {}
+        })();
 
         // Apply saved settings on load
         (function(){ try { const s = JSON.parse(localStorage.getItem('uplift:appSettings')||'{}'); if (s) applyAppSettings(s); const av=localStorage.getItem('uplift:avatar'); if (av) { const a=document.getElementById('profileAvatar'); if (a) { a.textContent=''; a.style.backgroundImage=`url(${av})`; a.style.backgroundSize='cover'; a.style.backgroundPosition='center'; } } } catch {} })();
@@ -5056,7 +5618,32 @@
         }
         function openTreasureChest() { document.getElementById('treasureChestModal')?.classList.add('active'); }
         function closeTreasureChest() { document.getElementById('treasureChestModal')?.classList.remove('active'); }
-        function claimTreasure() { OperatorUplift.ui?.showToast?.('Reward claimed!', 'success'); closeTreasureChest(); }
+        async function claimTreasure() {
+            try {
+                const uid = OperatorUplift?.currentUser?.uid; if (!uid) return;
+                const awardEssence = 25; const awardXP = 15;
+                const userRef = db.collection('users').doc(uid);
+
+                // Count total completed goals at claim time to set a robust baseline
+                const completedSnap = await userRef.collection('goals').where('status','==','completed').get();
+                const completedTotal = completedSnap.size;
+
+                await db.runTransaction(async (tx)=>{
+                    const u = await tx.get(userRef); const stats = u.exists? (u.data()?.stats||{}):{};
+                    const newPoints = Number(stats.points||0) + awardEssence;
+                    tx.set(userRef, { stats: { points: newPoints } }, { merge: true });
+                });
+                await addExperience(awardXP);
+                const rref = userRef.collection('rewards').doc('treasure');
+                await rref.set({
+                    claimedCount: firebase.firestore.FieldValue.increment(1),
+                    completedSumAtClaim: completedTotal,
+                    lastClaimedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                OperatorUplift.ui?.showToast?.(`Treasure claimed! +${awardEssence} Essence, +${awardXP} XP`, 'success');
+                closeTreasureChest(); updateTreasureChest?.(); updateProgressStats?.();
+            } catch (e) { console.error('claim treasure failed', e); }
+        }
         function closeLuckyWheel() { document.getElementById('luckyWheelModal')?.classList.remove('active'); }
         (function bindEditGoalForm(){
             const form = document.getElementById('editGoalForm');
@@ -5086,6 +5673,98 @@
                 }
             });
         })();
+
+        // ===== Quest Templates =====
+        const QUEST_TEMPLATES = [
+            {
+                id: 'FITNESS_STARTER',
+                title: 'Fitness Starter (2 Weeks)',
+                description: 'Build a consistent workout habit over two weeks.',
+                category: 'health',
+                difficulty: 'medium',
+                subtasks: [
+                    { text: 'Plan 4 workout slots this week' },
+                    { text: 'Complete 3 strength sessions' },
+                    { text: 'Do 2 mobility sessions' },
+                    { text: 'Reflect on energy and mood' }
+                ]
+            },
+            {
+                id: 'DEEP_WORK_SPRINT',
+                title: 'Deep Work Sprint (1 Week)',
+                description: 'Focus blocks to push a key project forward.',
+                category: 'work',
+                difficulty: 'hard',
+                subtasks: [
+                    { text: 'Define a clear, measurable outcome' },
+                    { text: 'Schedule 5 x 60-min focus blocks' },
+                    { text: 'Eliminate 3 distractions (apps/sites)' },
+                    { text: 'Daily 5-min review and plan for next day' }
+                ]
+            },
+            {
+                id: 'LEARNING_LOOP',
+                title: 'Learning Loop (30 Days)',
+                description: 'Daily study cadence for a new skill.',
+                category: 'education',
+                difficulty: 'medium',
+                subtasks: [
+                    { text: 'Pick source (course/book) and outline' },
+                    { text: 'Study 20 min/day, 5 days/week' },
+                    { text: 'Create 10 flashcards or notes' },
+                    { text: 'Weekly recap and self-quiz' }
+                ]
+            }
+        ];
+
+        function openQuestTemplatesModal() {
+            const m = document.getElementById('questTemplatesModal');
+            const list = document.getElementById('questTemplatesList');
+            if (!m || !list) return;
+            list.innerHTML = QUEST_TEMPLATES.map(t => `
+                <div class="list-item" style="align-items:flex-start;gap:10px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:700;">${t.title}</div>
+                        <div class="text-muted">${t.description}</div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-secondary" onclick="selectQuestTemplate('${t.id}')">Use</button>
+                    </div>
+                </div>
+            `).join('');
+            m.classList.add('active');
+        }
+        function closeQuestTemplatesModal() {
+            document.getElementById('questTemplatesModal')?.classList.remove('active');
+        }
+        async function selectQuestTemplate(templateId) {
+            try {
+                const uid = OperatorUplift?.currentUser?.uid; if (!uid || !db) return;
+                const t = QUEST_TEMPLATES.find(x=>x.id===templateId); if (!t) return;
+                // Create goal from template
+                const goal = {
+                    title: t.title,
+                    description: t.description,
+                    category: t.category,
+                    difficulty: t.difficulty,
+                    status: 'active',
+                    tasks: t.subtasks.map(s=>({ text: s.text, completed: false })),
+                    progress: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                const ref = await db.collection('users').doc(uid).collection('goals').add(goal);
+                goal.id = ref.id;
+                dashboardData.goals.unshift(goal);
+                updateGoalsList();
+                updateStats();
+                OperatorUplift.ui?.showToast?.('Template added as goal', 'success');
+                closeQuestTemplatesModal();
+            } catch (e) {
+                console.error('selectQuestTemplate failed', e);
+                OperatorUplift.ui?.showToast?.('Failed to use template', 'error');
+            }
+        }
         async function deleteGoal(goalId) {
             if (!OperatorUplift.currentUser || !goalId) return;
             try {
@@ -5116,7 +5795,6 @@
                 });
             }
         }
-
         // Lightweight renderers for new views
         function renderAnalytics() {
             if (!window.Chart) return;
@@ -5136,27 +5814,27 @@
             }
             const prodEl = document.getElementById('productivityChart');
             if (prodEl) {
-                const ctx = prodEl.getContext('2d');
                 if (prodEl._chart) prodEl._chart.destroy();
+                const ctx = prodEl.getContext('2d');
                 prodEl._chart = new Chart(ctx, {
                     type: 'bar',
-                    data: { labels: labelsProd, datasets: [{ label: 'Completions', data: dataProd, backgroundColor: 'rgba(249,115,22,0.35)' }] },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    data: { labels: labelsProd, datasets: [{ label: 'Tasks Completed', data: dataProd, backgroundColor: '#f97316' }] },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
             }
 
             // Category Distribution
-            const categoryCounts = {};
-            goals.forEach(g => { const c = g.category || 'uncategorized'; categoryCounts[c] = (categoryCounts[c] || 0) + 1; });
-            const catLabels = Object.keys(categoryCounts);
-            const catData = Object.values(categoryCounts);
+            const catData = {};
+            goals.forEach(g => { catData[g.category] = (catData[g.category] || 0) + 1; });
+            const catLabels = Object.keys(catData);
+            const catValues = Object.values(catData);
             const catEl = document.getElementById('categoryChart');
             if (catEl) {
-                const ctx = catEl.getContext('2d');
                 if (catEl._chart) catEl._chart.destroy();
+                const ctx = catEl.getContext('2d');
                 catEl._chart = new Chart(ctx, {
                     type: 'doughnut',
-                    data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#f97316', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#22d3ee'] }] },
+                    data: { labels: catLabels, datasets: [{ data: catValues, backgroundColor: ['#f97316', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#22d3ee'] }] },
                     options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
             }
@@ -5172,96 +5850,124 @@
             }
             const velEl = document.getElementById('velocityChart');
             if (velEl) {
-                const ctx = velEl.getContext('2d');
                 if (velEl._chart) velEl._chart.destroy();
+                const ctx = velEl.getContext('2d');
                 velEl._chart = new Chart(ctx, {
                     type: 'line',
-                    data: { labels: labelsProd, datasets: [{ label: 'Created', data: dataVel, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.25)', fill: true, tension: 0.3 }] },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    data: { labels: labelsProd, datasets: [{ label: 'Tasks Created', data: dataVel, borderColor: '#3b82f6', fill: false }] },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
             }
 
-            // Habit Tracking (completions per weekday)
+            // Habit Tracking (completions by weekday)
+            const habitData = { labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], datasets: [] };
+            const habits = dashboardData.habits || [];
+            habits.forEach(h => {
+                const completions = new Array(7).fill(0);
+                (h.completedOn || []).forEach(dateStr => {
+                    const date = new Date(dateStr);
+                    completions[date.getDay()]++;
+                });
+                habitData.datasets.push({ label: h.name, data: completions, backgroundColor: randomColor() });
+            });
             const habitEl = document.getElementById('habitChart');
             if (habitEl) {
-                const ctx = habitEl.getContext('2d');
                 if (habitEl._chart) habitEl._chart.destroy();
-                const labelsHabit = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                const dataHabit = new Array(7).fill(0);
-                if (OperatorUplift.currentUser) {
-                    db.collection('users').doc(OperatorUplift.currentUser.uid).collection('habits').get().then(snap => {
-                        snap.forEach(doc => {
-                            const completed = Array.isArray(doc.data().completedOn) ? doc.data().completedOn : [];
-                            completed.forEach(dStr => { const d = new Date(dStr); if (!isNaN(d)) dataHabit[d.getDay()]++; });
-                        });
-                        habitEl._chart = new Chart(ctx, {
-                            type: 'bar',
-                            data: { labels: labelsHabit, datasets: [{ label: 'Habit Completions', data: dataHabit, backgroundColor: '#10b981' }] },
-                            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-                        });
-                    });
+                const ctx = habitEl.getContext('2d');
+                function randomColor(){
+                    const hues = [24, 160, 220, 45, 0, 270, 190];
+                    const h = hues[Math.floor(Math.random()*hues.length)];
+                    return `hsl(${h} 85% 55% / 0.85)`;
                 }
-            }
-
-            // Productivity Heatmap: 7x14 grid (Sun..Sat x last 14 days)
-            const heatEl = document.getElementById('productivityHeatmap');
-            if (heatEl) {
-                const ctx = heatEl.getContext('2d');
-                if (heatEl._chart) heatEl._chart.destroy();
-                const days = 14;
-                const grid = Array.from({ length: 7 }, () => new Array(days).fill(0));
-                // Map completions to grid
-                const all = goals;
-                for (let i = 0; i < days; i++) {
-                    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (days - 1 - i));
-                    const key = d.toDateString();
-                    const count = all.filter(g => (g.completedAt?.toDate ? g.completedAt.toDate().toDateString() : null) === key).length;
-                    const dow = d.getDay();
-                    grid[dow][i] = count;
-                }
-                // Build dataset as stacked bars per weekday with tiny thickness
-                const labels = Array.from({ length: days }, (_, i) => `D-${days - i - 1}`);
-                const datasets = grid.map((row, r) => ({
-                    label: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][r],
-                    data: row,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.06)',
-                    backgroundColor: row.map(v => `rgba(16,185,129,${Math.min(0.1 + v*0.15, 0.85)})`),
-                    barPercentage: 1.0,
-                    categoryPercentage: 1.0
-                }));
-                heatEl._chart = new Chart(ctx, {
+                habitEl._chart = new Chart(ctx, {
                     type: 'bar',
-                    data: { labels, datasets },
-                    options: { indexAxis: 'y', plugins: { legend: { display: true, position: 'bottom' } }, scales: { x: { stacked: true, ticks: { precision: 0 } }, y: { stacked: true } } }
+                    data: habitData,
+                    options: { responsive: true, scales: { y: { beginAtZero: true, stacked: true }, x: { stacked: true } } }
                 });
             }
 
-            // Cumulative XP line chart (uses userData.experience history approximation)
+            // Productivity Heatmap
+            const heatmapData = [];
+            const startDate = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+            const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            let current = new Date(startDate);
+            while (current <= endDate) {
+                const key = current.toDateString();
+                const count = goals.filter(g => g.status === 'completed' && completedDate(g)?.toDateString() === key).length;
+                heatmapData.push({ x: current.toISOString().split('T')[0], y: count });
+                current.setDate(current.getDate() + 1);
+            }
+            const heatmapEl = document.getElementById('heatmapChart');
+            if (heatmapEl) {
+                if (heatmapEl._chart) heatmapEl._chart.destroy();
+                const ctx = heatmapEl.getContext('2d');
+                function colorScale(val){
+                    if (val <= 0) return 'rgba(16,185,129,0.15)';
+                    if (val === 1) return 'rgba(16,185,129,0.35)';
+                    if (val === 2) return 'rgba(16,185,129,0.55)';
+                    if (val === 3) return 'rgba(16,185,129,0.75)';
+                    return 'rgba(16,185,129,0.95)';
+                }
+                heatmapEl._chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets: [{ label: 'Completed Tasks', data: heatmapData, backgroundColor: (ctx) => colorScale(ctx.dataset.data[ctx.dataIndex].y) }] },
+                    options: { responsive: true, scales: { x: { type: 'time', time: { unit: 'day' } }, y: { beginAtZero: true } } }
+                });
+            }
+
+            // Cumulative XP
+            const xpData = [];
+            let cumulative = 0;
+            const sortedGoals = goals.sort((a,b) => (completedDate(a) || new Date()) - (completedDate(b) || new Date()));
+            sortedGoals.forEach(g => {
+                if (g.status === 'completed') {
+                    cumulative += g.experience || 0;
+                    xpData.push({ x: completedDate(g), y: cumulative });
+                }
+            });
             const xpEl = document.getElementById('xpChart');
             if (xpEl) {
-                const ctx = xpEl.getContext('2d');
                 if (xpEl._chart) xpEl._chart.destroy();
-                // Build a simple cumulative XP series from recent goals (reward map) and focus/habits approximations
-                const xpMap = { easy: 10, medium: 25, hard: 50, epic: 100 };
-                const days = 14;
-                const labels = [];
-                const series = [];
-                let total = 0;
-                for (let i = days - 1; i >= 0; i--) {
-                    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
-                    labels.push(`${d.getMonth()+1}/${d.getDate()}`);
-                    const key = d.toDateString();
-                    const gained = goals.filter(g => (g.completedAt?.toDate ? g.completedAt.toDate().toDateString() : null) === key)
-                        .reduce((sum, g) => sum + (xpMap[g.difficulty || 'easy'] || 10), 0);
-                    total += gained;
-                    series.push(total);
-                }
+                const ctx = xpEl.getContext('2d');
                 xpEl._chart = new Chart(ctx, {
                     type: 'line',
-                    data: { labels, datasets: [{ label: 'Cumulative XP', data: series, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.25)', fill: true, tension: 0.3 }] },
-                    options: { responsive: true, plugins: { legend: { display: false } } }
+                    data: { datasets: [{ label: 'Cumulative XP', data: xpData, borderColor: '#84cc16', fill: false }] },
+                    options: { responsive: true, scales: { x: { type: 'time', time: { unit: 'day' } }, y: { beginAtZero: true } } }
                 });
+            }
+        }
+
+        function refreshAnalytics() {
+            try {
+                // Force data reload if available
+                const btn = document.getElementById('analyticsRefreshBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+                if (typeof loadAnalyticsData === 'function') {
+					loadAnalyticsData().then(()=>{
+						try {
+							renderAnalytics();
+							const ts = new Date().toLocaleTimeString();
+							const at = document.getElementById('analyticsUpdatedAt');
+							if (at) at.textContent = `Last updated ${ts}`;
+							OperatorUplift.ui?.showToast?.('Analytics refreshed', 'success');
+                            try { document.getElementById('analyticsTopCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {}
+						} catch {}
+                    }).catch(()=>{ renderAnalytics(); OperatorUplift.ui?.showToast?.('Analytics refreshed', 'success'); }).finally(()=>{ if (btn) { btn.disabled = false; btn.textContent = 'Refresh Data'; } });
+                } else {
+					renderAnalytics();
+					const ts = new Date().toLocaleTimeString();
+					const at = document.getElementById('analyticsUpdatedAt');
+					if (at) at.textContent = `Last updated ${ts}`;
+                    OperatorUplift.ui?.showToast?.('Analytics refreshed', 'success');
+                    try { document.getElementById('analyticsTopCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {}
+                    if (btn) { btn.disabled = false; btn.textContent = 'Refresh Data'; }
+                }
+            } catch (e) {
+                console.error('refreshAnalytics failed', e);
+				renderAnalytics();
+				OperatorUplift.ui?.showToast?.('Failed to refresh analytics', 'error');
+                const btn = document.getElementById('analyticsRefreshBtn');
+                if (btn) { btn.disabled = false; btn.textContent = 'Refresh Data'; }
             }
         }
 
@@ -5402,6 +6108,27 @@
                 }
             } catch {}
         })();
+        // Weekly mission reset on first app open of week
+        (function ensureWeeklyMissionsReset(){
+            try {
+                const now = new Date();
+                const day = now.getDay();
+                const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((day + 6) % 7));
+                const key = 'uplift:lastMissionReset';
+                const last = localStorage.getItem(key);
+                if (!last || new Date(last) < monday) {
+                    // reset local accepted missions progress (server is handled by scheduled function)
+                    (async ()=>{
+                        if (!OperatorUplift.currentUser) return;
+                        const snap = await db.collection('users').doc(OperatorUplift.currentUser.uid).collection('missions').get();
+                        const b = db.batch();
+                        snap.forEach(doc=> b.set(doc.ref, { progress: 0 }, { merge: true }));
+                        if (!snap.empty) await b.commit();
+                        try { localStorage.setItem(key, monday.toISOString()); } catch {}
+                    })();
+                }
+            } catch {}
+        })();
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const label = document.getElementById('calMonthLabel');
@@ -5537,12 +6264,16 @@
                     if (!OperatorUplift.currentUser) return;
                     const text = (document.getElementById('communityPostText').value || '').trim();
                     if (!text) return;
+                    // simple client hint for rate; prevent very fast repeat posts
+                    const last = Number(localStorage.getItem('uplift:lastPostTs')||'0');
+                    if (Date.now() - last < 10000) { OperatorUplift.ui?.showToast?.('Please wait a few seconds before posting again', 'error'); return; }
                     try {
                         await db.collection('communityPosts').add({
                             userId: OperatorUplift.currentUser.uid,
                             text,
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        try { localStorage.setItem('uplift:lastPostTs', String(Date.now())); } catch {}
                         document.getElementById('communityPostText').value = '';
                         OperatorUplift.ui?.showToast?.('Posted', 'success');
                         renderCommunity();
@@ -5559,7 +6290,7 @@
                     .get();
                 const posts = [];
                 snap.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
-                feed.innerHTML = posts.length ? posts.map(p => `
+                feed.innerHTML = posts.length ? posts.filter(p=>!p.flagged).map(p => `
                     <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
                         <div style=\"flex:1;\">
                             <div class=\"text-muted\">${p.createdAt?.toDate ? new Date(p.createdAt.toDate()).toLocaleString() : ''}</div>
@@ -5567,6 +6298,7 @@
                         </div>
                         <div style=\"display:flex;gap:6px;\">
                             <button class=\"btn-secondary\" onclick=\"likePost('${p.id}')\">❤️ ${p.likes||0}</button>
+                            <button class=\"btn-secondary\" onclick=\"reportPost('${p.id}')\">🚩 Report</button>
                             ${OperatorUplift.currentUser?.uid === p.userId ? `<button class=\"btn-secondary\" onclick=\"deletePost('${p.id}')\">Delete</button>` : ''}
                         </div>
                     </div>`).join('') : '<div class=\"empty-state\"><p>No posts yet</p></div>';
@@ -5575,9 +6307,107 @@
             }
         }
 
+        async function reportPost(postId) {
+            try {
+                if (!OperatorUplift.currentUser) return;
+                const uid = OperatorUplift.currentUser.uid;
+                const ref = db.collection('communityPosts').doc(postId);
+                const repRef = ref.collection('reports').doc(uid);
+                const repSnap = await repRef.get();
+                if (repSnap.exists) { OperatorUplift.ui?.showToast?.('Already reported', 'success'); return; }
+                await repRef.set({ uid, at: firebase.firestore.FieldValue.serverTimestamp() });
+                await ref.set({ flagged: true, flaggedCount: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+                OperatorUplift.ui?.showToast?.('Reported', 'success');
+                renderCommunity();
+            } catch (e) { console.error('report failed', e); }
+        }
+
+        // Leaderboard and Challenges (Community)
+        async function renderLeaderboard() {
+            const el = document.getElementById('leaderboardList');
+            if (!el || !db) return;
+            try {
+                const snap = await db.collection('leaderboard')
+                    .orderBy('score', 'desc')
+                    .limit(20)
+                    .get();
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                el.innerHTML = items.length ? items.map((u, i) => `
+                    <div class="list-item" style="align-items:center;gap:8px;">
+                        <div style="width:28px;text-align:center;">${i+1}</div>
+                        <div style="flex:1;display:flex;align-items:center;gap:8px;">
+                            <div class="avatar" style="width:28px;height:28px;border-radius:50%;background:var(--glass-bg);"></div>
+                            <div>
+                                <div style="font-weight:600;">${u.name || u.id}</div>
+                                <div class="text-muted">${u.level ? `Lv ${u.level}` : ''}</div>
+                            </div>
+                        </div>
+                        <div style="font-weight:700;">${u.score || 0}</div>
+                    </div>`).join('') : '<div class="empty-state"><p>No leaderboard yet</p></div>';
+            } catch (e) {
+                console.error('renderLeaderboard failed', e);
+                el.innerHTML = '<div class="empty-state"><p>Failed to load leaderboard</p></div>';
+            }
+        }
+
+        async function renderChallenges() {
+            const el = document.getElementById('challengesList');
+            if (!el || !db) return;
+            try {
+                const snap = await db.collection('challenges')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                el.innerHTML = items.length ? items.map((c) => `
+                    <div class="list-item" style="align-items:flex-start;gap:8px;">
+                        <div style="flex:1;">
+                            <div style="font-weight:700;">${c.title || 'Challenge'}</div>
+                            <div class="text-muted">${c.description || ''}</div>
+                            <div class="text-muted">${c.startsAt?.toDate ? new Date(c.startsAt.toDate()).toLocaleDateString() : ''} → ${c.endsAt?.toDate ? new Date(c.endsAt.toDate()).toLocaleDateString() : ''}</div>
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            <button class="btn-secondary" onclick="joinChallenge('${c.id}')">Join</button>
+                            <button class="btn-secondary" onclick="likeChallenge('${c.id}')">👍 ${c.likes||0}</button>
+                        </div>
+                    </div>`).join('') : '<div class="empty-state"><p>No challenges yet</p></div>';
+            } catch (e) {
+                console.error('renderChallenges failed', e);
+                el.innerHTML = '<div class="empty-state"><p>Failed to load challenges</p></div>';
+            }
+        }
+
+        async function joinChallenge(id) {
+            try {
+                const uid = OperatorUplift?.currentUser?.uid; if (!uid) return;
+                await db.collection('challenges').doc(id).collection('participants').doc(uid).set({
+                    uid,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                OperatorUplift.ui?.showToast?.('Joined challenge', 'success');
+                renderChallenges();
+            } catch (e) { console.error('joinChallenge failed', e); }
+        }
+
+        async function likeChallenge(id) {
+            try {
+                await db.collection('challenges').doc(id).set({ likes: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+                renderChallenges();
+            } catch (e) { console.error('likeChallenge failed', e); }
+        }
+
         async function likePost(postId) {
             try {
-                await db.collection('communityPosts').doc(postId).update({ likes: firebase.firestore.FieldValue.increment(1) });
+                if (!OperatorUplift.currentUser) return;
+                const uid = OperatorUplift.currentUser.uid;
+                const ref = db.collection('communityPosts').doc(postId);
+                const likeRef = ref.collection('likes').doc(uid);
+                const likeSnap = await likeRef.get();
+                if (likeSnap.exists) { OperatorUplift.ui?.showToast?.('You already liked this', 'success'); return; }
+                await likeRef.set({ uid, at: firebase.firestore.FieldValue.serverTimestamp() });
+                await ref.set({ likes: firebase.firestore.FieldValue.increment(1) }, { merge: true });
                 renderCommunity();
             } catch (e) {
                 console.error('Like failed:', e);
@@ -5600,7 +6430,6 @@
                 console.error('Delete post failed:', e);
             }
         }
-
         async function renderFinance() {
             const summaryEl = document.getElementById('financeSummary');
             const listEl = document.getElementById('transactionsList');
@@ -5975,18 +6804,57 @@
             const container = document.getElementById('journeyMilestones');
             if (!container) return;
             if (!milestones.length) { container.innerHTML = '<div class="empty-state"><p>No plan generated</p></div>'; return; }
-            container.innerHTML = milestones.map(m => `
+            container.innerHTML = milestones.map((m, idx) => `
                 <div class=\"list-item\" style=\"align-items:flex-start;gap:8px;\">
                     <div style=\"min-width:160px;font-weight:700;\">${m.range}</div>
                     <div style=\"flex:1;\">
                         <div style=\"font-weight:700;margin-bottom:4px;\">${m.title}</div>
-                        <ul style=\"margin:0;padding-left:18px;\">${m.tasks.map(t=>`<li>${t}</li>`).join('')}</ul>
+                        <div style=\"margin:6px 0;\">
+                            <label class=\"text-muted\">Select tasks to add:</label>
+                            <div style=\"display:grid;gap:6px;margin-top:4px;\">
+                                ${m.tasks.map((t, i)=>`<label style=\"display:flex;gap:6px;align-items:center;\"><input type=\"checkbox\" id=\"msel_${idx}_${i}\" data-txt=\"${t.replace(/\"/g,'&quot;')}\" checked><span>${t}</span></label>`).join('')}
+                            </div>
+                        </div>
                     </div>
                     <div>
-                        <button class=\"btn-secondary\" onclick=\"createGoalsFromMilestone('${encodeURIComponent(JSON.stringify(m))}')\">Add as goals</button>
+                        <button class=\"btn-secondary\" onclick=\"addSelectedMilestoneTasks(${idx})\">Add Selected</button>
                     </div>
                 </div>
             `).join('');
+            // Store milestones in memory for addSelected
+            window.__journeyMilestones = milestones;
+        }
+        async function addSelectedMilestoneTasks(mIndex) {
+            try {
+                if (!OperatorUplift.currentUser) return;
+                const milestones = window.__journeyMilestones || [];
+                const m = milestones[mIndex]; if (!m) return;
+                const checks = Array.from(document.querySelectorAll(`[id^=msel_${mIndex}_]`));
+                const selected = checks.filter(c=>c && c.checked && c.dataset && c.dataset.txt).map(c=>c.dataset.txt);
+                if (!selected.length) { OperatorUplift.ui?.showToast?.('Select at least one task', 'error'); return; }
+                const batch = db.batch();
+                const userGoals = db.collection('users').doc(OperatorUplift.currentUser.uid).collection('goals');
+                selected.forEach(task => {
+                    const ref = userGoals.doc();
+                    batch.set(ref, {
+                        title: `${m.title}: ${task}`,
+                        description: '',
+                        category: 'journey',
+                        difficulty: 'medium',
+                        deadline: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 14*24*3600*1000)),
+                        priority: 'medium',
+                        status: 'active',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                await batch.commit();
+                OperatorUplift.ui?.showToast?.('Selected tasks added as goals', 'success');
+                loadUserGoals();
+            } catch (e) {
+                console.error('addSelectedMilestoneTasks failed', e);
+                OperatorUplift.ui?.showToast?.('Failed to add goals', 'error');
+            }
         }
         async function createGoalsFromMilestone(serialized) {
             try {
@@ -6259,6 +7127,7 @@
         window.saveMood = saveMood;
         window.spinLuckyWheel = spinLuckyWheel;
         window.closeLuckyWheel = closeLuckyWheel;
+        window.openLuckyWheel = function(){ document.getElementById('luckyWheelModal')?.classList.add('active'); document.body.classList.add('modal-open'); };
         window.claimTreasure = claimTreasure;
         window.showAnalytics = showAnalytics;
         window.showSettings = showSettings;
@@ -6397,9 +7266,26 @@
             showAiTypingIndicator();
             
             try {
-                const response = await callDeepSeekAI(message);
+                const container = document.getElementById('aiChatMessages');
+                const partial = document.createElement('div');
+                partial.className = 'ai-message ai-message-ai';
+                partial.innerHTML = `<div class="ai-avatar">🤖</div><div class="message-content"><div class="ai-message-text"></div></div>`;
+                let targetEl = null;
+                if (container) {
+                    container.appendChild(partial);
+                    targetEl = partial.querySelector('.ai-message-text');
+                    try { window.__aiStreamTarget = targetEl; } catch {}
+                }
+                const text = await callDeepSeekAI(message);
                 hideAiTypingIndicator();
-                addAiMessage(response, 'ai');
+                // If streaming wasn't used, render final; else finalize
+                if (typeof text === 'string') {
+                    if (targetEl) targetEl.innerHTML = renderMarkdown(text);
+                    else addAiMessage(text, 'ai');
+                } else {
+                    addAiMessage(String(text), 'ai');
+                }
+                try { delete window.__aiStreamTarget; } catch {}
             } catch (error) {
                 hideAiTypingIndicator();
                 addAiMessage('Sorry, I encountered an error. Please try again.', 'ai', 'error');
@@ -6409,6 +7295,10 @@
 
         function addAiMessage(content, sender, type = 'normal') {
             const messagesContainer = document.getElementById('aiChatMessages');
+            if (!messagesContainer) {
+                console.warn('Chat container not found');
+                return;
+            }
             const messageDiv = document.createElement('div');
             messageDiv.className = `ai-message ai-message-${sender} ${type !== 'normal' ? `ai-message-${type}` : ''}`;
             
@@ -6456,6 +7346,26 @@
 
         function hideAiTypingIndicator() {
             document.getElementById('aiTypingIndicator').style.display = 'none';
+        }
+
+        // Simple focus trap utils for modals
+        function enableFocusTrap(modalEl) {
+            try {
+                const focusables = modalEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (!focusables.length) return;
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                modalEl.__trapHandler = (e)=>{
+                    if (e.key !== 'Tab') return;
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                };
+                modalEl.addEventListener('keydown', modalEl.__trapHandler);
+                setTimeout(()=>{ try { first.focus(); } catch {} }, 0);
+            } catch {}
+        }
+        function disableFocusTrap(modalEl) {
+            try { if (modalEl.__trapHandler) modalEl.removeEventListener('keydown', modalEl.__trapHandler); } catch {}
         }
 
         // AI Function Calls
@@ -6507,17 +7417,8 @@
         // AI API Integration
         async function callDeepSeekAI(message) {
             const userContext = await buildUserContext();
-            
-            const prompt = `
-You are an AI assistant for Operator Uplift, a gamified goal-setting and personal development platform. 
-
-User Context:
-${userContext}
-
-User Message: ${message}
-
-Please provide helpful, actionable advice related to goal setting, personal development, productivity, and motivation. Keep responses concise but comprehensive, and always encourage the user's progress.
-            `;
+            const systemPrompt = await buildSystemPrompt(userContext);
+            const prompt = `User Message: ${message}`;
             
             try {
                 // Get current user for authentication
@@ -6533,11 +7434,8 @@ Please provide helpful, actionable advice related to goal setting, personal deve
                         'Authorization': `Bearer ${await user.getIdToken()}`
                     },
                     body: JSON.stringify({
-                        provider: AI_CONFIG.model,
-                        messages: [
-                            { role: 'system', content: 'You are an AI assistant for Operator Uplift, a gamified goal-setting and personal development platform.' },
-                            { role: 'user', content: prompt }
-                        ],
+                        provider: AI_CONFIG.model || 'deepseek-hf',
+                        messages: [ { role: 'system', content: systemPrompt }, { role: 'user', content: prompt } ],
                         userId: user.uid,
                         timestamp: Date.now()
                     })
@@ -6547,13 +7445,119 @@ Please provide helpful, actionable advice related to goal setting, personal deve
                     throw new Error('AI API request failed');
                 }
                 
+                // Try to stream if available (SSE/text)
+                const ct = response.headers.get('Content-Type') || '';
+                if (ct.includes('text/event-stream')) {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    const target = (typeof window !== 'undefined' && window.__aiStreamTarget) ? window.__aiStreamTarget : document.querySelector('.ai-message-ai .ai-message-text');
+                    let buffer = '';
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        buffer += chunk;
+                        if (target) target.innerHTML = renderMarkdown(buffer);
+                    }
+                    return buffer || '...';
+                } else {
                 const data = await response.json();
-                // ai-proxy returns { response: string }
-                return data.response || data.content || 'I apologize, but I couldn\'t process your request at the moment.';
+                    return data.response || data.content || data.text || 'I apologize, but I couldn\'t process your request at the moment.';
+                }
             } catch (error) {
                 console.error('AI API Error:', error);
                 return 'I apologize, but I\'m having trouble connecting to my AI services right now. Please try again later.';
             }
+        }
+
+        // Build a rich system prompt using persona + user context
+        async function buildSystemPrompt(userContext) {
+            try {
+                let persona = await loadAiPersona();
+                if (!persona) {
+                    // Auto-derive persona if missing using stored signals
+                    const personalityDoc = await (async ()=>{
+                        try { const uid = auth?.currentUser?.uid; if (!uid||!db) return null; const d = await db.collection('users').doc(uid).collection('aiProfile').doc('personality').get(); return d.exists? d.data(): null; } catch { return null; } })();
+                    const pref = (personalityDoc?.preferences||'').toLowerCase();
+                    const acct = (personalityDoc?.accountability||'medium').toLowerCase();
+                    const chal = (personalityDoc?.challengeLevel||'balanced').toLowerCase();
+                    const coachType = pref.includes('direct') ? 'trainer' : pref.includes('analytical') ? 'strategist' : pref.includes('empathetic') ? 'mentor' : 'coach';
+                    const tone = pref.includes('direct') ? 'direct' : pref.includes('analytical') ? 'analytical' : pref.includes('empathetic') ? 'empathetic' : 'supportive';
+                    persona = { coachType, tone, humor: 'light', accountability: acct, challengeLevel: chal, motivationStrategy: 'intrinsic-why-first' };
+                    // Persist auto-derived persona for future calls
+                    try { const uid = auth?.currentUser?.uid; if (uid&&db) await db.collection('users').doc(uid).collection('aiProfile').doc('persona').set(persona, { merge: true }); } catch {}
+                }
+                const moods = await loadRecentMoods(14);
+                const habits = await loadHabitsBrief(5);
+                const relTone = persona?.coachType || 'coach';
+                const tone = persona?.tone || 'supportive';
+                const style = persona?.style || 'actionable, concise, encouraging';
+                const accountability = persona?.accountability || 'medium';
+                const humor = persona?.humor || 'light';
+                const challenge = persona?.challengeLevel || 'balanced';
+                const motivation = persona?.motivationStrategy || 'intrinsic-why-first';
+
+                const moodsText = moods.map(m=>`${m.when}: ${m.mood||m.value}`).join('\n');
+                const habitsText = habits.map(h=>`${h.name} (${h.frequency||'varied'})`).join('\n');
+
+                return `
+You are the Operator Uplift ${relTone}. Be ${tone}. Style: ${style}. Humor: ${humor}. Accountability: ${accountability}. Challenge: ${challenge}. Motivation: ${motivation}.
+Personalize deeply to the user and adapt over time based on signals.
+
+USER CONTEXT\n${userContext}
+
+RECENT MOODS\n${moodsText || 'none'}
+
+HABITS\n${habitsText || 'none'}
+
+RULES
+- Always ground advice in the user's Why, constraints, and momentum.
+- Offer short, prioritized plans with clear next steps; avoid generic platitudes.
+- Ask 1 clarifying question when uncertainty exists, then propose a plan.
+- Track streaks, energy, and mood patterns to adjust difficulty.
+- If conflict between goals, propose trade-offs and a small experiment.
+                `.trim();
+            } catch {
+                return 'You are a supportive, actionable AI mentor for Operator Uplift. Be concise and helpful.';
+            }
+        }
+
+        async function loadAiPersona() {
+            try {
+                const uid = auth?.currentUser?.uid; if (!uid || !db) return null;
+                const snap = await db.collection('users').doc(uid).collection('aiProfile').doc('persona').get();
+                if (snap.exists) return snap.data();
+            } catch {}
+            return null;
+        }
+
+        async function saveAiPersona(persona) {
+            try {
+                const uid = auth?.currentUser?.uid; if (!uid || !db) return;
+                await db.collection('users').doc(uid).collection('aiProfile').doc('persona').set(persona, { merge: true });
+                localStorage.setItem('uplift:aiPersona', JSON.stringify(persona));
+            } catch {}
+        }
+
+        async function loadRecentMoods(days=14) {
+            const out = [];
+            try {
+                const uid = auth?.currentUser?.uid; if (!uid || !db) return out;
+                const since = Date.now() - days*86400000;
+                const snap = await db.collection('users').doc(uid).collection('moods').orderBy('createdAt','desc').limit(50).get();
+                snap.forEach(d=>{ const t = d.data()?.createdAt?.toMillis?.() || 0; if (t >= since) out.push({ when: new Date(t).toDateString(), mood: d.data()?.mood || d.data()?.value }); });
+            } catch {}
+            return out;
+        }
+
+        async function loadHabitsBrief(limit=5) {
+            const out = [];
+            try {
+                const uid = auth?.currentUser?.uid; if (!uid || !db) return out;
+                const snap = await db.collection('users').doc(uid).collection('habits').limit(limit).get();
+                snap.forEach(d=>{ const h=d.data(); out.push({ name: h.name, frequency: h.frequency }); });
+            } catch {}
+            return out;
         }
 
         async function buildUserContext() {
@@ -6589,9 +7593,7 @@ Please provide helpful, actionable advice related to goal setting, personal deve
             
             const prompt = `
 Analyze these user goals and provide insights:
-
 ${goalsText}
-
 Please provide:
 1. Overall goal balance assessment
 2. Potential conflicts or overlaps
@@ -6725,6 +7727,138 @@ Focus on actionable insights and encouragement.
         }
         function openAISettings() { document.getElementById('aiSettingsModal')?.classList.add('active'); loadAISettingsIntoModal(); }
         function closeAISettings() { document.getElementById('aiSettingsModal')?.classList.remove('active'); }
+
+        // === Onboarding Assessment Logic ===
+        const Onboarding = {
+            step: 0,
+            answers: {},
+            questions: [
+                { key: 'why', text: "What's your primary 'why' for using Operator Uplift right now?", required: true },
+                { key: 'constraints', text: 'What constraints or obstacles should we account for (time, energy, resources)?', required: true },
+                { key: 'preferences', text: 'How do you prefer to be coached? Direct, supportive, analytical, or empathetic?', required: true },
+                { key: 'habitStyle', text: 'Do you prefer routines (same time daily) or flexible blocks?', required: false },
+                { key: 'accountability', text: 'How much accountability helps you? Low, medium, or high?', required: false },
+                { key: 'challenge', text: 'Preferred challenge level? Gentle, balanced, or intense?', required: false }
+            ]
+        };
+        function openOnboardingAssessment() {
+            const m = document.getElementById('onboardingAssessmentModal');
+            Onboarding.step = 0; Onboarding.answers = {};
+            const msgs = document.getElementById('onboardingMessages');
+            if (msgs) msgs.scrollTop = msgs.scrollHeight;
+            if (m) m.classList.add('active');
+            document.body.classList.add('modal-open');
+            document.getElementById('finishOnboardingBtn')?.setAttribute('disabled','true');
+        }
+        function closeOnboardingAssessment() {
+            document.getElementById('onboardingAssessmentModal')?.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+        function appendOnboardingMessage(text, sender='ai') {
+            const wrap = document.getElementById('onboardingMessages');
+            if (!wrap) return;
+            const div = document.createElement('div');
+            div.className = `ai-message ai-message-${sender}`;
+            div.innerHTML = sender==='ai'
+                ? `<div class="ai-avatar">🤖</div><div class="message-content"><div class="ai-message-text">${text}</div></div>`
+                : `<div class="message-content"><div class="ai-message-text">${text}</div></div>`;
+            wrap.appendChild(div); wrap.scrollTop = wrap.scrollHeight;
+        }
+        function sendOnboardingMessage() {
+            const input = document.getElementById('onboardingInput');
+            if (!input) return; const text = String(input.value||'').trim(); if (!text) return;
+            appendOnboardingMessage(text, 'user'); input.value='';
+            const q = Onboarding.questions[Onboarding.step];
+            if (q) Onboarding.answers[q.key] = text;
+            // Decide next
+            const next = chooseNextOnboardingQuestion();
+            if (next) {
+                setTimeout(()=>appendOnboardingMessage(next.text, 'ai'), 200);
+            } else {
+                document.getElementById('finishOnboardingBtn')?.removeAttribute('disabled');
+                setTimeout(()=>appendOnboardingMessage('Thanks! Click Save & Finish to personalize your AI.', 'ai'), 200);
+            }
+        }
+        function chooseNextOnboardingQuestion() {
+            // Adaptive: if "why" is too short, ask a follow-up; else move on
+            if (Onboarding.step === 0) {
+                const why = Onboarding.answers.why||'';
+                if (why.length < 12) { Onboarding.step = 0; return { text: 'Tell me a bit more—why now, and why this matters?' }; }
+            }
+            // If constraints look empty/weak, ask a sharper prompt once
+            if (Onboarding.step === 1) {
+                const c = (Onboarding.answers.constraints||'').toLowerCase();
+                if (c.length < 8 || (!c.includes('time') && !c.includes('energy') && !c.includes('money') && !c.includes('schedule'))) {
+                    Onboarding.step = 1; return { text: 'What 1–2 real constraints should we respect (e.g., time/energy/schedule/resources)?' };
+                }
+            }
+            // If preferences vague, ask coaching style example
+            if (Onboarding.step === 2) {
+                const p = (Onboarding.answers.preferences||'').toLowerCase();
+                const hints = ['direct','supportive','analytical','empathetic'];
+                const hits = hints.some(h=>p.includes(h));
+                if (!hits) { Onboarding.step = 2; return { text: 'Pick one that fits best: direct, supportive, analytical, or empathetic?' };
+                }
+            }
+            Onboarding.step++;
+            // Skip optional if similar signal exists
+            while (Onboarding.step < Onboarding.questions.length) {
+                const q = Onboarding.questions[Onboarding.step];
+                if (!q) break;
+                if (!q.required && inferAlreadyCovered(q.key)) { Onboarding.step++; continue; }
+                return q;
+            }
+            return null;
+        }
+        function inferAlreadyCovered(key) {
+            const a = Onboarding.answers;
+            if (key==='preferences' && (a.accountability||a.challenge)) return true;
+            return false;
+        }
+        async function finalizeOnboardingAssessment() {
+            try {
+                const uid = auth?.currentUser?.uid; if (!uid || !db) return;
+                // Map to persona and personality docs
+                const persona = {
+                    coachType: guessCoachType(Onboarding.answers.preferences),
+                    tone: guessTone(Onboarding.answers.preferences),
+                    humor: 'light',
+                    accountability: (Onboarding.answers.accountability||'medium').toLowerCase(),
+                    challengeLevel: (Onboarding.answers.challenge||'balanced').toLowerCase(),
+                    motivationStrategy: 'intrinsic-why-first'
+                };
+                const personality = {
+                    why: Onboarding.answers.why||'',
+                    constraints: Onboarding.answers.constraints||'',
+                    preferences: Onboarding.answers.preferences||'',
+                    habitStyle: (Onboarding.answers.habitStyle||'').toLowerCase(),
+                    collectedAt: Date.now()
+                };
+                await db.collection('users').doc(uid).collection('aiProfile').doc('persona').set(persona, { merge: true });
+                await db.collection('users').doc(uid).collection('aiProfile').doc('personality').set(personality, { merge: true });
+                await db.collection('users').doc(uid).set({ onboardingCompleted: true }, { merge: true });
+                OperatorUplift.userData.onboardingCompleted = true;
+                closeOnboardingAssessment();
+                OperatorUplift.ui?.showToast?.('Personalization saved', 'success');
+            } catch (e) {
+                console.error('finalize onboarding failed', e);
+                OperatorUplift.ui?.showToast?.('Failed to save assessment', 'error');
+            }
+        }
+        function guessCoachType(pref='') {
+            const p = pref.toLowerCase();
+            if (p.includes('direct')) return 'trainer';
+            if (p.includes('analytical')) return 'strategist';
+            if (p.includes('empathetic')) return 'mentor';
+            return 'coach';
+        }
+        function guessTone(pref='') {
+            const p = pref.toLowerCase();
+            if (p.includes('direct')) return 'direct';
+            if (p.includes('analytical')) return 'analytical';
+            if (p.includes('empathetic')) return 'empathetic';
+            return 'supportive';
+        }
         async function loadAISettingsIntoModal() {
             try {
                 let settings = null;
@@ -6744,6 +7878,11 @@ Focus on actionable insights and encouragement.
                     m.querySelector('#aiDetailLevel').value = settings.detailLevel ?? 6;
                     m.querySelector('#aiProvider').value = settings.provider || 'deepseek-hf';
                     m.querySelector('#aiModel').value = settings.model || '';
+                    try { m.querySelector('#aiCoachType').value = settings.coachType || 'coach'; } catch {}
+                    try { m.querySelector('#aiTone').value = settings.tone || 'supportive'; } catch {}
+                    try { m.querySelector('#aiHumor').value = settings.humor || 'light'; } catch {}
+                    try { m.querySelector('#aiAccountability').value = settings.accountability || 'medium'; } catch {}
+                    try { m.querySelector('#aiChallenge').value = settings.challengeLevel || 'balanced'; } catch {}
                 }
             } catch (e) { console.error('loadAISettings failed', e); }
         }
@@ -6755,12 +7894,16 @@ Focus on actionable insights and encouragement.
                     supportStyle: Number(m.querySelector('#aiSupportStyle').value),
                     detailLevel: Number(m.querySelector('#aiDetailLevel').value),
                     provider: m.querySelector('#aiProvider').value,
-                    model: m.querySelector('#aiModel').value
+                    model: m.querySelector('#aiModel').value,
+                    coachType: m.querySelector('#aiCoachType')?.value || 'coach',
+                    tone: m.querySelector('#aiTone')?.value || 'supportive',
+                    humor: m.querySelector('#aiHumor')?.value || 'light',
+                    accountability: m.querySelector('#aiAccountability')?.value || 'medium',
+                    challengeLevel: m.querySelector('#aiChallenge')?.value || 'balanced'
                 };
                 localStorage.setItem('aiPersonalitySettings', JSON.stringify(settings));
                 if (auth?.currentUser && db) {
-                    await db.collection('users').doc(auth.currentUser.uid)
-                        .collection('aiProfile').doc('settings').set(settings, { merge: true });
+                    await db.collection('users').doc(auth.currentUser.uid).collection('aiProfile').doc('settings').set(settings, { merge: true });
                 }
                 // Apply to runtime config
                 try { if (settings.provider) AI_CONFIG.model = settings.provider; } catch {}
@@ -7087,7 +8230,6 @@ Focus on actionable insights and encouragement.
                 }
             }
         `;
-
         // Add AI styles to the document
         const aiStyleSheet = document.createElement('style');
         aiStyleSheet.textContent = aiStyles;
@@ -7185,7 +8327,9 @@ Focus on actionable insights and encouragement.
                 const categoryLabels = Object.keys(analyticsData.goalsByCategory);
                 const categoryData = Object.values(analyticsData.goalsByCategory);
                 
-                new Chart(categoryCtx, {
+                if (categoryCtx._chart) categoryCtx._chart.destroy();
+                const ctx = categoryCtx.getContext('2d');
+                categoryCtx._chart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: categoryLabels,
@@ -7221,7 +8365,9 @@ Focus on actionable insights and encouragement.
                     item.progress
                 );
                 
-                new Chart(progressCtx, {
+                if (progressCtx._chart) progressCtx._chart.destroy();
+                const ctx = progressCtx.getContext('2d');
+                progressCtx._chart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: dates,
@@ -7587,7 +8733,6 @@ Focus on actionable insights and encouragement.
             loadAchievements();
             loadUserAchievements();
         }
-
         async function loadAchievements() {
             try {
                 const achievementsSnapshot = await db.collection('achievements').get();
@@ -7736,12 +8881,21 @@ Focus on actionable insights and encouragement.
                             .set({ 'stats.points': firebase.firestore.FieldValue.increment(pts) }, { merge: true });
                     }
                     showAchievementNotification({ ...achievement, icon: cat?.icon, points: cat?.points });
-                    // Celebrate in full gallery if open
+                    // Celebrate in full gallery if open + subtle confetti
                     try {
                         if (OperatorUplift.currentView === 'achievements') {
                             const card = document.querySelector(`.achievement-card[data-id="${achievement.achievementId}"]`);
                             if (card) card.classList.add('celebrate');
                         }
+                        const burst = document.createElement('div');
+                        burst.setAttribute('aria-hidden','true');
+                        burst.style.position='fixed';
+                        burst.style.inset='0';
+                        burst.style.pointerEvents='none';
+                        burst.style.background='radial-gradient(circle at center, rgba(255,255,255,0.18), transparent 60%)';
+                        burst.style.animation='fadeOut 600ms ease-out forwards';
+                        document.body.appendChild(burst);
+                        setTimeout(()=>{ try { document.body.removeChild(burst); } catch {} }, 650);
                     } catch {}
                 } catch (error) {
                     console.error('Error awarding achievement:', error);
@@ -8067,7 +9221,6 @@ Focus on actionable insights and encouragement.
             generatePredictiveInsights();
             analyzeTimePatterns();
         }
-
         async function calculateProductivityScore() {
             if (!OperatorUplift.currentUser) return;
 
@@ -8194,14 +9347,13 @@ Focus on actionable insights and encouragement.
                 );
 
                 advancedAnalytics.timeAnalysis = {
-                    peakProductivityHour: parseInt(peakHour),
+                    peakProductivityHour: (function(){ const v = parseInt(peakHour, 10); return Number.isNaN(v) ? 0 : v; })(),
                     totalCompletions: completionTimes.length
                 };
             }
 
             updateAdvancedAnalyticsUI();
         }
-
         function updateAdvancedAnalyticsUI() {
             // Update productivity score display
             const productivityScoreElement = document.getElementById('productivityScore');
@@ -8282,24 +9434,21 @@ Focus on actionable insights and encouragement.
             const luckyWheelBtn = document.getElementById('luckyWheelBtn');
             if (luckyWheelBtn) {
                 luckyWheelBtn.addEventListener('click', () => {
-                    console.log('🎰 Lucky wheel clicked');
-                    // Lucky wheel functionality will be implemented later
+                    openLuckyWheel();
                 });
             }
 
             const treasureChestBtn = document.getElementById('treasureChestBtn');
             if (treasureChestBtn) {
                 treasureChestBtn.addEventListener('click', () => {
-                    console.log('💎 Treasure chest clicked');
-                    // Treasure chest functionality will be implemented later
+                    openTreasureChest();
                 });
             }
 
             const essenceShopBtn = document.getElementById('essenceShopBtn');
             if (essenceShopBtn) {
                 essenceShopBtn.addEventListener('click', () => {
-                    console.log('🛍️ Essence shop clicked');
-                    // Essence shop functionality will be implemented later
+                    showShop();
                 });
             }
         }
@@ -8548,7 +9697,6 @@ Focus on actionable insights and encouragement.
                 }
             }
         }
-
         function generateAdaptiveSuggestions() {
             aiEnhancementData.adaptiveSuggestions = [];
 
@@ -8750,6 +9898,38 @@ Focus on actionable insights and encouragement.
                     `;
                     integrationsContainer.appendChild(serviceElement);
                 });
+            }
+        }
+
+        // ===== Pending Redemptions (read-only) =====
+        async function renderPendingRedemptions() {
+            try {
+                const list = document.getElementById('redemptionsList');
+                if (!list || !auth?.currentUser || !db) return;
+                const snap = await db.collection('redemptions')
+                    .where('uid','==', auth.currentUser.uid)
+                    .orderBy('createdAt','desc')
+                    .limit(10)
+                    .get();
+                const rows = [];
+                snap.forEach(doc => rows.push({ id: doc.id, ...doc.data() }));
+                if (!rows.length) { list.innerHTML = '<div class="text-muted">No redemptions yet</div>'; return; }
+                list.innerHTML = rows.map(r => {
+                    const status = r.status || 'pending';
+                    const created = r.createdAt?.toDate ? new Date(r.createdAt.toDate()).toLocaleString() : '';
+                    const vestMs = r.vestingEnd?.toDate ? (r.vestingEnd.toDate().getTime() - Date.now()) : 0;
+                    const daysLeft = vestMs > 0 ? Math.ceil(vestMs/86400000) : 0;
+                    const vestText = status==='pending' ? (daysLeft>0 ? `${daysLeft}d left` : 'vesting done') : '';
+                    const txLink = r.tx ? ` • <a href=\"https://solscan.io/tx/${r.tx}\" target=\"_blank\" rel=\"noopener\">view</a>` : '';
+                    return `<div class=\"list-item\" style=\"gap:8px;align-items:flex-start;\">
+                        <div style=\"flex:1;\">
+                            <div><strong>${r.pointsRedeemed||r.points||0}</strong> pts → <strong>${r.upliftGranted||0}</strong> UPLIFT</div>
+                            <div class=\"text-muted\">${created} • ${status}${vestText?` • ${vestText}`:''}${txLink}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('renderPendingRedemptions failed', e);
             }
         }
 
@@ -8967,7 +10147,6 @@ Focus on actionable insights and encouragement.
             
             console.log('✅ Security Hardening Initialized');
         }
-
         // Monitoring & Logging
         function initializeMonitoringAndLogging() {
             console.log('📊 Initializing Monitoring & Logging...');
@@ -9416,7 +10595,6 @@ Focus on actionable insights and encouragement.
             
             console.log('✅ CDN Optimization Initialized');
         }
-
         // Performance Monitoring
         function initializePerformanceMonitoring() {
             console.log('⚡ Initializing Performance Monitoring...');

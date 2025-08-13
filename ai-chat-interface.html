@@ -195,6 +195,22 @@
             transform: none;
         }
 
+        /* Export button (header) */
+        .export-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .export-button:hover { border-color: var(--accent-color); color: var(--accent-color); }
+
         /* Personality Assessment Modal Styles */
         .personality-modal {
             position: fixed;
@@ -559,6 +575,7 @@
     <div class="chat-container">
         <div class="chat-header">
             <a href="app.html" class="nav-button">← Back to App</a>
+            <button id="export-chat" class="export-button" title="Export chat">💾 Export</button>
             <h1>AI Chat Interface</h1>
             <p>Your personalized AI mentor is here to help</p>
         </div>
@@ -760,6 +777,7 @@
                 
                 // Load user profile and personality data
                 await this.loadUserData();
+                this.restoreChatHistory();
                 
                 // Setup event listeners
                 this.setupEventListeners();
@@ -834,6 +852,7 @@
             setupEventListeners() {
                 const chatInput = document.getElementById('chat-input');
                 const sendButton = document.getElementById('send-button');
+                const exportBtn = document.getElementById('export-chat');
 
                 // Send message on Enter (but allow Shift+Enter for new line)
                 chatInput.addEventListener('keydown', (e) => {
@@ -850,23 +869,37 @@
                 });
 
                 // Send button click
+                let lastSendTs = 0;
                 sendButton.addEventListener('click', () => {
+                    const now = Date.now();
+                    if (now - lastSendTs < 800) return; // debounce double-clicks
+                    lastSendTs = now;
                     this.sendMessage();
                 });
 
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => this.exportChat());
+                }
+
                 // AI personality sliders
-                document.getElementById('motivation-level').addEventListener('input', (e) => {
-                    this.aiPersonality.motivationLevel = parseInt(e.target.value);
+                const motEl = document.getElementById('motivation-level');
+                if (motEl) motEl.addEventListener('input', (e) => {
+                    const v = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(v)) this.aiPersonality.motivationLevel = v;
                     this.saveAIPersonality();
                 });
 
-                document.getElementById('support-style').addEventListener('input', (e) => {
-                    this.aiPersonality.supportStyle = parseInt(e.target.value);
+                const supEl = document.getElementById('support-style');
+                if (supEl) supEl.addEventListener('input', (e) => {
+                    const v = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(v)) this.aiPersonality.supportStyle = v;
                     this.saveAIPersonality();
                 });
 
-                document.getElementById('detail-level').addEventListener('input', (e) => {
-                    this.aiPersonality.detailLevel = parseInt(e.target.value);
+                const detEl = document.getElementById('detail-level');
+                if (detEl) detEl.addEventListener('input', (e) => {
+                    const v = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(v)) this.aiPersonality.detailLevel = v;
                     this.saveAIPersonality();
                 });
 
@@ -887,6 +920,18 @@
                 document.getElementById('tutorial-next').addEventListener('click', () => {
                     this.nextTutorialStep();
                 });
+            }
+
+            exportChat() {
+                try {
+                    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), chat: this.chatHistory }, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = 'ai-chat-history.json'; a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 500);
+                } catch (e) {
+                    console.error('exportChat failed', e);
+                }
             }
 
             checkOnboardingStatus() {
@@ -1143,7 +1188,8 @@
                 
                 const messageContent = document.createElement('div');
                 messageContent.className = 'message-content';
-                messageContent.textContent = content;
+                // basic markdown (links + line breaks)
+                messageContent.innerHTML = this.renderBasicMarkdown(content);
                 
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(messageContent);
@@ -1153,16 +1199,71 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 
                 // Add to chat history
-                this.chatHistory.push({ sender, content, timestamp: new Date() });
+                this.chatHistory.push({ sender, content, timestamp: new Date().toISOString() });
+                try { localStorage.setItem('aiChatHistory', JSON.stringify(this.chatHistory.slice(-200))); } catch {}
+            }
+
+            renderBasicMarkdown(text) {
+                if (!text) return '';
+                // escape HTML
+                let s = String(text).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+                // links
+                s = s.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+                // line breaks
+                s = s.replace(/\n/g, '<br/>');
+                return s;
+            }
+
+            restoreChatHistory() {
+                try {
+                    const raw = localStorage.getItem('aiChatHistory');
+                    if (!raw) return;
+                    const arr = JSON.parse(raw);
+                    if (!Array.isArray(arr)) return;
+                    arr.forEach(m => this.addMessage(m.sender, m.content));
+                } catch {}
             }
 
             async generateAIResponse(userMessage) {
-                // Create personalized prompt based on user's personality and AI settings
-                const prompt = this.createPersonalizedPrompt(userMessage);
-                
-                // This would typically call an AI service
-                // For now, we'll create a mock response based on personality
-                return this.generateMockResponse(userMessage, prompt);
+                try {
+                    // Create personalized prompt
+                    const prompt = this.createPersonalizedPrompt(userMessage);
+                    // Optional: include persona if present in localStorage for this standalone page
+                    let persona = null;
+                    try { persona = JSON.parse(localStorage.getItem('uplift:aiPersona')||'null'); } catch {}
+                    const messages = [];
+                    if (persona) messages.push({ role: 'system', content: JSON.stringify(persona) });
+                    messages.push({ role: 'user', content: prompt });
+                    // Attempt authenticated proxy call if ID token is available via opener
+                    const token = await this.getIdTokenSafe();
+                    const res = await fetch('/.netlify/functions/ai-proxy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+                        },
+                        body: JSON.stringify({ messages })
+                    });
+                    const data = await res.json().catch(()=>null);
+                    if (!res.ok || !data) throw new Error(data?.error || 'ai_proxy_failed');
+                    const text = data.text || data.output || data.choices?.[0]?.message?.content || 'I processed your message.';
+                    return text;
+                } catch (e) {
+                    // Fallback to mock response if proxy fails
+                    const prompt = this.createPersonalizedPrompt(userMessage);
+                    return this.generateMockResponse(userMessage, prompt);
+                }
+            }
+
+            async getIdTokenSafe() {
+                try {
+                    // If this page is opened from app, we can try window.opener
+                    const openerAuth = window.opener && window.opener.firebase && window.opener.firebase.auth && window.opener.firebase.auth();
+                    if (openerAuth && openerAuth.currentUser) {
+                        return await openerAuth.currentUser.getIdToken();
+                    }
+                } catch {}
+                return null;
             }
 
             createPersonalizedPrompt(userMessage) {

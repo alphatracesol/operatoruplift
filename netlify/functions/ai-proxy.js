@@ -5,6 +5,7 @@ const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());
+const router = express.Router();
 
 // Simple provider switch: deepseek-hf (Hugging Face Inference)
 async function callProvider({ provider, messages, maxTokens = 2000, temperature = 0.7 }) {
@@ -28,7 +29,7 @@ async function callProvider({ provider, messages, maxTokens = 2000, temperature 
   return 'Provider not configured.';
 }
 
-app.post('/.netlify/functions/ai-proxy', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { provider, messages, maxTokens, temperature } = req.body || {};
     if (!Array.isArray(messages) || messages.length === 0) return res.status(400).json({ error: 'missing_messages' });
@@ -39,6 +40,7 @@ app.post('/.netlify/functions/ai-proxy', async (req, res) => {
   }
 });
 
+app.use('/.netlify/functions/ai-proxy', router);
 module.exports.handler = serverless(app);
 
 const { initializeApp, getApps } = require('firebase-admin/app');
@@ -46,7 +48,7 @@ const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
 
 // Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
+  if (!getApps().length) {
   try {
     initializeApp({
       credential: require('firebase-admin/app').cert({
@@ -150,11 +152,8 @@ exports.handler = async function(event, context) {
       }
     }
 
-    // Authenticate user
+    // Re-enable auth verification
     const authHeader = event.headers.authorization;
-    console.log('Auth header present:', !!authHeader);
-    console.log('Auth header starts with Bearer:', authHeader?.startsWith('Bearer '));
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return {
         statusCode: 401,
@@ -206,7 +205,9 @@ exports.handler = async function(event, context) {
     }
 
     const userData = userDoc.data();
-    if (userData.stats.aiCredits <= 0) {
+    if (!userData.stats || typeof userData.stats.aiCredits !== 'number') {
+      await db.collection('users').doc(userId).set({ stats: { aiCredits: 3 } }, { merge: true });
+    } else if (userData.stats.aiCredits <= 0) {
       return {
         statusCode: 402,
         headers,

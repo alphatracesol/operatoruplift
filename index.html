@@ -4882,6 +4882,13 @@
         .then(r=>r.ok?r.json():null)
         .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
         .catch(()=>{});
+      // Refresh every 2 minutes
+      setInterval(()=>{
+        fetch('/.netlify/functions/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+          .then(r=>r.ok?r.json():null)
+          .then(d=>{ if (d && typeof d.points === 'number') badge.textContent = 'PTS: ' + Number(d.points).toLocaleString(); })
+          .catch(()=>{});
+      }, 120000);
     } catch {}
   })();
 </script>

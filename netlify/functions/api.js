@@ -3,7 +3,7 @@ const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { getBurnTotalStore, incrBurnTotal } = require('../../src/utils/store');
+const { getCounter, incrCounterBy } = require('../../src/utils/store');
 const { Connection, PublicKey } = require('@solana/web3.js');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
@@ -23,6 +23,41 @@ app.use(cors({ origin: corsOrigins.split ? corsOrigins : (o, cb)=> {
   if (!origin || allowed.includes(origin)) return cb(null, true);
   return cb(new Error('CORS not allowed'), false);
 } }));
+
+// Router mounted at Netlify function base path to avoid double /api prefix
+const router = express.Router();
+
+// ---- Price cache (USD-pegged redemption) ----
+let __upliftPriceCache = { value: null, ts: 0 };
+const PRICE_TTL_MS = Number(process.env.PRICE_TTL_MS || 30000);
+async function getUpliftUsdPrice() {
+  const now = Date.now();
+  if (__upliftPriceCache.value && now - __upliftPriceCache.ts < PRICE_TTL_MS) return __upliftPriceCache.value;
+  try {
+    const mintStr = process.env.UPLIFT_MINT;
+    const endpoint = process.env.PRICE_ENDPOINT || 'https://price.jup.ag/v6/price';
+    const url = `${endpoint}?ids=${encodeURIComponent(mintStr)}`;
+    const r = await fetch(url, { headers: { 'accept': 'application/json' } });
+    if (r.ok) {
+      const j = await r.json();
+      const data = j?.data || {};
+      // Try by mint key, else try first entry
+      let price = data[mintStr]?.price;
+      if (typeof price !== 'number') {
+        const first = Object.values(data)[0];
+        price = first?.price;
+      }
+      if (typeof price === 'number' && price > 0) {
+        __upliftPriceCache = { value: price, ts: now };
+        return price;
+      }
+    }
+  } catch {}
+  // Fallback
+  const fb = Number(process.env.FALLBACK_UPLIFT_USD || 0.00001818);
+  __upliftPriceCache = { value: fb, ts: Date.now() };
+  return fb;
+}
 
 // Simple rate limiter (per IP) using Redis when available, or in-memory fallback
 const RATE_WINDOW = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
@@ -68,14 +103,15 @@ async function rateLimiter(req, res, next) {
   } catch { next(); }
 }
 
-app.use('/api/', rateLimiter);
+// Mount router at Netlify function base path
+app.use('/.netlify/functions/api', rateLimiter, router);
 
-app.get('/api/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.json({ ok: true, cluster: process.env.SOLANA_CLUSTER || 'mainnet' });
 });
 
 // Public environment readiness check (safe, no secret values)
-app.get('/api/env/check', (req, res) => {
+router.get('/env/check', (req, res) => {
   try {
     const envKeys = [
       'HELIUS_RPC_URL',
@@ -96,12 +132,20 @@ app.get('/api/env/check', (req, res) => {
 });
 
 // Public config (no secrets)
-app.get('/api/config/public', (req, res) => {
+router.get('/config/public', (req, res) => {
   try {
     const cfg = {
       mint: process.env.UPLIFT_MINT || null,
       decimals: Number(process.env.UPLIFT_DECIMALS || 9),
-      pointsRate: Number(process.env.POINTS_RATE || 100)
+      pointsRate: Number(process.env.POINTS_RATE || 100),
+      redemption: {
+        mode: (process.env.REDEMPTION_MODE || 'fixed').toLowerCase(),
+        pointUsd: Number(process.env.POINT_USD || 0.00001),
+        upliftPerPoint: Number(process.env.REDEEM_UPLIFT_PER_POINT || 0.5),
+        dailyCap: Number(process.env.DAILY_REDEEM_POINTS_CAP || 10000),
+        weeklyCap: Number(process.env.WEEKLY_REDEEM_POINTS_CAP || 30000),
+        cooldownHours: Number(process.env.REDEEM_COOLDOWN_HOURS || 24)
+      }
     };
     res.json(cfg);
   } catch (e) {
@@ -109,9 +153,9 @@ app.get('/api/config/public', (req, res) => {
   }
 });
 
-app.get('/api/burn/total', async (req, res) => {
+router.get('/burn/total', async (req, res) => {
   try {
-    const total = await getBurnTotalStore();
+    const total = await getCounter('burn_total');
     res.json({ total });
   } catch (e) {
     res.status(500).json({ error: e.message || 'server_error' });
@@ -119,7 +163,7 @@ app.get('/api/burn/total', async (req, res) => {
 });
 
 // Simple SSE stream emitting snapshots periodically
-app.get('/api/burn/stream', async (req, res) => {
+router.get('/burn/stream', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -129,7 +173,7 @@ app.get('/api/burn/stream', async (req, res) => {
   async function push() {
     if (!active) return;
     try {
-      const total = await getBurnTotalStore();
+      const total = await getCounter('burn_total');
       res.write(`event: snapshot\n`);
       res.write(`data: ${JSON.stringify({ total })}\n\n`);
     } catch {}
@@ -139,8 +183,8 @@ app.get('/api/burn/stream', async (req, res) => {
   req.on('close', () => { active = false; clearInterval(timer); res.end(); });
 });
 
-// Placeholder points endpoint returning 0 until wallet lookup worker is added
-app.get('/api/user/:wallet/points', async (req, res) => {
+// Points endpoint (reads SPL token balance and returns points)
+router.get('/user/:wallet/points', async (req, res) => {
   try {
     const rate = Number(process.env.POINTS_RATE || 100);
     const rpc = process.env.HELIUS_RPC_URL || 'https://api.mainnet-beta.solana.com';
@@ -156,15 +200,27 @@ app.get('/api/user/:wallet/points', async (req, res) => {
       raw += BigInt(bal.value.amount);
     }
     const uplift = Number(raw) / Math.pow(10, decimals);
-    const points = Math.floor(uplift * rate);
-    res.json({ wallet: String(owner), uplift, points, rate });
+    const points_from_balance = Math.floor(uplift * rate);
+    // Try to find linked user to include off-chain points
+    let offchain_points = 0;
+    try {
+      const link = await adminDb.collection('walletLinks').doc(String(owner)).get();
+      if (link.exists && link.data()?.uid) {
+        const userDoc = await adminDb.collection('users').doc(link.data().uid).get();
+        if (userDoc.exists) {
+          offchain_points = Number(userDoc.data()?.stats?.points || 0);
+        }
+      }
+    } catch {}
+    const points = points_from_balance + offchain_points; // total display points
+    res.json({ wallet: String(owner), uplift, points_from_balance, offchain_points, points, rate, decimals });
   } catch (e) {
     res.status(500).json({ error: e.message || 'server_error' });
   }
 });
 
 // Helius Smart Webhook endpoint for burn ingestion
-app.post('/api/webhooks/helius', async (req, res) => {
+router.post('/webhooks/helius', async (req, res) => {
   try {
     const secret = process.env.HELIUS_WEBHOOK_SECRET;
     if (secret) {
@@ -194,7 +250,7 @@ app.post('/api/webhooks/helius', async (req, res) => {
     if (Array.isArray(body)) body.forEach(scan); else scan(body);
     if (totalRaw > 0) {
       const human = totalRaw / Math.pow(10, decimals);
-      await incrBurnTotal(human);
+      await incrCounterBy('burn_total', human);
     }
     res.json({ ok: true, added: totalRaw });
   } catch (e) {
@@ -206,14 +262,138 @@ app.post('/api/webhooks/helius', async (req, res) => {
 const NONCE_TTL_MS = 5 * 60 * 1000;
 global.__phantom_nonces = global.__phantom_nonces || new Map();
 
-app.get('/api/auth/phantom/nonce', (req, res) => {
+// Helpers
+function parseTierMultipliers(str) {
+  const out = { base: 1.0 };
+  (str || '').split(';').map(s=>s.trim()).filter(Boolean).forEach(pair=>{
+    const [k,v] = pair.split(':');
+    const num = Number(v);
+    if (k && !Number.isNaN(num)) out[k] = num;
+  });
+  return out;
+}
+function getTierForUser(userDoc) {
+  const verified = !!userDoc?.data()?.verified; // simple flag; expand as needed
+  const vip = !!userDoc?.data()?.vip;
+  if (vip) return 'vip';
+  if (verified) return 'verified';
+  return 'base';
+}
+
+// Points: rate and redeem
+router.get('/points/rate', (req, res) => {
+  const mode = (process.env.REDEMPTION_MODE || 'fixed').toLowerCase();
+  if (mode === 'usd_pegged') {
+    return res.json({ type: 'usd_pegged', pointUsd: Number(process.env.POINT_USD || 0.00001) });
+  }
+  return res.json({ type: 'fixed', rate: Number(process.env.REDEEM_UPLIFT_PER_POINT || 0.5) });
+});
+
+router.post('/points/redeem', async (req, res) => {
+  try {
+    // Auth
+    const authz = req.headers.authorization || '';
+    const idToken = authz.replace('Bearer ', '');
+    if (!idToken) return res.status(401).json({ error: 'missing_token' });
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    const uid = decoded.uid;
+
+    const { wallet, points } = req.body || {};
+    if (!wallet || !points || points <= 0) return res.status(400).json({ error: 'invalid_request' });
+
+    // Caps and env
+    const dailyCap = Number(process.env.DAILY_REDEEM_POINTS_CAP || 10000);
+    const weeklyCap = Number(process.env.WEEKLY_REDEEM_POINTS_CAP || 30000);
+    const newUserCap = Number(process.env.NEW_USER_REDEEM_POINTS_CAP || 2000);
+    const cooldownH = Number(process.env.REDEEM_COOLDOWN_HOURS || 24);
+    const vestDays = Number(process.env.REDEMPTION_VESTING_DAYS || 7);
+    const monthlyCap = Number(process.env.MONTHLY_ISSUANCE_UPLIFT_CAP || 50000000);
+    const mode = (process.env.REDEMPTION_MODE || 'fixed').toLowerCase();
+    const tierMultipliers = parseTierMultipliers(process.env.TIER_MULTIPLIERS || 'base:1.0;verified:1.1;vip:1.2');
+
+    // Load user and points
+    const userRef = adminDb.collection('users').doc(uid);
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) return res.status(404).json({ error: 'user_not_found' });
+    const stats = userSnap.data()?.stats || {};
+    const offchainPoints = Number(stats.points || 0);
+    if (offchainPoints < points) return res.status(400).json({ error: 'insufficient_points' });
+
+    // Simple daily/weekly counters (by date keys)
+    const now = new Date();
+    const ymd = now.toISOString().slice(0,10).replace(/-/g,'');
+    const weekKey = `${uid}_${ymd.slice(0,4)}W${Math.ceil((now.getDate())/7)}`;
+    const countersRef = adminDb.collection('redeemCounters');
+    const dailyRef = countersRef.doc(`${uid}_${ymd}`);
+    const weeklyRef = countersRef.doc(weekKey);
+    const daily = (await dailyRef.get()).data() || { total: 0, lastAt: 0 };
+    const weekly = (await weeklyRef.get()).data() || { total: 0 };
+
+    // Cooldown
+    if (daily.lastAt && (Date.now() - daily.lastAt) < cooldownH*3600*1000) {
+      // allow, but you may prefer to block if too soon; leaving permissive here
+    }
+
+    // New user cap
+    const accountAgeDays = Math.max(0, Math.floor((Date.now() - (userSnap.createTime?.toDate?.() || new Date()).getTime())/86400000));
+    const effectiveDailyCap = accountAgeDays < 7 ? Math.min(dailyCap, newUserCap) : dailyCap;
+    if ((daily.total + points) > effectiveDailyCap) return res.status(400).json({ error: 'daily_cap_exceeded' });
+    if ((weekly.total + points) > weeklyCap) return res.status(400).json({ error: 'weekly_cap_exceeded' });
+
+    // Compute uplift granted
+    const tier = getTierForUser(userSnap);
+    const tierMult = tierMultipliers[tier] || 1.0;
+    let upliftGranted = 0;
+    if (mode === 'usd_pegged') {
+      const pointUsd = Number(process.env.POINT_USD || 0.00001);
+      const price = await getUpliftUsdPrice();
+      upliftGranted = Math.floor((points * pointUsd * tierMult) / Math.max(price, 1e-9));
+    } else {
+      const rate = Number(process.env.REDEEM_UPLIFT_PER_POINT || 0.5) * tierMult;
+      upliftGranted = Math.floor(points * rate);
+    }
+    if (upliftGranted <= 0) return res.status(400).json({ error: 'zero_grant' });
+
+    // Monthly issuance budget check
+    const monthKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}`;
+    const monthlyRef = countersRef.doc(`issued_${monthKey}`);
+    const monthly = (await monthlyRef.get()).data() || { total: 0 };
+    if ((monthly.total + upliftGranted) > monthlyCap) return res.status(400).json({ error: 'monthly_cap_exceeded' });
+
+    // Deduct points and record redemption (vesting)
+    const vestEnd = new Date(Date.now() + vestDays*86400000);
+    const redemption = {
+      uid, wallet: String(wallet), points, upliftGranted, tier, mode,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      vestingEnd: admin.firestore.Timestamp.fromDate(vestEnd),
+      status: 'pending', // for on-chain fulfillment worker
+    };
+
+    await adminDb.runTransaction(async (tx) => {
+      const userDoc = await tx.get(userRef);
+      const curPts = Number(userDoc.data()?.stats?.points || 0);
+      if (curPts < points) throw new Error('insufficient_points');
+      tx.set(userRef, { stats: { points: admin.firestore.FieldValue.increment(-points) } }, { merge: true });
+      const rid = `${uid}_${Date.now()}`;
+      tx.set(adminDb.collection('redemptions').doc(rid), redemption);
+      tx.set(dailyRef, { total: (daily.total||0) + points, lastAt: Date.now() }, { merge: true });
+      tx.set(weeklyRef, { total: (weekly.total||0) + points }, { merge: true });
+      tx.set(monthlyRef, { total: (monthly.total||0) + upliftGranted }, { merge: true });
+    });
+
+    return res.json({ ok: true, pointsRedeemed: points, upliftGranted, status: 'pending', vestingDays: vestDays });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+router.get('/auth/phantom/nonce', (req, res) => {
   const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
   const message = `Operator Uplift login\nNonce: ${nonce}`;
   global.__phantom_nonces.set(nonce, Date.now());
   res.json({ nonce, message });
 });
 
-app.post('/api/auth/phantom/verify', async (req, res) => {
+router.post('/auth/phantom/verify', async (req, res) => {
   try {
     const { address, signature, nonce } = req.body || {};
     if (!address || !signature || !nonce) return res.status(400).json({ error: 'missing_params' });
@@ -237,7 +417,7 @@ app.post('/api/auth/phantom/verify', async (req, res) => {
   }
 });
 
-app.post('/api/auth/phantom/link', async (req, res) => {
+router.post('/auth/phantom/link', async (req, res) => {
   try {
     const authz = req.headers.authorization || '';
     const idToken = authz.replace('Bearer ','');
@@ -263,6 +443,42 @@ app.post('/api/auth/phantom/link', async (req, res) => {
     // also note on user doc
     await adminDb.collection('users').doc(currentUid).set({ walletAddress: address }, { merge: true });
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// Unlink wallet from current user (server-side)
+router.post('/auth/phantom/unlink', async (req, res) => {
+  try {
+    const authz = req.headers.authorization || '';
+    const idToken = authz.replace('Bearer ','');
+    if (!idToken) return res.status(401).json({ error: 'missing_token' });
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    const currentUid = decoded.uid;
+    const { address } = req.body || {};
+    if (!address) return res.status(400).json({ error: 'missing_params' });
+    const ref = adminDb.collection('walletLinks').doc(address);
+    const snap = await ref.get();
+    if (!snap.exists || snap.data()?.uid !== currentUid) {
+      return res.status(404).json({ error: 'not_linked' });
+    }
+    await ref.delete();
+    await adminDb.collection('users').doc(currentUid).set({ walletAddress: admin.firestore.FieldValue.delete() }, { merge: true });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// Simple jobs status inspector (admin-lite)
+router.get('/jobs/status', async (req, res) => {
+  try {
+    const keys = ['weekly-reset', 'redeem-fulfill'];
+    const docs = await Promise.all(keys.map(k => adminDb.collection('jobs').doc(k).get()));
+    const out = {};
+    docs.forEach((d,i)=>{ out[keys[i]] = d.exists ? d.data() : null; });
+    res.json({ ok: true, jobs: out });
   } catch (e) {
     res.status(500).json({ error: e.message || 'server_error' });
   }
