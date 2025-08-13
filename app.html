@@ -3406,14 +3406,15 @@
                 <div class="modal-content" style="max-width:800px;max-height:90vh;overflow:auto;">
                     <div class="modal-header">
                         <h2>🧠 Personality Assessment</h2>
-                        <button class="btn-icon" onclick="closePersonalityAssessment()">✖</button>
+                        <button class="btn-icon" onclick="closePersonalityAssessment()" title="Close assessment">✖</button>
                     </div>
                     <div class="modal-body">
-                        <p class="text-muted">Answer a few questions so your AI mentor can personalize guidance.</p>
+                        <p class="text-muted">Answer a few questions so your AI mentor can personalize guidance. <br><small>You can skip this and take it later from the AI Chat.</small></p>
                         <div id="paProgress" style="display:flex;gap:6px;margin:10px 0;"></div>
                         <div id="paQuestion"></div>
                     </div>
                     <div class="modal-actions">
+                        <button class="btn-secondary" onclick="skipPersonalityAssessment()">Skip Assessment</button>
                         <button class="btn-secondary" onclick="prevPersonalityQuestion()">Back</button>
                         <button class="btn-primary" onclick="nextPersonalityQuestion()" id="paNextBtn">Next</button>
                     </div>
@@ -8450,10 +8451,56 @@ Focus on actionable insights and encouragement.
         let paIndex = 0; let paData = {};
         function openPersonalityAssessment() {
             paIndex = 0; paData = {}; renderPA();
-            document.getElementById('personalityAssessmentModal')?.classList.add('active');
+            const modal = document.getElementById('personalityAssessmentModal');
+            if (modal) {
+                modal.classList.add('active');
+                
+                // Add ESC key listener
+                const escHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        skipPersonalityAssessment();
+                        document.removeEventListener('keydown', escHandler);
+                    }
+                };
+                document.addEventListener('keydown', escHandler);
+                
+                // Store handler to remove it when modal closes
+                modal.escHandler = escHandler;
+            }
         }
         function closePersonalityAssessment() {
-            document.getElementById('personalityAssessmentModal')?.classList.remove('active');
+            const modal = document.getElementById('personalityAssessmentModal');
+            if (modal) {
+                modal.classList.remove('active');
+                
+                // Remove ESC key listener if it exists
+                if (modal.escHandler) {
+                    document.removeEventListener('keydown', modal.escHandler);
+                    delete modal.escHandler;
+                }
+            }
+        }
+        
+        function skipPersonalityAssessment() {
+            // Close the modal
+            closePersonalityAssessment();
+            
+            // Show a toast message
+            if (window.OperatorUplift?.ui?.showToast) {
+                window.OperatorUplift.ui.showToast('Personality assessment skipped. You can take it anytime from the AI Chat.', 'info');
+            }
+            
+            // Optionally save that the user skipped
+            if (auth?.currentUser) {
+                try {
+                    db.collection('users').doc(auth.currentUser.uid).set({
+                        personalityAssessmentSkipped: true,
+                        personalityAssessmentSkippedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } catch (e) {
+                    console.log('Could not save skip status:', e);
+                }
+            }
         }
         function renderPA() {
             const q = personalityQuestions[paIndex];
