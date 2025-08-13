@@ -490,17 +490,26 @@
         }
 
         /* View containers */
+        /* View containers - Fixed for proper layout */
         .view-container {
             display: none;
-            flex: 1;
             padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
         }
-        /* Ensure app views have left padding to clear sidebar; auth stays centered */
-        .view-container:not(#authView) { padding-left: 84px; padding-right: 16px; }
-        @media (min-width: 1024px) {
-            .view-container:not(#authView) { padding-left: 236px; padding-right: 20px; }
+        
+        .view-container.active {
+            display: block;
+        }
+        
+        /* Content max-width wrapper */
+        .view-container > .container,
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         /* Center auth view vertically and respect safe areas */
@@ -875,27 +884,68 @@
         #appShell .view-container { max-width: 1320px; margin: 0 auto; padding-left: clamp(12px, 2vw, 20px); padding-right: clamp(12px, 2vw, 20px); }
         html, body { height: 100%; }
         body { overflow: hidden; }
-        #appShell { min-height: 100dvh; display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr; }
-        #appShell .app-sidebar { grid-column: 1; grid-row: 1; }
-        #appShell .app-main { grid-column: 2; grid-row: 1; min-height: 100dvh; display: flex; flex-direction: column; }
-        #appShell .view-container { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+        /* Fixed App Shell Layout */
+        #appShell { 
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            position: relative;
+        }
+        
+        #appShell .app-sidebar { 
+            position: sticky;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            height: 100dvh;
+            flex-shrink: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        #appShell .view-container { 
+            flex: 1;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            min-width: 0; /* Prevent flex child from overflowing */
+        }
+        
         @media (max-width: 900px) {
-            #appShell { grid-template-columns: 1fr; }
-            #appShell .app-sidebar { position: fixed; }
-            #appShell .app-main { grid-column: 1; }
+            #appShell .app-sidebar { 
+                position: fixed;
+                left: 0;
+                top: 0;
+                z-index: 1000;
+            }
+            
+            #appShell {
+                padding-left: 72px; /* Space for collapsed sidebar */
+            }
         }
 
         /* ===== AUTHENTICATION STYLES ===== */
         
-        /* Auth Container */
+        /* Auth Container - Properly Centered */
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 24px 20px 28px 20px;
+            padding: 40px 20px;
             text-align: center;
             position: relative;
-            z-index: 15; /* Higher than matrix rain */
-            transform: translateY(-26px);
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        #authView {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
                 /* Matrix Rain Background - Canvas-based */
@@ -1264,10 +1314,7 @@
         .app-sidebar .nav-item:hover .nav-tooltip { display: block; }
         /* Expanded vs Collapsed */
         @media (min-width: 1024px) { .app-sidebar:not([data-collapsed="true"]) .nav-link .nav-text { display:inline; } }
-        .app-sidebar[data-collapsed="true"] { width:84px !important; }
-        .app-sidebar:not([data-collapsed="true"]) { width:260px !important; }
-        body.sidebar-collapsed .view-container:not(#authView) { padding-left: 96px; }
-        body.sidebar-expanded .view-container:not(#authView) { padding-left: 276px; }
+        /* Sidebar width states - handled by main layout */
 
         /* Enforce card and modal glass inside app wrapper */
         /* Strong specificity to avoid login/landing styles leaking in */
@@ -1860,7 +1907,7 @@
         </div>
 
         <!-- App Sidebar (SVG icons, tooltips, collapse control) -->
-            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="position:fixed;left:0;top:0;height:100dvh;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);z-index:12; grid-column:1; grid-row:1;">
+            <aside id="appSidebar" class="app-sidebar" data-collapsed="false" style="width:220px;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:flex-start;padding:14px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px);border-right:1px solid var(--border-glass);transition:width 0.3s ease;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
             <div style="display:flex;align-items:center;gap:8px;">
                     <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"/>
@@ -1971,6 +2018,7 @@
         </div>
         <!-- Dashboard View -->
         <div id="dashboardView" class="view-container">
+            <div class="dashboard-container">
             <!-- Dashboard Header -->
             <div class="dashboard-card dashboard-header">
                 <div class="header-left">
@@ -2968,6 +3016,7 @@
                 </div>
             </div>
         </div>
+        </div><!-- End dashboard-container -->
 
         <!-- Analytics View -->
         <div id="analyticsView" class="view-container" style="display:none;">

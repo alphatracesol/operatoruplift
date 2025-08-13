@@ -1682,5 +1682,37 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
   </script>
 </div>
+
+<script>
+  // Points badge updater
+  (function() {
+    try {
+      const badge = document.getElementById('landingPointsText');
+      if (!badge) return;
+      const saved = localStorage.getItem('uplift:wallet');
+      if (!saved) { badge.textContent = 'PTS: 0'; return; }
+      badge.textContent = 'PTS: …';
+      
+      function fetchPoints() {
+        fetch('/.netlify/functions/api/user/' + encodeURIComponent(saved) + '/points', { cache: 'no-store' })
+          .then(r=>r.ok?r.json():null)
+          .then(d=>{ 
+            if (d && typeof d.points === 'number') {
+              badge.textContent = 'PTS: ' + Number(d.points).toLocaleString();
+            } else {
+              badge.textContent = 'PTS: 0';
+            }
+          })
+          .catch(()=>{ badge.textContent = 'PTS: —'; });
+      }
+      
+      fetchPoints();
+      // Refresh every 2 minutes
+      setInterval(fetchPoints, 120000);
+    } catch (e) {
+      console.error('Points badge error:', e);
+    }
+  })();
+</script>
 </body>
 </html> 
