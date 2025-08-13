@@ -7038,7 +7038,11 @@
             const redeemOpen = e.target.closest('[data-action="open-redeem-modal"]');
             if (redeemOpen) { try { openRedeemModal(); } catch {} return; }
             const redeemSubmit = e.target.closest('#redeemSubmitBtn');
-            if (redeemSubmit && !redeemSubmit.disabled) { try { submitRedeem(); } catch {} return; }
+            if (redeemSubmit && !redeemSubmit.disabled) {
+                // Avoid double-call if inline onclick is still present during migration
+                if (!redeemSubmit.getAttribute('onclick')) { try { submitRedeem(); } catch {} }
+                return;
+            }
         });
 
         // ===== FOCUS SESSIONS =====
