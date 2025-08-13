@@ -205,13 +205,15 @@
             overflow: hidden; 
         }
         
-        /* Main App Container - Fixed */
+        /* MAIN APP CONTAINER - CLEAN ORANGE/BLACK THEME */
         #appShell {
-            display: flex;
-            width: 100%;
-            min-height: 100vh;
-            background: var(--bg-color);
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a0a;
             position: relative;
+            overflow: hidden;
         }
         
         /* Loading Screen - Fixed */
@@ -2194,36 +2196,34 @@
         }
         
         /* Main App Container */
-        #appShell { 
-            display: grid;
-            grid-template-columns: auto 1fr;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
+        /* REMOVED - Duplicate #appShell definition */
         
-        /* Sidebar */
-        #appShell .app-sidebar { 
+        /* SIDEBAR - CLEAN ORANGE/BLACK */
+        .app-sidebar, #appSidebar { 
             grid-column: 1;
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
             position: relative;
             z-index: 100;
+            background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
+            border-right: 1px solid rgba(249, 115, 22, 0.2);
             transition: width 0.3s ease;
         }
         
-        .app-sidebar[data-collapsed="false"] { width: 220px !important; }
+        .app-sidebar[data-collapsed="false"] { width: 260px !important; }
         .app-sidebar[data-collapsed="true"] { width: 72px !important; }
         
-        /* Content Area */
-        #appShell .view-container { 
+        /* MAIN CONTENT - CLEAN */
+        .view-container, .main-content, #mainContent { 
             grid-column: 2;
             overflow-y: auto; 
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             height: 100vh;
             position: relative;
+            background: #0a0a0a;
+            padding: 0;
         }
         
         /* Mobile Responsive */
@@ -2232,17 +2232,22 @@
                 grid-template-columns: 1fr;
             }
             
-            #appShell .app-sidebar { 
+            .app-sidebar, #appSidebar { 
                 position: fixed;
                 left: 0;
                 top: 0;
                 z-index: 1000;
-                width: 72px !important;
+                width: 260px;
+                transform: translateX(-100%);
             }
             
-            #appShell .view-container {
+            .app-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .view-container, .main-content {
                 grid-column: 1;
-                padding-left: 72px;
+                width: 100%;
             }
         }
 
@@ -2621,15 +2626,48 @@
             padding: 10px;
         }
 
-        /* Remove old layout fixes - handled by grid system */
-
-        .app-sidebar { background: var(--glass-bg); border-right:1px solid var(--border-glass); }
-        .app-sidebar .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text-color); text-decoration: none; background: var(--card-bg-glass); width:100%; min-height:52px; }
-        .app-sidebar .nav-link .nav-icon { width: 24px; height: 24px; display:grid; place-items:center; flex: 0 0 auto; }
-        .app-sidebar .nav-link .nav-text { display:none; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .app-sidebar .nav-link.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
-        .app-sidebar .nav-link:hover { border-color: var(--accent-color); color: var(--accent-color); }
-        .app-sidebar .nav-tooltip { position: absolute; left: 64px; background: var(--card-bg-glass); border:1px solid var(--border-glass); padding:4px 8px; border-radius:6px; font-size:12px; display:none; white-space:nowrap; }
+        /* Navigation Links - Clean Orange/Black Theme */
+        .app-sidebar .nav-link { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 14px; 
+            border: 1px solid rgba(249, 115, 22, 0.1); 
+            border-radius: 12px; 
+            color: #e0e0e0; 
+            text-decoration: none; 
+            background: rgba(249, 115, 22, 0.05); 
+            width: 100%; 
+            min-height: 52px;
+            transition: all 0.3s ease;
+        }
+        
+        .app-sidebar .nav-link:hover {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: rgba(249, 115, 22, 0.3);
+            transform: translateX(4px);
+        }
+        
+        .app-sidebar .nav-link.active {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .app-sidebar .nav-link .nav-icon { 
+            width: 24px; 
+            height: 24px; 
+            display: grid; 
+            place-items: center; 
+            flex: 0 0 auto; 
+        }
+        
+        .app-sidebar .nav-link .nav-text { 
+            font-size: 15px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
         .app-sidebar .nav-item { position: relative; width:100%; }
         .app-sidebar .nav-item:hover .nav-tooltip { display: block; }
         /* Expanded vs Collapsed */
