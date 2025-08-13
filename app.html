@@ -31,6 +31,15 @@
         (function() {
             const savedTheme = localStorage.getItem('operatorUpliftTheme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
+            // DEBUG gating for console noise (set localStorage.debug="1" to enable; default enabled on localhost)
+            if (typeof window !== 'undefined') {
+                if (typeof window.DEBUG === 'undefined') {
+                    try { window.DEBUG = (localStorage.getItem('debug') === '1') || (location.hostname === 'localhost'); } catch { window.DEBUG = false; }
+                }
+                if (!window.DEBUG) {
+                    try { console.log = function(){}; } catch {}
+                }
+            }
             console.log('🎨 Immediate theme set:', savedTheme);
         })();
         // Bind quick add task form
@@ -1964,7 +1973,7 @@
                     <div class="card-header">
                         <h3>Redeem Points</h3>
                         <div class="card-actions">
-                            <button class="btn-secondary" onclick="openRedeemModal()">Redeem</button>
+                            <button class="btn-secondary" data-action="open-redeem-modal" onclick="openRedeemModal()">Redeem</button>
                             <button class="btn-link" onclick="scrollToRedemptions()">History</button>
                             <button class="btn-icon" title="Learn about caps & cooldowns" onclick="openRedeemHelp()">❓</button>
                         </div>
@@ -3557,6 +3566,16 @@
         
         // Register view management functions
         FunctionRegistry.register('core', 'showView', showView);
+
+        // Delegated navigation binding for data-view links
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('[data-view]');
+            if (link) {
+                e.preventDefault();
+                const v = link.getAttribute('data-view');
+                if (v) showView(v);
+            }
+        });
 
         // Matrix Rain Background Effect - Canvas-based
         function initializeMatrixRain() {
@@ -6909,7 +6928,7 @@
                                 <div class="text-muted">${h.frequency || 'daily'}</div>
                             </div>
                             <div>
-                                <button class="btn-secondary" onclick="markHabitToday('${h.id}')">Did it today</button>
+                                <button class="btn-secondary mark-habit" data-habit-id="${h.id}">Did it today</button>
                             </div>
                         </div>
                     `).join('');
@@ -7007,6 +7026,20 @@
                 OperatorUplift.ui?.showToast?.('Failed to mark habit', 'error');
             }
         }
+
+        // Delegated handlers for common actions (first tranche)
+        document.addEventListener('click', (e) => {
+            const markBtn = e.target.closest('.mark-habit[data-habit-id]');
+            if (markBtn) {
+                const id = markBtn.getAttribute('data-habit-id');
+                if (id) markHabitToday(id);
+                return;
+            }
+            const redeemOpen = e.target.closest('[data-action="open-redeem-modal"]');
+            if (redeemOpen) { try { openRedeemModal(); } catch {} return; }
+            const redeemSubmit = e.target.closest('#redeemSubmitBtn');
+            if (redeemSubmit && !redeemSubmit.disabled) { try { submitRedeem(); } catch {} return; }
+        });
 
         // ===== FOCUS SESSIONS =====
         let focusInterval = null;
