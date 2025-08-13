@@ -6939,7 +6939,8 @@
                 const name = document.getElementById('habitName').value.trim();
                 const frequency = document.getElementById('habitFrequency').value;
                 const protocol = document.getElementById('habitProtocol')?.value || 'none';
-                if (!name) return;
+                const category = document.getElementById('habitCategory')?.value || 'other';
+                if (!name || !frequency || !category) { OperatorUplift.ui?.showToast?.('Missing fields', 'error'); return; }
                 try {
                     await db.collection('users')
                         .doc(OperatorUplift.currentUser.uid)
@@ -6947,6 +6948,7 @@
                         .add({
                             name,
                             frequency,
+                            category,
                             protocol,
                             streak: 0,
                             lastDone: null,
@@ -7438,7 +7440,7 @@
                     throw new Error('User not authenticated');
                 }
 
-                const response = await fetch(AI_CONFIG.apiEndpoint, {
+            const response = await fetch(AI_CONFIG.apiEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -7453,7 +7455,9 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('AI API request failed');
+                    let detail = '';
+                    try { const err = await response.json(); detail = err?.error || JSON.stringify(err); } catch {}
+                    throw new Error('AI API request failed' + (detail ? (': ' + detail) : ''));
                 }
                 
                 // Try to stream if available (SSE/text)
@@ -8861,7 +8865,9 @@ Focus on actionable insights and encouragement.
 
             // Streak Achievement
             const recentGoals = goals.filter(goal => {
-                const daysSinceCreation = (new Date() - goal.createdAt.toDate()) / (1000 * 60 * 60 * 24);
+                const createdAt = goal.createdAt?.toDate ? goal.createdAt.toDate() : (goal.createdAt instanceof Date ? goal.createdAt : null);
+                if (!createdAt) return false;
+                const daysSinceCreation = (Date.now() - createdAt.getTime()) / 86400000;
                 return daysSinceCreation <= 7;
             });
             

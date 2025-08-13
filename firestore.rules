@@ -66,6 +66,15 @@ service cloud.firestore {
       match /achievements/{docId} {
         allow read, write: if isOwner(userId);
       }
+      match /rewards/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /missions/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /rewards/treasure/{docId} {
+        allow read, write: if isOwner(userId);
+      }
       match /analytics/{docId} {
         allow read, write: if isOwner(userId);
       }
@@ -156,6 +165,10 @@ service cloud.firestore {
     // Redemptions: allow users to read their own redemptions only; writes are server-side
     match /redemptions/{docId} {
       allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /redeemCounters/{docId} {
+      allow read: if request.auth != null && docId.startsWith(request.auth.uid);
       allow write: if false;
     }
 
