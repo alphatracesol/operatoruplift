@@ -1357,7 +1357,14 @@
                                                 <th style="text-align:left;padding:.4rem;color:var(--text-muted);font-weight:600;">Time</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="burnFeedBody"></tbody>
+                                        <tbody id="burnFeedBody">
+                                            <tr>
+                                                <td colspan="3">
+                                                    <div class="skeleton" style="height:14px;margin:.25rem 0;"></div>
+                                                    <div class="skeleton" style="height:14px;width:70%;"></div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -1845,14 +1852,15 @@
         const Redeem = { rate: 0, mode: 'fixed', pointUsd: 0 };
         async function loadRedeemRate() {
             try {
+                const help = document.getElementById('redeemRateHelp');
+                if (help) help.innerHTML = '<span class="skeleton" style="display:inline-block;width:220px;height:16px;"></span>';
                 const res = await fetch('/.netlify/functions/api/points/rate', { cache: 'no-store' });
-                if (!res.ok) return;
+                if (!res.ok) { if (help) help.textContent = 'Failed to load redemption rate'; return; }
                 const data = await res.json();
                 Redeem.mode = data.type;
                 if (data.type === 'fixed') { Redeem.rate = Number(data.rate||0); } else { Redeem.pointUsd = Number(data.pointUsd||0); }
                 const t = document.getElementById('redeemRateText');
                 if (t) t.textContent = data.type === 'fixed' ? `Current rate: 1 point = ${Redeem.rate} UPLIFT` : `Current rate: 1 point ≈ ${Redeem.pointUsd} USD worth of UPLIFT`;
-                const help = document.getElementById('redeemRateHelp');
                 if (help) help.textContent = t?.textContent || '';
                 const caps = document.getElementById('redeemCaps');
                 if (caps) {
@@ -1860,7 +1868,7 @@
                     const r = pc?.redemption || {};
                     caps.textContent = `Caps: daily ${Number(r.dailyCap||0).toLocaleString()} pts, weekly ${Number(r.weeklyCap||0).toLocaleString()} pts, cooldown ${Number(r.cooldownHours||24)}h`;
                 }
-            } catch {}
+            } catch { const help = document.getElementById('redeemRateHelp'); if (help) help.innerHTML = 'Failed to load rate <button class="btn btn-sm btn-secondary" onclick="loadRedeemRate()">Retry</button>'; }
         }
         function updateRedeemPreview() {
             const input = document.getElementById('redeemPointsInput');
@@ -2004,6 +2012,7 @@
             const el = document.getElementById('burnFeedBody');
             if (!el) return;
             try {
+                el.innerHTML = '<tr><td colspan="3"><div class="skeleton" style="height:14px;margin:.25rem 0;"></div><div class="skeleton" style="height:14px;width:70%;"></div></td></tr>';
                 const mint = (await fetch('/.netlify/functions/api/config/public').then(r=>r.ok?r.json():null).catch(()=>null))?.mint || '';
                 if (!mint) { el.innerHTML = '<tr><td colspan="3" class="text-muted">No mint configured</td></tr>'; return; }
                 const res = await fetch(`/.netlify/functions/burn-feed?mint=${mint}&limit=20`, { cache: 'no-store' });
