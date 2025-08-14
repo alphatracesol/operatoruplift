@@ -1746,19 +1746,19 @@
                 
                 // Create user document in Firestore
                 if (!db) throw new Error('Database not initialized');
-                    await db.collection('users').doc(userCredential.user.uid).set({
-                        name: name,
-                        email: email,
-                        level: 1,
-                        experience: 0,
-                        tokens: 100,
-                        points: 0,
-                        streak: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    name: name,
+                    email: email,
+                    level: 1,
+                    experience: 0,
+                    tokens: 100,
+                    points: 0,
+                    streak: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
                 showToast('Account created successfully!', 'success');
+                showLoginForm();
             } catch (error) {
                 showToast(error.message, 'error');
             }
