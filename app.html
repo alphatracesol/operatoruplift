@@ -2598,34 +2598,39 @@
         
         // Leaderboard View (extracted from Community leaderboard section)
         function createLeaderboardView() {
+            // build container and hydrate from same data source as preview
+            const containerId = 'leaderboardFullContainer';
+            setTimeout(async () => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '<div class="skeleton" style="height:16px;margin-bottom:8px;"></div><div class="skeleton" style="height:16px;width:70%;"></div>';
+                try {
+                    let rows;
+                    try {
+                        rows = await (window.fetchDailyLeaderboard ? window.fetchDailyLeaderboard() : (async () => {
+                            try {
+                                const r = await fetch('/.netlify/functions/api/leaderboard/today', { cache: 'no-store' });
+                                if (r.ok) { const j = await r.json(); return (j?.rows||[]).map((x,i)=>({ rank: x.rank||i+1, name: x.user||x.name||'User', xp: x.points||x.xp||0 })); }
+                            } catch {}
+                            return [];
+                        })());
+                    } catch { rows = []; }
+                    if (!rows.length) { container.innerHTML = '<div class="text-muted">No leaderboard data yet.</div>'; return; }
+                    container.innerHTML = rows.map(user => `
+                        <div style=\"display:flex; align-items:center; gap: 1rem; padding: 0.75rem; border:1px solid var(--border-light); border-radius:12px;\">\n
+                            <div style=\"width: 40px; text-align: center; font-weight: 700; color: ${user.rank <= 3 ? 'var(--warning-color)' : 'var(--text-muted)'};\">#${user.rank}</div>
+                            <div style=\"flex: 1; color: var(--text-primary); font-weight: 600;\">${user.name}</div>
+                            <div style=\"color: var(--primary-color); font-weight: 700;\">${(user.xp||0).toLocaleString()} XP</div>
+                        </div>
+                    `).join('');
+                } catch {
+                    container.innerHTML = '<div class="text-muted">Failed to load leaderboard</div><div style=\"margin-top:.5rem;\"><button class=\"btn btn-secondary\" onclick=\"navigate(\'leaderboard\')\">Retry</button></div>';
+                }
+            }, 0);
             return `
                 <div class="leaderboard-container" style="padding: 2rem;">
                     <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🏆 Leaderboard</h2>
-                    <div style="display: grid; gap: 0.75rem;">
-                        ${[
-                            { rank: 1, name: 'Alex Champion', xp: 15420, avatar: '🦸' },
-                            { rank: 2, name: 'Sarah Master', xp: 14200, avatar: '👩‍💻' },
-                            { rank: 3, name: 'Mike Pro', xp: 13500, avatar: '🧙‍♂️' },
-                            { rank: 4, name: 'You', xp: 8750, avatar: '😎', highlight: true },
-                            { rank: 5, name: 'Emma Rising', xp: 8200, avatar: '🌟' }
-                        ].map(user => `
-                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; 
-                                        background: ${user.highlight ? 'rgba(249,115,22,0.1)' : 'transparent'}; 
-                                        border: ${user.highlight ? '1px solid var(--primary-color)' : '1px solid var(--border-light)'}; 
-                                        border-radius: 12px;">
-                                <div style="width: 32px; text-align: center; font-weight: 700; color: ${user.rank <= 3 ? 'var(--warning-color)' : 'var(--text-muted)'};">
-                                    #${user.rank}
-                                </div>
-                                <div style="font-size: 1.5rem;">${user.avatar}</div>
-                                <div style="flex: 1;">
-                                    <div style="color: var(--text-primary); font-weight: 600;">${user.name}</div>
-                                </div>
-                                <div style="color: var(--primary-color); font-weight: 700;">
-                                    ${user.xp.toLocaleString()} XP
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div id="${containerId}" style="display: grid; gap: 0.75rem;"></div>
                 </div>
             `;
         }
@@ -3156,20 +3161,39 @@
             const elP = document.getElementById('personalityInsights');
             const elS = document.getElementById('adaptiveSuggestions');
             if (!elP || !elS) return;
-            elP.innerHTML = `
-                <div class="personality-card">
-                    <h4>Your Profile</h4>
-                    <p><strong>Motivation:</strong> Progress + Recognition</p>
-                    <p><strong>Style:</strong> Structured challenges</p>
-                    <p><strong>Focus Window:</strong> 25–45 minutes</p>
-                </div>`;
-            elS.innerHTML = `
-                <div class="personality-card">
-                    <h4>Suggestions</h4>
-                    <p>• Schedule 2×25 min focus blocks today</p>
-                    <p>• Convert 1 goal into 3 sub-steps</p>
-                    <p>• Claim daily reward and spin the wheel</p>
-                </div>`;
+            // loading skeletons
+            elP.innerHTML = '<div class="skeleton" style="height:16px;margin-bottom:8px;"></div><div class="skeleton" style="height:16px;width:70%;"></div>';
+            elS.innerHTML = '<div class="skeleton" style="height:16px;margin-bottom:8px;"></div><div class="skeleton" style="height:16px;width:60%;"></div>';
+            setTimeout(() => {
+                try {
+                    // read any saved preferences to decide if we have data
+                    const style = localStorage.getItem('uplift:aiStyle');
+                    const tone = localStorage.getItem('uplift:aiTone');
+                    const hasData = Boolean(style || tone);
+                    if (!hasData) {
+                        elP.innerHTML = '<div class="text-muted">No insights yet.</div>';
+                        elS.innerHTML = '<div class="text-muted">Complete the assessment to personalize suggestions.</div>';
+                        return;
+                    }
+                    elP.innerHTML = `
+                        <div class="personality-card">
+                            <h4>Your Profile</h4>
+                            <p><strong>Motivation:</strong> Progress + Recognition</p>
+                            <p><strong>Style:</strong> ${style || 'Structured challenges'}</p>
+                            <p><strong>Preferred Tone:</strong> ${tone || 'Neutral'}</p>
+                        </div>`;
+                    elS.innerHTML = `
+                        <div class="personality-card">
+                            <h4>Suggestions</h4>
+                            <p>• Schedule 2×25 min focus blocks today</p>
+                            <p>• Convert 1 goal into 3 sub-steps</p>
+                            <p>• Claim daily reward and spin the wheel</p>
+                        </div>`;
+                } catch (e) {
+                    elP.innerHTML = '<div class="text-muted">Failed to load insights</div>';
+                    elS.innerHTML = '<div><button class="btn btn-secondary" onclick="renderAIInsights()">Retry</button></div>';
+                }
+            }, 0);
         }
         
         // Achievement System
@@ -3560,17 +3584,23 @@
         // ===== Today Tasks (local) =====
         function loadTodayTasks() {
             try {
-                const raw = localStorage.getItem('uplift:todayTasks');
-                const items = raw ? JSON.parse(raw) : [];
                 const ul = document.getElementById('todayTasksList');
                 if (!ul) return;
-                if (!items.length) { ul.innerHTML = '<li class="text-muted">No tasks yet. Add one to get momentum.</li>'; return; }
-                ul.innerHTML = items.map((t, i)=>`<li style=\"display:flex;align-items:center;gap:.5rem;\">
-                    <input type=\"checkbox\" ${t.done?'checked':''} onchange=\"toggleTodayTask(${i})\" aria-label=\"Mark task done\" />
-                    <span style=\"flex:1;${t.done?'text-decoration:line-through;color:var(--text-muted);':''}\">${t.title}</span>
-                    <button class=\"btn btn-sm btn-secondary\" onclick=\"removeTodayTask(${i})\">Remove</button>
-                </li>`).join('');
-                updateTodayAggregates();
+                // show skeleton placeholders while loading
+                ul.innerHTML = '<li><div class="skeleton" style="height:14px;"></div></li><li><div class="skeleton" style="height:14px;width:70%;"></div></li>';
+                setTimeout(() => {
+                    try {
+                        const raw = localStorage.getItem('uplift:todayTasks');
+                        const items = raw ? JSON.parse(raw) : [];
+                        if (!items.length) { ul.innerHTML = '<li class="text-muted">No tasks yet. Add one to get momentum.</li>'; updateTodayAggregates(); return; }
+                        ul.innerHTML = items.map((t, i)=>`<li style="display:flex;align-items:center;gap:.5rem;">
+                            <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodayTask(${i})" aria-label="Mark task done" />
+                            <span style="flex:1;${t.done?'text-decoration:line-through;color:var(--text-muted);':''}">${t.title}</span>
+                            <button class="btn btn-sm btn-secondary" onclick="removeTodayTask(${i})">Remove</button>
+                        </li>`).join('');
+                        updateTodayAggregates();
+                    } catch {}
+                }, 0);
             } catch {}
         }
         function saveTodayTasks(items) { localStorage.setItem('uplift:todayTasks', JSON.stringify(items||[])); }
