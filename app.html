@@ -1271,6 +1271,67 @@
                                 <!-- Leaderboard will be dynamically loaded -->
                             </div>
                         </div>
+
+                        <!-- Redeem Points Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Redeem Points</h3>
+                                <div class="card-icon">💱</div>
+                            </div>
+                            <div class="card-actions" style="display:flex;gap:.5rem;margin-bottom:.5rem;">
+                                <button class="btn btn-secondary" onclick="openRedeemModal()">Redeem</button>
+                                <button class="btn btn-link" onclick="scrollToRedemptions()">History</button>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted" id="redeemRateHelp">Fetching redemption rate…</p>
+                            </div>
+                        </div>
+
+                        <!-- Pending Redemptions Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title shimmer-text">Pending Redemptions</h3>
+                                <div class="card-icon">⏳</div>
+                            </div>
+                            <div class="card-body" id="redemptionsList">
+                                <div class="text-muted">Loading…</div>
+                            </div>
+                        </div>
+
+                        <!-- Wallet & Burn Feed Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Wallet & Burn Feed</h3>
+                                <div class="card-icon">👛</div>
+                            </div>
+                            <div class="card-body" style="display:flex;flex-direction:column;gap:.75rem;">
+                                <div style="display:flex;align-items:center;gap:.5rem;justify-content:space-between;">
+                                    <div style="color:var(--text-secondary);font-size:.9rem;">Connected Wallet</div>
+                                    <div id="walletAddressText" style="font-weight:700;color:var(--text-primary);">—</div>
+                                </div>
+                                <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                                    <button class="btn btn-secondary" id="connectWalletBtn" onclick="connectPhantomWallet()">Connect Phantom</button>
+                                    <button class="btn btn-secondary" id="linkWalletBtn" onclick="linkWalletToAccount()">Link Wallet</button>
+                                    <button class="btn btn-secondary" id="unlinkWalletBtn" onclick="unlinkWalletFromAccount()">Unlink</button>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;">
+                                    <div style="color:var(--text-secondary);">Recent Burns</div>
+                                    <button class="btn btn-sm btn-secondary" id="burnFeedRefresh" onclick="fetchBurnFeed()">Refresh</button>
+                                </div>
+                                <div style="overflow:auto;max-height:220px;border:1px solid var(--border-light);border-radius:10px;">
+                                    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:left;padding:.4rem;color:var(--text-muted);font-weight:600;">Wallet</th>
+                                                <th style="text-align:right;padding:.4rem;color:var(--text-muted);font-weight:600;">Amount</th>
+                                                <th style="text-align:left;padding:.4rem;color:var(--text-muted);font-weight:600;">Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="burnFeedBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1281,6 +1342,30 @@
 
     <!-- Toast Container -->
     <div id="toastContainer"></div>
+    <!-- Redeem Modal -->
+    <div id="redeemModal" class="modal">
+        <div class="modal-content" style="max-width:520px;">
+            <div class="modal-header">
+                <h2>Redeem Points</h2>
+                <button class="modal-close" onclick="closeRedeemModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="redeemAvailable" class="text-muted" style="margin-bottom:8px;">Available: —</div>
+                <div id="redeemRateText" class="text-muted" style="margin-bottom:12px;">Loading rate…</div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                    <label for="redeemPointsInput" class="text-label" style="flex:1;">Points to redeem</label>
+                    <button class="btn btn-secondary" id="redeemMaxBtn" type="button">Max</button>
+                </div>
+                <input id="redeemPointsInput" type="number" min="1" step="1" placeholder="e.g., 100" style="width:100%" />
+                <div id="redeemPreview" class="text-muted" style="margin-top:8px;">—</div>
+                <div id="redeemCaps" class="text-muted" style="margin-top:8px;">Daily/weekly caps apply.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeRedeemModal()">Cancel</button>
+                <button id="redeemSubmitBtn" class="btn btn-primary" onclick="submitRedeem()">Redeem</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Onboarding Assessment Modal -->
     <div id="onboardingAssessmentModal" class="modal">
@@ -1708,6 +1793,182 @@
             document.getElementById('app').classList.remove('active');
         }
 
+        // ===== Redemption & Wallet & Burn Feed =====
+        const Redeem = { rate: 0, mode: 'fixed', pointUsd: 0 };
+        async function loadRedeemRate() {
+            try {
+                const res = await fetch('/.netlify/functions/api/points/rate', { cache: 'no-store' });
+                if (!res.ok) return;
+                const data = await res.json();
+                Redeem.mode = data.type;
+                if (data.type === 'fixed') { Redeem.rate = Number(data.rate||0); } else { Redeem.pointUsd = Number(data.pointUsd||0); }
+                const t = document.getElementById('redeemRateText');
+                if (t) t.textContent = data.type === 'fixed' ? `Current rate: 1 point = ${Redeem.rate} UPLIFT` : `Current rate: 1 point ≈ ${Redeem.pointUsd} USD worth of UPLIFT`;
+                const help = document.getElementById('redeemRateHelp');
+                if (help) help.textContent = t?.textContent || '';
+                const caps = document.getElementById('redeemCaps');
+                if (caps) {
+                    const pc = await fetch('/.netlify/functions/api/config/public', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null);
+                    const r = pc?.redemption || {};
+                    caps.textContent = `Caps: daily ${Number(r.dailyCap||0).toLocaleString()} pts, weekly ${Number(r.weeklyCap||0).toLocaleString()} pts, cooldown ${Number(r.cooldownHours||24)}h`;
+                }
+            } catch {}
+        }
+        function updateRedeemPreview() {
+            const input = document.getElementById('redeemPointsInput');
+            const out = document.getElementById('redeemPreview');
+            if (!input || !out) return;
+            const pts = Number(input.value||0);
+            if (Redeem.mode === 'fixed') {
+                const uplift = Math.max(0, Math.floor(pts * (Redeem.rate||0)));
+                out.textContent = `${pts.toLocaleString()} pts → ${uplift.toLocaleString()} UPLIFT`;
+            } else {
+                out.textContent = `${pts.toLocaleString()} pts → ~${(pts*(Redeem.pointUsd||0)).toLocaleString()} USD worth of UPLIFT`;
+            }
+        }
+        async function openRedeemModal() {
+            const m = document.getElementById('redeemModal');
+            m?.classList.add('active');
+            try {
+                if (!auth || !auth.currentUser) throw new Error('Sign in first');
+                const idToken = await auth.currentUser.getIdToken(); // might be used later
+            } catch {}
+            try {
+                const res = await fetch('/.netlify/functions/api/user/me/points', { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + (await auth?.currentUser?.getIdToken?.() || '') } }).catch(()=>null);
+                if (res && res.ok) {
+                    const data = await res.json();
+                    const av = document.getElementById('redeemAvailable');
+                    if (av) av.textContent = `Available: ${Number(data.points||0).toLocaleString()} pts`;
+                }
+            } catch {}
+            try {
+                const maxBtn = document.getElementById('redeemMaxBtn');
+                if (maxBtn && !maxBtn.dataset.bound) {
+                    maxBtn.dataset.bound = '1';
+                    maxBtn.addEventListener('click', async ()=>{
+                        const input = document.getElementById('redeemPointsInput');
+                        if (!input) return;
+                        try {
+                            const pc = await fetch('/.netlify/functions/api/config/public', { cache: 'no-store' }).then(r=>r.ok?r.json():null).catch(()=>null);
+                            const r = pc?.redemption || {};
+                            const daily = Number(r.dailyCap || 10000);
+                            input.value = String(daily|0);
+                        } catch { input.value = '1000'; }
+                        updateRedeemPreview();
+                    });
+                }
+            } catch {}
+            updateRedeemPreview();
+            const input = document.getElementById('redeemPointsInput');
+            if (input && !input.dataset.bound) {
+                input.dataset.bound = '1';
+                input.addEventListener('input', updateRedeemPreview);
+            }
+            loadRedeemRate();
+        }
+        function closeRedeemModal() {
+            document.getElementById('redeemModal')?.classList.remove('active');
+        }
+        async function submitRedeem() {
+            const btn = document.getElementById('redeemSubmitBtn');
+            try {
+                if (!auth || !auth.currentUser) throw new Error('Sign in first');
+                const pts = Number(document.getElementById('redeemPointsInput')?.value||0);
+                if (!pts || pts <= 0) throw new Error('Enter points to redeem');
+                btn.disabled = true; btn.textContent = 'Submitting…';
+                const idToken = await auth.currentUser.getIdToken();
+                const res = await fetch('/.netlify/functions/api/points/redeem', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+                    body: JSON.stringify({ points: pts })
+                });
+                if (!res.ok) throw new Error((await res.json()).error || 'redeem_failed');
+                const data = await res.json();
+                showToast(`Redemption queued: ${data.pointsRedeemed||pts} pts`, 'success');
+                closeRedeemModal();
+                try { renderPendingRedemptions(); } catch {}
+            } catch (e) { showToast(String(e?.message||'Redeem failed'), 'error'); }
+            finally { if (btn) { btn.disabled = false; btn.textContent = 'Redeem'; } }
+        }
+        async function renderPendingRedemptions() {
+            try {
+                const list = document.getElementById('redemptionsList');
+                if (!list) return;
+                if (!auth || !auth.currentUser || !db) { list.innerHTML = '<div class="text-muted">Sign in to view</div>'; return; }
+                const snap = await db.collection('users').doc(auth.currentUser.uid).collection('redemptions').orderBy('createdAt','desc').limit(10).get();
+                const rows = [];
+                snap.forEach(d => {
+                    const r = d.data();
+                    const when = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : '';
+                    rows.push(`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border-light);">
+                        <span>${Number(r.points||0).toLocaleString()} pts</span>
+                        <span class="text-muted">${when}</span>
+                        <span style="color:${r.status==='completed'?'var(--success)':'var(--warning-color)'};font-weight:600;">${(r.status||'pending')}</span>
+                    </div>`);
+                });
+                list.innerHTML = rows.length ? rows.join('') : '<div class="text-muted">No pending redemptions</div>';
+            } catch (e) { console.error('renderPendingRedemptions failed', e); }
+        }
+        function scrollToRedemptions() { document.getElementById('redemptionsList')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+        // Phantom wallet helpers
+        async function connectPhantomWallet() {
+            try {
+                if (!window.solana || !window.solana.isPhantom) { window.open('https://phantom.app/', '_blank'); return; }
+                const resp = await window.solana.connect({ onlyIfTrusted: false });
+                const address = resp?.publicKey?.toString?.();
+                if (address) { localStorage.setItem('uplift:wallet', address); document.getElementById('walletAddressText').textContent = address.slice(0,4)+'…'+address.slice(-4); }
+            } catch (e) { showToast(String(e?.message||'Wallet connect failed'), 'error'); }
+        }
+        async function linkWalletToAccount() {
+            try {
+                if (!auth || !auth.currentUser) throw new Error('Sign in first');
+                const saved = localStorage.getItem('uplift:wallet');
+                let address = saved;
+                if (!address) {
+                    const resp = await window.solana.connect({ onlyIfTrusted: false });
+                    address = resp?.publicKey?.toString?.();
+                }
+                if (!address) throw new Error('No wallet address');
+                const n = await fetch('/.netlify/functions/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
+                const message = new TextEncoder().encode(n.message);
+                const signed = await window.solana.signMessage(message, 'utf8');
+                const signature = Array.from(signed.signature);
+                const idToken = await auth.currentUser.getIdToken();
+                const res = await fetch('/.netlify/functions/api/auth/phantom/link', { method:'POST', headers: { 'Content-Type': 'application/json', 'Authorization':'Bearer '+idToken }, body: JSON.stringify({ address, signature, nonce: n.nonce }) });
+                if (!res.ok) throw new Error('Link failed');
+                showToast('Wallet linked', 'success');
+            } catch (e) { showToast(String(e?.message||'Link failed'), 'error'); }
+        }
+        async function unlinkWalletFromAccount() {
+            try {
+                if (!auth || !auth.currentUser) throw new Error('Sign in first');
+                const address = localStorage.getItem('uplift:wallet');
+                if (!address) throw new Error('No wallet address');
+                const idToken = await auth.currentUser.getIdToken();
+                const res = await fetch('/.netlify/functions/api/auth/phantom/unlink', { method:'POST', headers: { 'Content-Type': 'application/json', 'Authorization':'Bearer '+idToken }, body: JSON.stringify({ address }) });
+                if (!res.ok) throw new Error('Unlink failed');
+                showToast('Wallet unlinked', 'success');
+            } catch (e) { showToast(String(e?.message||'Unlink failed'), 'error'); }
+        }
+
+        // Burn feed
+        async function fetchBurnFeed() {
+            try {
+                const el = document.getElementById('burnFeedBody');
+                if (!el) return;
+                const mint = (await fetch('/.netlify/functions/api/config/public').then(r=>r.ok?r.json():null).catch(()=>null))?.mint || '';
+                if (!mint) { el.innerHTML = ''; return; }
+                const res = await fetch(`/.netlify/functions/burn-feed?mint=${mint}&limit=20`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('feed http '+res.status);
+                const data = await res.json();
+                const rows = (data?.burns||[]).map(b => `<tr>
+                    <td style="padding:.35rem .4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(b.wallet||'').slice(0,4)}…${(b.wallet||'').slice(-4)}</td>
+                    <td style="padding:.35rem .4rem;text-align:right;">${Number(b.amount||0).toLocaleString()}</td>
+                    <td style="padding:.35rem .4rem;">${b.blockTime?new Date(b.blockTime).toLocaleString():''}</td>
+                </tr>`).join('');
+                el.innerHTML = rows || '';
+            } catch {}
+        }
         function showApp() {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('app').classList.add('active');
