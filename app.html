@@ -1244,7 +1244,7 @@
                                     <input id="newTaskInput" type="text" placeholder="Quick add task…" style="flex:1;">
                                     <button class="btn btn-secondary" onclick="addTodayTask()">Add</button>
                                 </div>
-                                <ul id="todayTasksList" style="list-style:none; margin:0.75rem 0 0 0; padding:0; display:grid; gap:6px;"></ul>
+                                <ul id="todayTasksList" aria-live="polite" style="list-style:none; margin:0.75rem 0 0 0; padding:0; display:grid; gap:6px;"></ul>
                             </div>
                         </div>
 
@@ -1315,8 +1315,11 @@
                                 <h3 class="card-title shimmer-text">Pending Redemptions</h3>
                                 <div class="card-icon">⏳</div>
                             </div>
-                            <div class="card-body" id="redemptionsList">
+                            <div class="card-body" id="redemptionsList" aria-live="polite">
                                 <div class="text-muted">Loading…</div>
+                                <div style="margin-top:.5rem; display:flex; gap:.5rem;">
+                                    <button class="btn btn-sm btn-secondary" onclick="renderPendingRedemptions()">Retry</button>
+                                </div>
                             </div>
                         </div>
 
