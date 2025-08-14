@@ -1292,6 +1292,10 @@
                             <div id="leaderboardPreview" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                 <!-- Leaderboard will be dynamically loaded -->
                             </div>
+                            <div class="card-actions" style="display:flex; gap:.5rem;">
+                                <button class="btn btn-secondary" onclick="renderLeaderboardPreview()">Retry</button>
+                                <button class="btn btn-secondary" onclick="navigate('leaderboard')">View Full</button>
+                            </div>
                         </div>
 
                         <!-- Redeem Points Card -->
@@ -3026,6 +3030,9 @@
                 const ftEl = document.getElementById('focusTime'); if (ftEl) ftEl.textContent = `${hrs}h ${mins}m`;
                 const pct = Math.min(100, Math.round((next/240)*100));
                 const fpEl = document.getElementById('focusProgress'); if (fpEl) fpEl.style.width = `${pct}%`;
+                // hide skeletons once metrics populate
+                const sk1 = document.getElementById('tpSkel1'); if (sk1) sk1.style.display = 'none';
+                const sk2 = document.getElementById('tpSkel2'); if (sk2) sk2.style.display = 'none';
             } catch {}
         }
         function renderActiveChallenge() {
@@ -3033,25 +3040,41 @@
                 const next = Number(localStorage.getItem('uplift:todayMinutes')||'0')|0;
                 const card = document.getElementById('challengesList'); if (!card) return;
                 const hrs = (next/60).toFixed(1);
-                card.innerHTML = `<div style=\"padding: 0.75rem; background: rgba(249, 115, 22, 0.1); border-radius: 8px; border-left: 3px solid var(--primary-color);\">
-                    <div style=\"display: flex; justify-content: space-between; align-items: center;\">
-                        <span style=\"font-weight: 600;\">Daily Focus Goal</span>
-                        <span style=\"color: var(--primary-color); font-size: 0.875rem;\">+100 tokens</span>
+                card.innerHTML = `<div style="padding: 0.75rem; background: rgba(249, 115, 22, 0.1); border-radius: 8px; border-left: 3px solid var(--primary-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">Daily Focus Goal</span>
+                        <span style="color: var(--primary-color); font-size: 0.875rem;">+100 tokens</span>
                     </div>
-                    <div style=\"font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;\">Progress: ${hrs}/4.0 hours</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Progress: ${hrs}/4.0 hours</div>
                 </div>`;
+                // remove any skeleton placeholders that were shown initially
+                const skels = card.querySelectorAll('.skeleton');
+                skels.forEach(el => el.remove());
             } catch {}
         }
         async function renderLeaderboardPreview() {
             const root = document.getElementById('leaderboardPreview');
             if (!root) return;
             try {
-                root.innerHTML = '<div class="text-muted">Loading…</div>';
-                const rows = [
-                    { rank: 1, name: 'Alex Champion', xp: 15420 },
-                    { rank: 2, name: 'Sarah Master', xp: 14200 },
-                    { rank: 3, name: 'Mike Pro', xp: 13500 },
-                ];
+                root.innerHTML = '<div class="skeleton" style="height:16px;margin-bottom:8px;"></div><div class="skeleton" style="height:16px;width:70%;"></div>';
+                let rows;
+                try {
+                    // Prefer local service file if present
+                    rows = await (window.fetchDailyLeaderboard ? window.fetchDailyLeaderboard() : (async () => {
+                        // fallback to api or mock
+                        try {
+                            const r = await fetch('/.netlify/functions/api/leaderboard/today', { cache: 'no-store' });
+                            if (r.ok) { const j = await r.json(); return (j?.rows||[]).map((x,i)=>({ rank: x.rank||i+1, name: x.user||x.name||'User', xp: x.points||x.xp||0 })); }
+                        } catch {}
+                        return [
+                            { rank: 1, name: 'Alex Champion', xp: 15420 },
+                            { rank: 2, name: 'Sarah Master', xp: 14200 },
+                            { rank: 3, name: 'Mike Pro', xp: 13500 },
+                        ];
+                    })());
+                } catch {
+                    rows = [];
+                }
                 if (!rows.length) { root.innerHTML = '<div class="text-muted">No data yet. <a href="#" class="btn-link">Invite teammates</a></div>'; return; }
                 root.innerHTML = rows.map(user => `
                     <div style=\"display:flex; align-items:center; gap: 1rem; padding: 0.5rem; border:1px solid var(--border-light); border-radius:10px;\">
@@ -3061,7 +3084,7 @@
                     </div>
                 `).join('');
             } catch (e) {
-                root.innerHTML = '<div class="text-muted">Failed to load leaderboard</div>';
+                root.innerHTML = '<div class="text-muted">Failed to load leaderboard</div><div style=\"margin-top:.5rem;\"><button class=\"btn btn-secondary\" onclick=\"renderLeaderboardPreview()\">Retry</button></div>';
             }
         }
         
