@@ -21,6 +21,7 @@ const urlsToCache = [
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
     'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
     'https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap'
 ];
 
@@ -31,7 +32,15 @@ self.addEventListener('install', (event) => {
         caches.open(STATIC_CACHE)
             .then(cache => {
                 console.log('📦 Caching static assets');
-                return cache.addAll(urlsToCache);
+                // Try to cache URLs individually to avoid complete failure
+                const cachePromises = urlsToCache.map(url => {
+                    return cache.add(url).catch(error => {
+                        console.warn(`Failed to cache ${url}:`, error);
+                        // Don't fail the entire installation if one URL fails
+                        return Promise.resolve();
+                    });
+                });
+                return Promise.all(cachePromises);
             })
             .then(() => {
                 console.log('✅ Static assets cached successfully');
@@ -39,6 +48,8 @@ self.addEventListener('install', (event) => {
             })
             .catch(error => {
                 console.error('❌ Cache installation failed:', error);
+                // Still skip waiting even if caching fails
+                return self.skipWaiting();
             })
     );
 });
@@ -112,7 +123,17 @@ self.addEventListener('fetch', (event) => {
         const requestUrl = new URL(event.request.url);
         // If request is cross-origin, explicitly proxy through network to avoid no-op
         if (requestUrl.origin !== self.location.origin) {
-            event.respondWith(fetch(event.request));
+            event.respondWith(
+                fetch(event.request)
+                    .catch(error => {
+                        console.warn('Cross-origin request failed:', error);
+                        // Return a fallback response for cross-origin failures
+                        return new Response('Cross-origin request failed', {
+                            status: 503,
+                            statusText: 'Service Unavailable'
+                        });
+                    })
+            );
             return;
         }
         
