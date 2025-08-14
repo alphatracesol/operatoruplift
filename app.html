@@ -1261,6 +1261,21 @@
                             </div>
                         </div>
 
+                        <!-- AI Insights Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">AI Insights</h3>
+                                <div class="card-icon">🧠</div>
+                            </div>
+                            <div class="card-body">
+                                <div id="personalityInsights"></div>
+                                <div id="adaptiveSuggestions" style="margin-top:12px;"></div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-secondary" onclick="openPersonalityAssessment()">Update Assessment</button>
+                            </div>
+                        </div>
+
                         <!-- Leaderboard Preview Card -->
                         <div class="card">
                             <div class="card-header">
@@ -1742,6 +1757,9 @@
             initParticles();
             initSounds();
             initAnimations();
+            try { renderPendingRedemptions(); } catch {}
+            try { fetchBurnFeed(); } catch {}
+            try { const w = localStorage.getItem('uplift:wallet'); if (w) document.getElementById('walletAddressText').textContent = w.slice(0,4)+'…'+w.slice(-4); } catch {}
         }, 1000);
 
         // Hide loading screen after a short delay
@@ -2259,6 +2277,9 @@
                     case 'achievements':
                         viewContainer.innerHTML = createAchievementsView();
                         break;
+                    case 'settings':
+                        viewContainer.innerHTML = createSettingsView();
+                        break;
                     default:
                         viewContainer.innerHTML = `
                             <div class="card">
@@ -2603,6 +2624,49 @@
                 </div>
             `;
         }
+
+        // Settings View (AI persona, notifications)
+        function createSettingsView() {
+            return `
+                <div class="settings-container" style="padding: 2rem; max-width: 860px;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 1.25rem;">⚙️ Settings</h2>
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">AI Persona</h3>
+                            <div class="card-icon">🤖</div>
+                        </div>
+                        <div class="card-body" style="display:grid;gap:.75rem;">
+                            <label>Style</label>
+                            <select id="aiStyle" style="padding:.6rem;border:1px solid var(--border-light);border-radius:10px;">
+                                <option value="coach">Coach</option>
+                                <option value="mentor">Mentor</option>
+                                <option value="strict">Strict</option>
+                                <option value="friendly">Friendly</option>
+                            </select>
+                            <label>Tone</label>
+                            <select id="aiTone" style="padding:.6rem;border:1px solid var(--border-light);border-radius:10px;">
+                                <option value="neutral">Neutral</option>
+                                <option value="motivational">Motivational</option>
+                                <option value="analytical">Analytical</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="saveAISettings()">Save</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Notifications</h3>
+                            <div class="card-icon">🔔</div>
+                        </div>
+                        <div class="card-body" style="display:grid;gap:.5rem;">
+                            <label><input type="checkbox" id="notifyDaily" /> Daily reminders</label>
+                            <label><input type="checkbox" id="notifyStreaks" /> Streak milestones</label>
+                            <label><input type="checkbox" id="notifyRewards" /> Rewards & achievements</label>
+                            <button class="btn btn-primary" onclick="saveNotificationSettings()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
         
         // Goal Management Functions
         function openCreateGoalModal() {
@@ -2891,6 +2955,28 @@
             // const response = await fetch('/api/deepseek', { ... });
             return "AI response would appear here when connected to DeepSeek API.";
         }
+
+        // Settings save handlers
+        function saveAISettings() {
+            try {
+                const style = document.getElementById('aiStyle')?.value || 'coach';
+                const tone = document.getElementById('aiTone')?.value || 'neutral';
+                localStorage.setItem('uplift:aiStyle', style);
+                localStorage.setItem('uplift:aiTone', tone);
+                showToast('AI settings saved', 'success');
+            } catch {}
+        }
+        function saveNotificationSettings() {
+            try {
+                const daily = document.getElementById('notifyDaily')?.checked ? '1' : '0';
+                const streaks = document.getElementById('notifyStreaks')?.checked ? '1' : '0';
+                const rewards = document.getElementById('notifyRewards')?.checked ? '1' : '0';
+                localStorage.setItem('uplift:notifyDaily', daily);
+                localStorage.setItem('uplift:notifyStreaks', streaks);
+                localStorage.setItem('uplift:notifyRewards', rewards);
+                showToast('Notification preferences saved', 'success');
+            } catch {}
+        }
         
         // Personality Assessment Functions
         function openPersonalityAssessment() {
@@ -2952,6 +3038,28 @@
                     assessmentDate: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
+            try { renderAIInsights(); } catch {}
+        }
+
+        // AI Insights renderer (basic)
+        function renderAIInsights() {
+            const elP = document.getElementById('personalityInsights');
+            const elS = document.getElementById('adaptiveSuggestions');
+            if (!elP || !elS) return;
+            elP.innerHTML = `
+                <div class="personality-card">
+                    <h4>Your Profile</h4>
+                    <p><strong>Motivation:</strong> Progress + Recognition</p>
+                    <p><strong>Style:</strong> Structured challenges</p>
+                    <p><strong>Focus Window:</strong> 25–45 minutes</p>
+                </div>`;
+            elS.innerHTML = `
+                <div class="personality-card">
+                    <h4>Suggestions</h4>
+                    <p>• Schedule 2×25 min focus blocks today</p>
+                    <p>• Convert 1 goal into 3 sub-steps</p>
+                    <p>• Claim daily reward and spin the wheel</p>
+                </div>`;
         }
         
         // Achievement System
