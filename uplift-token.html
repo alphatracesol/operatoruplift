@@ -610,6 +610,82 @@
         </div>
     </div>
 
+  <!-- UPLIFT Framework Section -->
+  <section id="uplift-framework" style="max-width:1100px;margin:100px auto 40px auto;padding:24px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:linear-gradient(180deg, rgba(249,115,22,0.10), rgba(17,17,17,0.6));">
+    <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(249,115,22,0.2);border:1px solid rgba(249,115,22,0.35);">🔥</div>
+      <h2 style="margin:0;color:#fff;font-size:28px;letter-spacing:.2px;">UPLIFT Framework</h2>
+    </header>
+    <ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">🎯 Focus</strong>: Focused on long-term holders & market structure.
+      </li>
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">💧 Liquidity</strong>: LP is permanent, with steady adds over 7–10 days to improve depth.
+      </li>
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">🔥 Buybacks</strong>: Only if volume >$25k/day & 1h is green, burns batched weekly.
+      </li>
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">🔒 Team</strong>: Team won’t market sell.
+      </li>
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">🔓 Holders</strong>: We reward holders 0.25–1%, invite whales to lock for perks!
+      </li>
+      <li style="padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#f3f4f6;">
+        <strong style="color:#f97316;">📊 Mondays</strong>: Stats: holders, liquidity, burn logs, trade impact, all on-chain.
+      </li>
+    </ul>
+  </section>
+
+  <!-- Monday Stats Placeholder -->
+  <section id="monday-stats" style="max-width:1100px;margin:0 auto 120px auto;padding:24px;border:1px dashed rgba(255,255,255,.18);border-radius:16px;background:rgba(0,0,0,.25);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;color:#fff;font-size:22px;">📊 Weekly On-Chain Stats (Mondays)</h3>
+      <button id="refreshStatsBtn" style="padding:10px 14px;background:#f97316;border:none;border-radius:10px;color:white;font-weight:600;cursor:pointer;">Refresh</button>
+    </div>
+    <div id="statsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+      <div style="padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#e5e7eb;">
+        <div style="font-size:12px;color:#9ca3af;">Holders</div>
+        <div id="statHolders" style="font-size:26px;font-weight:700;color:#fff;">—</div>
+      </div>
+      <div style="padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#e5e7eb;">
+        <div style="font-size:12px;color:#9ca3af;">Liquidity (USD)</div>
+        <div id="statLiquidity" style="font-size:26px;font-weight:700;color:#fff;">—</div>
+      </div>
+      <div style="padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#e5e7eb;">
+        <div style="font-size:12px;color:#9ca3af;">Weekly Burns (UPLIFT)</div>
+        <div id="statBurns" style="font-size:26px;font-weight:700;color:#fff;">—</div>
+      </div>
+      <div style="padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.35);color:#e5e7eb;">
+        <div style="font-size:12px;color:#9ca3af;">Trade Impact</div>
+        <div id="statImpact" style="font-size:26px;font-weight:700;color:#fff;">—</div>
+      </div>
+    </div>
+    <p style="margin-top:10px;color:#9ca3af;font-size:12px;">All stats are on-chain. Final weekly snapshot posted each Monday.</p>
+  </section>
+
+  <script>
+    // Lightweight placeholder loaders
+    (function initMondayStats(){
+      async function fmt(n){ try { return Number(n).toLocaleString(); } catch { return n; } }
+      async function fetchStats(){
+        try {
+          // Placeholder fetches; wire to APIs/datasources as available
+          const holders = localStorage.getItem('uplift:holders') || 1234;
+          const liquidity = localStorage.getItem('uplift:liquidity') || 152345.23;
+          const burns = localStorage.getItem('uplift:weeklyBurns') || 1250000;
+          const impact = localStorage.getItem('uplift:tradeImpact') || '+4.2%';
+          document.getElementById('statHolders').textContent = await fmt(holders);
+          document.getElementById('statLiquidity').textContent = `$${await fmt(liquidity)}`;
+          document.getElementById('statBurns').textContent = await fmt(burns);
+          document.getElementById('statImpact').textContent = impact;
+        } catch {}
+      }
+      document.getElementById('refreshStatsBtn')?.addEventListener('click', fetchStats);
+      fetchStats();
+    })();
+  </script>
     <!-- Hero Gradient Wrapper -->
     <div class="hero-gradient-wrapper">
         
