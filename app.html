@@ -1772,6 +1772,7 @@
             try { renderActiveChallenge(); } catch {}
             try { renderLeaderboardPreview(); } catch {}
             try { initStatTooltips(); } catch {}
+            try { checkActiveSessionAndResume(); } catch {}
         }, 1000);
 
         // Hide loading screen after a short delay
@@ -3393,6 +3394,19 @@
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        function checkActiveSessionAndResume() {
+            try {
+                const raw = localStorage.getItem('uplift:activeSession');
+                if (!raw) return;
+                const s = JSON.parse(raw);
+                const elapsed = Math.max(0, Math.round((Date.now() - Number(s.startedAt||Date.now()))/1000));
+                // Resume modal UI with remaining time if target available
+                const targetSec = Math.max(60, (Number(s.targetMin||25) * 60)|0);
+                const remaining = Math.max(1, targetSec - elapsed);
+                burnActive = false; // ensure we can start
+                startBurnSession(Math.ceil(remaining/60));
+            } catch {}
         }
         
         function pauseBurnSession() {
