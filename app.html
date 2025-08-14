@@ -943,6 +943,7 @@
     <script src="js/error-tracking.js" type="module"></script>
     <script src="js/missing-features-implementation.js" type="module"></script>
     <script src="js/complete-features-implementation.js" type="module"></script>
+    <script src="js/social-wallet-integration.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -2337,6 +2338,12 @@
                         break;
                     case 'settings':
                         viewContainer.innerHTML = createSettingsView();
+                        break;
+                    case 'social':
+                        viewContainer.innerHTML = window.createSocialView ? window.createSocialView() : createSocialView();
+                        break;
+                    case 'wallet':
+                        viewContainer.innerHTML = window.createWalletView ? window.createWalletView() : createWalletView();
                         break;
                     default:
                         viewContainer.innerHTML = `
