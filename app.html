@@ -976,7 +976,7 @@
             <form id="loginForm" class="auth-form active">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your email">
+            <input type="email" id="loginEmail" required placeholder="Enter your email" autocomplete="username email">
                 </div>
                 
                 <div class="form-group">
@@ -1005,7 +1005,7 @@
                 
                 <div class="form-group">
                     <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required placeholder="Enter your email">
+            <input type="email" id="registerEmail" required placeholder="Enter your email" autocomplete="username email">
                 </div>
                 
                 <div class="form-group">
@@ -1032,7 +1032,7 @@
                 
                 <div class="form-group">
                     <label for="resetEmail">Email</label>
-                    <input type="email" id="resetEmail" required placeholder="Enter your email">
+            <input type="email" id="resetEmail" required placeholder="Enter your email" autocomplete="username email">
                 </div>
                 
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Send Reset Link</button>
@@ -1541,11 +1541,22 @@
         // Initialize Firebase (will be loaded from firebase-config.js)
         let auth, db;
         
-        // Wait for Firebase to be configured
-        if (window.firebaseConfig) {
-            firebase.initializeApp(window.firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
+        // Wait for Firebase to be configured (prefer config provided by firebase-config.js)
+        if (!auth || !db) {
+            try {
+                if (window.firebaseAuth && window.firebaseDb) {
+                    auth = window.firebaseAuth;
+                    db = window.firebaseDb;
+                } else if (window.firebaseConfig) {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(window.firebaseConfig);
+                    }
+                    auth = firebase.auth();
+                    db = firebase.firestore();
+                }
+            } catch (e) {
+                console.warn('Auth init warning:', e);
+            }
         }
 
         // Auth State Management
@@ -1708,6 +1719,7 @@
             const password = document.getElementById('loginPassword').value;
             
             try {
+                if (!auth) throw new Error('Auth not initialized');
                 await auth.signInWithEmailAndPassword(email, password);
                 showToast('Welcome back!', 'success');
             } catch (error) {
@@ -1728,11 +1740,12 @@
             }
             
             try {
+                if (!auth) throw new Error('Auth not initialized');
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.updateProfile({ displayName: name });
                 
                 // Create user document in Firestore
-                if (db) {
+                if (!db) throw new Error('Database not initialized');
                     await db.collection('users').doc(userCredential.user.uid).set({
                         name: name,
                         email: email,
@@ -1756,6 +1769,7 @@
             const email = document.getElementById('resetEmail').value;
             
             try {
+                if (!auth) throw new Error('Auth not initialized');
                 await auth.sendPasswordResetEmail(email);
                 showToast('Password reset email sent!', 'success');
                 showLoginForm();
@@ -1766,14 +1780,58 @@
 
         // Google Sign In
         document.getElementById('googleSignIn').addEventListener('click', async () => {
+            try { if (typeof Tone !== 'undefined' && Tone?.start) await Tone.start(); } catch {}
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
+                const provider = window.googleProvider || new firebase.auth.GoogleAuthProvider();
+                if (!auth) throw new Error('Auth not initialized');
+                try {
+                    await auth.signInWithPopup(provider);
+                } catch (popupError) {
+                    await auth.signInWithRedirect(provider);
+                }
                 showToast('Welcome!', 'success');
             } catch (error) {
                 showToast(error.message, 'error');
             }
         });
+
+        // Phantom Sign In
+        (function bindPhantomSignIn(){
+            const btn = document.getElementById('phantomSignIn');
+            if (!btn || btn.dataset.bound) return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', async () => {
+                try {
+                    if (!window.solana || !window.solana.isPhantom) {
+                        window.open('https://phantom.app/', '_blank');
+                        return;
+                    }
+                    // Ensure runs within user gesture
+                    const resp = await window.solana.connect({ onlyIfTrusted: false });
+                    const address = resp?.publicKey?.toString?.();
+                    if (!address) throw new Error('No wallet address');
+
+                    const n = await fetch('/.netlify/functions/api/auth/phantom/nonce', { cache: 'no-store' }).then(r=>r.json());
+                    const message = new TextEncoder().encode(n.message);
+                    const signed = await window.solana.signMessage(message, 'utf8');
+                    const signature = Array.from(signed.signature);
+
+                    const verifyRes = await fetch('/.netlify/functions/api/auth/phantom/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ address, signature, nonce: n.nonce })
+                    }).then(r=>r.json());
+                    if (!verifyRes || !verifyRes.token) throw new Error(verifyRes?.error || 'verify_failed');
+
+                    if (!auth) throw new Error('Auth not initialized');
+                    await auth.signInWithCustomToken(verifyRes.token);
+                    showToast('Signed in with Phantom', 'success');
+                } catch (e) {
+                    console.error('Phantom sign-in failed', e);
+                    showToast(e?.message || 'Phantom sign-in failed', 'error');
+                }
+            });
+        })();
 
         // Load User Data
         async function loadUserData() {
