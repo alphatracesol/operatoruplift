@@ -685,6 +685,44 @@
       document.getElementById('refreshStatsBtn')?.addEventListener('click', fetchStats);
       fetchStats();
     })();
+
+    // Live Fee Routing
+    (function initFees(){
+      async function refreshFees(){
+        try{
+          const res = await fetch('/.netlify/functions/api/fees/summary?period=weekly', { cache: 'no-store' });
+          const data = await res.json();
+          const bySource = data.bySource || {}; const route = data.route || {}; const total = Number(data.totalUsd||0);
+          const srcEl = document.getElementById('fees-by-source');
+          srcEl.innerHTML = Object.keys(bySource).map(s=>`<div style="display:flex;justify-content:space-between;"><span>${s}</span><span>$${Number(bySource[s]||0).toLocaleString()}</span></div>`).join('') || '<div>—</div>';
+          const routeEl = document.getElementById('fees-route');
+          routeEl.innerHTML = `<div style="display:flex;justify-content:space-between;"><span>Buyback (25%)</span><span>$${Number(route.buyback||0).toLocaleString()}</span></div>
+                               <div style=\"display:flex;justify-content:space-between;\"><span>Burn (25%)</span><span>$${Number(route.burn||0).toLocaleString()}</span></div>
+                               <div style=\"display:flex;justify-content:space-between;\"><span>Treasury (50%)</span><span>$${Number(route.treasury||0).toLocaleString()}</span></div>`;
+          const totEl = document.getElementById('fees-totals');
+          totEl.innerHTML = `<div style=\"display:flex;justify-content:space-between;\"><span>Weekly Total</span><span>$${total.toLocaleString()}</span></div>`;
+        }catch(e){ console.log('fees failed', e); }
+      }
+      document.getElementById('fees-refresh')?.addEventListener('click', refreshFees);
+      refreshFees();
+    })();
+
+    // Buyback proofs list (recent)
+    (function initBuybacks(){
+      async function refreshBB(){
+        try{
+          const res = await fetch('/.netlify/functions/api/buybacks/log?limit=50', { cache: 'no-store' });
+          const data = await res.json();
+          const rows = (data.rows||[]).map(r=>`<div style=\"display:flex;justify-content:space-between;gap:.5rem;\">
+            <a href=\"https://solscan.io/tx/${r.tx}\" target=\"_blank\" rel=\"noopener\">${r.tx.slice(0,6)}…</a>
+            <span>$${Number(r.amountUsd||0).toLocaleString()}</span>
+            <span class=\"muted\">${new Date(r.ts||Date.now()).toLocaleString()}</span>
+          </div>`).join('');
+          document.getElementById('bb-list').innerHTML = rows || '<div class="muted">—</div>';
+        }catch(e){ console.log('buybacks failed', e); }
+      }
+      refreshBB();
+    })();
   </script>
     <!-- Hero Gradient Wrapper -->
     <div class="hero-gradient-wrapper">
@@ -1035,6 +1073,56 @@
             <small class="muted">Data integrity: totals computed from configured initial supply and on-chain supply. Burn history: <a href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener">View recent burns</a>.</small>
         </section>
 
+        <!-- 9b) Live Fee Routing (25/25/50) -->
+        <section id="fee-routing" class="section">
+            <h3 class="section-title">Live Fee Routing (25/25/50)</h3>
+            <p class="section-subtext">Creator-fee inflows by source, auto-routing, and weekly snapshots (Mondays).</p>
+            <div class="viz-grid" style="margin-top: 1rem;">
+                <div class="card">
+                    <div class="row" style="justify-content:space-between; align-items:center;">
+                        <strong>Inflows (USD) by Source</strong>
+                        <button class="copy-btn" id="fees-refresh" type="button">Refresh</button>
+                    </div>
+                    <div id="fees-by-source" class="muted" style="margin-top:.5rem; display:grid; gap:.35rem;"></div>
+                </div>
+                <div class="card">
+                    <div><strong>Auto-Route (25/25/50)</strong></div>
+                    <div id="fees-route" class="muted" style="margin-top:.5rem; display:grid; gap:.35rem;"></div>
+                    <small class="muted">Each entry links to tx proof when applicable with timestamp.</small>
+                </div>
+                <div class="card">
+                    <div><strong>Totals</strong></div>
+                    <div id="fees-totals" class="muted" style="margin-top:.5rem; display:grid; gap:.35rem;"></div>
+                    <small class="muted">Weekly snapshot published every Monday.</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9c) Buyback Policy Proofs -->
+        <section id="buyback-proofs" class="section">
+            <h3 class="section-title">Buyback Policy Proofs</h3>
+            <p class="section-subtext">TWAP schedule, caps used, executed trades, and downloadable logs.</p>
+            <div class="viz-grid" style="margin-top:1rem;">
+                <div class="card">
+                    <div class="row" style="justify-content:space-between; align-items:center;">
+                        <strong>Executed Trades</strong>
+                        <div>
+                            <a class="pill" href="/.netlify/functions/api/buybacks/log?format=json" target="_blank" rel="noopener">JSON</a>
+                            <a class="pill" href="/.netlify/functions/api/buybacks/log?format=csv" target="_blank" rel="noopener">CSV</a>
+                        </div>
+                    </div>
+                    <div id="bb-list" class="muted" style="margin-top:.5rem; display:grid; gap:.35rem;"></div>
+                </div>
+                <div class="card">
+                    <div><strong>Policy</strong></div>
+                    <ul class="muted" style="margin-top:.5rem; padding-left:1rem; list-style:disc;">
+                        <li>TWAP-based weekly schedule</li>
+                        <li>Caps: ≤0.5% of 30d volume or ≤10% of BB wallet per week</li>
+                        <li>Proofs: linked tx and signed log</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
         
 
         <!-- 7) Access & Subscription -->

@@ -612,6 +612,113 @@ router.get('/jobs/status', async (req, res) => {
   }
 });
 
+// ===== Token supply (RPC via server to avoid CORS) =====
+router.get('/token/supply', async (req, res) => {
+  try {
+    const mintStr = String(req.query.mint || process.env.UPLIFT_MINT || '').trim();
+    if (!mintStr) return res.status(400).json({ error: 'mint_required' });
+    const conn = new Connection(process.env.HELIUS_RPC_URL || (process.env.HELIUS_API_KEY ? `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}` : 'https://api.mainnet-beta.solana.com'), 'confirmed');
+    const info = await conn.getTokenSupply(new PublicKey(mintStr));
+    const decimals = Number(info?.value?.decimals || 9);
+    const amount = info?.value?.amount || '0';
+    const uiAmount = Number(amount) / Math.pow(10, decimals);
+    res.json({ mint: mintStr, decimals, amount, uiAmount });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// ===== Burns history (parsed RPC similar to burn-feed but generalized) =====
+router.get('/burns/history', async (req, res) => {
+  try {
+    const mintStr = String(req.query.mint || process.env.UPLIFT_MINT || '').trim();
+    const limit = Math.min(Number(req.query.limit || 50), 100);
+    if (!mintStr) return res.status(400).json({ error: 'mint_required' });
+    const rpcUrl = process.env.HELIUS_RPC_URL || (process.env.HELIUS_API_KEY ? `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}` : 'https://api.mainnet-beta.solana.com');
+    async function rpc(method, params) {
+      const r = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
+      if (!r.ok) throw new Error('rpc_http_'+r.status);
+      const j = await r.json(); if (j.error) throw new Error('rpc_err_'+(j.error.message||'unknown')); return j.result;
+    }
+    const supplyInfo = await rpc('getTokenSupply', [mintStr, { commitment: 'confirmed' }]);
+    const decimals = Number(supplyInfo?.value?.decimals ?? 9);
+    const sigs = await rpc('getSignaturesForAddress', [mintStr, { limit }]);
+    const signatures = (sigs || []).map(s => s.signature);
+    const txs = signatures.length ? await rpc('getParsedTransactions', [signatures, { maxSupportedTransactionVersion: 0 }]) : [];
+    const burns = [];
+    for (const tx of (txs||[])) {
+      const allInstr = [ ...(tx?.transaction?.message?.instructions || []), ...((tx?.meta?.innerInstructions || []).flatMap(i=>i.instructions)||[]) ];
+      for (const ix of allInstr) {
+        const parsed = ix?.parsed || null; if (!parsed) continue; const type = parsed?.type;
+        if (type !== 'burn' && type !== 'burnChecked') continue;
+        const info = parsed?.info || {}; if (info?.mint !== mintStr) continue;
+        const raw = info?.amount || info?.tokenAmount || '0';
+        const uiAmount = Number(raw) / Math.pow(10, decimals);
+        burns.push({ signature: tx?.transaction?.signatures?.[0], blockTime: tx?.blockTime ? tx.blockTime*1000 : null, amount: uiAmount });
+      }
+    }
+    burns.sort((a,b)=>(b.blockTime||0)-(a.blockTime||0));
+    res.json({ mint: mintStr, decimals, count: burns.length, burns });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'server_error' });
+  }
+});
+
+// ===== Fee ingress logging & summary =====
+router.post('/fees/ingress', async (req, res) => {
+  try {
+    if (!adminDb) return res.status(503).json({ error: 'db_unavailable' });
+    const { source, amountUsd, tx, ts } = req.body || {};
+    if (!source || typeof amountUsd !== 'number') return res.status(400).json({ error: 'invalid_params' });
+    const doc = { source: String(source), amountUsd: Number(amountUsd), tx: tx||null, ts: ts || Date.now(), createdAt: admin.firestore.FieldValue.serverTimestamp() };
+    await adminDb.collection('feeIngress').add(doc);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message || 'server_error' }); }
+});
+
+router.get('/fees/summary', async (req, res) => {
+  try {
+    if (!adminDb) return res.status(503).json({ error: 'db_unavailable' });
+    const period = String(req.query.period || 'weekly');
+    const sinceMs = period === 'weekly' ? (Date.now() - 7*24*3600*1000) : (Date.now() - 24*3600*1000);
+    const snap = await adminDb.collection('feeIngress').where('ts', '>=', sinceMs).orderBy('ts','desc').get();
+    const rows = []; let total = 0; const bySource = {};
+    snap.forEach(d=>{ const v=d.data(); rows.push(v); total+=Number(v.amountUsd||0); const s=v.source||'unknown'; bySource[s]=(bySource[s]||0)+Number(v.amountUsd||0); });
+    const route = { buyback: total*0.25, burn: total*0.25, treasury: total*0.50 };
+    res.json({ period, totalUsd: total, bySource, route, rows });
+  } catch (e) { res.status(500).json({ error: e.message || 'server_error' }); }
+});
+
+// ===== Buybacks log (GET JSON/CSV, POST insert) =====
+router.post('/buybacks/log', async (req, res) => {
+  try {
+    if (!adminDb) return res.status(503).json({ error: 'db_unavailable' });
+    const { tx, amountUsd, amountToken, twapWindow, ts } = req.body || {};
+    if (!tx || typeof amountUsd !== 'number') return res.status(400).json({ error: 'invalid_params' });
+    const doc = { tx, amountUsd: Number(amountUsd), amountToken: Number(amountToken||0), twapWindow: twapWindow||null, ts: ts||Date.now(), createdAt: admin.firestore.FieldValue.serverTimestamp() };
+    await adminDb.collection('buybacks').add(doc);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message || 'server_error' }); }
+});
+
+router.get('/buybacks/log', async (req, res) => {
+  try {
+    if (!adminDb) return res.status(503).json({ error: 'db_unavailable' });
+    const limit = Math.min(Number(req.query.limit || 100), 1000);
+    const format = String(req.query.format || 'json');
+    const snap = await adminDb.collection('buybacks').orderBy('ts','desc').limit(limit).get();
+    const rows = []; snap.forEach(d=>rows.push(d.data()));
+    if (format === 'csv') {
+      const header = 'ts,tx,amountUsd,amountToken,twapWindow';
+      const csv = [header].concat(rows.map(r=>[r.ts, r.tx, r.amountUsd, r.amountToken||'', (r.twapWindow||'')].join(','))).join('\n');
+      res.set('Content-Type','text/csv');
+      res.send(csv);
+      return;
+    }
+    res.json({ rows });
+  } catch (e) { res.status(500).json({ error: e.message || 'server_error' }); }
+});
+
 module.exports.handler = serverless(app);
 
 
