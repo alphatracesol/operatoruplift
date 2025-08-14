@@ -1239,6 +1239,13 @@
                                     <div class="progress-fill" id="tasksProgress" style="width: 0%"></div>
                                 </div>
                             </div>
+                            <div style="margin-top: 0.75rem; border-top:1px solid var(--border-light); padding-top:0.75rem;">
+                                <div style="display:flex; gap:8px;">
+                                    <input id="newTaskInput" type="text" placeholder="Quick add task…" style="flex:1;">
+                                    <button class="btn btn-secondary" onclick="addTodayTask()">Add</button>
+                                </div>
+                                <ul id="todayTasksList" style="list-style:none; margin:0.75rem 0 0 0; padding:0; display:grid; gap:6px;"></ul>
+                            </div>
                         </div>
 
                         <!-- Active Challenges Card -->
@@ -1760,6 +1767,7 @@
             try { renderPendingRedemptions(); } catch {}
             try { fetchBurnFeed(); } catch {}
             try { const w = localStorage.getItem('uplift:wallet'); if (w) document.getElementById('walletAddressText').textContent = w.slice(0,4)+'…'+w.slice(-4); } catch {}
+            try { loadTodayTasks(); } catch {}
         }, 1000);
 
         // Hide loading screen after a short delay
@@ -3373,6 +3381,51 @@
                 icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
             }
             showToast(soundEnabled ? '🔊 Sound enabled' : '🔇 Sound disabled', 'info');
+        }
+
+        // ===== Today Tasks (local) =====
+        function loadTodayTasks() {
+            try {
+                const raw = localStorage.getItem('uplift:todayTasks');
+                const items = raw ? JSON.parse(raw) : [];
+                const ul = document.getElementById('todayTasksList');
+                if (!ul) return;
+                if (!items.length) { ul.innerHTML = '<li class="text-muted">No tasks yet. Add one to get momentum.</li>'; return; }
+                ul.innerHTML = items.map((t, i)=>`<li style=\"display:flex;align-items:center;gap:.5rem;\">
+                    <input type=\"checkbox\" ${t.done?'checked':''} onchange=\"toggleTodayTask(${i})\" aria-label=\"Mark task done\" />
+                    <span style=\"flex:1;${t.done?'text-decoration:line-through;color:var(--text-muted);':''}\">${t.title}</span>
+                    <button class=\"btn btn-sm btn-secondary\" onclick=\"removeTodayTask(${i})\">Remove</button>
+                </li>`).join('');
+                updateTodayAggregates();
+            } catch {}
+        }
+        function saveTodayTasks(items) { localStorage.setItem('uplift:todayTasks', JSON.stringify(items||[])); }
+        function addTodayTask() {
+            const input = document.getElementById('newTaskInput');
+            const title = (input?.value||'').trim();
+            if (!title) return;
+            const items = JSON.parse(localStorage.getItem('uplift:todayTasks')||'[]');
+            items.push({ title, done: false, createdAt: Date.now() });
+            saveTodayTasks(items); input.value = '';
+            loadTodayTasks(); showToast('Task added', 'success');
+        }
+        function toggleTodayTask(i) {
+            const items = JSON.parse(localStorage.getItem('uplift:todayTasks')||'[]');
+            if (!items[i]) return; items[i].done = !items[i].done; saveTodayTasks(items); loadTodayTasks();
+        }
+        function removeTodayTask(i) {
+            const items = JSON.parse(localStorage.getItem('uplift:todayTasks')||'[]');
+            items.splice(i,1); saveTodayTasks(items); loadTodayTasks();
+        }
+        function updateTodayAggregates() {
+            const items = JSON.parse(localStorage.getItem('uplift:todayTasks')||'[]');
+            const done = items.filter(x=>x.done).length;
+            const total = items.length;
+            const tasksText = document.getElementById('tasksComplete');
+            const pct = total ? Math.round((done/total)*100) : 0;
+            if (tasksText) tasksText.textContent = `${done} / ${total}`;
+            const bar = document.getElementById('tasksProgress');
+            if (bar) bar.style.width = `${pct}%`;
         }
 
         function openLuckyWheel() {
