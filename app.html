@@ -1949,6 +1949,7 @@
             try {
                 const list = document.getElementById('redemptionsList');
                 if (!list) return;
+                list.innerHTML = '<div class="skeleton" style="height:14px;margin-bottom:8px;"></div><div class="skeleton" style="height:14px;width:70%;"></div>';
                 if (!auth || !auth.currentUser || !db) { list.innerHTML = '<div class="text-muted">Sign in to view</div>'; return; }
                 const snap = await db.collection('users').doc(auth.currentUser.uid).collection('redemptions').orderBy('createdAt','desc').limit(10).get();
                 const rows = [];
@@ -1962,7 +1963,10 @@
                     </div>`);
                 });
                 list.innerHTML = rows.length ? rows.join('') : '<div class="text-muted">No pending redemptions</div>';
-            } catch (e) { console.error('renderPendingRedemptions failed', e); }
+            } catch (e) {
+                const list = document.getElementById('redemptionsList');
+                if (list) list.innerHTML = '<div class="text-muted">Failed to load</div><div style="margin-top:.5rem;"><button class="btn btn-sm btn-secondary" onclick="renderPendingRedemptions()">Retry</button></div>';
+            }
         }
         function scrollToRedemptions() { document.getElementById('redemptionsList')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
