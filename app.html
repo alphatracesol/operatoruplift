@@ -1521,6 +1521,11 @@
         }
     </style>
     
+    <!-- Animation Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1545,6 +1550,103 @@
 
         // Auth State Management
         let currentUser = null;
+        
+        // Initialize Particles Background
+        function initParticles() {
+            // Add particles container if it doesn't exist
+            if (!document.getElementById('particles-container')) {
+                const container = document.createElement('div');
+                container.id = 'particles-container';
+                container.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;';
+                document.body.insertBefore(container, document.body.firstChild);
+            }
+            
+            if (typeof tsParticles !== 'undefined') {
+                tsParticles.load("particles-container", {
+                    particles: {
+                        number: { value: 50, density: { enable: true, value_area: 800 } },
+                        color: { value: ["#f97316", "#fb923c"] },
+                        shape: { type: "circle" },
+                        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1 } },
+                        size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 0.1 } },
+                        line_linked: { enable: true, distance: 150, color: "#f97316", opacity: 0.2, width: 1 },
+                        move: { enable: true, speed: 1, direction: "none", random: false, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        events: {
+                            onhover: { enable: true, mode: "grab" },
+                            onclick: { enable: true, mode: "push" }
+                        },
+                        modes: {
+                            grab: { distance: 140, line_linked: { opacity: 0.5 } },
+                            push: { particles_nb: 4 }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Initialize Sound System
+        let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+        const sounds = {};
+        
+        function initSounds() {
+            if (typeof Tone !== 'undefined') {
+                sounds.click = new Tone.Synth().toDestination();
+                sounds.success = new Tone.Synth().toDestination();
+                sounds.achievement = new Tone.PolySynth().toDestination();
+            }
+        }
+        
+        function playSound(type) {
+            if (!soundEnabled || !sounds[type]) return;
+            try {
+                switch(type) {
+                    case 'click':
+                        sounds.click?.triggerAttackRelease("C5", "8n");
+                        break;
+                    case 'success':
+                        sounds.success?.triggerAttackRelease("E5", "4n");
+                        break;
+                    case 'achievement':
+                        sounds.achievement?.triggerAttackRelease(["C5", "E5", "G5"], "2n");
+                        break;
+                }
+            } catch (e) {
+                console.log('Sound failed:', e);
+            }
+        }
+        
+        // Initialize GSAP Animations
+        function initAnimations() {
+            if (typeof gsap === 'undefined') return;
+            
+            // Animate cards on load
+            gsap.from(".card", {
+                duration: 0.8, y: 50, opacity: 0, stagger: 0.1, ease: "power2.out"
+            });
+            
+            // Button hover effects
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    gsap.to(btn, { scale: 1.05, duration: 0.2 });
+                });
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, { scale: 1, duration: 0.2 });
+                });
+                btn.addEventListener('click', () => {
+                    playSound('click');
+                    gsap.to(btn, { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 });
+                });
+            });
+        }
+        
+        // Initialize all enhancements when page loads
+        setTimeout(() => {
+            initParticles();
+            initSounds();
+            initAnimations();
+        }, 1000);
 
         // Hide loading screen after a short delay
         window.addEventListener('DOMContentLoaded', () => {
@@ -2217,9 +2319,36 @@
             
             container.appendChild(toast);
             
+            // Play appropriate sound
+            if (type === 'success') {
+                playSound('success');
+            } else if (type === 'error') {
+                playSound('error');
+            }
+            
+            // Animate with GSAP if available
+            if (typeof gsap !== 'undefined') {
+                gsap.from(toast, {
+                    x: 100,
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            }
+            
             setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(toast, {
+                        x: 100,
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: "power2.in",
+                        onComplete: () => toast.remove()
+                    });
+                } else {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }
             }, 3000);
         }
 
@@ -2524,13 +2653,45 @@
             
             document.body.appendChild(notification);
             
-            // Animate in
-            setTimeout(() => notification.classList.add('show'), 100);
+            // Play achievement sound
+            playSound('achievement');
+            
+            // Animate with GSAP if available
+            if (typeof gsap !== 'undefined') {
+                gsap.from(notification, {
+                    x: 400,
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: "back.out(1.7)"
+                });
+                
+                // Add floating animation to icon
+                gsap.to(notification.querySelector('.achievement-icon'), {
+                    y: -10,
+                    duration: 1,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "power1.inOut"
+                });
+            } else {
+                // Fallback animation
+                setTimeout(() => notification.classList.add('show'), 100);
+            }
             
             // Remove after 5 seconds
             setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(notification, {
+                        x: 400,
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: "power2.in",
+                        onComplete: () => notification.remove()
+                    });
+                } else {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }
             }, 5000);
         }
         
@@ -2721,6 +2882,16 @@
 
         function showProfile() {
             showToast('👤 Profile settings coming soon!', 'info');
+        }
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('soundEnabled', soundEnabled.toString());
+            const icon = document.getElementById('soundIcon');
+            if (icon) {
+                icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+            }
+            showToast(soundEnabled ? '🔊 Sound enabled' : '🔇 Sound disabled', 'info');
         }
 
         function openLuckyWheel() {
