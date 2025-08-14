@@ -1685,6 +1685,23 @@
             }, 1000);
         });
 
+        // Force SW to activate updated version and reload once
+        (function refreshServiceWorker(){
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration?.().then(reg => {
+                    try { reg?.update(); } catch {}
+                    if (reg?.waiting) {
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        reg.waiting.addEventListener('statechange', (e) => {
+                            if (e.target.state === 'activated') {
+                                window.location.reload();
+                            }
+                        });
+                    }
+                });
+            }
+        })();
+
         // Show/Hide Auth and App
         function showAuth() {
             document.getElementById('authContainer').style.display = 'flex';
