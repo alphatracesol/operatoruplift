@@ -1768,6 +1768,10 @@
             try { fetchBurnFeed(); } catch {}
             try { const w = localStorage.getItem('uplift:wallet'); if (w) document.getElementById('walletAddressText').textContent = w.slice(0,4)+'…'+w.slice(-4); } catch {}
             try { loadTodayTasks(); } catch {}
+            try { updateFocusUIFromTodayMinutes(); } catch {}
+            try { renderActiveChallenge(); } catch {}
+            try { renderLeaderboardPreview(); } catch {}
+            try { initStatTooltips(); } catch {}
         }, 1000);
 
         // Hide loading screen after a short delay
@@ -2989,6 +2993,65 @@
                 localStorage.setItem('uplift:notifyRewards', rewards);
                 showToast('Notification preferences saved', 'success');
             } catch {}
+        }
+
+        // Tooltips for Streak/Tokens/Points earning rules
+        function initStatTooltips() {
+            try {
+                const streakEl = document.querySelector('.quick-stats .stat-item:nth-child(1) .stat-label');
+                const tokenEl = document.querySelector('.quick-stats .stat-item:nth-child(2) .stat-label');
+                const pointsEl = document.querySelector('.quick-stats .stat-item:nth-child(3) .stat-label');
+                if (streakEl) streakEl.title = 'Day streak increases when you focus ≥ 25 minutes in a day';
+                if (tokenEl) tokenEl.title = 'Tokens: +25 per completed hour of focus, +100 when you hit 4h daily goal';
+                if (pointsEl) pointsEl.title = 'Points: +10 per completed task, +1 per 5 minutes of focus';
+            } catch {}
+        }
+
+        // Focus UI helpers and challenge/leaderboard rendering
+        function updateFocusUIFromTodayMinutes() {
+            try {
+                const next = Number(localStorage.getItem('uplift:todayMinutes')||'0')|0;
+                const hrs = Math.floor(next/60); const mins = next % 60;
+                const ftEl = document.getElementById('focusTime'); if (ftEl) ftEl.textContent = `${hrs}h ${mins}m`;
+                const pct = Math.min(100, Math.round((next/240)*100));
+                const fpEl = document.getElementById('focusProgress'); if (fpEl) fpEl.style.width = `${pct}%`;
+            } catch {}
+        }
+        function renderActiveChallenge() {
+            try {
+                const next = Number(localStorage.getItem('uplift:todayMinutes')||'0')|0;
+                const card = document.getElementById('challengesList'); if (!card) return;
+                const hrs = (next/60).toFixed(1);
+                card.innerHTML = `<div style=\"padding: 0.75rem; background: rgba(249, 115, 22, 0.1); border-radius: 8px; border-left: 3px solid var(--primary-color);\">
+                    <div style=\"display: flex; justify-content: space-between; align-items: center;\">
+                        <span style=\"font-weight: 600;\">Daily Focus Goal</span>
+                        <span style=\"color: var(--primary-color); font-size: 0.875rem;\">+100 tokens</span>
+                    </div>
+                    <div style=\"font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;\">Progress: ${hrs}/4.0 hours</div>
+                </div>`;
+            } catch {}
+        }
+        async function renderLeaderboardPreview() {
+            const root = document.getElementById('leaderboardPreview');
+            if (!root) return;
+            try {
+                root.innerHTML = '<div class="text-muted">Loading…</div>';
+                const rows = [
+                    { rank: 1, name: 'Alex Champion', xp: 15420 },
+                    { rank: 2, name: 'Sarah Master', xp: 14200 },
+                    { rank: 3, name: 'Mike Pro', xp: 13500 },
+                ];
+                if (!rows.length) { root.innerHTML = '<div class="text-muted">No data yet. <a href="#" class="btn-link">Invite teammates</a></div>'; return; }
+                root.innerHTML = rows.map(user => `
+                    <div style=\"display:flex; align-items:center; gap: 1rem; padding: 0.5rem; border:1px solid var(--border-light); border-radius:10px;\">
+                        <div style=\"width: 32px; text-align: center; font-weight: 700; color: ${user.rank <= 3 ? 'var(--warning-color)' : 'var(--text-muted)'};\">#${user.rank}</div>
+                        <div style=\"flex:1; color: var(--text-primary); font-weight: 600;\">${user.name}</div>
+                        <div style=\"color: var(--primary-color); font-weight: 700;\">${user.xp.toLocaleString()} XP</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                root.innerHTML = '<div class="text-muted">Failed to load leaderboard</div>';
+            }
         }
         
         // Personality Assessment Functions
