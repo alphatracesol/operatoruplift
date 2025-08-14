@@ -1470,6 +1470,55 @@
             border-radius: 12px;
             max-width: 70%;
         }
+        
+        /* Achievement Notification */
+        .achievement-notification {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 10px 40px rgba(249, 115, 22, 0.3);
+            transition: right 0.3s ease;
+            z-index: 10000;
+            max-width: 400px;
+        }
+        
+        .achievement-notification.show {
+            right: 20px;
+        }
+        
+        .achievement-icon {
+            font-size: 48px;
+            animation: bounce 1s ease infinite;
+        }
+        
+        .achievement-content {
+            flex: 1;
+        }
+        
+        .achievement-title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .achievement-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .achievement-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
     </style>
     
     <!-- Firebase Scripts -->
@@ -1735,8 +1784,6 @@
 
         // Load View Content
         function loadViewContent(view) {
-            // This will be expanded to load actual view content
-            // For now, just show a placeholder
             const mainContent = document.getElementById('mainContent');
             
             // Hide all views
@@ -1744,23 +1791,47 @@
                 v.classList.remove('active');
             });
             
-            // Show selected view or create placeholder
+            // Show selected view or create it
             let viewContainer = document.getElementById(`${view}View`);
             if (!viewContainer && view !== 'dashboard') {
                 viewContainer = document.createElement('div');
                 viewContainer.id = `${view}View`;
                 viewContainer.className = 'view-container';
-                viewContainer.innerHTML = `
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">${document.getElementById('pageTitle').textContent}</h3>
-                            <div class="card-icon">🚀</div>
-                        </div>
-                        <p style="color: var(--text-secondary);">
-                            This feature is being integrated. Check back soon!
-                        </p>
-                    </div>
-                `;
+                
+                // Create specific content for each view
+                switch(view) {
+                    case 'goals':
+                        viewContainer.innerHTML = createGoalsView();
+                        break;
+                    case 'habits':
+                        viewContainer.innerHTML = createHabitsView();
+                        break;
+                    case 'analytics':
+                        viewContainer.innerHTML = createAnalyticsView();
+                        break;
+                    case 'burn':
+                        viewContainer.innerHTML = createBurnView();
+                        break;
+                    case 'community':
+                        viewContainer.innerHTML = createCommunityView();
+                        break;
+                    case 'achievements':
+                        viewContainer.innerHTML = createAchievementsView();
+                        break;
+                    default:
+                        viewContainer.innerHTML = `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">${document.getElementById('pageTitle').textContent}</h3>
+                                    <div class="card-icon">🚀</div>
+                                </div>
+                                <p style="color: var(--text-secondary);">
+                                    This feature is being integrated. Check back soon!
+                                </p>
+                            </div>
+                        `;
+                }
+                
                 mainContent.appendChild(viewContainer);
             }
             
@@ -1769,6 +1840,356 @@
             }
         }
 
+        // View Creation Functions
+        function createGoalsView() {
+            return `
+                <div class="goals-container" style="padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--text-primary); font-size: 2rem;">🎯 Goals</h2>
+                        <button class="btn btn-primary" onclick="openCreateGoalModal()">
+                            <i class="fas fa-plus"></i> New Goal
+                        </button>
+                    </div>
+                    
+                    <div class="goals-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                        ${getGoalsHTML()}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getGoalsHTML() {
+            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            
+            if (goals.length === 0) {
+                return `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <div style="font-size: 64px; margin-bottom: 1rem;">🎯</div>
+                        <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No goals yet</h3>
+                        <p style="color: var(--text-secondary);">Create your first goal to get started!</p>
+                    </div>
+                `;
+            }
+            
+            return goals.map(goal => `
+                <div class="goal-card" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <h3 style="color: var(--text-primary); font-size: 1.25rem;">${goal.title}</h3>
+                        <span style="background: ${goal.priority === 'high' ? 'var(--error-color)' : goal.priority === 'medium' ? 'var(--warning-color)' : 'var(--success-color)'}; 
+                                     padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; color: white;">
+                            ${goal.priority}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">${goal.description}</p>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted); font-size: 0.875rem;">Progress</span>
+                            <span style="color: var(--primary-color); font-weight: 600;">${goal.progress}%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${goal.progress}%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color));"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-sm" onclick="updateGoalProgress('${goal.id}', 10)" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                            +10%
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="editGoal('${goal.id}')" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteGoal('${goal.id}')" style="padding: 0.5rem 1rem; font-size: 0.875rem; background: var(--error-color);">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function createHabitsView() {
+            return `
+                <div class="habits-container" style="padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--text-primary); font-size: 2rem;">📅 Habits</h2>
+                        <button class="btn btn-primary" onclick="openCreateHabitModal()">
+                            <i class="fas fa-plus"></i> New Habit
+                        </button>
+                    </div>
+                    
+                    <div class="habits-list" style="display: grid; gap: 1rem;">
+                        ${getHabitsHTML()}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getHabitsHTML() {
+            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            
+            if (habits.length === 0) {
+                return `
+                    <div style="text-align: center; padding: 3rem;">
+                        <div style="font-size: 64px; margin-bottom: 1rem;">📅</div>
+                        <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No habits yet</h3>
+                        <p style="color: var(--text-secondary);">Start building positive habits today!</p>
+                    </div>
+                `;
+            }
+            
+            return habits.map(habit => `
+                <div class="habit-item" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem;">
+                    <button class="habit-check" onclick="toggleHabit('${habit.id}')" 
+                            style="width: 48px; height: 48px; border-radius: 12px; border: 2px solid ${habit.completed ? 'var(--success-color)' : 'var(--border-light)'}; 
+                                   background: ${habit.completed ? 'var(--success-color)' : 'transparent'}; color: white; font-size: 1.5rem; cursor: pointer;">
+                        ${habit.completed ? '✓' : ''}
+                    </button>
+                    <div style="flex: 1;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 0.25rem;">${habit.name}</h3>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <span style="color: var(--text-secondary); font-size: 0.875rem;">
+                                <i class="fas fa-fire"></i> ${habit.streak} day streak
+                            </span>
+                            <span style="color: var(--text-muted); font-size: 0.875rem;">
+                                ${habit.frequency}
+                            </span>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary" onclick="deleteHabit('${habit.id}')" style="padding: 0.5rem 1rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function createAnalyticsView() {
+            return `
+                <div class="analytics-container" style="padding: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">📊 Analytics</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="stat-card" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem;">
+                            <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Total XP</div>
+                            <div style="color: var(--primary-color); font-size: 2rem; font-weight: 700;">${localStorage.getItem('userXP') || '0'}</div>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem;">
+                            <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Current Streak</div>
+                            <div style="color: var(--accent-color); font-size: 2rem; font-weight: 700;">${localStorage.getItem('dailyStreak') || '0'} days</div>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem;">
+                            <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Goals Completed</div>
+                            <div style="color: var(--success-color); font-size: 2rem; font-weight: 700;">${localStorage.getItem('goalsCompleted') || '0'}</div>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem;">
+                            <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Focus Sessions</div>
+                            <div style="color: var(--warning-color); font-size: 2rem; font-weight: 700;">${localStorage.getItem('totalBurns') || '0'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 1.5rem;">Weekly Progress</h3>
+                        <div style="height: 200px; display: flex; align-items: flex-end; gap: 1rem;">
+                            ${[...Array(7)].map((_, i) => {
+                                const height = Math.random() * 100 + 20;
+                                return `<div style="flex: 1; height: ${height}px; background: linear-gradient(to top, var(--primary-color), var(--accent-color)); border-radius: 8px 8px 0 0;"></div>`;
+                            }).join('')}
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                            ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => 
+                                `<div style="flex: 1; text-align: center; color: var(--text-muted); font-size: 0.75rem;">${day}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createBurnView() {
+            return `
+                <div class="burn-container" style="padding: 2rem; text-align: center;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🔥 Focus Sessions</h2>
+                    
+                    <div style="max-width: 600px; margin: 0 auto;">
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 24px; padding: 3rem;">
+                            <div style="font-size: 80px; margin-bottom: 1rem;">🔥</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Ready to Focus?</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                                Choose a session duration and eliminate distractions
+                            </p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                                <button class="btn btn-secondary" onclick="startBurnSession(15)">
+                                    15 min
+                                </button>
+                                <button class="btn btn-primary" onclick="startBurnSession(25)">
+                                    25 min
+                                </button>
+                                <button class="btn btn-secondary" onclick="startBurnSession(45)">
+                                    45 min
+                                </button>
+                            </div>
+                            
+                            <div style="padding-top: 2rem; border-top: 1px solid var(--border-light);">
+                                <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Today's Sessions</div>
+                                <div style="color: var(--primary-color); font-size: 2rem; font-weight: 700;">
+                                    ${localStorage.getItem('todayBurns') || '0'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createCommunityView() {
+            return `
+                <div class="community-container" style="padding: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">👥 Community</h2>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem;">
+                            <h3 style="color: var(--text-primary); margin-bottom: 1rem;">🏆 Leaderboard</h3>
+                            <div style="display: grid; gap: 0.75rem;">
+                                ${[
+                                    { rank: 1, name: 'Alex Champion', xp: 15420, avatar: '🦸' },
+                                    { rank: 2, name: 'Sarah Master', xp: 14200, avatar: '👩‍💻' },
+                                    { rank: 3, name: 'Mike Pro', xp: 13500, avatar: '🧙‍♂️' },
+                                    { rank: 4, name: 'You', xp: 8750, avatar: '😎', highlight: true },
+                                    { rank: 5, name: 'Emma Rising', xp: 8200, avatar: '🌟' }
+                                ].map(user => `
+                                    <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; 
+                                                background: ${user.highlight ? 'rgba(249,115,22,0.1)' : 'transparent'}; 
+                                                border: ${user.highlight ? '1px solid var(--primary-color)' : 'none'}; 
+                                                border-radius: 12px;">
+                                        <div style="width: 32px; text-align: center; font-weight: 700; color: ${user.rank <= 3 ? 'var(--warning-color)' : 'var(--text-muted)' };">
+                                            #${user.rank}
+                                        </div>
+                                        <div style="font-size: 1.5rem;">${user.avatar}</div>
+                                        <div style="flex: 1;">
+                                            <div style="color: var(--text-primary); font-weight: 600;">${user.name}</div>
+                                        </div>
+                                        <div style="color: var(--primary-color); font-weight: 700;">
+                                            ${user.xp.toLocaleString()} XP
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem;">
+                            <h3 style="color: var(--text-primary); margin-bottom: 1rem;">🎯 Community Challenges</h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="color: var(--text-primary); font-weight: 600;">Weekend Warrior</div>
+                                            <div style="color: var(--text-secondary); font-size: 0.875rem;">Complete 10 tasks this weekend</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-primary">Join</button>
+                                    </div>
+                                </div>
+                                <div style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="color: var(--text-primary); font-weight: 600;">Focus Marathon</div>
+                                            <div style="color: var(--text-secondary); font-size: 0.875rem;">100 minutes of focus time today</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-primary">Join</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createAchievementsView() {
+            return `
+                <div class="achievements-container" style="padding: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🏆 Achievements</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.5rem;">
+                        ${Object.values(achievements).map(achievement => `
+                            <div style="text-align: center; padding: 1.5rem; background: ${achievement.unlocked ? 'rgba(249,115,22,0.1)' : 'rgba(255,255,255,0.03)'}; 
+                                        border: 1px solid ${achievement.unlocked ? 'var(--primary-color)' : 'var(--border-light)'}; 
+                                        border-radius: 16px; opacity: ${achievement.unlocked ? '1' : '0.5'};">
+                                <div style="font-size: 48px; margin-bottom: 0.5rem; filter: ${achievement.unlocked ? 'none' : 'grayscale(1)'};">
+                                    ${achievement.icon}
+                                </div>
+                                <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.25rem;">
+                                    ${achievement.name}
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 0.75rem;">
+                                    ${achievement.description}
+                                </div>
+                                ${achievement.unlocked ? '<div style="color: var(--success-color); font-size: 0.75rem; margin-top: 0.5rem;">✓ Unlocked</div>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Goal Management Functions
+        function openCreateGoalModal() {
+            showToast('Goal creation modal coming soon!', 'info');
+        }
+        
+        function updateGoalProgress(goalId, amount) {
+            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            const goal = goals.find(g => g.id === goalId);
+            if (goal) {
+                goal.progress = Math.min(100, goal.progress + amount);
+                localStorage.setItem('userGoals', JSON.stringify(goals));
+                loadViewContent('goals');
+                showToast(`Goal progress updated! +${amount}%`, 'success');
+                
+                if (goal.progress === 100) {
+                    const completed = parseInt(localStorage.getItem('goalsCompleted') || '0') + 1;
+                    localStorage.setItem('goalsCompleted', completed.toString());
+                    checkAchievement('goals', completed);
+                }
+            }
+        }
+        
+        function editGoal(goalId) {
+            showToast('Goal editing coming soon!', 'info');
+        }
+        
+        function deleteGoal(goalId) {
+            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            const filtered = goals.filter(g => g.id !== goalId);
+            localStorage.setItem('userGoals', JSON.stringify(filtered));
+            loadViewContent('goals');
+            showToast('Goal deleted', 'info');
+        }
+        
+        // Habit Functions
+        function openCreateHabitModal() {
+            showToast('Habit creation modal coming soon!', 'info');
+        }
+        
+        function toggleHabit(habitId) {
+            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                habit.completed = !habit.completed;
+                if (habit.completed) {
+                    habit.streak = (habit.streak || 0) + 1;
+                }
+                localStorage.setItem('userHabits', JSON.stringify(habits));
+                loadViewContent('habits');
+                showToast(habit.completed ? '✅ Habit completed!' : 'Habit unchecked', 'success');
+            }
+        }
+        
+        function deleteHabit(habitId) {
+            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            const filtered = habits.filter(h => h.id !== habitId);
+            localStorage.setItem('userHabits', JSON.stringify(filtered));
+            loadViewContent('habits');
+            showToast('Habit deleted', 'info');
+        }
+        
         // Toast Notifications
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -2031,10 +2452,267 @@
             }
         }
         
+        // Achievement System
+        const achievements = {
+            firstStep: { id: 'first-step', name: 'First Step', description: 'Complete your first task', icon: '👣', unlocked: false },
+            weekWarrior: { id: 'week-warrior', name: 'Week Warrior', description: '7 day streak', icon: '⚔️', unlocked: false },
+            focusMaster: { id: 'focus-master', name: 'Focus Master', description: '100 burn sessions', icon: '🎯', unlocked: false },
+            goalGetter: { id: 'goal-getter', name: 'Goal Getter', description: 'Complete 10 goals', icon: '🏆', unlocked: false },
+            socialButterfly: { id: 'social-butterfly', name: 'Social Butterfly', description: 'Connect with 5 friends', icon: '🦋', unlocked: false },
+            treasureHunter: { id: 'treasure-hunter', name: 'Treasure Hunter', description: 'Open 50 treasure chests', icon: '💎', unlocked: false },
+            aiExplorer: { id: 'ai-explorer', name: 'AI Explorer', description: '100 AI conversations', icon: '🤖', unlocked: false },
+            levelLegend: { id: 'level-legend', name: 'Level Legend', description: 'Reach level 50', icon: '⭐', unlocked: false }
+        };
+        
+        function checkAchievement(type, value) {
+            let achievement = null;
+            
+            switch(type) {
+                case 'streak':
+                    if (value >= 7 && !achievements.weekWarrior.unlocked) {
+                        achievement = achievements.weekWarrior;
+                    }
+                    break;
+                case 'burns':
+                    if (value >= 100 && !achievements.focusMaster.unlocked) {
+                        achievement = achievements.focusMaster;
+                    }
+                    break;
+                case 'goals':
+                    if (value >= 10 && !achievements.goalGetter.unlocked) {
+                        achievement = achievements.goalGetter;
+                    }
+                    break;
+                case 'level':
+                    if (value >= 50 && !achievements.levelLegend.unlocked) {
+                        achievement = achievements.levelLegend;
+                    }
+                    break;
+            }
+            
+            if (achievement) {
+                unlockAchievement(achievement);
+            }
+        }
+        
+        function unlockAchievement(achievement) {
+            achievement.unlocked = true;
+            showAchievementNotification(achievement);
+            
+            // Save to Firebase if connected
+            if (currentUser && db) {
+                db.collection('users').doc(currentUser.uid).update({
+                    [`achievements.${achievement.id}`]: {
+                        unlocked: true,
+                        unlockedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+            }
+        }
+        
+        function showAchievementNotification(achievement) {
+            const notification = document.createElement('div');
+            notification.className = 'achievement-notification';
+            notification.innerHTML = `
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">🎉 Achievement Unlocked!</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-desc">${achievement.description}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Daily Rewards System
+        const dailyRewards = [
+            { day: 1, reward: '10 XP', icon: '⭐' },
+            { day: 2, reward: '20 XP', icon: '⭐' },
+            { day: 3, reward: '30 XP + 10 Tokens', icon: '💎' },
+            { day: 4, reward: '40 XP', icon: '⭐' },
+            { day: 5, reward: '50 XP + Treasure Chest', icon: '🎁' },
+            { day: 6, reward: '60 XP', icon: '⭐' },
+            { day: 7, reward: '100 XP + Mystery Box', icon: '🎉' }
+        ];
+        
+        function checkDailyReward() {
+            const lastClaim = localStorage.getItem('lastDailyReward');
+            const today = new Date().toDateString();
+            
+            if (lastClaim !== today) {
+                showDailyRewardModal();
+            }
+        }
+        
+        function showDailyRewardModal() {
+            const streak = parseInt(localStorage.getItem('dailyStreak') || '0');
+            const dayIndex = Math.min(streak % 7, 6);
+            const todayReward = dailyRewards[dayIndex];
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.id = 'dailyRewardModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align:center;max-width:400px;">
+                    <div class="modal-header">
+                        <h2>📅 Daily Reward - Day ${dayIndex + 1}</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div style="font-size:64px;margin:1rem 0;">${todayReward.icon}</div>
+                        <p style="font-size:1.25rem;font-weight:600;color:var(--primary-color);">
+                            ${todayReward.reward}
+                        </p>
+                        <div style="display:flex;justify-content:center;gap:0.5rem;margin:1rem 0;">
+                            ${dailyRewards.map((r, i) => `
+                                <div style="width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+                                    background:${i <= dayIndex ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'};
+                                    color:${i <= dayIndex ? 'white' : 'var(--text-muted)'};">
+                                    ${i + 1}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p style="color:var(--text-secondary);font-size:0.875rem;">
+                            Current Streak: ${streak + 1} days
+                        </p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="claimDailyReward()">
+                            Claim Reward
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function claimDailyReward() {
+            const today = new Date().toDateString();
+            const streak = parseInt(localStorage.getItem('dailyStreak') || '0') + 1;
+            
+            localStorage.setItem('lastDailyReward', today);
+            localStorage.setItem('dailyStreak', streak.toString());
+            
+            document.getElementById('dailyRewardModal')?.remove();
+            showToast('🎉 Daily reward claimed!', 'success');
+            
+            // Check for streak achievement
+            checkAchievement('streak', streak);
+        }
+        
+        // Burn Counter / Focus Timer
+        let burnTimer = null;
+        let burnSeconds = 0;
+        let burnActive = false;
+        
+        function startBurnSession(duration = 25) {
+            if (burnActive) return;
+            
+            burnActive = true;
+            burnSeconds = duration * 60;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.id = 'burnModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align:center;max-width:400px;">
+                    <div class="modal-header">
+                        <h2>🔥 Focus Session</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div id="burnTimer" style="font-size:3rem;font-weight:700;color:var(--primary-color);margin:2rem 0;">
+                            ${formatTime(burnSeconds)}
+                        </div>
+                        <div class="burn-progress" style="width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;">
+                            <div id="burnProgressBar" style="width:100%;height:100%;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));transition:width 1s linear;"></div>
+                        </div>
+                        <p style="color:var(--text-secondary);margin-top:1rem;">
+                            Stay focused! You're doing great.
+                        </p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="pauseBurnSession()">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn btn-primary" onclick="endBurnSession()">
+                            <i class="fas fa-stop"></i> End Session
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            burnTimer = setInterval(() => {
+                burnSeconds--;
+                document.getElementById('burnTimer').textContent = formatTime(burnSeconds);
+                
+                const progress = ((duration * 60 - burnSeconds) / (duration * 60)) * 100;
+                document.getElementById('burnProgressBar').style.width = (100 - progress) + '%';
+                
+                if (burnSeconds <= 0) {
+                    completeBurnSession();
+                }
+            }, 1000);
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function pauseBurnSession() {
+            if (burnTimer) {
+                clearInterval(burnTimer);
+                burnTimer = null;
+                showToast('⏸️ Session paused', 'info');
+            }
+        }
+        
+        function endBurnSession() {
+            if (burnTimer) {
+                clearInterval(burnTimer);
+                burnTimer = null;
+            }
+            burnActive = false;
+            document.getElementById('burnModal')?.remove();
+            showToast('Session ended', 'info');
+        }
+        
+        function completeBurnSession() {
+            endBurnSession();
+            
+            const totalBurns = parseInt(localStorage.getItem('totalBurns') || '0') + 1;
+            localStorage.setItem('totalBurns', totalBurns.toString());
+            
+            showToast('🎉 Focus session complete! +25 XP', 'success');
+            
+            // Update user stats
+            if (currentUser && db) {
+                db.collection('users').doc(currentUser.uid).update({
+                    experience: firebase.firestore.FieldValue.increment(25),
+                    totalBurns: firebase.firestore.FieldValue.increment(1)
+                });
+            }
+            
+            // Check for achievement
+            checkAchievement('burns', totalBurns);
+        }
+        
         // Demo Functions
         function startQuickBurn() {
-            showToast('🔥 Focus session started!', 'success');
-            navigate('burn');
+            startBurnSession(25);
         }
 
         function showNotifications() {
