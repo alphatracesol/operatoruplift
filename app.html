@@ -1305,7 +1305,7 @@
                                 <button class="btn btn-link" onclick="scrollToRedemptions()">History</button>
                             </div>
                             <div class="card-body">
-                                <p class="text-muted" id="redeemRateHelp">Fetching redemption rate…</p>
+                                <p class="text-muted" id="redeemRateHelp"><span class="skeleton" style="display:inline-block;width:220px;height:16px;"></span></p>
                             </div>
                         </div>
 
@@ -1316,7 +1316,8 @@
                                 <div class="card-icon">⏳</div>
                             </div>
                             <div class="card-body" id="redemptionsList" aria-live="polite">
-                                <div class="text-muted">Loading…</div>
+                                <div class="skeleton" style="height:14px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="height:14px;margin-bottom:8px;width:70%;"></div>
                                 <div style="margin-top:.5rem; display:flex; gap:.5rem;">
                                     <button class="btn btn-sm btn-secondary" onclick="renderPendingRedemptions()">Retry</button>
                                 </div>
@@ -1629,6 +1630,10 @@
             font-size: 0.875rem;
             color: var(--text-secondary);
         }
+        /* Skeletons */
+        .skeleton { position: relative; overflow: hidden; background: rgba(255,255,255,0.06); border-radius: 8px; }
+        .skeleton::after { content:""; position:absolute; inset:0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); animation: shimmer 1.2s infinite; }
+        @keyframes shimmer { 100% { transform: translateX(100%);} }
     </style>
     
     <!-- Animation Libraries -->
@@ -1992,11 +1997,11 @@
 
         // Burn feed
         async function fetchBurnFeed() {
+            const el = document.getElementById('burnFeedBody');
+            if (!el) return;
             try {
-                const el = document.getElementById('burnFeedBody');
-                if (!el) return;
                 const mint = (await fetch('/.netlify/functions/api/config/public').then(r=>r.ok?r.json():null).catch(()=>null))?.mint || '';
-                if (!mint) { el.innerHTML = ''; return; }
+                if (!mint) { el.innerHTML = '<tr><td colspan="3" class="text-muted">No mint configured</td></tr>'; return; }
                 const res = await fetch(`/.netlify/functions/burn-feed?mint=${mint}&limit=20`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('feed http '+res.status);
                 const data = await res.json();
@@ -2005,8 +2010,10 @@
                     <td style="padding:.35rem .4rem;text-align:right;">${Number(b.amount||0).toLocaleString()}</td>
                     <td style="padding:.35rem .4rem;">${b.blockTime?new Date(b.blockTime).toLocaleString():''}</td>
                 </tr>`).join('');
-                el.innerHTML = rows || '';
-            } catch {}
+                el.innerHTML = rows || '<tr><td colspan="3" class="text-muted">No burns found</td></tr>';
+            } catch (e) {
+                el.innerHTML = '<tr><td colspan="3" class="text-muted">Failed to load burn feed</td></tr>';
+            }
         }
         function showApp() {
             document.getElementById('authContainer').style.display = 'none';
