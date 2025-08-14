@@ -1992,6 +1992,9 @@
                     case 'community':
                         viewContainer.innerHTML = createCommunityView();
                         break;
+                    case 'leaderboard':
+                        viewContainer.innerHTML = createLeaderboardView();
+                        break;
                     case 'achievements':
                         viewContainer.innerHTML = createAchievementsView();
                         break;
@@ -2279,6 +2282,40 @@
             `;
         }
         
+        // Leaderboard View (extracted from Community leaderboard section)
+        function createLeaderboardView() {
+            return `
+                <div class="leaderboard-container" style="padding: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🏆 Leaderboard</h2>
+                    <div style="display: grid; gap: 0.75rem;">
+                        ${[
+                            { rank: 1, name: 'Alex Champion', xp: 15420, avatar: '🦸' },
+                            { rank: 2, name: 'Sarah Master', xp: 14200, avatar: '👩‍💻' },
+                            { rank: 3, name: 'Mike Pro', xp: 13500, avatar: '🧙‍♂️' },
+                            { rank: 4, name: 'You', xp: 8750, avatar: '😎', highlight: true },
+                            { rank: 5, name: 'Emma Rising', xp: 8200, avatar: '🌟' }
+                        ].map(user => `
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; 
+                                        background: ${user.highlight ? 'rgba(249,115,22,0.1)' : 'transparent'}; 
+                                        border: ${user.highlight ? '1px solid var(--primary-color)' : '1px solid var(--border-light)'}; 
+                                        border-radius: 12px;">
+                                <div style="width: 32px; text-align: center; font-weight: 700; color: ${user.rank <= 3 ? 'var(--warning-color)' : 'var(--text-muted)'};">
+                                    #${user.rank}
+                                </div>
+                                <div style="font-size: 1.5rem;">${user.avatar}</div>
+                                <div style="flex: 1;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">${user.name}</div>
+                                </div>
+                                <div style="color: var(--primary-color); font-weight: 700;">
+                                    ${user.xp.toLocaleString()} XP
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         function createAchievementsView() {
             return `
                 <div class="achievements-container" style="padding: 2rem;">
