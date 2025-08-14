@@ -1794,6 +1794,11 @@
                     showAuth();
                 }
             }, 1000);
+            // Initialize stat counters from storage in demo/local mode
+            try {
+                const sc = document.getElementById('streakCount'); if (sc) sc.textContent = String(Number(localStorage.getItem('uplift:streak')||'0')|0);
+                const tk = document.getElementById('tokenCount'); if (tk) tk.textContent = String(Number(localStorage.getItem('uplift:tokens')||'0')|0);
+            } catch {}
         });
 
         // Force SW to activate updated version and reload once
