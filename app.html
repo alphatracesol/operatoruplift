@@ -336,6 +336,27 @@
 
         .sidebar.collapsed .nav-item {
             justify-content: center;
+            position: relative;
+        }
+        
+        /* Fix notification badge positioning in collapsed sidebar */
+        .sidebar.collapsed .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.6rem;
+            padding: 1px 3px;
+            min-width: 14px;
+            height: 14px;
+            line-height: 12px;
+        }
+        
+        /* Keep icon centered when notification present */
+        .sidebar.collapsed .nav-item i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         /* Sidebar Header */
@@ -520,6 +541,24 @@
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
+        }
+        
+        /* Menu Toggle Button */
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(255, 107, 0, 0.1);
+            color: var(--primary-color);
         }
 
         .header-left {
@@ -1225,6 +1264,99 @@
             }
         };
         
+        // Settings functions
+        window.saveProfileSettings = function() {
+            const username = document.getElementById('settingsUsername')?.value;
+            const email = document.getElementById('settingsEmail')?.value;
+            const bio = document.getElementById('settingsBio')?.value;
+            
+            if (username) localStorage.setItem('userName', username);
+            if (email) localStorage.setItem('userEmail', email);
+            if (bio) localStorage.setItem('userBio', bio);
+            
+            // Save notification settings
+            localStorage.setItem('notifyAchievements', document.getElementById('notifyAchievements')?.checked);
+            localStorage.setItem('notifyStreaks', document.getElementById('notifyStreaks')?.checked);
+            localStorage.setItem('notifySocial', document.getElementById('notifySocial')?.checked);
+            
+            // Save privacy settings
+            localStorage.setItem('profilePublic', document.getElementById('profilePublic')?.checked);
+            localStorage.setItem('showActivity', document.getElementById('showActivity')?.checked);
+            
+            showToast('Settings saved successfully!', 'success');
+        };
+        
+        // Goals and Habits functions
+        window.openCreateGoalModal = function() {
+            const title = prompt('Goal title:');
+            const description = prompt('Goal description:');
+            
+            if (title && description) {
+                const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+                const newGoal = {
+                    id: Date.now().toString(),
+                    title,
+                    description,
+                    progress: 0,
+                    createdAt: new Date().toISOString()
+                };
+                goals.push(newGoal);
+                localStorage.setItem('userGoals', JSON.stringify(goals));
+                window.navigate('goals');
+                showToast('Goal created successfully!', 'success');
+            }
+        };
+        
+        window.updateGoalProgress = function(goalId) {
+            const progress = prompt('Enter progress (0-100):');
+            if (progress !== null) {
+                const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+                const goal = goals.find(g => g.id === goalId);
+                if (goal) {
+                    goal.progress = Math.min(100, Math.max(0, parseInt(progress)));
+                    localStorage.setItem('userGoals', JSON.stringify(goals));
+                    window.navigate('goals');
+                    showToast('Goal updated!', 'success');
+                }
+            }
+        };
+        
+        window.openCreateHabitModal = function() {
+            const title = prompt('Habit title:');
+            const description = prompt('Habit description:');
+            
+            if (title && description) {
+                const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+                const newHabit = {
+                    id: Date.now().toString(),
+                    title,
+                    description,
+                    streak: 0,
+                    frequency: 'Daily',
+                    completedToday: false,
+                    createdAt: new Date().toISOString()
+                };
+                habits.push(newHabit);
+                localStorage.setItem('userHabits', JSON.stringify(habits));
+                window.navigate('habits');
+                showToast('Habit created successfully!', 'success');
+            }
+        };
+        
+        window.toggleHabitComplete = function(habitId) {
+            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                habit.completedToday = !habit.completedToday;
+                if (habit.completedToday) {
+                    habit.streak = (habit.streak || 0) + 1;
+                    showToast('Great job! Habit completed!', 'success');
+                }
+                localStorage.setItem('userHabits', JSON.stringify(habits));
+                window.navigate('habits');
+            }
+        };
+        
         // STEP 2: Create robust navigation
         window.navigate = function(view) {
                 console.log('🔄 Navigating to:', view);
@@ -1504,42 +1636,89 @@
     
     // Add all other missing view creators
     window.createGoalsView = function() {
+        const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+        
         return `
-            <div style="padding: 2rem;">
-                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🎯 Goals</h2>
-                <button class="btn btn-primary" onclick="showToast('Create goal coming soon!', 'info')">
-                    <i class="fas fa-plus"></i> New Goal
-                </button>
-                <div class="goals-grid" style="display: grid; gap: 1rem; margin-top: 2rem;">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3>Complete 100 Tasks</h3>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 45%"></div></div>
-                            <p>45/100 completed</p>
+            <div class="goals-container" style="padding: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem;">
+                        <i class="fas fa-bullseye"></i> Goals
+                    </h2>
+                    <button class="btn btn-primary" onclick="openCreateGoalModal()">
+                        <i class="fas fa-plus"></i> New Goal
+                    </button>
+                </div>
+                
+                <div class="goals-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    ${goals.length === 0 ? `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                            <div style="font-size: 64px; margin-bottom: 1rem;">🎯</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No goals yet</h3>
+                            <p style="color: var(--text-secondary);">Create your first goal to get started!</p>
                         </div>
-                    </div>
+                    ` : goals.map(goal => `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">${goal.title}</h3>
+                                <div class="card-icon">${goal.icon || '🎯'}</div>
+                            </div>
+                            <div class="card-body">
+                                <p style="margin-bottom: 1rem;">${goal.description}</p>
+                                <div class="progress-bar" style="margin-bottom: 0.5rem;">
+                                    <div class="progress-fill" style="width: ${goal.progress || 0}%"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${goal.progress || 0}% Complete</span>
+                                    <button class="btn btn-sm" onclick="updateGoalProgress('${goal.id}')">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
     };
     
     window.createHabitsView = function() {
+        const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+        
         return `
-            <div style="padding: 2rem;">
-                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">📅 Habits</h2>
-                <button class="btn btn-primary" onclick="showToast('Create habit coming soon!', 'info')">
-                    <i class="fas fa-plus"></i> New Habit
-                </button>
-                <div style="margin-top: 2rem;">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3>Morning Meditation</h3>
-                            <p>Streak: 7 days</p>
-                            <button class="btn btn-success btn-sm" onclick="showToast('Habit completed!', 'success')">
-                                ✓ Complete Today
-                            </button>
+            <div class="habits-container" style="padding: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem;">
+                        <i class="fas fa-calendar-check"></i> Habits
+                    </h2>
+                    <button class="btn btn-primary" onclick="openCreateHabitModal()">
+                        <i class="fas fa-plus"></i> New Habit
+                    </button>
+                </div>
+                
+                <div class="habits-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    ${habits.length === 0 ? `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                            <div style="font-size: 64px; margin-bottom: 1rem;">📅</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No habits yet</h3>
+                            <p style="color: var(--text-secondary);">Create your first habit to build consistency!</p>
                         </div>
-                    </div>
+                    ` : habits.map(habit => `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">${habit.title}</h3>
+                                <div class="card-icon">${habit.icon || '📅'}</div>
+                            </div>
+                            <div class="card-body">
+                                <p style="margin-bottom: 1rem;">${habit.description}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <span>🔥 ${habit.streak || 0} day streak</span>
+                                    <span>${habit.frequency || 'Daily'}</span>
+                                </div>
+                                <button class="btn ${habit.completedToday ? 'btn-success' : 'btn-primary'}" 
+                                        onclick="toggleHabitComplete('${habit.id}')">
+                                    ${habit.completedToday ? '✓ Completed' : 'Mark Complete'}
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -1628,16 +1807,102 @@
     
     window.createSettingsView = function() {
         return `
-            <div style="padding: 2rem;">
-                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">⚙️ Settings</h2>
-                <div class="card">
-                    <div class="card-body">
-                        <h3>Profile</h3>
-                        <div style="margin: 1rem 0;">
-                            <label>Username</label>
-                            <input type="text" value="${localStorage.getItem('userName') || 'User'}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+            <div class="settings-container" style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">
+                    <i class="fas fa-cog"></i> Settings
+                </h2>
+                
+                <div style="display: grid; gap: 1.5rem; max-width: 800px;">
+                    <!-- Profile Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Profile Settings</h3>
+                            <div class="card-icon">👤</div>
                         </div>
-                        <button class="btn btn-primary" onclick="showToast('Settings saved!', 'success')">Save Changes</button>
+                        <div class="card-body">
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Username</label>
+                                    <input type="text" id="settingsUsername" value="${localStorage.getItem('userName') || 'User'}" 
+                                           style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Email</label>
+                                    <input type="email" id="settingsEmail" value="${localStorage.getItem('userEmail') || ''}" 
+                                           style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Bio</label>
+                                    <textarea id="settingsBio" rows="3" 
+                                              style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary); resize: vertical;">${localStorage.getItem('userBio') || ''}</textarea>
+                                </div>
+                                <button class="btn btn-primary" onclick="saveProfileSettings()">
+                                    <i class="fas fa-save"></i> Save Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Notification Settings</h3>
+                            <div class="card-icon">🔔</div>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; gap: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="notifyAchievements" ${localStorage.getItem('notifyAchievements') !== 'false' ? 'checked' : ''}>
+                                    <span>Achievement Notifications</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="notifyStreaks" ${localStorage.getItem('notifyStreaks') !== 'false' ? 'checked' : ''}>
+                                    <span>Streak Reminders</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="notifySocial" ${localStorage.getItem('notifySocial') !== 'false' ? 'checked' : ''}>
+                                    <span>Social Updates</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Theme Settings</h3>
+                            <div class="card-icon">🎨</div>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Theme</label>
+                                <select id="themeSelect" onchange="changeTheme(this.value)" 
+                                        style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                                    <option value="dark">Dark Mode</option>
+                                    <option value="light">Light Mode</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Privacy Settings</h3>
+                            <div class="card-icon">🔒</div>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; gap: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="profilePublic" ${localStorage.getItem('profilePublic') !== 'false' ? 'checked' : ''}>
+                                    <span>Public Profile</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="showActivity" ${localStorage.getItem('showActivity') !== 'false' ? 'checked' : ''}>
+                                    <span>Show Activity Status</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1746,11 +2011,136 @@
     };
     
     window.showNotifications = function() {
-        showToast('No new notifications', 'info');
+        const existingDropdown = document.getElementById('notificationsDropdown');
+        if (existingDropdown) {
+            existingDropdown.remove();
+            return;
+        }
+        
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        
+        const dropdown = document.createElement('div');
+        dropdown.id = 'notificationsDropdown';
+        dropdown.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 320px;
+            max-height: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 1000;
+            overflow: hidden;
+        `;
+        
+        dropdown.innerHTML = `
+            <div style="padding: 1rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: var(--text-primary);">Notifications</h3>
+                <button onclick="clearAllNotifications()" style="background: transparent; border: none; color: var(--primary-color); cursor: pointer;">
+                    Clear All
+                </button>
+            </div>
+            <div style="max-height: 320px; overflow-y: auto;">
+                ${notifications.length === 0 ? `
+                    <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                        <i class="fas fa-bell" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                        <p>No notifications</p>
+                    </div>
+                ` : notifications.map(notif => `
+                    <div class="notification-item" style="padding: 1rem; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.2s; ${!notif.read ? 'background: rgba(255,107,0,0.05);' : ''}" 
+                         onmouseover="this.style.background='rgba(255,107,0,0.1)'" 
+                         onmouseout="this.style.background='${!notif.read ? 'rgba(255,107,0,0.05)' : 'transparent'}'">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                    <span>${notif.icon || '🔔'}</span>
+                                    <strong style="color: var(--text-primary);">${notif.title}</strong>
+                                    ${!notif.read ? '<span style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;"></span>' : ''}
+                                </div>
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">${notif.message}</p>
+                                <small style="color: var(--text-muted);">${notif.time || 'Just now'}</small>
+                            </div>
+                            <button onclick="removeNotification('${notif.id}')" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.25rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        document.body.appendChild(dropdown);
+        
+        // Mark all as read
+        notifications.forEach(n => n.read = true);
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        
+        // Update badge
+        updateNotificationBadge();
+        
+        // Close on click outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!dropdown.contains(e.target) && !e.target.closest('.header-btn')) {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }, 100);
     };
     
     window.openLuckyWheel = function() {
         showToast('Lucky wheel coming soon!', 'info');
+    };
+    
+    // Notification helper functions
+    window.clearAllNotifications = function() {
+        localStorage.setItem('notifications', '[]');
+        const dropdown = document.getElementById('notificationsDropdown');
+        if (dropdown) dropdown.remove();
+        updateNotificationBadge();
+        showToast('All notifications cleared', 'success');
+    };
+    
+    window.removeNotification = function(notifId) {
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        const filtered = notifications.filter(n => n.id !== notifId);
+        localStorage.setItem('notifications', JSON.stringify(filtered));
+        showNotifications(); // Refresh dropdown
+        updateNotificationBadge();
+    };
+    
+    window.updateNotificationBadge = function() {
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        const unreadCount = notifications.filter(n => !n.read).length;
+        const badges = document.querySelectorAll('.notification-badge');
+        badges.forEach(badge => {
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    };
+    
+    window.addNotification = function(title, message, icon) {
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        const newNotif = {
+            id: Date.now().toString(),
+            title,
+            message,
+            icon: icon || '🔔',
+            time: new Date().toLocaleTimeString(),
+            read: false
+        };
+        notifications.unshift(newNotif);
+        // Keep only last 20 notifications
+        if (notifications.length > 20) notifications.pop();
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        updateNotificationBadge();
     };
     
     window.openTreasureChest = function() {
@@ -2080,7 +2470,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo">
-                    <div class="logo-icon">🚀</div>
+                    <div class="logo-icon">🟠</div>
                     <span class="logo-text">Operator Uplift</span>
                 </a>
                 <button class="toggle-sidebar" onclick="toggleSidebar()">
@@ -2152,6 +2542,9 @@
             <!-- Header -->
             <header class="header">
                 <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <h1 class="page-title" id="pageTitle">Mission Control</h1>
                 </div>
 
@@ -2190,8 +2583,8 @@
                         <button class="header-btn" onclick="openLuckyWheel()">
                             <i class="fas fa-dice"></i>
                         </button>
-                        <button class="header-btn" onclick="openTreasureChest()">
-                            <i class="fas fa-treasure-chest"></i>
+                        <button class="header-btn" onclick="openTreasureChest()" title="Open Treasure Chest">
+                            <i class="fas fa-gift"></i>
                         </button>
                         <button class="header-btn" onclick="showProfile()">
                             <i class="fas fa-user"></i>
@@ -3234,7 +3627,11 @@
         // Sidebar Toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('collapsed');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                // Save state to localStorage
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            }
         }
 
         // Mobile Sidebar Toggle
