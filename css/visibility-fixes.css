@@ -1,0 +1,188 @@
+/* Visibility Fixes for All Systems */
+/* Ensures all 20 systems are properly visible */
+
+/* Ensure app is visible */
+#app {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Ensure dashboard is visible */
+#dashboardView {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#dashboardView.active {
+    display: block !important;
+}
+
+/* Ensure dashboard grid is visible */
+.dashboard-grid {
+    display: grid !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Ensure all cards are visible */
+.card {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-height: 150px;
+}
+
+/* Fix header buttons */
+.header-right {
+    display: flex !important;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mood-check-btn,
+.notification-bell,
+.a11y-toggle,
+.marketplace-btn {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix journey card */
+.journey-card {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Fix AI coaching card */
+.ai-coaching-card {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Fix team challenges card */
+.team-challenges-card {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Fix weekly report card */
+.weekly-report-card {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Fix streak shield */
+.streak-shield-indicator {
+    display: inline-flex !important;
+    align-items: center;
+    margin-left: 0.5rem;
+}
+
+/* Fix notification badge */
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--error-color, #ff4444);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure main content is visible */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+/* Fix view containers */
+.view-container {
+    display: none;
+}
+
+.view-container.active {
+    display: block !important;
+}
+
+/* Fix button icons */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Fix card content spacing */
+.card-content {
+    padding: 1rem;
+}
+
+.journey-content,
+.coaching-content,
+.team-content,
+.report-summary {
+    padding: 1rem 0;
+}
+
+/* Ensure buttons in cards are visible */
+.card button {
+    margin-top: 1rem;
+}
+
+/* Fix offline indicator */
+.offline-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--warning-color, #ffaa00);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    z-index: 100;
+}
+
+/* Hide auth screen when app is active */
+body:not(.show-auth) #authScreen {
+    display: none !important;
+}
+
+body:not(.show-auth) #app {
+    display: flex !important;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .header-right {
+        flex-wrap: wrap;
+    }
+}
