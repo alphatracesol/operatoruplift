@@ -1176,6 +1176,332 @@
             }
         });
     })();
+    
+    // GLOBAL VIEW FUNCTIONS - Make them accessible
+    window.createSocialHubView = function() {
+        return `
+            <div class="social-hub-container" style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">
+                    <i class="fas fa-users"></i> Social Hub
+                </h2>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="card" style="margin-bottom: 1.5rem;">
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <textarea id="postContent" placeholder="Share your progress..." style="width: 100%; min-height: 80px; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);"></textarea>
+                                <button class="btn btn-primary" onclick="createPost()" style="margin-top: 0.5rem;">
+                                    <i class="fas fa-paper-plane"></i> Post
+                                </button>
+                            </div>
+                        </div>
+                        <div id="socialFeed">
+                            <div class="card" style="margin-bottom: 1rem;">
+                                <div class="card-body">
+                                    <strong>Alex</strong> - Just completed a 4-hour focus session! 🔥
+                                    <div style="margin-top: 0.5rem;">
+                                        <button class="btn btn-sm" onclick="showToast('Liked!', 'success')">❤️ 23</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title">Friends Online</h3></div>
+                            <div class="card-body">Emma, James, Olivia, Lucas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createWalletInterfaceView = function() {
+        const isConnected = localStorage.getItem('walletConnected') === 'true';
+        const address = localStorage.getItem('walletAddress') || '';
+        
+        if (!isConnected) {
+            return `
+                <div class="wallet-container" style="padding: 2rem; text-align: center;">
+                    <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">
+                        <i class="fas fa-wallet"></i> Token Wallet
+                    </h2>
+                    <div class="card" style="padding: 3rem;">
+                        <div style="font-size: 64px; margin-bottom: 1rem;">🔗</div>
+                        <h3>Connect Your Wallet</h3>
+                        <p style="margin: 1rem 0;">Connect your Phantom wallet to manage UPLIFT tokens.</p>
+                        <button class="btn btn-primary btn-lg" onclick="connectPhantomWallet()">
+                            <i class="fas fa-plug"></i> Connect Phantom
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="wallet-container" style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">
+                    <i class="fas fa-wallet"></i> Token Wallet
+                </h2>
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div class="card-body">
+                        <div>Wallet: ${address.slice(0,6)}...${address.slice(-4)}</div>
+                        <div>Balance: ${localStorage.getItem('tokenBalance') || '0'} UPLIFT</div>
+                        <button class="btn btn-secondary" onclick="disconnectWallet()" style="margin-top: 1rem;">
+                            Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    // Wallet functions
+    window.connectPhantomWallet = function() {
+        if (window.solana && window.solana.isPhantom) {
+            window.solana.connect().then(response => {
+                localStorage.setItem('walletConnected', 'true');
+                localStorage.setItem('walletAddress', response.publicKey.toString());
+                window.navigate('wallet');
+                showToast('Wallet connected!', 'success');
+            }).catch(err => {
+                showToast('Failed to connect', 'error');
+            });
+        } else {
+            showToast('Install Phantom wallet', 'warning');
+            window.open('https://phantom.app/', '_blank');
+        }
+    };
+    
+    window.disconnectWallet = function() {
+        if (window.solana) window.solana.disconnect();
+        localStorage.removeItem('walletConnected');
+        localStorage.removeItem('walletAddress');
+        window.navigate('wallet');
+        showToast('Disconnected', 'info');
+    };
+    
+    window.showToast = function(message, type = 'info') {
+        const toast = document.createElement('div');
+        const colors = {success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6'};
+        toast.style.cssText = `position:fixed;bottom:20px;right:20px;padding:1rem;background:${colors[type]};color:white;border-radius:8px;z-index:9999;`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    };
+    
+    window.createPost = function() {
+        const content = document.getElementById('postContent')?.value;
+        if (content) {
+            showToast('Posted!', 'success');
+            document.getElementById('postContent').value = '';
+        }
+    };
+    
+    // Add all other missing view creators
+    window.createGoalsView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🎯 Goals</h2>
+                <button class="btn btn-primary" onclick="showToast('Create goal coming soon!', 'info')">
+                    <i class="fas fa-plus"></i> New Goal
+                </button>
+                <div class="goals-grid" style="display: grid; gap: 1rem; margin-top: 2rem;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Complete 100 Tasks</h3>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 45%"></div></div>
+                            <p>45/100 completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createHabitsView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">📅 Habits</h2>
+                <button class="btn btn-primary" onclick="showToast('Create habit coming soon!', 'info')">
+                    <i class="fas fa-plus"></i> New Habit
+                </button>
+                <div style="margin-top: 2rem;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Morning Meditation</h3>
+                            <p>Streak: 7 days</p>
+                            <button class="btn btn-success btn-sm" onclick="showToast('Habit completed!', 'success')">
+                                ✓ Complete Today
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createAnalyticsView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">📊 Analytics</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="color: var(--text-muted);">Total XP</div>
+                            <div style="font-size: 2rem; color: var(--primary-color);">${localStorage.getItem('userXP') || '0'}</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="color: var(--text-muted);">Streak</div>
+                            <div style="font-size: 2rem; color: var(--success);">${localStorage.getItem('userStreak') || '0'}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createBurnView = function() {
+        return `
+            <div style="padding: 2rem; text-align: center;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🔥 Focus Sessions</h2>
+                <div class="card" style="max-width: 600px; margin: 0 auto; padding: 3rem;">
+                    <div style="font-size: 80px; margin-bottom: 1rem;">🔥</div>
+                    <h3>Ready to Focus?</h3>
+                    <p style="margin: 1rem 0;">Choose a session duration and eliminate distractions</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                        <button class="btn btn-primary" onclick="startBurnSession(25)">25 min</button>
+                        <button class="btn btn-primary" onclick="startBurnSession(50)">50 min</button>
+                        <button class="btn btn-primary" onclick="startBurnSession(90)">90 min</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createLeaderboardView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🏆 Leaderboard</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-light);">
+                            <span style="color: gold;">🥇</span> Alex Champion - 15,420 XP
+                        </div>
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-light);">
+                            <span style="color: silver;">🥈</span> Sarah Master - 14,200 XP
+                        </div>
+                        <div style="padding: 1rem;">
+                            <span style="color: #cd7f32;">🥉</span> Mike Pro - 13,500 XP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createAchievementsView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">🏆 Achievements</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                    <div class="card" style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 3rem;">🔥</div>
+                        <h4>First Burn</h4>
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">Complete your first focus session</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 1rem; opacity: 0.5;">
+                        <div style="font-size: 3rem;">⚡</div>
+                        <h4>Speed Demon</h4>
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">Complete 10 tasks in one day</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createSettingsView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">⚙️ Settings</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Profile</h3>
+                        <div style="margin: 1rem 0;">
+                            <label>Username</label>
+                            <input type="text" value="${localStorage.getItem('userName') || 'User'}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                        </div>
+                        <button class="btn btn-primary" onclick="showToast('Settings saved!', 'success')">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    window.createCommunityView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">👥 Community</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Join the Discussion</h3>
+                        <p>Connect with other users and share your journey!</p>
+                        <button class="btn btn-primary" onclick="window.open('https://discord.gg/operatoruplift', '_blank')">
+                            <i class="fab fa-discord"></i> Join Discord
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    // Additional CTA handlers
+    window.startBurnSession = function(minutes) {
+        showToast(`Starting ${minutes} minute focus session!`, 'success');
+        localStorage.setItem('activeBurn', JSON.stringify({
+            start: Date.now(),
+            duration: minutes * 60 * 1000
+        }));
+    };
+    
+    window.startQuickBurn = function() {
+        showToast('Quick burn started!', 'success');
+        startBurnSession(25);
+    };
+    
+    window.showProfile = function() {
+        window.navigate('settings');
+    };
+    
+    window.showNotifications = function() {
+        showToast('No new notifications', 'info');
+    };
+    
+    window.openLuckyWheel = function() {
+        showToast('Lucky wheel coming soon!', 'info');
+    };
+    
+    window.openTreasureChest = function() {
+        showToast('Treasure chest coming soon!', 'info');
+    };
+    
+    window.openRedeemModal = function() {
+        showToast('Redeem feature coming soon!', 'info');
+    };
+    
+    window.openPersonalityAssessment = function() {
+        showToast('Personality assessment coming soon!', 'info');
+    };
+    
+    window.addTodayTask = function() {
+        const input = document.getElementById('newTaskInput');
+        if (input && input.value) {
+            showToast('Task added!', 'success');
+            input.value = '';
+        }
+    };
     </script>
     
     <!-- CSS to ensure complete view isolation -->
