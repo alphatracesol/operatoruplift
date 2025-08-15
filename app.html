@@ -931,6 +931,10 @@
         }
     </style>
     
+    <!-- Initial State Fix - Must load first -->
+    <script src="js/initial-state-fix.js"></script>
+    <script src="js/inline-style-override.js"></script>
+    
     <!-- Auth Bypass for Testing -->
     <script src="js/auth-bypass.js"></script>
     
@@ -1258,7 +1262,7 @@
             <!-- Main Content Area -->
             <main class="main-content" id="mainContent">
                 <!-- Dashboard View -->
-                <div class="view-container active" id="dashboardView">
+                <div class="view-container" id="dashboardView">
                     <div class="dashboard-grid">
                         <!-- Welcome Card -->
                         <div class="card">
