@@ -340,15 +340,20 @@
         }
         
         /* Fix notification badge positioning in collapsed sidebar */
+        .sidebar.collapsed .nav-item {
+            position: relative;
+        }
+        
         .sidebar.collapsed .notification-badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
+            top: -4px;
+            right: 8px;
             font-size: 0.6rem;
             padding: 1px 3px;
             min-width: 14px;
             height: 14px;
             line-height: 12px;
+            z-index: 10;
         }
         
         /* Keep icon centered when notification present */
@@ -357,6 +362,12 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            margin: 0;
+        }
+        
+        /* Ensure nav-item doesn't expand with badge */
+        .sidebar.collapsed .nav-icon {
+            position: relative;
         }
 
         /* Sidebar Header */
@@ -380,13 +391,18 @@
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
             flex-shrink: 0;
+            object-fit: contain;
+        }
+        
+        /* Remove background for img elements */
+        img.logo-icon {
+            background: none;
+            border-radius: 0;
         }
 
         .logo-text {
@@ -2470,12 +2486,9 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo">
-                    <div class="logo-icon">🟠</div>
+                    <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" class="logo-icon" style="width: 40px; height: 40px; object-fit: contain;">
                     <span class="logo-text">Operator Uplift</span>
                 </a>
-                <button class="toggle-sidebar" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
 
             <nav class="nav-menu">
@@ -2545,7 +2558,6 @@
                     <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1 class="page-title" id="pageTitle">Mission Control</h1>
                 </div>
 
                 <div class="header-right">
@@ -2604,12 +2616,14 @@
                                 <h3 class="card-title">Welcome Back!</h3>
                                 <div class="card-icon">🎯</div>
                             </div>
-                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                                Ready to level up your life today?
-                            </p>
-                            <button class="btn btn-primary" onclick="startQuickBurn()">
-                                <i class="fas fa-fire"></i> Start Focus Session
-                            </button>
+                            <div class="card-body">
+                                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                    Ready to level up your life today?
+                                </p>
+                                <button class="btn btn-primary" onclick="startQuickBurn()">
+                                    <i class="fas fa-fire"></i> Start Focus Session
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Daily Progress Card -->
