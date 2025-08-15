@@ -2450,11 +2450,125 @@
     };
     
     window.openRedeemModal = function() {
-        showToast('Redeem feature coming soon!', 'info');
+        const modal = createStandardModal(
+            '🎁 Redeem Points',
+            `
+            <div style="text-align: center;">
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem;">Your Balance</h3>
+                    <div style="font-size: 2rem; color: var(--primary-color);">
+                        <span data-stat="points">0</span> Points
+                    </div>
+                    <div style="font-size: 1rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        = <span>${Math.floor((parseInt(localStorage.getItem('userPoints') || '0')) / 100)}</span> Tokens
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">Redeem Options</h4>
+                    <div style="display: grid; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="tokenEconomy.claimTokens(); closeModal();">
+                            Convert to Tokens (100:1)
+                        </button>
+                        <button class="btn btn-secondary" onclick="redeemForBoost('xp'); closeModal();">
+                            XP Boost (500 Points)
+                        </button>
+                        <button class="btn btn-secondary" onclick="redeemForBoost('streak'); closeModal();">
+                            Streak Freeze (300 Points)
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `,
+            null,
+            null
+        );
+        
+        window.redeemForBoost = function(type) {
+            const points = parseInt(localStorage.getItem('userPoints') || '0');
+            if (type === 'xp' && points >= 500) {
+                localStorage.setItem('userPoints', points - 500);
+                const xp = parseInt(localStorage.getItem('userXP') || '0');
+                localStorage.setItem('userXP', xp + 100);
+                showToast('XP Boost applied! +100 XP', 'success');
+                updateUserStats();
+            } else if (type === 'streak' && points >= 300) {
+                localStorage.setItem('userPoints', points - 300);
+                localStorage.setItem('streakFreezes', (parseInt(localStorage.getItem('streakFreezes') || '0') + 1).toString());
+                showToast('Streak Freeze added!', 'success');
+                updateUserStats();
+            } else {
+                showToast('Not enough points!', 'error');
+            }
+        };
+        
+        window.closeModal = function() {
+            document.querySelector('.modal-overlay')?.remove();
+        };
     };
     
     window.openPersonalityAssessment = function() {
-        showToast('Personality assessment coming soon!', 'info');
+        const questions = [
+            { q: "How do you prefer to work?", options: ["Alone", "With a team", "Mix of both"] },
+            { q: "What motivates you most?", options: ["Achievement", "Growth", "Recognition", "Financial rewards"] },
+            { q: "How do you handle stress?", options: ["Take breaks", "Push through", "Seek support", "Organize better"] },
+            { q: "Your ideal learning style?", options: ["Visual", "Hands-on", "Reading", "Discussion"] },
+            { q: "Preferred work session length?", options: ["Short bursts (25min)", "Medium (45min)", "Long (90min+)"] }
+        ];
+        
+        let currentQuestion = 0;
+        const answers = [];
+        
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            const modal = createStandardModal(
+                `🧠 Personality Assessment (${currentQuestion + 1}/${questions.length})`,
+                `
+                <div style="text-align: center;">
+                    <h3 style="margin-bottom: 1.5rem;">${q.q}</h3>
+                    <div style="display: grid; gap: 0.75rem;">
+                        ${q.options.map((opt, i) => `
+                            <button class="btn btn-secondary" onclick="answerQuestion(${i}, '${opt}')">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                `,
+                null,
+                () => { currentQuestion = 0; answers.length = 0; }
+            );
+        }
+        
+        window.answerQuestion = function(index, answer) {
+            answers.push(answer);
+            document.querySelector('.modal-overlay')?.remove();
+            
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                setTimeout(showQuestion, 300);
+            } else {
+                // Complete assessment
+                const profile = {
+                    workStyle: answers[0],
+                    motivation: answers[1],
+                    stressResponse: answers[2],
+                    learningStyle: answers[3],
+                    sessionLength: answers[4],
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('personalityProfile', JSON.stringify(profile));
+                showToast('Assessment complete! AI will now personalize your experience.', 'success');
+                unlockAchievement('self-aware');
+                
+                // Reset for next time
+                currentQuestion = 0;
+                answers.length = 0;
+            }
+        };
+        
+        showQuestion();
     };
     
     window.addTodayTask = function() {

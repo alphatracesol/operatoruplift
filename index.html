@@ -3057,23 +3057,37 @@
                     </div>
                 </div>
                 
-                <!-- Burn Counter -->
-                <div class="burn-counter-wrapper" aria-live="polite">
-                    <a class="burn-counter-link" href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener noreferrer" aria-label="View burn activity on Solscan">
-                    <div class="burn-counter glass-card">
-                        <div class="burn-icon" aria-hidden="true">
-                            <span class="flame" role="img">🔥</span>
-                            <span class="embers"></span>
-                            <span class="embers s2"></span>
-                            <span class="embers s3"></span>
+                <!-- Burn Counter and Product Hunt Badge -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <!-- Burn Counter -->
+                    <div class="burn-counter-wrapper" aria-live="polite" style="margin-top: 0;">
+                        <a class="burn-counter-link" href="https://solscan.io/token/6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS?activity_type=ACTIVITY_SPL_BURN&exclude_amount_zero=true&remove_spam=false&page_size=10" target="_blank" rel="noopener noreferrer" aria-label="View burn activity on Solscan">
+                        <div class="burn-counter glass-card">
+                            <div class="burn-icon" aria-hidden="true">
+                                <span class="flame" role="img">🔥</span>
+                                <span class="embers"></span>
+                                <span class="embers s2"></span>
+                                <span class="embers s3"></span>
+                            </div>
+                            <div class="burn-text">
+                                <span class="burn-label">Tokens Burned</span>
+                                <span id="burn-counter" class="burn-value">Calculating…</span>
+                                <span id="burn-percent" class="burn-percent"></span>
+                            </div>
                         </div>
-                        <div class="burn-text">
-                            <span class="burn-label">Tokens Burned</span>
-                            <span id="burn-counter" class="burn-value">Calculating…</span>
-                            <span id="burn-percent" class="burn-percent"></span>
-                        </div>
+                        </a>
                     </div>
-                    </a>
+                    
+                    <!-- Product Hunt Badge -->
+                    <div style="display: flex; align-items: center;">
+                        <a href="https://www.producthunt.com/products/operator-uplift?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-operator&#0045;uplift&#0045;2" target="_blank">
+                            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1005626&theme=dark&t=1755258696336" 
+                                 alt="Operator&#0032;Uplift - AI&#0045;Powered&#0032;Ambition&#0058;&#0032;Unlock&#0032;Real&#0032;Results&#0044;&#0032;One&#0032;Win&#0032;at&#0032;a&#0032;Time&#0046; | Product Hunt" 
+                                 style="width: 250px; height: 54px; border-radius: 8px;" 
+                                 width="250" 
+                                 height="54" />
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Trust Strip removed per request -->
