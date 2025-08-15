@@ -1023,7 +1023,14 @@
                     targetView.className = 'view-container';
                     
                     // Try to get content from creator function
-                    const creatorName = 'create' + view.charAt(0).toUpperCase() + view.slice(1) + 'View';
+                    // Handle hyphenated names like ai-chat
+                    let creatorName = 'create' + view.charAt(0).toUpperCase() + view.slice(1) + 'View';
+                    
+                    // Special handling for hyphenated views
+                    if (view === 'ai-chat') {
+                        creatorName = 'createAiChatView';
+                    }
+                    
                     if (typeof window[creatorName] === 'function') {
                         try {
                             targetView.innerHTML = window[creatorName]();
@@ -1032,6 +1039,7 @@
                             targetView.innerHTML = '<div style="padding:2rem;text-align:center;"><h2>' + view + '</h2><p>View is loading...</p></div>';
                         }
                     } else {
+                        console.warn('View creator not found:', creatorName);
                         targetView.innerHTML = '<div style="padding:2rem;text-align:center;"><h2>' + view + '</h2><p>View is loading...</p></div>';
                     }
                     
@@ -1457,6 +1465,72 @@
         `;
     };
     
+    // Add missing AI Chat view
+    window.createAiChatView = function() {
+        return `
+            <div style="padding: 2rem;">
+                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">
+                    <i class="fas fa-robot"></i> AI Assistant
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 800px; margin: 0 auto;">
+                    <!-- Chat Interface -->
+                    <div class="card">
+                        <div class="card-body" style="height: 500px; display: flex; flex-direction: column;">
+                            <!-- Chat Messages -->
+                            <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-light); border-radius: 8px; margin-bottom: 1rem;">
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">
+                                        Hello! I'm your AI assistant. How can I help you level up today?
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chat Input -->
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input 
+                                    id="chatInput" 
+                                    type="text" 
+                                    placeholder="Ask me anything..." 
+                                    style="flex: 1; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);"
+                                    onkeypress="if(event.key === 'Enter') sendChatMessage()"
+                                >
+                                <button class="btn btn-primary" onclick="sendChatMessage()">
+                                    <i class="fas fa-paper-plane"></i> Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quick Actions</h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; gap: 0.5rem;">
+                                <button class="btn btn-secondary" onclick="askAI('Give me a motivational quote')">
+                                    💭 Get Motivated
+                                </button>
+                                <button class="btn btn-secondary" onclick="askAI('What should I focus on today?')">
+                                    🎯 Daily Focus
+                                </button>
+                                <button class="btn btn-secondary" onclick="askAI('How can I improve my productivity?')">
+                                    📈 Productivity Tips
+                                </button>
+                                <button class="btn btn-secondary" onclick="askAI('Analyze my progress')">
+                                    📊 Progress Analysis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    // Ensure the original view creators are properly named
+    window['createAi-chatView'] = window.createAiChatView;  // Handle hyphenated name
+    
     // Additional CTA handlers
     window.startBurnSession = function(minutes) {
         showToast(`Starting ${minutes} minute focus session!`, 'success');
@@ -1502,6 +1576,41 @@
             input.value = '';
         }
     };
+    
+    // AI Chat functions
+    window.sendChatMessage = function() {
+        const input = document.getElementById('chatInput');
+        const messages = document.getElementById('chatMessages');
+        
+        if (input && input.value && messages) {
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.style.cssText = 'margin-bottom: 1rem; text-align: right;';
+            userMsg.innerHTML = `<div style="background: rgba(255,255,255,0.1); color: var(--text-primary); padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">${input.value}</div>`;
+            messages.appendChild(userMsg);
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.style.cssText = 'margin-bottom: 1rem;';
+                aiMsg.innerHTML = `<div style="background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">I'm processing your request. This feature will connect to AI services soon!</div>`;
+                messages.appendChild(aiMsg);
+                messages.scrollTop = messages.scrollHeight;
+            }, 500);
+            
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+    };
+    
+    window.askAI = function(question) {
+        const input = document.getElementById('chatInput');
+        if (input) {
+            input.value = question;
+            sendChatMessage();
+        }
+    };
+    
     </script>
     
     <!-- CSS to ensure complete view isolation -->
