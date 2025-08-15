@@ -931,119 +931,336 @@
         }
     </style>
     
-    <!-- INLINE FIX - No external files needed -->
+    <!-- COMPLETE INLINE FIX - Full solution without external files -->
     <script>
-    // Inline Dashboard Fix - Directly in HTML
     (function() {
         'use strict';
         
-        console.log('🔧 Inline Dashboard Fix starting...');
+        console.log('🚀 Complete Inline Fix initializing...');
         
-        // Wait for DOM
-        window.addEventListener('DOMContentLoaded', function() {
-            console.log('📦 Restructuring views...');
+        // Wait for DOM to be fully loaded
+        function onReady(fn) {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', fn);
+            } else {
+                fn();
+            }
+        }
+        
+        onReady(function() {
+            console.log('📦 Starting complete fix...');
             
-            // Fix navigation function
-            window.navigate = function(view) {
-                console.log('Navigating to:', view);
+            // STEP 1: Restructure the main content
+            function restructureContent() {
+                const mainContent = document.getElementById('mainContent');
+                if (!mainContent) return;
                 
-                // Hide ALL view containers
-                document.querySelectorAll('.view-container').forEach(v => {
-                    v.style.display = 'none';
-                    v.classList.remove('active');
-                });
-                
-                // Special handling for dashboard
-                if (view === 'dashboard') {
-                    const dashboard = document.getElementById('dashboardView');
-                    if (dashboard) {
-                        dashboard.style.display = 'block';
-                        dashboard.classList.add('active');
-                    }
-                } else {
-                    // Hide dashboard completely
-                    const dashboard = document.getElementById('dashboardView');
-                    if (dashboard) {
-                        dashboard.style.display = 'none';
-                        dashboard.style.visibility = 'hidden';
-                        dashboard.style.position = 'absolute';
-                        dashboard.style.left = '-9999px';
-                    }
-                    
-                    // Show or create target view
-                    let targetView = document.getElementById(view + 'View');
-                    if (!targetView) {
-                        targetView = document.createElement('div');
-                        targetView.id = view + 'View';
-                        targetView.className = 'view-container';
-                        
-                        // Get content
-                        const creatorFunc = window['create' + view.charAt(0).toUpperCase() + view.slice(1) + 'View'];
-                        if (typeof creatorFunc === 'function') {
-                            targetView.innerHTML = creatorFunc();
-                        } else {
-                            targetView.innerHTML = '<div style="padding:2rem;"><h2>' + view + '</h2><p>Loading...</p></div>';
-                        }
-                        
-                        document.getElementById('mainContent').appendChild(targetView);
-                    }
-                    
-                    targetView.style.display = 'block';
-                    targetView.classList.add('active');
+                // Extract dashboard content
+                const dashboardView = document.getElementById('dashboardView');
+                let dashboardHTML = '';
+                if (dashboardView) {
+                    dashboardHTML = dashboardView.innerHTML;
                 }
                 
-                // Update nav
+                // Clear and rebuild
+                mainContent.innerHTML = '';
+                
+                // Create views wrapper
+                const wrapper = document.createElement('div');
+                wrapper.id = 'viewsWrapper';
+                wrapper.style.cssText = 'width:100%;height:100%;position:relative;';
+                mainContent.appendChild(wrapper);
+                
+                // Re-create dashboard as a proper view
+                const newDashboard = document.createElement('div');
+                newDashboard.id = 'dashboardView';
+                newDashboard.className = 'view-container';
+                newDashboard.innerHTML = dashboardHTML;
+                newDashboard.style.display = 'none';
+                wrapper.appendChild(newDashboard);
+                
+                console.log('✅ Content restructured');
+            }
+            
+            // STEP 2: Create robust navigation
+            window.navigate = function(view) {
+                console.log('🔄 Navigating to:', view);
+                
+                const wrapper = document.getElementById('viewsWrapper') || document.getElementById('mainContent');
+                if (!wrapper) return;
+                
+                // Hide ALL views completely
+                wrapper.querySelectorAll('.view-container').forEach(container => {
+                    // Remove from display
+                    container.style.display = 'none';
+                    container.classList.remove('active');
+                    
+                    // Extra hiding for non-active views
+                    if (container.id !== view + 'View') {
+                        container.style.visibility = 'hidden';
+                        container.style.position = 'absolute';
+                        container.style.left = '-99999px';
+                        container.style.top = '-99999px';
+                        container.style.width = '0';
+                        container.style.height = '0';
+                        container.style.overflow = 'hidden';
+                        container.style.opacity = '0';
+                        container.style.pointerEvents = 'none';
+                        
+                        // Hide all children
+                        container.querySelectorAll('*').forEach(child => {
+                            child.style.visibility = 'hidden';
+                        });
+                    }
+                });
+                
+                // Get or create target view
+                let targetView = document.getElementById(view + 'View');
+                
+                if (!targetView && view !== 'dashboard') {
+                    targetView = document.createElement('div');
+                    targetView.id = view + 'View';
+                    targetView.className = 'view-container';
+                    
+                    // Try to get content from creator function
+                    const creatorName = 'create' + view.charAt(0).toUpperCase() + view.slice(1) + 'View';
+                    if (typeof window[creatorName] === 'function') {
+                        try {
+                            targetView.innerHTML = window[creatorName]();
+                        } catch(e) {
+                            console.error('Error creating view:', e);
+                            targetView.innerHTML = '<div style="padding:2rem;text-align:center;"><h2>' + view + '</h2><p>View is loading...</p></div>';
+                        }
+                    } else {
+                        targetView.innerHTML = '<div style="padding:2rem;text-align:center;"><h2>' + view + '</h2><p>View is loading...</p></div>';
+                    }
+                    
+                    wrapper.appendChild(targetView);
+                }
+                
+                // Show ONLY target view
+                if (targetView) {
+                    targetView.style.display = 'block';
+                    targetView.style.visibility = 'visible';
+                    targetView.style.position = 'relative';
+                    targetView.style.left = '0';
+                    targetView.style.top = '0';
+                    targetView.style.width = '100%';
+                    targetView.style.height = '100%';
+                    targetView.style.opacity = '1';
+                    targetView.style.pointerEvents = 'auto';
+                    targetView.classList.add('active');
+                    
+                    // Restore visibility to children
+                    targetView.querySelectorAll('*').forEach(child => {
+                        child.style.visibility = '';
+                    });
+                }
+                
+                // Update navigation UI
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.toggle('active', item.getAttribute('data-view') === view);
                 });
+                
+                // Set body attribute
+                document.body.setAttribute('data-current-view', view);
+                
+                // Close mobile menu if open
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+                
+                console.log('✅ Navigation complete to:', view);
             };
             
-            // Override loadViewContent
-            window.loadViewContent = window.navigate;
+            // STEP 3: Override loadViewContent
+            window.loadViewContent = function(view) {
+                window.navigate(view);
+            };
             
-            // Wire up navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                const view = item.getAttribute('data-view');
-                if (view) {
-                    item.onclick = function() { window.navigate(view); };
-                }
-            });
-            
-            // Hide dashboard initially if not on dashboard
-            const activeNav = document.querySelector('.nav-item.active');
-            const currentView = activeNav ? activeNav.getAttribute('data-view') : 'dashboard';
-            
-            if (currentView !== 'dashboard') {
-                const dashboard = document.getElementById('dashboardView');
-                if (dashboard) {
-                    dashboard.style.display = 'none';
-                    dashboard.classList.remove('active');
-                }
+            // STEP 4: Fix all navigation clicks
+            function wireNavigation() {
+                // Main navigation items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    const view = item.getAttribute('data-view');
+                    if (view) {
+                        item.style.cursor = 'pointer';
+                        item.onclick = function(e) {
+                            e.preventDefault();
+                            window.navigate(view);
+                        };
+                    }
+                });
+                
+                // Any buttons that navigate
+                document.querySelectorAll('[onclick*="navigate"]').forEach(btn => {
+                    const onclick = btn.getAttribute('onclick');
+                    if (onclick) {
+                        const match = onclick.match(/navigate\(['"]([^'"]+)['"]\)/);
+                        if (match) {
+                            btn.onclick = function(e) {
+                                e.preventDefault();
+                                window.navigate(match[1]);
+                            };
+                        }
+                    }
+                });
+                
+                console.log('✅ Navigation wired');
             }
             
-            console.log('✅ Inline fix applied');
+            // STEP 5: Monitor for escaping elements
+            function setupMonitor() {
+                const observer = new MutationObserver(function(mutations) {
+                    const currentView = document.body.getAttribute('data-current-view');
+                    if (!currentView || currentView === 'dashboard') return;
+                    
+                    // Check for dashboard elements appearing
+                    const dashboard = document.getElementById('dashboardView');
+                    if (dashboard && dashboard.style.display !== 'none') {
+                        console.warn('🚨 Dashboard trying to show, hiding it');
+                        dashboard.style.display = 'none';
+                        dashboard.style.visibility = 'hidden';
+                        dashboard.style.position = 'absolute';
+                        dashboard.style.left = '-99999px';
+                    }
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+            }
+            
+            // STEP 6: Apply everything
+            try {
+                // Restructure content
+                restructureContent();
+                
+                // Wire navigation
+                wireNavigation();
+                
+                // Setup monitoring
+                setupMonitor();
+                
+                // Set initial view
+                const activeNav = document.querySelector('.nav-item.active');
+                const initialView = activeNav ? activeNav.getAttribute('data-view') : 'dashboard';
+                
+                // Navigate to initial view
+                setTimeout(function() {
+                    window.navigate(initialView);
+                }, 100);
+                
+                // Periodic cleanup
+                setInterval(function() {
+                    const currentView = document.body.getAttribute('data-current-view');
+                    if (currentView && currentView !== 'dashboard') {
+                        const dashboard = document.getElementById('dashboardView');
+                        if (dashboard && dashboard.offsetParent !== null) {
+                            dashboard.style.display = 'none';
+                            dashboard.style.visibility = 'hidden';
+                            dashboard.style.position = 'absolute';
+                            dashboard.style.left = '-99999px';
+                        }
+                    }
+                }, 1000);
+                
+                console.log('✅ Complete fix applied successfully!');
+                
+            } catch(error) {
+                console.error('❌ Error applying fix:', error);
+            }
         });
     })();
     </script>
     
-    <!-- CSS to ensure dashboard stays hidden -->
+    <!-- CSS to ensure complete view isolation -->
     <style>
-    #dashboardView:not(.active) {
+    /* Hide all views by default */
+    .view-container {
         display: none !important;
         visibility: hidden !important;
         position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-        pointer-events: none !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
         opacity: 0 !important;
+        pointer-events: none !important;
     }
     
-    .view-container {
-        display: none;
-    }
-    
+    /* Show only active view */
     .view-container.active {
         display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Specifically hide dashboard when not active */
+    body:not([data-current-view="dashboard"]) #dashboardView,
+    body:not([data-current-view="dashboard"]) #dashboardView *,
+    body:not([data-current-view="dashboard"]) .dashboard-grid,
+    body:not([data-current-view="dashboard"]) .dashboard-grid * {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        max-width: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        clip-path: inset(100%) !important;
+        transform: scale(0) !important;
+        z-index: -99999 !important;
+    }
+    
+    /* Hide dashboard cards specifically */
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Welcome Back")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Today's Progress")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Active Challenges")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("AI Insights")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Top Performers")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Redeem Points")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Pending Redemptions")),
+    body:not([data-current-view="dashboard"]) .card:has(.card-title:contains("Wallet & Burn Feed")) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure views wrapper takes full space */
+    #viewsWrapper {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Prevent any bleed-through */
+    #mainContent {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        isolation: isolate;
     }
     </style>
     
