@@ -931,16 +931,125 @@
         }
     </style>
     
-    <!-- Main Content Restructure - Fix the root structural issue -->
-    <script src="js/main-content-restructure.js"></script>
+    <!-- INLINE FIX - No external files needed -->
+    <script>
+    // Inline Dashboard Fix - Directly in HTML
+    (function() {
+        'use strict';
+        
+        console.log('🔧 Inline Dashboard Fix starting...');
+        
+        // Wait for DOM
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('📦 Restructuring views...');
+            
+            // Fix navigation function
+            window.navigate = function(view) {
+                console.log('Navigating to:', view);
+                
+                // Hide ALL view containers
+                document.querySelectorAll('.view-container').forEach(v => {
+                    v.style.display = 'none';
+                    v.classList.remove('active');
+                });
+                
+                // Special handling for dashboard
+                if (view === 'dashboard') {
+                    const dashboard = document.getElementById('dashboardView');
+                    if (dashboard) {
+                        dashboard.style.display = 'block';
+                        dashboard.classList.add('active');
+                    }
+                } else {
+                    // Hide dashboard completely
+                    const dashboard = document.getElementById('dashboardView');
+                    if (dashboard) {
+                        dashboard.style.display = 'none';
+                        dashboard.style.visibility = 'hidden';
+                        dashboard.style.position = 'absolute';
+                        dashboard.style.left = '-9999px';
+                    }
+                    
+                    // Show or create target view
+                    let targetView = document.getElementById(view + 'View');
+                    if (!targetView) {
+                        targetView = document.createElement('div');
+                        targetView.id = view + 'View';
+                        targetView.className = 'view-container';
+                        
+                        // Get content
+                        const creatorFunc = window['create' + view.charAt(0).toUpperCase() + view.slice(1) + 'View'];
+                        if (typeof creatorFunc === 'function') {
+                            targetView.innerHTML = creatorFunc();
+                        } else {
+                            targetView.innerHTML = '<div style="padding:2rem;"><h2>' + view + '</h2><p>Loading...</p></div>';
+                        }
+                        
+                        document.getElementById('mainContent').appendChild(targetView);
+                    }
+                    
+                    targetView.style.display = 'block';
+                    targetView.classList.add('active');
+                }
+                
+                // Update nav
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.toggle('active', item.getAttribute('data-view') === view);
+                });
+            };
+            
+            // Override loadViewContent
+            window.loadViewContent = window.navigate;
+            
+            // Wire up navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const view = item.getAttribute('data-view');
+                if (view) {
+                    item.onclick = function() { window.navigate(view); };
+                }
+            });
+            
+            // Hide dashboard initially if not on dashboard
+            const activeNav = document.querySelector('.nav-item.active');
+            const currentView = activeNav ? activeNav.getAttribute('data-view') : 'dashboard';
+            
+            if (currentView !== 'dashboard') {
+                const dashboard = document.getElementById('dashboardView');
+                if (dashboard) {
+                    dashboard.style.display = 'none';
+                    dashboard.classList.remove('active');
+                }
+            }
+            
+            console.log('✅ Inline fix applied');
+        });
+    })();
+    </script>
     
-    <!-- View Container Isolation - Proper containment for each view -->
-    <script src="js/view-container-isolation.js"></script>
+    <!-- CSS to ensure dashboard stays hidden -->
+    <style>
+    #dashboardView:not(.active) {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
     
-    <!-- Auth Bypass for Testing -->
-    <script src="js/auth-bypass.js"></script>
+    .view-container {
+        display: none;
+    }
     
-    <!-- Enhanced System Scripts -->
+    .view-container.active {
+        display: block !important;
+    }
+    </style>
+    
+    <!-- Enhanced System Scripts - COMMENTED OUT UNTIL DEPLOYED -->
+    <!-- These files exist locally but not on the server yet -->
+    <!--
     <script src="js/performance-optimizations.js" type="module"></script>
     <script src="js/ui-enhancements.js" type="module"></script>
     <script src="js/ai-multi-provider.js" type="module"></script>
@@ -970,12 +1079,10 @@
     <script src="js/enhanced-onboarding.js"></script>
     <script src="js/security-enhancements.js"></script>
     <script src="js/testing-suite.js"></script>
-    <!-- Complete UI Integration - Must load last -->
     <script src="js/complete-ui-integration.js"></script>
-    <!-- Visual Integration Checker (Dev Tool) -->
     <script src="js/visual-integration-check.js"></script>
-    <!-- System Diagnostic Tool -->
     <script src="js/system-diagnostic.js"></script>
+    -->
     
     <!-- Visibility Fixes CSS -->
     <link rel="stylesheet" href="css/visibility-fixes.css">
