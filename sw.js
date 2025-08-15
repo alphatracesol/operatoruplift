@@ -1,469 +1,141 @@
-// Enhanced Service Worker for Operator Uplift
-// Version: 2.2 - Fixed POST Request Caching and Removed Problematic URLs
-
-const CACHE_NAME = 'operator-uplift-v2.6';
-const STATIC_CACHE = 'static-v2.6';
-const DYNAMIC_CACHE = 'dynamic-v2.6';
-const API_CACHE = 'api-v2.6';
-
-// Cache strategies
-const CACHE_STRATEGIES = {
-    'static': 'cache-first',
-    'dynamic': 'stale-while-revalidate',
-    'api': 'network-first',
-    'images': 'stale-while-revalidate'
-};
-
-// URLs to cache immediately (removed problematic URLs)
+// Service Worker for Operator Uplift PWA
+const CACHE_NAME = 'operator-uplift-v1';
 const urlsToCache = [
-    '/',
-    '/manifest.json',
-    'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
-    'https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js',
-    'https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap'
+  '/',
+  '/app.html',
+  '/index.html',
+  '/style.css',
+  '/Operator Uplift LOGO PNG 2.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Install event - cache static assets
-self.addEventListener('install', (event) => {
-    console.log('🚀 Service Worker installing...');
-    event.waitUntil(
-        caches.open(STATIC_CACHE)
+// Install event - cache resources
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+      .catch(err => console.log('Cache error:', err))
+  );
+});
+
+// Fetch event - serve from cache when offline
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        
+        // Clone the request
+        const fetchRequest = event.request.clone();
+        
+        return fetch(fetchRequest).then(response => {
+          // Check if valid response
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          // Clone the response
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('📦 Caching static assets');
-                // Try to cache URLs individually to avoid complete failure
-                const cachePromises = urlsToCache.map(url => {
-                    return cache.add(url).catch(error => {
-                        console.warn(`Failed to cache ${url}:`, error);
-                        // Don't fail the entire installation if one URL fails
-                        return Promise.resolve();
-                    });
-                });
-                return Promise.all(cachePromises);
-            })
-            .then(() => {
-                console.log('✅ Static assets cached successfully');
-                return self.skipWaiting();
-            })
-            .catch(error => {
-                console.error('❌ Cache installation failed:', error);
-                // Still skip waiting even if caching fails
-                return self.skipWaiting();
-            })
-    );
+              cache.put(event.request, responseToCache);
+            });
+          
+          return response;
+        });
+      })
+      .catch(() => {
+        // Return offline page if available
+        return caches.match('/app.html');
+      })
+  );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-    console.log('🔄 Service Worker activating...');
-    event.waitUntil(
-        caches.keys()
-            .then(cacheNames => {
-                return Promise.all(
-                    cacheNames.map(cacheName => {
-                        if (cacheName !== STATIC_CACHE && 
-                            cacheName !== DYNAMIC_CACHE && 
-                            cacheName !== API_CACHE) {
-                            console.log('🗑️ Deleting old cache:', cacheName);
-                            return caches.delete(cacheName);
-                        }
-                    })
-                );
-            })
-            .then(() => {
-                console.log('✅ Service Worker activated');
-                return self.clients.claim();
-            })
-    );
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
-
-// Utility function to sanitize URLs containing API keys
-function sanitizeUrl(url) {
-    if (typeof url !== 'string') return url;
-    
-    // Remove API keys from various Firebase endpoints
-    const patterns = [
-        /key=([^&]+)/g,
-        /api_key=([^&]+)/g,
-        /auth_token=([^&]+)/g,
-        /token=([^&]+)/g,
-        /access_token=([^&]+)/g,
-        /id_token=([^&]+)/g,
-        /refresh_token=([^&]+)/g,
-        /firebase_key=([^&]+)/g,
-        /firebase_token=([^&]+)/g
-    ];
-    
-    let sanitized = url;
-    patterns.forEach(pattern => {
-        sanitized = sanitized.replace(pattern, (match, key) => {
-            return match.replace(key, '***');
-        });
-    });
-    
-    // Also sanitize any Firebase project IDs that might be sensitive
-    sanitized = sanitized.replace(/(projects\/[^\/]+)/g, 'projects/***');
-    
-    return sanitized;
-}
-
-// Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
-    try {
-        // CRITICAL: Never cache POST requests - handle them immediately
-        if (event.request.method === 'POST') {
-            const safeUrl = sanitizeUrl(event.request.url);
-            console.log(`🚫 POST request detected, bypassing cache: ${safeUrl}`);
-            event.respondWith(fetch(event.request));
-            return;
-        }
-        
-        // Always explicitly handle cross-origin requests to avoid no-op warnings
-        const requestUrl = new URL(event.request.url);
-        // If request is cross-origin, explicitly proxy through network to avoid no-op
-        if (requestUrl.origin !== self.location.origin) {
-            event.respondWith(
-                fetch(event.request)
-                    .catch(error => {
-                        console.warn('Cross-origin request failed:', error);
-                        // Return a fallback response for cross-origin failures
-                        return new Response('Cross-origin request failed', {
-                            status: 503,
-                            statusText: 'Service Unavailable'
-                        });
-                    })
-            );
-            return;
-        }
-        
-        const url = requestUrl;
-        const strategy = getCacheStrategy(url);
-        
-        const safePathname = sanitizeUrl(url.pathname);
-        console.log(`📡 Fetch: ${safePathname} (${strategy})`);
-        
-        if (strategy === 'cache-first') event.respondWith(cacheFirst(event.request));
-        else if (strategy === 'network-first') event.respondWith(networkFirst(event.request));
-        else if (strategy === 'stale-while-revalidate') event.respondWith(staleWhileRevalidate(event.request));
-        else event.respondWith(networkOnly(event.request));
-    } catch (err) {
-        console.error('❌ Fetch handler error:', err);
-        // If an unhandled error occurs and we didn't take control, let browser proceed
-        // Avoid responding with a duplicate when no event.respondWith was called
-    }
-});
-
-// Cache strategies implementation
-async function cacheFirst(request) {
-    // CRITICAL: Never cache POST requests - multiple safety checks
-    if (request.method === 'POST') {
-        const safeUrl = sanitizeUrl(request.url);
-        console.log('🚫 POST request detected in cacheFirst, bypassing cache:', safeUrl);
-        return fetch(request);
-    }
-    
-    // Skip caching for chrome-extension URLs
-    if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    // Skip caching for external resources that might be blocked by CSP
-    if (request.url.includes('unpkg.com') || 
-        request.url.includes('cdn.jsdelivr.net') ||
-        request.url.includes('apis.google.com') || 
-        request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com') ||
-        request.url.includes('firebase.googleapis.com') ||
-        request.url.includes('firebaseinstallations.googleapis.com') ||
-        request.url.includes('googletagmanager.com') ||
-        request.url.includes('api.producthunt.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    const cache = await caches.open(STATIC_CACHE);
-    const cachedResponse = await cache.match(request);
-    
-    if (cachedResponse) {
-        console.log('📦 Serving from cache:', sanitizeUrl(request.url));
-        return cachedResponse;
-    }
-    
-    try {
-        const networkResponse = await fetch(request);
-        // Do not cache partial (206) or non-OK responses
-        if (!networkResponse || !networkResponse.ok || networkResponse.status === 206) {
-            return networkResponse;
-        }
-        // Triple-check method before caching
-        if (request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
-            try { await cache.put(request, networkResponse.clone()); } catch (e) { console.warn('Cache put failed (networkFirst):', e); }
-        }
-        return networkResponse;
-    } catch (error) {
-        console.error('❌ Network failed for cache-first:', error);
-        return new Response('Offline content not available', { status: 503 });
-    }
-}
-
-async function networkFirst(request) {
-    // CRITICAL: Never cache POST requests - multiple safety checks
-    if (request.method === 'POST') {
-        const safeUrl = sanitizeUrl(request.url);
-        console.log('🚫 POST request detected in networkFirst, bypassing cache:', safeUrl);
-        return fetch(request);
-    }
-    
-    // Skip caching for chrome-extension URLs
-    if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    // Skip caching for external resources that might be blocked by CSP
-    if (request.url.includes('unpkg.com') || 
-        request.url.includes('cdn.jsdelivr.net') ||
-        request.url.includes('apis.google.com') || 
-        request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com') ||
-        request.url.includes('api.producthunt.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    const cache = await caches.open(API_CACHE);
-    
-    try {
-        const networkResponse = await fetch(request);
-        // Do not cache partial (206) or non-OK responses
-        if (networkResponse.ok && networkResponse.status !== 206 && request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
-            cache.put(request, networkResponse.clone());
-        }
-        return networkResponse;
-    } catch (error) {
-        console.log('🌐 Network failed, trying cache:', error);
-        const cachedResponse = await cache.match(request);
-        
-        if (cachedResponse) {
-            console.log('📦 Serving API from cache:', sanitizeUrl(request.url));
-            return cachedResponse;
-        }
-        
-        return new Response('API offline', { status: 503 });
-    }
-}
-
-async function staleWhileRevalidate(request) {
-    // CRITICAL: Never cache POST requests - multiple safety checks
-    if (request.method === 'POST') {
-        const safeUrl = sanitizeUrl(request.url);
-        console.log('🚫 POST request detected in staleWhileRevalidate, bypassing cache:', safeUrl);
-        return fetch(request);
-    }
-    
-    // Skip caching for chrome-extension URLs
-    if (request.url.startsWith('chrome-extension://')) {
-        console.log('🚫 Chrome extension request detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    // Skip caching for external resources that might be blocked by CSP
-    if (request.url.includes('unpkg.com') || 
-        request.url.includes('cdn.jsdelivr.net') ||
-        request.url.includes('apis.google.com') || 
-        request.url.includes('facebook.com') ||
-        request.url.includes('google-analytics.com') ||
-        request.url.includes('firebase.googleapis.com') ||
-        request.url.includes('firebaseinstallations.googleapis.com') ||
-        request.url.includes('googletagmanager.com') ||
-        request.url.includes('api.producthunt.com')) {
-        console.log('🚫 External resource detected, bypassing cache:', sanitizeUrl(request.url));
-        return fetch(request);
-    }
-    
-    const cache = await caches.open(DYNAMIC_CACHE);
-    const cachedResponse = await cache.match(request);
-    
-    const fetchPromise = fetch(request).then(networkResponse => {
-        // Do not cache partial (206) or non-OK responses
-        if (!networkResponse || !networkResponse.ok || networkResponse.status === 206) {
-            return networkResponse;
-        }
-        // Triple-check method before caching
-        if (request.method !== 'POST' && request.method !== 'PUT' && request.method !== 'DELETE') {
-            try { cache.put(request, networkResponse.clone()); } catch (e) { console.warn('Cache put failed (SWR):', e); }
-        }
-        return networkResponse;
-    }).catch(error => {
-        console.error('❌ Network failed for stale-while-revalidate:', error);
-        // Always return a Response to avoid unhandled promise rejections
-        return new Response('Network error', { status: 502 });
-    });
-    
-    return cachedResponse || fetchPromise;
-}
-
-async function networkOnly(request) {
-    try {
-        return await fetch(request);
-    } catch (error) {
-        console.error('❌ Network failed:', error);
-        return new Response('Offline', { status: 503 });
-    }
-}
-
-// Determine cache strategy based on URL
-function getCacheStrategy(url) {
-    // Static assets
-    if (url.pathname.includes('.js') || 
-        url.pathname.includes('.css') || 
-        url.pathname.includes('.woff') ||
-        url.pathname.includes('.woff2') ||
-        url.pathname.includes('.ttf')) {
-        return 'cache-first';
-    }
-    
-    // Images
-    if (url.pathname.includes('.jpg') || 
-        url.pathname.includes('.jpeg') || 
-        url.pathname.includes('.png') || 
-        url.pathname.includes('.gif') || 
-        url.pathname.includes('.svg') ||
-        url.pathname.includes('.webp')) {
-        return 'stale-while-revalidate';
-    }
-    // Audio
-    if (url.pathname.includes('.mp3') || url.pathname.includes('.wav') || url.pathname.includes('.ogg')) {
-        return 'network-only';
-    }
-    
-    // API calls
-    if (url.pathname.includes('/api/') || 
-        url.hostname.includes('firebase') ||
-        url.hostname.includes('googleapis')) {
-        return 'network-first';
-    }
-    
-    // HTML pages
-    if (url.pathname.endsWith('.html') || url.pathname === '/') {
-        return 'stale-while-revalidate';
-    }
-    
-    // Default to network-first for unknown types
-    return 'network-first';
-}
 
 // Background sync for offline actions
-self.addEventListener('sync', (event) => {
-    console.log('🔄 Background sync triggered:', event.tag);
-    
-    if (event.tag === 'background-sync') {
-        event.waitUntil(doBackgroundSync());
-    }
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-user-data') {
+    event.waitUntil(syncUserData());
+  }
 });
 
-async function doBackgroundSync() {
-    try {
-        // Sync offline data when connection is restored
-        const offlineData = await getOfflineData();
-        
-        for (const data of offlineData) {
-            try {
-                await syncOfflineAction(data);
-            } catch (error) {
-                console.error('❌ Failed to sync offline action:', error);
-            }
-        }
-        
-        console.log('✅ Background sync completed');
-    } catch (error) {
-        console.error('❌ Background sync failed:', error);
-    }
-}
-
-// Get offline data from IndexedDB
-async function getOfflineData() {
-    // This would integrate with the app's IndexedDB storage
-    return [];
-}
-
-// Sync offline action to server
-async function syncOfflineAction(data) {
-    // Implementation would depend on the specific action type
-    console.log('🔄 Syncing offline action:', data);
-}
-
-// Push notification handling
-self.addEventListener('push', (event) => {
-    console.log('📱 Push notification received');
-    
-    const options = {
-        body: event.data ? event.data.text() : 'New notification from Operator Uplift',
-        icon: '/icon-192x192.png',
-        badge: '/badge-72x72.png',
-        vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        },
-        actions: [
-            {
-                action: 'explore',
-                title: 'Open App',
-                icon: '/icon-192x192.png'
-            },
-            {
-                action: 'close',
-                title: 'Close',
-                icon: '/icon-192x192.png'
-            }
-        ]
+async function syncUserData() {
+  // Sync localStorage data to server when online
+  try {
+    const data = {
+      xp: localStorage.getItem('userXP'),
+      tokens: localStorage.getItem('userTokens'),
+      achievements: localStorage.getItem('unlockedAchievements'),
+      streak: localStorage.getItem('currentStreak')
     };
     
+    // Send to server when API is ready
+    console.log('Ready to sync:', data);
+  } catch (error) {
+    console.error('Sync failed:', error);
+  }
+}
+
+// Push notifications
+self.addEventListener('push', event => {
+  const options = {
+    body: event.data ? event.data.text() : 'Time for your focus session!',
+    icon: '/Operator Uplift LOGO PNG 2.png',
+    badge: '/Operator Uplift LOGO PNG 2.png',
+    vibrate: [200, 100, 200],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    },
+    actions: [
+      {
+        action: 'start',
+        title: 'Start Focus',
+        icon: '/icons/timer.png'
+      },
+      {
+        action: 'close',
+        title: 'Dismiss',
+        icon: '/icons/close.png'
+      }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification('Operator Uplift', options)
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  if (event.action === 'start') {
+    // Open app and start focus session
     event.waitUntil(
-        self.registration.showNotification('Operator Uplift', options)
+      clients.openWindow('/app.html#focus')
     );
+  }
 });
-
-// Notification click handling
-self.addEventListener('notificationclick', (event) => {
-    console.log('👆 Notification clicked:', event.action);
-    
-    event.notification.close();
-    
-    if (event.action === 'explore') {
-        event.waitUntil(
-            clients.openWindow('/Operator_Uplift_Complete.html')
-        );
-    }
-});
-
-// Message handling from main thread
-self.addEventListener('message', (event) => {
-    console.log('💬 Message received in SW:', event.data);
-    
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-    
-    if (event.data && event.data.type === 'CACHE_URLS') {
-        event.waitUntil(
-            caches.open(DYNAMIC_CACHE)
-                .then(cache => cache.addAll(event.data.urls))
-        );
-    }
-});
-
-// Error handling
-self.addEventListener('error', (event) => {
-    console.error('❌ Service Worker error:', event.error);
-});
-
-// Unhandled rejection handling
-self.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Service Worker unhandled rejection:', event.reason);
-});
-
-console.log('🚀 Enhanced Service Worker loaded successfully!'); 
