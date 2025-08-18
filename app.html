@@ -936,6 +936,10 @@
                 display: flex;
             }
 
+            .menu-toggle {
+                display: none;
+            }
+
             .sidebar {
                 position: fixed;
                 left: 0;
@@ -2629,27 +2633,55 @@
     };
     
     // AI Chat functions
-    window.sendChatMessage = function() {
+    window.sendChatMessage = async function() {
         const input = document.getElementById('chatInput');
         const messages = document.getElementById('chatMessages');
         
         if (input && input.value && messages) {
+            const userMessage = input.value;
+            
             // Add user message
             const userMsg = document.createElement('div');
             userMsg.style.cssText = 'margin-bottom: 1rem; text-align: right;';
-            userMsg.innerHTML = `<div style="background: rgba(255,255,255,0.1); color: var(--text-primary); padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">${input.value}</div>`;
+            userMsg.innerHTML = `<div style="background: rgba(255,255,255,0.1); color: var(--text-primary); padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">${userMessage}</div>`;
             messages.appendChild(userMsg);
             
-            // Simulate AI response
-            setTimeout(() => {
+            // Add loading indicator
+            const loadingMsg = document.createElement('div');
+            loadingMsg.style.cssText = 'margin-bottom: 1rem;';
+            loadingMsg.innerHTML = `<div style="background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">🤖 Thinking...</div>`;
+            messages.appendChild(loadingMsg);
+            messages.scrollTop = messages.scrollHeight;
+            
+            // Clear input immediately
+            input.value = '';
+            
+            try {
+                // Call real AI function
+                const aiResponse = await window.sendAIMessage(userMessage);
+                
+                // Remove loading message
+                loadingMsg.remove();
+                
+                // Add AI response
                 const aiMsg = document.createElement('div');
                 aiMsg.style.cssText = 'margin-bottom: 1rem;';
-                aiMsg.innerHTML = `<div style="background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">I'm processing your request. This feature will connect to AI services soon!</div>`;
+                aiMsg.innerHTML = `<div style="background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">${aiResponse}</div>`;
                 messages.appendChild(aiMsg);
-                messages.scrollTop = messages.scrollHeight;
-            }, 500);
+                
+            } catch (error) {
+                // Remove loading message
+                loadingMsg.remove();
+                
+                // Add error message
+                const errorMsg = document.createElement('div');
+                errorMsg.style.cssText = 'margin-bottom: 1rem;';
+                errorMsg.innerHTML = `<div style="background: #ef4444; color: white; padding: 0.75rem; border-radius: 8px; display: inline-block; max-width: 70%;">Sorry, I'm having trouble connecting right now. Please try again later.</div>`;
+                messages.appendChild(errorMsg);
+                
+                console.error('AI chat error:', error);
+            }
             
-            input.value = '';
             messages.scrollTop = messages.scrollHeight;
         }
     };
@@ -5603,10 +5635,6 @@
         }
         
         // Goal Management Functions
-        function openCreateGoalModal() {
-            showToast('Goal creation modal coming soon!', 'info');
-        }
-        
         function updateGoalProgress(goalId, amount) {
             const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
             const goal = goals.find(g => g.id === goalId);
@@ -5637,10 +5665,6 @@
         }
         
         // Habit Functions
-        function openCreateHabitModal() {
-            showToast('Habit creation modal coming soon!', 'info');
-        }
-        
         function toggleHabit(habitId) {
             const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
             const habit = habits.find(h => h.id === habitId);
