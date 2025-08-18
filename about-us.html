@@ -3,44 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Operator Uplift</title>
-    <link rel="icon" href="Operator Uplift LOGO PNG 2.png" type="image/png">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>About Us - Operator Uplift | AI-Powered Self-Progression Platform</title>
+    <meta name="description" content="Learn about Operator Uplift, the AI-powered self-progression platform founded by Matt Sim. Discover our vision, features, and roadmap for transforming ambitious goals into actionable plans.">
+    <meta property="og:title" content="About Us - Operator Uplift">
+    <meta property="og:description" content="Learn about Operator Uplift, the AI-powered self-progression platform founded by Matt Sim. Discover our vision, features, and roadmap.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://operatoruplift.netlify.app/about-us">
+    <meta property="og:image" content="/Website Thumbnail Operator Uplift.png">
+    <meta name="twitter:image" content="/Website Thumbnail Operator Uplift.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@OperatorUplift">
+    <meta name="author" content="Operator Uplift">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f97316">
+    <link rel="canonical" href="https://operatoruplift.netlify.app/about-us">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --primary-color: #f97316;
             --primary-dark: #ea580c;
             --primary-light: #fb923c;
-            --accent-color: #ff6b35;
-            --secondary-color: #fbbf24;
-            
-            --bg-dark: #0a0a0a;
-            --bg-darker: #000000;
-            --bg-lighter: #1a1a1a;
-            --bg-card: rgba(15, 15, 15, 0.95);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.1);
-            
-            --text-primary: #ffffff;
-            --text-secondary: #a3a3a3;
-            --text-muted: #737373;
-            
-            --border-color: rgba(249, 115, 22, 0.2);
-            --border-light: rgba(255, 255, 255, 0.1);
-            
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
+            --secondary-color: #f97316;
+            --secondary-dark: #ea580c;
+            --accent-color: #f97316;
+            --accent-light: #fb923c;
+            --accent-hover: #fb923c;
+            --accent-glow: rgba(249, 115, 22, 0.6);
+            --bg-color: #0a0a0a;
+            --text-color: #e5e7eb;
+            --text-muted-color: #9ca3af;
+            --dark-card: rgba(24, 24, 27, 0.5);
+            --dark-card-hover: rgba(24, 24, 27, 0.7);
+            --text-light: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color-light: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            --gradient-accent: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            --gradient-hero: linear-gradient(135deg, #0a0a0a 0%, #1f2937 50%, #374151 100%);
+        }
+
+        /* Hero gradient wrapper for dynamic background */
+        .hero-gradient-wrapper {
+            position: relative;
+        }
+        
+        .hero-gradient-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60vh;
+            background: radial-gradient(ellipse at top, rgba(249, 115, 22, 0.1) 0%, transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        header, main {
+            position: relative;
+            z-index: 2;
         }
 
         * {
@@ -49,182 +83,605 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
+        html {
+            scroll-behavior: smooth;
         }
 
+        /* Ensure smooth scrolling for all browsers */
+        * {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Glass morphism cards */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
         }
 
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-color-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gradient text */
         .gradient-text {
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-container .logo { grid-column: 1; justify-self: start; }
+        .nav-container .nav-links { grid-column: 2; justify-self: center; }
+        .nav-container .cta-button { grid-column: 3; justify-self: end; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+        .logo:hover {
+            transform: scale(1.05);
         }
 
-        .nav-link {
-            color: var(--text-secondary);
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
             text-decoration: none;
-            transition: color 0.3s ease;
             font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
         }
 
-        .nav-link:hover {
-            color: var(--primary-color);
+        .nav-links a:hover {
+            color: var(--accent-color);
         }
 
-        .nav-link.active {
-            color: var(--primary-color);
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
         }
 
-        .hero-section {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(255, 107, 53, 0.1));
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger-icon span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-light);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1001;
+            padding: 2rem;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mobile-menu a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.25rem;
+            padding: 1rem 0;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
+        .mobile-menu-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero section */
+        .hero-section {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Content sections */
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .content-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 2rem;
             transition: all 0.3s ease;
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
-            box-shadow: 0 20px 40px rgba(249, 115, 22, 0.1);
+        .content-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .card-content {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Feature highlights */
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.05));
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: var(--text-muted);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .feature-list li::before {
+            content: '🚀';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+        }
+
+        /* Roadmap */
+        .roadmap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .roadmap-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .roadmap-item:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+        }
+
+        .roadmap-phase {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-timeline {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .roadmap-description {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Team section */
+        .team-section {
+            text-align: center;
+            margin: 4rem 0;
         }
 
         .team-member {
-            text-align: center;
-            padding: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
-        .team-member img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-role {
+            color: var(--text-muted);
             margin-bottom: 1rem;
-            border: 3px solid var(--primary-color);
         }
 
-        .timeline-item {
-            position: relative;
-            padding-left: 2rem;
+        .team-bio {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Call to action */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.05));
+            border-radius: 24px;
+            margin: 4rem 0;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .cta-description {
+            font-size: 1.125rem;
+            color: var(--text-muted);
             margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 12px;
-            height: 12px;
-            background: var(--primary-color);
-            border-radius: 50%;
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            left: 5px;
-            top: 12px;
-            width: 2px;
-            height: calc(100% + 1rem);
-            background: var(--border-light);
+        /* Footer */
+        footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
         }
 
-        .timeline-item:last-child::after {
-            display: none;
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-bottom {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .roadmap {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideInLeft 0.6s ease forwards;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(30px);
+            animation: slideInRight 0.6s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Scroll animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Utility classes */
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="glass-card sticky top-0 z-50 mx-4 mt-4 mb-8">
-        <div class="flex items-center justify-between p-4">
-            <div class="flex items-center space-x-4">
-                <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" class="w-10 h-10">
-                <span class="text-xl font-bold gradient-text">Operator Uplift</span>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" style="width:24px;height:24px;object-fit:contain;filter: drop-shadow(0 0 3px var(--accent-color));">
+                <span style="color: white; white-space: nowrap; position: relative; overflow: hidden; cursor: pointer;" class="ripple-effect">Operator Uplift</span>
             </div>
-            
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="app.html" class="nav-link">App</a>
-                <a href="uplift-token.html" class="nav-link">Uplift Token</a>
-                <a href="mvp-launch-page.html" class="nav-link">MVP Launch</a>
-                <a href="press-release.html" class="nav-link">Press Release</a>
-                <a href="about-us.html" class="nav-link active">About Us</a>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="app.html" class="btn-primary">Launch App</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about-us.html">About Us</a></li>
+                <li><a href="mvp-launch-page.html">MVP</a></li>
+                <li><a href="uplift-token.html">$UPLIFT</a></li>
+                <li><a href="press-release.html">Press</a></li>
+            </ul>
+            <a href="app.html" class="cta-button desktop-only">Launch App</a>
+            <div class="mobile-menu-toggle">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html">Home</a>
+        <a href="about-us.html">About Us</a>
+        <a href="mvp-launch-page.html">MVP</a>
+        <a href="uplift-token.html">$UPLIFT</a>
+        <a href="press-release.html">Press</a>
+        <a href="app.html">Launch App</a>
+        <button class="mobile-menu-close">✕</button>
+    </div>
+
     <!-- Hero Section -->
-    <section class="hero-section py-20 px-4">
-        <div class="max-w-6xl mx-auto text-center">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+    <section class="hero-section hero-gradient-wrapper">
+        <div class="container mx-auto">
+            <h1 class="hero-title fade-in">
                 About <span class="gradient-text">Operator Uplift</span>
             </h1>
-            <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                We're building the future of elite performance through AI-powered goal achievement, 
-                gamified productivity, and blockchain-based rewards.
+            <p class="hero-subtitle fade-in">
+                Discover the story behind the AI-powered self-progression platform that's transforming ambitious goals into actionable, psychologically optimized plans.
             </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="app.html" class="btn-primary">
+            <div class="cta-buttons fade-in">
+                <a href="app.html" class="cta-button">
                     <i class="fas fa-rocket mr-2"></i>Start Your Journey
                 </a>
-                <a href="uplift-token.html" class="btn-primary" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                    <i class="fas fa-coins mr-2"></i>Learn About UPLIFT
+                <a href="uplift-token.html" class="cta-button" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                    <i class="fas fa-coins mr-2"></i>Learn About $UPLIFT
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Mission Section -->
-    <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto">
+    <section class="content-section">
+        <div class="container mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6">Our Mission</h2>
-                <p class="text-xl text-gray-300 max-w-4xl mx-auto">
+                <h2 class="section-title slide-in-left">Our Mission</h2>
+                <p class="section-subtitle slide-in-right">
                     To democratize elite performance by making advanced productivity tools, 
                     AI coaching, and financial rewards accessible to everyone.
                 </p>
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="feature-card text-center">
+            <div class="content-grid">
+                <div class="content-card text-center animate-on-scroll">
                     <div class="text-4xl mb-4">🚀</div>
                     <h3 class="text-xl font-semibold mb-3">Elite Performance</h3>
                     <p class="text-gray-400">
@@ -233,7 +690,7 @@
                     </p>
                 </div>
                 
-                <div class="feature-card text-center">
+                <div class="content-card text-center animate-on-scroll">
                     <div class="text-4xl mb-4">🤖</div>
                     <h3 class="text-xl font-semibold mb-3">AI Coaching</h3>
                     <p class="text-gray-400">
@@ -242,7 +699,7 @@
                     </p>
                 </div>
                 
-                <div class="feature-card text-center">
+                <div class="content-card text-center animate-on-scroll">
                     <div class="text-4xl mb-4">💰</div>
                     <h3 class="text-xl font-semibold mb-3">Earn Rewards</h3>
                     <p class="text-gray-400">
@@ -255,18 +712,18 @@
     </section>
 
     <!-- Story Section -->
-    <section class="py-20 px-4 bg-gray-900">
-        <div class="max-w-6xl mx-auto">
+    <section class="content-section bg-gray-900">
+        <div class="container mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6">Our Story</h2>
-                <p class="text-xl text-gray-300 max-w-4xl mx-auto">
+                <h2 class="section-title slide-in-left">Our Story</h2>
+                <p class="section-subtitle slide-in-right">
                     Born from the belief that everyone deserves access to elite performance tools, 
                     Operator Uplift started as a vision to bridge the gap between aspiration and achievement.
                 </p>
             </div>
             
             <div class="max-w-4xl mx-auto">
-                <div class="timeline-item">
+                <div class="timeline-item animate-on-scroll">
                     <h3 class="text-xl font-semibold mb-2">2024 - The Vision</h3>
                     <p class="text-gray-400">
                         The idea for Operator Uplift was born from observing how elite performers 
@@ -274,7 +731,7 @@
                     </p>
                 </div>
                 
-                <div class="timeline-item">
+                <div class="timeline-item animate-on-scroll">
                     <h3 class="text-xl font-semibold mb-2">2024 - Development</h3>
                     <p class="text-gray-400">
                         Our team of developers, designers, and performance experts began building 
@@ -282,7 +739,7 @@
                     </p>
                 </div>
                 
-                <div class="timeline-item">
+                <div class="timeline-item animate-on-scroll">
                     <h3 class="text-xl font-semibold mb-2">2024 - MVP Launch</h3>
                     <p class="text-gray-400">
                         We launched our Minimum Viable Product, bringing AI coaching, goal tracking, 
@@ -290,7 +747,7 @@
                     </p>
                 </div>
                 
-                <div class="timeline-item">
+                <div class="timeline-item animate-on-scroll">
                     <h3 class="text-xl font-semibold mb-2">2024 - Future Vision</h3>
                     <p class="text-gray-400">
                         We're building toward a future where anyone can access the tools and systems 
@@ -302,18 +759,18 @@
     </section>
 
     <!-- Team Section -->
-    <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto">
+    <section class="content-section">
+        <div class="container mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6">Our Team</h2>
-                <p class="text-xl text-gray-300 max-w-4xl mx-auto">
+                <h2 class="section-title slide-in-left">Our Team</h2>
+                <p class="section-subtitle slide-in-right">
                     Meet the passionate individuals behind Operator Uplift, dedicated to 
                     revolutionizing how people achieve their goals.
                 </p>
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="team-member">
+            <div class="content-grid">
+                <div class="team-member animate-on-scroll">
                     <div class="w-32 h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
                         👨‍💻
                     </div>
@@ -323,7 +780,7 @@
                     </p>
                 </div>
                 
-                <div class="team-member">
+                <div class="team-member animate-on-scroll">
                     <div class="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
                         🎨
                     </div>
@@ -333,7 +790,7 @@
                     </p>
                 </div>
                 
-                <div class="team-member">
+                <div class="team-member animate-on-scroll">
                     <div class="w-32 h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
                         🧠
                     </div>
@@ -347,17 +804,17 @@
     </section>
 
     <!-- Values Section -->
-    <section class="py-20 px-4 bg-gray-900">
-        <div class="max-w-6xl mx-auto">
+    <section class="content-section bg-gray-900">
+        <div class="container mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6">Our Values</h2>
-                <p class="text-xl text-gray-300 max-w-4xl mx-auto">
+                <h2 class="section-title slide-in-left">Our Values</h2>
+                <p class="section-subtitle slide-in-right">
                     The principles that guide everything we do at Operator Uplift.
                 </p>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="feature-card">
+            <div class="content-grid">
+                <div class="content-card animate-on-scroll">
                     <h3 class="text-2xl font-semibold mb-4 text-orange-400">
                         <i class="fas fa-users mr-2"></i>Accessibility
                     </h3>
@@ -367,7 +824,7 @@
                     </p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="content-card animate-on-scroll">
                     <h3 class="text-2xl font-semibold mb-4 text-blue-400">
                         <i class="fas fa-lightbulb mr-2"></i>Innovation
                     </h3>
@@ -377,8 +834,8 @@
                     </p>
                 </div>
                 
-                <div class="feature-card">
-                    <h3 class="text-2xl font-semibold mb-4 text-green-400">
+                <div class="content-card animate-on-scroll">
+                    <h3 class="text-xl font-semibold mb-4 text-green-400">
                         <i class="fas fa-heart mr-2"></i>User-Centric
                     </h3>
                     <p class="text-gray-400">
@@ -387,8 +844,8 @@
                     </p>
                 </div>
                 
-                <div class="feature-card">
-                    <h3 class="text-2xl font-semibold mb-4 text-purple-400">
+                <div class="content-card animate-on-scroll">
+                    <h3 class="text-xl font-semibold mb-4 text-purple-400">
                         <i class="fas fa-shield-alt mr-2"></i>Transparency
                     </h3>
                     <p class="text-gray-400">
@@ -401,17 +858,17 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 px-4">
+    <section class="content-section">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-6">Ready to Transform Your Performance?</h2>
-            <p class="text-xl text-gray-300 mb-8">
+            <h2 class="cta-title slide-in-left">Ready to Transform Your Performance?</h2>
+            <p class="cta-description slide-in-right">
                 Join thousands of users who are already achieving their goals with Operator Uplift.
             </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="app.html" class="btn-primary text-lg px-8 py-4">
+            <div class="cta-buttons">
+                <a href="app.html" class="cta-button text-lg px-8 py-4">
                     <i class="fas fa-rocket mr-2"></i>Launch App
                 </a>
-                <a href="uplift-token.html" class="btn-primary text-lg px-8 py-4" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                <a href="uplift-token.html" class="cta-button text-lg px-8 py-4" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
                     <i class="fas fa-coins mr-2"></i>Learn About UPLIFT
                 </a>
             </div>
@@ -419,80 +876,65 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 py-12 px-4 border-t border-gray-800">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <img src="Operator Uplift LOGO PNG 2.png" alt="Operator Uplift" class="w-8 h-8">
-                        <span class="text-lg font-bold gradient-text">Operator Uplift</span>
-                    </div>
-                    <p class="text-gray-400">
-                        Transforming productivity through AI-powered goal achievement and blockchain rewards.
-                    </p>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Product</h4>
-                    <ul class="space-y-2">
-                        <li><a href="app.html" class="text-gray-400 hover:text-white transition-colors">App</a></li>
-                        <li><a href="uplift-token.html" class="text-gray-400 hover:text-white transition-colors">UPLIFT Token</a></li>
-                        <li><a href="mvp-launch-page.html" class="text-gray-400 hover:text-white transition-colors">MVP Launch</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Company</h4>
-                    <ul class="space-y-2">
-                        <li><a href="about-us.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                        <li><a href="press-release.html" class="text-gray-400 hover:text-white transition-colors">Press Release</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Connect</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
-                            <i class="fab fa-discord"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
-                            <i class="fab fa-telegram"></i>
-                        </a>
-                    </div>
-                </div>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about-us.html">About Us</a>
+                <a href="mvp-launch-page.html">MVP</a>
+                <a href="uplift-token.html">$UPLIFT</a>
+                <a href="press-release.html">Press</a>
+                <a href="app.html">Launch App</a>
             </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Operator Uplift. All rights reserved.</p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Operator Uplift. Built with ❤️ during The Residency's Delta Sprint.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Mobile Menu Toggle Script -->
     <script>
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileMenu.style.display = 'flex';
+            });
+            
+            document.querySelector('.mobile-menu-close').addEventListener('click', function() {
+                mobileMenu.style.display = 'none';
+            });
+            
+            // Close mobile menu when clicking on a link
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.style.display = 'none';
+                });
             });
         });
+    </script>
 
-        // Add active state to navigation
-        const currentPage = window.location.pathname.split('/').pop();
-        document.querySelectorAll('.nav-link').forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
-                link.classList.add('active');
-            }
-        });
+    <!-- Scroll Animation Script -->
+    <script>
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('animated');
+                }
+            });
+        }
+        
+        // Add scroll event listener
+        window.addEventListener('scroll', animateOnScroll);
+        
+        // Initial check for elements already in view
+        window.addEventListener('load', animateOnScroll);
     </script>
 </body>
 </html>
