@@ -305,24 +305,11 @@
     </style>
 </head>
 <body>
-    <!-- Landing Points -->
-    <div id="landingPoints" style="position: fixed; right: 16px; top: 90px; z-index: 20; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.15); padding: 6px 10px; border-radius: 10px;">
-        <span aria-hidden="true" style="font-size: 18px">🟠</span>
-        <span id="landingPointsText" style="font-weight: 600;">PTS: 0</span>
-    </div>
 
-    <!-- Music Controls -->
-    <div class="music-controls" style="position: fixed; top: 90px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px; cursor: pointer; transition: all 0.3s ease;">
-        <button class="music-btn" id="music-toggle" title="Toggle Music" style="background: none; border: none; color: #f97316; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; transition: all 0.3s ease;">
-            🎵
-        </button>
-    </div>
 
-    <!-- Background Music -->
-    <audio id="background-music" loop>
-        <source src="music.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+
+
+
 
     <div class="container">
         <div class="login-card">
@@ -383,43 +370,7 @@
     </div>
 
     <script>
-        // Music functionality
-        const music = document.getElementById('background-music');
-        const musicToggle = document.getElementById('music-toggle');
-        let isMusicPlaying = false;
-        let isMuted = false;
 
-        // Set initial volume to 10%
-        music.volume = 0.1;
-
-        // Music toggle functionality
-        musicToggle.addEventListener('click', () => {
-            if (isMuted) {
-                // Unmute
-                music.volume = 0.1;
-                musicToggle.textContent = '🎵';
-                musicToggle.classList.remove('muted');
-                isMuted = false;
-            } else {
-                // Mute
-                music.volume = 0;
-                musicToggle.textContent = '🔇';
-                musicToggle.classList.add('muted');
-                isMuted = true;
-            }
-        });
-
-        // Auto-play music when page loads (with user interaction)
-        document.addEventListener('click', () => {
-            if (!isMusicPlaying) {
-                music.play().then(() => {
-                    isMusicPlaying = true;
-                    console.log('Music started playing');
-                }).catch(error => {
-                    console.log('Music autoplay failed:', error);
-                });
-            }
-        }, { once: true });
 
         // Form switching
         const loginForm = document.getElementById('login-form');
