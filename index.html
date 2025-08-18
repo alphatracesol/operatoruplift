@@ -208,6 +208,12 @@
         .burn-icon .flame, .burn-icon .embers { animation: none !important; }
         .cta-button { transition: none; }
       }
+
+      /* Gold highlight glow effect for $UPLIFT navigation */
+      .glow-gold { 
+        color: #ffd166; 
+        text-shadow: 0 0 12px rgba(255, 215, 0, .6), 0 0 22px rgba(255, 140, 0, .4); 
+      }
     </style>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1462196764930097&ev=PageView&noscript=1"
@@ -223,8 +229,42 @@
                 <!-- Preload hero image for better performance -->
             
                 
-                <!-- Service Worker for caching -->
+                <!-- Service Worker for caching and cache reset -->
                 <script>
+                    // Reset cache for all users on every load
+                    if ('caches' in window) {
+                        caches.keys().then(cacheNames => {
+                            cacheNames.forEach(cacheName => {
+                                caches.delete(cacheName);
+                                console.log('🗑️ Cache cleared:', cacheName);
+                            });
+                        });
+                    }
+                    
+                    // Clear service worker cache
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then(registrations => {
+                            registrations.forEach(registration => {
+                                registration.unregister();
+                                console.log('🔄 Service Worker unregistered');
+                            });
+                        });
+                    }
+                    
+                    // Clear localStorage items that might cause stale data
+                    const keysToKeep = ['uplift:hf_token', 'uplift:user_profile', 'uplift:goals', 'uplift:habits'];
+                    const allKeys = Object.keys(localStorage);
+                    allKeys.forEach(key => {
+                        if (!keysToKeep.includes(key)) {
+                            localStorage.removeItem(key);
+                            console.log('🗑️ localStorage cleared:', key);
+                        }
+                    });
+                    
+                    // Clear sessionStorage
+                    sessionStorage.clear();
+                    console.log('🗑️ sessionStorage cleared');
+                    
                     if ('serviceWorker' in navigator) {
                         window.addEventListener('load', () => {
                             navigator.serviceWorker.register('/sw.js').catch(console.error);
@@ -2966,12 +3006,11 @@
                 <span style="color: white; white-space: nowrap; position: relative; overflow: hidden; cursor: pointer;" class="ripple-effect">Operator Uplift</span>
             </div>
             <ul class="nav-links">
-                <li><a href="uplift-token.html">$UPLIFT</a></li>
+                <li><a href="uplift-token.html" class="glow-gold">$UPLIFT</a></li>
+                <li><a href="MVP Launch Page.html">MVP</a></li>
                 <li><a href="press-release.html">Press Release</a></li>
                 <li><a href="about-us.html">About Us</a></li>
-                <li><a href="MVP Launch Page.html">MVP</a></li>
             </ul>
-            <button id="phantom-connect" class="phantom-button desktop-only">Connect Wallet</button>
             <a href="app.html" class="cta-button desktop-only">Launch App</a>
             <div class="mobile-menu-toggle">
                 <div class="hamburger-icon">
@@ -2985,10 +3024,10 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <a href="uplift-token.html">$UPLIFT</a>
+        <a href="uplift-token.html" class="glow-gold">$UPLIFT</a>
+        <a href="MVP Launch Page.html">MVP</a>
         <a href="press-release.html">Press Release</a>
         <a href="about-us.html">About Us</a>
-        <a href="MVP Launch Page.html">MVP</a>
         <a href="app.html">Launch App</a>
         <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
     </div>
@@ -4706,101 +4745,7 @@
             }
         }
 
-        // --- Phantom Wallet Connection ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const phantomButton = document.getElementById('phantom-connect');
-            if (phantomButton) {
-                phantomButton.addEventListener('click', async () => {
-                    await phantomLogin();
-                });
 
-                // Check if already connected on page load
-                const isConnected = localStorage.getItem('phantomConnected');
-                const publicKey = localStorage.getItem('phantomPublicKey');
-                const phantomProvider = window.solana || window.phantom?.solana;
-                if (isConnected && publicKey && phantomProvider && (phantomProvider.isPhantom || window.phantom?.solana)) {
-                    connectAccountAnimation(publicKey);
-                }
-            }
-        });
-
-        // Enhanced Phantom Login Function
-        async function phantomLogin() {
-            // Debug logging
-            console.log('🔍 Checking for Phantom wallet...');
-            console.log('window.solana:', window.solana);
-            console.log('window.phantom:', window.phantom);
-            
-            // More robust Phantom detection
-            const isPhantomInstalled = window.solana && window.solana.isPhantom;
-            const isPhantomAvailable = window.phantom && window.phantom.solana;
-            
-            console.log('isPhantomInstalled:', isPhantomInstalled);
-            console.log('isPhantomAvailable:', isPhantomAvailable);
-            
-            if (!isPhantomInstalled && !isPhantomAvailable) {
-                console.log('❌ Phantom not detected');
-                alert("Phantom browser extension is not detected! Please install it from https://phantom.app/");
-                window.open('https://phantom.app/', '_blank');
-                return;
-            }
-            
-            // Use the available Phantom provider
-            const phantomProvider = window.solana || window.phantom?.solana;
-
-            try {
-                // Check if already connected
-                if (phantomProvider.isConnected) {
-                    // Disconnect
-                    await phantomProvider.disconnect();
-                    const phantomButton = document.getElementById('phantom-connect');
-                    phantomButton.textContent = 'Connect Wallet';
-                    phantomButton.style.background = 'linear-gradient(135deg, #9945FF 0%, #14F195 100%)';
-                    localStorage.removeItem('phantomConnected');
-                    localStorage.removeItem('phantomPublicKey');
-                    console.log('Disconnected from Phantom wallet');
-                    return;
-                }
-
-                // Connect to Phantom
-                const resp = await phantomProvider.connect();
-                const publicKey = resp.publicKey.toString();
-                connectAccountAnimation(publicKey);
-                
-            } catch (err) {
-                console.error('Phantom connection error:', err);
-                if (err.code === 4001) {
-                    alert('Connection was rejected by user');
-                } else {
-                    alert('Failed to connect to Phantom wallet. Please try again.');
-                }
-            }
-        }
-
-        // Enhanced Account Animation Function
-        async function connectAccountAnimation(publicKey) {
-            const phantomButton = document.getElementById('phantom-connect');
-            
-            // Update button text with truncated public key
-            phantomButton.textContent = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
-            phantomButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-            
-            // Store connection state
-            localStorage.setItem('phantomConnected', 'true');
-            localStorage.setItem('phantomPublicKey', publicKey);
-            try { localStorage.setItem('uplift:wallet', publicKey); } catch {}
-            
-            console.log('Connected to Phantom wallet:', publicKey);
-            
-            // Optional: Show balance if Solana Web3.js is available
-            if (typeof solanaWeb3 !== 'undefined') {
-                try {
-                    await showBalance(publicKey);
-                } catch (error) {
-                    console.log('Could not fetch balance:', error);
-                }
-            }
-        }
 
         // Enhanced Balance Display Function
         async function showBalance(publicKey) {

@@ -1675,13 +1675,7 @@
         setTimeout(() => toast.remove(), 3000);
     };
     
-    window.createPost = function() {
-        const content = document.getElementById('postContent')?.value;
-        if (content) {
-            showToast('Posted!', 'success');
-            document.getElementById('postContent').value = '';
-        }
-    };
+
     
     // Add all other missing view creators
     window.createGoalsView = function() {
@@ -2664,8 +2658,42 @@
         }
     };
     
-    // Load saved token on startup
+    // Load saved token on startup and reset cache
     window.addEventListener('DOMContentLoaded', () => {
+        // Reset cache for all users on every load
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    caches.delete(cacheName);
+                    console.log('🗑️ Cache cleared:', cacheName);
+                });
+            });
+        }
+        
+        // Clear service worker cache
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(registration => {
+                    registration.unregister();
+                    console.log('🔄 Service Worker unregistered');
+                });
+            });
+        }
+        
+        // Clear localStorage items that might cause stale data
+        const keysToKeep = ['uplift:hf_token', 'uplift:user_profile', 'uplift:goals', 'uplift:habits'];
+        const allKeys = Object.keys(localStorage);
+        allKeys.forEach(key => {
+            if (!keysToKeep.includes(key)) {
+                localStorage.removeItem(key);
+                console.log('🗑️ localStorage cleared:', key);
+            }
+        });
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+        console.log('🗑️ sessionStorage cleared');
+        
         const savedToken = localStorage.getItem('uplift:hf_token');
         if (savedToken) {
             window.setHuggingFaceToken(savedToken);

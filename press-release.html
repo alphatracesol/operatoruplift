@@ -122,6 +122,12 @@
             text-fill-color: transparent;
         }
 
+        /* Gold highlight glow effect for $UPLIFT navigation */
+        .glow-gold { 
+            color: #ffd166; 
+            text-shadow: 0 0 12px rgba(255, 215, 0, .6), 0 0 22px rgba(255, 140, 0, .4); 
+        }
+
         .bg-dark-card {
             background-color: rgba(24, 24, 27, 0.5);
         }
@@ -771,10 +777,10 @@
                 <span style="color: white; white-space: nowrap; position: relative; overflow: hidden; cursor: pointer;" class="ripple-effect">Operator Uplift</span>
             </div>
             <ul class="nav-links">
-                <li><a href="uplift-token.html">$UPLIFT</a></li>
+                <li><a href="uplift-token.html" class="glow-gold">$UPLIFT</a></li>
+                <li><a href="MVP Launch Page.html">MVP</a></li>
                 <li><a href="press-release.html">Press Release</a></li>
                 <li><a href="about-us.html">About Us</a></li>
-                <li><a href="MVP Launch Page.html">MVP</a></li>
             </ul>
             <a href="app.html" class="cta-button desktop-only">Launch App</a>
             <div class="mobile-menu-toggle">
@@ -789,10 +795,10 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <a href="uplift-token.html">$UPLIFT</a>
+        <a href="uplift-token.html" class="glow-gold">$UPLIFT</a>
+        <a href="MVP Launch Page.html">MVP</a>
         <a href="press-release.html">Press Release</a>
         <a href="about-us.html">About Us</a>
-        <a href="MVP Launch Page.html">MVP</a>
         <a href="app.html">Launch App</a>
         <button class="mobile-menu-close">✕</button>
     </div>
@@ -1630,6 +1636,43 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Points badge error:', e);
     }
   })();
-</script>
+    </script>
+    
+    <!-- Cache reset functionality -->
+    <script>
+        // Reset cache for all users on every load
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    caches.delete(cacheName);
+                    console.log('🗑️ Cache cleared:', cacheName);
+                });
+            });
+        }
+        
+        // Clear service worker cache
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(registration => {
+                    registration.unregister();
+                    console.log('🔄 Service Worker unregistered');
+                });
+            });
+        }
+        
+        // Clear localStorage items that might cause stale data
+        const keysToKeep = ['uplift:hf_token', 'uplift:user_profile', 'uplift:goals', 'uplift:habits'];
+        const allKeys = Object.keys(localStorage);
+        allKeys.forEach(key => {
+            if (!keysToKeep.includes(key)) {
+                localStorage.removeItem(key);
+                console.log('🗑️ localStorage cleared:', key);
+            }
+        });
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+        console.log('🗑️ sessionStorage cleared');
+    </script>
 </body>
 </html> 
