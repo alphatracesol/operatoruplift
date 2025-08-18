@@ -24,9 +24,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
             --primary-color: #f97316;
@@ -147,9 +144,6 @@
             gap: 2rem;
             align-items: center;
         }
-        .nav-container .logo { grid-column: 1; justify-self: start; }
-        .nav-container .nav-links { grid-column: 2; justify-self: center; }
-        .nav-container .cta-button { grid-column: 3; justify-self: end; }
 
         .logo {
             display: flex;
@@ -168,6 +162,7 @@
             list-style: none;
             gap: 2rem;
             align-items: center;
+            justify-self: center;
         }
 
         .nav-links a {
@@ -207,6 +202,7 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            justify-self: end;
         }
 
         .cta-button:hover {
@@ -599,17 +595,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-
-        /* Utility classes */
-        .mr-2 {
-            margin-right: 0.5rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
     </style>
 </head>
 <body>
@@ -658,102 +643,216 @@
             <p class="hero-subtitle fade-in">
                 Discover the story behind the AI-powered self-progression platform that's transforming ambitious goals into actionable, psychologically optimized plans.
             </p>
-            <div class="cta-buttons fade-in">
-                <a href="app.html" class="cta-button">
-                    <i class="fas fa-rocket mr-2"></i>Start Your Journey
-                </a>
-                <a href="uplift-token.html" class="cta-button" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                    <i class="fas fa-coins mr-2"></i>Learn About $UPLIFT
-                </a>
-            </div>
         </div>
     </section>
 
-    <!-- Mission Section -->
+    <!-- Executive Summary -->
     <section class="content-section">
         <div class="container mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="section-title slide-in-left">Our Mission</h2>
-                <p class="section-subtitle slide-in-right">
-                    To democratize elite performance by making advanced productivity tools, 
-                    AI coaching, and financial rewards accessible to everyone.
-                </p>
-            </div>
+            <h2 class="section-title slide-in-left">Executive Summary</h2>
+            <p class="section-subtitle slide-in-right">
+                Operator Uplift is an AI-powered self-progression platform that transforms ambitious goals into actionable, psychologically optimized plans.
+            </p>
             
-            <div class="content-grid">
-                <div class="content-card text-center animate-on-scroll">
-                    <div class="text-4xl mb-4">🚀</div>
-                    <h3 class="text-xl font-semibold mb-3">Elite Performance</h3>
-                    <p class="text-gray-400">
-                        Transform your productivity with AI-powered goal setting, habit tracking, 
-                        and performance optimization.
-                    </p>
-                </div>
-                
-                <div class="content-card text-center animate-on-scroll">
-                    <div class="text-4xl mb-4">🤖</div>
-                    <h3 class="text-xl font-semibold mb-3">AI Coaching</h3>
-                    <p class="text-gray-400">
-                        Get personalized guidance from our advanced AI that understands your goals, 
-                        personality, and progress patterns.
-                    </p>
-                </div>
-                
-                <div class="content-card text-center animate-on-scroll">
-                    <div class="text-4xl mb-4">💰</div>
-                    <h3 class="text-xl font-semibold mb-3">Earn Rewards</h3>
-                    <p class="text-gray-400">
-                        Turn your achievements into real value with UPLIFT tokens and 
-                        blockchain-based reward systems.
-                    </p>
-                </div>
+            <div class="content-card animate-on-scroll">
+                <p class="card-content">
+                    Founded by Matt Sim (@RVAClassic on X), the app addresses the "motivation gap"—the disconnect between visionary aspirations and daily execution—by leveraging advanced AI models like HuggingFace, gamified RPG elements, and frameworks such as Maslow's Hierarchy and the Four Temperaments. Launched as an MVP during The Residency's Delta sprint in July-August 2025, Operator Uplift has already garnered community attention, with over 50 user conversations informing its development and a community-driven Solana token ($UPLIFT) raising $5K+ in initial funds.
+                </p>
+                <br>
+                <p class="card-content">
+                    The project's direction is to evolve into a "Proof-of-Ascent" ecosystem, where users earn on-chain rewards for real-world achievements, fostering a flywheel of motivation, progress, and community uplift. Key features include AI goal deconstruction, personalized mentorship, habit tracking, focus sessions, and analytics, with unique advantages in psychological depth and Web3 integration. For investors and users, $UPLIFT offers utility through discounts, staking, and governance, with 15% revenue buyback/burn for value accrual.
+                </p>
+                <br>
+                <p class="card-content">
+                    Inspired by Sim's own experiences as a builder facing productivity tools' shortcomings, Operator Uplift aims to empower high-agency individuals—from founders to creators—to conquer inertia. Get involved by joining the beta, holding $UPLIFT, or following @OperatorUplift on X. Roadmap includes full Web3 launch in Q4 2025.
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- Story Section -->
-    <section class="content-section bg-gray-900">
+    <!-- Vision and Purpose -->
+    <section class="content-section">
         <div class="container mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="section-title slide-in-left">Our Story</h2>
-                <p class="section-subtitle slide-in-right">
-                    Born from the belief that everyone deserves access to elite performance tools, 
-                    Operator Uplift started as a vision to bridge the gap between aspiration and achievement.
+            <h2 class="section-title slide-in-left">Vision and Purpose</h2>
+            <p class="section-subtitle slide-in-right">
+                Engineering the ascent from disappointment to empowerment for ambitious individuals.
+            </p>
+            
+            <div class="content-card animate-on-scroll">
+                <p class="card-content">
+                    Operator Uplift's vision is to engineer the ascent from disappointment to empowerment for ambitious individuals. Founded by Matt Sim, a prolific builder and Delta sprint participant in The Residency cohort, the app solves a core pain point: the "execution gap" where grand visions stall due to fragmented to-do lists and waning motivation. As Sim shared in his X posts, early user feedback revealed users felt "stuck in planning paralysis," with tools failing to bridge long-term ambitions and daily actions.
+                </p>
+                <br>
+                <p class="card-content">
+                    The purpose is simple yet profound: Use AI to deconstruct complex goals into "quick wins" that align with users' psychological needs, turning chores into addictive progress. By integrating Maslow's Hierarchy (focusing on needs like esteem/self-actualization) and the Four Temperaments (adapting to styles like choleric/sanguine), the app creates personalized paths that sustain momentum. It's not just a task manager—it's a "personal command center" for high-agency operators, as Sim described in his Delta updates.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Direction of the Project -->
+    <section class="content-section">
+        <div class="container mx-auto">
+            <h2 class="section-title slide-in-left">Direction of the Project</h2>
+            <p class="section-subtitle slide-in-right">
+                Evolving from AI MVP to a fully integrated Web3 ecosystem.
+            </p>
+            
+            <div class="content-card animate-on-scroll">
+                <p class="card-content">
+                    Operator Uplift is heading toward a fully integrated Web3 ecosystem, evolving from an AI MVP to a "Proof-of-Ascent" platform where achievements are tokenized for real utility and community uplift. Short-term (Q3-Q4 2025): Stabilize MVP with bug fixes, enhance AI personalization, and integrate $UPLIFT for in-app rewards. Mid-term (2026): Launch staking/governance, expand to mobile/PWA, and add integrations (e.g., calendar sync). Long-term: Become a global tool for teams/enterprises, with merch/ecosystem expansions.
+                </p>
+                <br>
+                <p class="card-content">
+                    Key pivot: Community-launched $UPLIFT token (CA: 6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS) on Bags.fm shifts from memecoin to utility, with fees reinvested into app dev. Direction emphasizes transparency (monthly Solscan reports) and sustainability (hybrid tokenomics to avoid over-deflation).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features and Functionalities -->
+    <section class="content-section">
+        <div class="container mx-auto">
+            <h2 class="section-title slide-in-left">Key Features and Functionalities</h2>
+            <p class="section-subtitle slide-in-right">
+                Even in MVP stage, Operator Uplift offers core features, with more in progress.
+            </p>
+            
+            <div class="content-grid">
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">AI Goal Deconstruction</h3>
+                    <p class="card-content">
+                        Input ambitions; AI (HuggingFace primary, stubs for Claude/Gemini/Perplexity/xAI/OpenRouter) breaks them into tactical plans. In progress: Adaptive learning from history/profile.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Personalized Mentorship</h3>
+                    <p class="card-content">
+                        AI chat mentor adapts to personality (Maslow/Temperaments assessment in onboarding) for motivation/tips. Features: Typing/history, quick stubs (Get Motivated/Advice). In progress: Voice/multimodal input.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Gamified RPG Progression</h3>
+                    <p class="card-content">
+                        Earn essence/levels/streaks for completes. Features: Dashboard stats (health/energy/motivation), treasure chest/lucky wheel rewards, achievement unlocks, shop (boosts/merch). In progress: Daily spin limits, staking for yields.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Core Tools</h3>
+                    <p class="card-content">
+                        Habits tracker (add/frequency/reminders), focus sessions (timer/breaks), analytics (tabs/charts for trends/insights), community (leaderboard/challenges/friends). In progress: Finance stubs (budget/goals).
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Onboarding & Mood Tracking</h3>
+                    <p class="card-content">
+                        5-step assessment (basic/personality/needs/prefs), HuggingFace analysis for AI adapt. Mood modal (emojis/slider, analyze/save). In progress: Google login via Firebase.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Aesthetic/UI</h3>
+                    <p class="card-content">
+                        Glassmorphism cards, gradients/animations, themes (dark/light/auto), responsive grid/mobile gestures. In progress: Custom scrollbars (low priority).
+                    </p>
+                </div>
+            </div>
+            
+            <div class="feature-highlight animate-on-scroll">
+                <h3 class="feature-title">Unique Advantages</h3>
+                <ul class="feature-list">
+                    <li>Psychological depth (Maslow/Temperaments for adapt)</li>
+                    <li>$UPLIFT integration for "Proof-of-Ascent" (tokenized achievements)</li>
+                    <li>Story narrative arc (disappointment to empowerment in onboarding/UI)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Proposition -->
+    <section class="content-section">
+        <div class="container mx-auto">
+            <h2 class="section-title slide-in-left">Value Proposition</h2>
+            <p class="section-subtitle slide-in-right">
+                Why care, invest, or participate in Operator Uplift?
+            </p>
+            
+            <div class="content-card animate-on-scroll">
+                <h3 class="card-title">For Users</h3>
+                <p class="card-content">
+                    Personalized AI turns chores into wins, RPG gamification boosts retention (streaks/rewards), insights drive growth. Early adopters get free credits, exclusive $UPLIFT airdrops.
                 </p>
             </div>
             
-            <div class="max-w-4xl mx-auto">
-                <div class="timeline-item animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-2">2024 - The Vision</h3>
-                    <p class="text-gray-400">
-                        The idea for Operator Uplift was born from observing how elite performers 
-                        use systematic approaches to achieve their goals.
-                    </p>
+            <div class="content-card animate-on-scroll">
+                <h3 class="card-title">For Investors/Holders</h3>
+                <p class="card-content">
+                    $UPLIFT (1B supply, 30% creator vested) offers utility (shop discounts/merch/staking yields) and accrual (15% revenue buyback/burn from app sales). Community-driven (30% alloc), transparent (monthly Solscan reports)—potential 10x+ as app scales (50+ user convos validate demand). No rug risk: Fees reinvest in dev (30% treasury DAO-governed).
+                </p>
+            </div>
+            
+            <div class="content-card animate-on-scroll">
+                <h3 class="card-title">Advantages</h3>
+                <p class="card-content">
+                    Free HuggingFace AI (stubs for premium), no bloat (inline SPA), Web3 ready (wallet connect for $UPLIFT), psychological edge (Maslow/Temperaments for 80% retention boost per research). Value: From $0 to $5k community funds in hours—proven traction.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap & Milestones -->
+    <section class="content-section">
+        <div class="container mx-auto">
+            <h2 class="section-title slide-in-left">Roadmap & Milestones</h2>
+            <p class="section-subtitle slide-in-right">
+                Our journey from MVP to global platform.
+            </p>
+            
+            <div class="roadmap">
+                <div class="roadmap-item animate-on-scroll">
+                    <div class="roadmap-phase">Phase 1: Spark</div>
+                    <div class="roadmap-timeline">Q3 2025, Complete</div>
+                    <div class="roadmap-description">
+                        MVP launch, community $UPLIFT token, Litepaper, beta with AI/onboarding/gamification.
+                    </div>
                 </div>
                 
-                <div class="timeline-item animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-2">2024 - Development</h3>
-                    <p class="text-gray-400">
-                        Our team of developers, designers, and performance experts began building 
-                        the platform that would make elite performance accessible to everyone.
-                    </p>
+                <div class="roadmap-item animate-on-scroll">
+                    <div class="roadmap-phase">Phase 2: Forge</div>
+                    <div class="roadmap-timeline">Q4 2025</div>
+                    <div class="roadmap-description">
+                        Wallet connect for $UPLIFT discounts, launch shop/merch, start buyback/burn, Google auth.
+                    </div>
                 </div>
                 
-                <div class="timeline-item animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-2">2024 - MVP Launch</h3>
-                    <p class="text-gray-400">
-                        We launched our Minimum Viable Product, bringing AI coaching, goal tracking, 
-                        and blockchain rewards to our first users.
-                    </p>
+                <div class="roadmap-item animate-on-scroll">
+                    <div class="roadmap-phase">Phase 3: Ascent</div>
+                    <div class="roadmap-timeline">Q1 2026</div>
+                    <div class="roadmap-description">
+                        Staking/governance launch, mobile PWA, advanced AI (voice/multimodal), integrations (calendar/fitness).
+                    </div>
                 </div>
                 
-                <div class="timeline-item animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-2">2024 - Future Vision</h3>
-                    <p class="text-gray-400">
-                        We're building toward a future where anyone can access the tools and systems 
-                        that drive elite performance, regardless of their background or resources.
-                    </p>
+                <div class="roadmap-item animate-on-scroll">
+                    <div class="roadmap-phase">Phase 4: Apex</div>
+                    <div class="roadmap-timeline">Q2 2026+</div>
+                    <div class="roadmap-description">
+                        Enterprise/team features, full merch out-of-app revenue, global scaling, DAO for treasury.
+                    </div>
                 </div>
+            </div>
+            
+            <div class="content-card animate-on-scroll" style="margin-top: 3rem;">
+                <h3 class="card-title">Key Milestones</h3>
+                <ul class="feature-list">
+                    <li>$10K MC (complete MVP features)</li>
+                    <li>$100K MC (staking launch)</li>
+                    <li>$1M MC (mobile app)</li>
+                </ul>
             </div>
         </div>
     </section>
@@ -761,116 +860,95 @@
     <!-- Team Section -->
     <section class="content-section">
         <div class="container mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="section-title slide-in-left">Our Team</h2>
-                <p class="section-subtitle slide-in-right">
-                    Meet the passionate individuals behind Operator Uplift, dedicated to 
-                    revolutionizing how people achieve their goals.
-                </p>
+            <h2 class="section-title slide-in-left">Background, Team & Inspiration</h2>
+            <p class="section-subtitle slide-in-right">
+                The story behind Operator Uplift.
+            </p>
+            
+            <div class="team-section">
+                <div class="team-member animate-on-scroll">
+                    <h3 class="team-name">Matt Sim</h3>
+                    <div class="team-role">Founder & CEO</div>
+                    <div class="team-bio">
+                        A prolific builder with experience in productivity tools and Delta sprint (The Residency cohort)—inspired by user frustration with "dud" apps (planning paralysis, no motivation). From 10+ crashes/50k lines lost to $5k community raise in hours, pivoting $UPLIFT to utility with Bags.fm.
+                    </div>
+                </div>
             </div>
             
-            <div class="content-grid">
-                <div class="team-member animate-on-scroll">
-                    <div class="w-32 h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
-                        👨‍💻
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Development Team</h3>
-                    <p class="text-gray-400">
-                        Expert developers building the future of productivity technology.
-                    </p>
-                </div>
-                
-                <div class="team-member animate-on-scroll">
-                    <div class="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
-                        🎨
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Design Team</h3>
-                    <p class="text-gray-400">
-                        Creative designers crafting intuitive and beautiful user experiences.
-                    </p>
-                </div>
-                
-                <div class="team-member animate-on-scroll">
-                    <div class="w-32 h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white">
-                        🧠
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">AI Team</h3>
-                    <p class="text-gray-400">
-                        AI researchers developing intelligent coaching and productivity systems.
-                    </p>
-                </div>
+            <div class="content-card animate-on-scroll">
+                <h3 class="card-title">The Story</h3>
+                <p class="card-content">
+                    Founded by Matt Sim (@RVAClassic), a builder with experience in productivity tools and Delta sprint (The Residency cohort)—inspired by user frustration with "dud" apps (planning paralysis, no motivation). Story: From 10+ crashes/50k lines lost to $5k community raise in hours, pivoting $UPLIFT to utility with Bags.fm. Team: Solo founder (dev/marketing), community-driven (50+ operators for feedback). Inspiration: Sim's journey from disappointment (stalled projects) to ascent (AI/RPG for momentum).
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- Values Section -->
-    <section class="content-section bg-gray-900">
+    <!-- Call to Action -->
+    <section class="cta-section">
         <div class="container mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="section-title slide-in-left">Our Values</h2>
-                <p class="section-subtitle slide-in-right">
-                    The principles that guide everything we do at Operator Uplift.
-                </p>
-            </div>
-            
-            <div class="content-grid">
-                <div class="content-card animate-on-scroll">
-                    <h3 class="text-2xl font-semibold mb-4 text-orange-400">
-                        <i class="fas fa-users mr-2"></i>Accessibility
-                    </h3>
-                    <p class="text-gray-400">
-                        We believe elite performance tools should be available to everyone, 
-                        not just those with access to expensive coaches or exclusive programs.
-                    </p>
-                </div>
-                
-                <div class="content-card animate-on-scroll">
-                    <h3 class="text-2xl font-semibold mb-4 text-blue-400">
-                        <i class="fas fa-lightbulb mr-2"></i>Innovation
-                    </h3>
-                    <p class="text-gray-400">
-                        We're constantly pushing the boundaries of what's possible with AI, 
-                        blockchain, and productivity technology.
-                    </p>
-                </div>
-                
-                <div class="content-card animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-4 text-green-400">
-                        <i class="fas fa-heart mr-2"></i>User-Centric
-                    </h3>
-                    <p class="text-gray-400">
-                        Every feature we build is designed with our users' needs and 
-                        success in mind.
-                    </p>
-                </div>
-                
-                <div class="content-card animate-on-scroll">
-                    <h3 class="text-xl font-semibold mb-4 text-purple-400">
-                        <i class="fas fa-shield-alt mr-2"></i>Transparency
-                    </h3>
-                    <p class="text-gray-400">
-                        We believe in open communication and building trust through 
-                        honest, transparent practices.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="content-section">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="cta-title slide-in-left">Ready to Transform Your Performance?</h2>
+            <h2 class="cta-title slide-in-left">Get Involved Today</h2>
             <p class="cta-description slide-in-right">
-                Join thousands of users who are already achieving their goals with Operator Uplift.
+                Join the ascent and become part of the Operator Uplift community. Whether you're a user, investor, or contributor, there's a place for you in our mission to transform ambitious goals into achievable progress.
             </p>
             <div class="cta-buttons">
-                <a href="app.html" class="cta-button text-lg px-8 py-4">
-                    <i class="fas fa-rocket mr-2"></i>Launch App
-                </a>
-                <a href="uplift-token.html" class="cta-button text-lg px-8 py-4" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                    <i class="fas fa-coins mr-2"></i>Learn About UPLIFT
-                </a>
+                <a href="app.html" class="cta-button">Join Beta</a>
+                <a href="uplift-token.html" class="cta-button">Learn About $UPLIFT</a>
+                <a href="https://twitter.com/OperatorUplift" target="_blank" class="cta-button">Follow on X</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Get Involved -->
+    <section class="content-section">
+        <div class="container mx-auto">
+            <h2 class="section-title slide-in-left">How to Get Involved, Invest, or Follow Progress</h2>
+            <p class="section-subtitle slide-in-right">
+                Multiple ways to participate in the Operator Uplift ecosystem.
+            </p>
+            
+            <div class="content-grid">
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Users</h3>
+                    <p class="card-content">
+                        Join beta at operatoruplift.com—free AI/goals/onboarding, earn $UPLIFT for completes.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Invest/Hold</h3>
+                    <p class="card-content">
+                        Buy $UPLIFT on Solana (CA: 6zn51qJZs4P5MG1Miq79KH8mFEpi9yV232SHKz8zBAGS) for utility/discounts/burn upside. Track fees/redistribution on Solscan/X reports.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Community</h3>
+                    <p class="card-content">
+                        Follow @OperatorUplift on X for updates/Spaces, join Discord for discussions/challenges.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Contribute</h3>
+                    <p class="card-content">
+                        Feedback on beta, propose features via DAO (post-Phase 3).
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Track Progress</h3>
+                    <p class="card-content">
+                        #BuildInPublic on X, litepaper/roadmap at operatoruplift.com/litepaper.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="content-card animate-on-scroll" style="margin-top: 3rem; text-align: center;">
+                <h3 class="card-title">Join the Ascent</h3>
+                <p class="card-content" style="font-size: 1.25rem; font-weight: 600;">
+                    $UPLIFT each other! 🚀
+                </p>
             </div>
         </div>
     </section>
