@@ -2807,9 +2807,16 @@
                 console.log('🤖 AI: Response data:', data);
                 
                 const generatedText = data[0]?.generated_text || data.generated_text;
-                if (generatedText) {
+                if (generatedText && generatedText.trim()) {
                     // Clean up the response - remove the input message if it's repeated
-                    const cleanResponse = generatedText.replace(message, '').trim();
+                    let cleanResponse = generatedText.replace(message, '').trim();
+                    
+                    // If cleaning removed everything, use the original response
+                    if (!cleanResponse) {
+                        cleanResponse = generatedText.trim();
+                    }
+                    
+                    // Ensure we have a meaningful response
                     const finalResponse = cleanResponse || 'Let me help you with that!';
                     console.log('🤖 AI: Final response:', finalResponse);
                     return finalResponse;
@@ -4245,17 +4252,35 @@
     <div id="aiChatModal" class="modal">
         <div class="modal-content" style="max-width:900px;height:80vh;display:flex;flex-direction:column;">
             <div class="modal-header">
-                <h2>🤖 AI Assistant - DeepSeek</h2>
+                <h2>🤖 AI Assistant - HuggingFace</h2>
                 <button class="modal-close" onclick="closeAIChat()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body" style="flex:1;display:flex;flex-direction:column;padding:0;">
+                <!-- API Token Input Section -->
+                <div id="tokenInputSection" style="padding:1.5rem;border-bottom:1px solid var(--border-light);background:rgba(249,115,22,0.05);">
+                    <div style="display:flex;gap:0.75rem;align-items:center;">
+                        <input id="hfTokenInput" type="password" placeholder="Enter your HuggingFace API token..." 
+                               style="flex:1;padding:0.75rem;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:12px;color:var(--text-primary);"
+                               onkeypress="if(event.key==='Enter')setHuggingFaceTokenFromInput()">
+                        <button class="btn btn-secondary" onclick="setHuggingFaceTokenFromInput()">
+                            <i class="fas fa-key"></i> Set Token
+                        </button>
+                        <button class="btn btn-sm" onclick="toggleTokenVisibility()" style="padding:0.5rem;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-secondary);">
+                        <span id="tokenStatus">No API token set. Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a></span>
+                    </div>
+                </div>
+                
                 <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
                     <div class="ai-message">
                         <div class="ai-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">🤖</div>
                         <div class="message-content" style="background:rgba(249,115,22,0.1);padding:1rem;border-radius:12px;max-width:70%;">
-                            <div>Hello! I'm your AI coach powered by DeepSeek. How can I help you achieve your goals today?</div>
+                            <div>Hello! I'm your AI coach powered by HuggingFace. Please set your API token above to start chatting, or I'll use fallback responses.</div>
                         </div>
                     </div>
                 </div>
@@ -5867,10 +5892,50 @@
         // AI Chat Functions
         function openAIChat() {
             document.getElementById('aiChatModal').classList.add('active');
+            updateTokenStatus();
         }
         
         function closeAIChat() {
             document.getElementById('aiChatModal').classList.remove('active');
+        }
+        
+        // Token management functions
+        function setHuggingFaceTokenFromInput() {
+            const tokenInput = document.getElementById('hfTokenInput');
+            const token = tokenInput.value.trim();
+            
+            if (token) {
+                window.setHuggingFaceToken(token);
+                tokenInput.value = '';
+                updateTokenStatus();
+                showToast('HuggingFace API token set successfully!', 'success');
+            } else {
+                showToast('Please enter a valid API token', 'error');
+            }
+        }
+        
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('hfTokenInput');
+            const toggleBtn = document.querySelector('#tokenInputSection button:last-child i');
+            
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                toggleBtn.className = 'fas fa-eye-slash';
+            } else {
+                tokenInput.type = 'password';
+                toggleBtn.className = 'fas fa-eye';
+            }
+        }
+        
+        function updateTokenStatus() {
+            const tokenStatus = document.getElementById('tokenStatus');
+            const savedToken = localStorage.getItem('uplift:hf_token');
+            
+            if (savedToken && savedToken !== 'hf_demo') {
+                tokenStatus.innerHTML = `<span style="color:var(--success);">✓ API token set successfully</span>`;
+            } else {
+                tokenStatus.innerHTML = `No API token set. Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a>`;
+            }
         }
         
         async function sendAIMessage() {
@@ -5891,8 +5956,29 @@
                 
                 // Remove typing indicator and add response
                 document.getElementById(typingId)?.remove();
-                addChatMessage(response, 'ai');
+                
+                // Ensure we have a valid response
+                if (response && response !== 'undefined' && response.trim()) {
+                    addChatMessage(response, 'ai');
+                } else {
+                    // Fallback response if AI returns undefined or empty
+                    const fallbackResponses = [
+                        "I understand your question. Let me help you break this down into actionable steps.",
+                        "That's a great point! Here's how we can approach this together.",
+                        "Excellent question! Let me provide you with some guidance on this.",
+                        "I see what you're asking. Here's a different perspective to consider.",
+                        "That's a smart approach. Have you considered this angle?",
+                        "Great thinking! Let me help you develop this further.",
+                        "I understand your goal. Here's how we can make progress step by step.",
+                        "That's a fantastic insight! Let me help you optimize your approach.",
+                        "I see what you're getting at. Here's how we can make this more effective.",
+                        "Your question is spot on. Let me help you create a plan for this."
+                    ];
+                    const fallbackResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+                    addChatMessage(fallbackResponse, 'ai');
+                }
             } catch (error) {
+                console.error('AI Chat error:', error);
                 document.getElementById(typingId)?.remove();
                 addChatMessage('I apologize, but I encountered an error. Please try again.', 'ai');
             }
