@@ -5305,7 +5305,7 @@
         }
         
         function getGoalsHTML() {
-            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
             
             if (goals.length === 0) {
                 return `
@@ -5659,11 +5659,11 @@
         
         // Goal Management Functions
         function updateGoalProgress(goalId, amount) {
-            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
             const goal = goals.find(g => g.id === goalId);
             if (goal) {
                 goal.progress = Math.min(100, goal.progress + amount);
-                localStorage.setItem('userGoals', JSON.stringify(goals));
+                localStorage.setItem('uplift:goals', JSON.stringify(goals));
                 loadViewContent('goals');
                 showToast(`Goal progress updated! +${amount}%`, 'success');
                 
@@ -5680,32 +5680,32 @@
         }
         
         function deleteGoal(goalId) {
-            const goals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
             const filtered = goals.filter(g => g.id !== goalId);
-            localStorage.setItem('userGoals', JSON.stringify(filtered));
+            localStorage.setItem('uplift:goals', JSON.stringify(filtered));
             loadViewContent('goals');
             showToast('Goal deleted', 'info');
         }
         
         // Habit Functions
         function toggleHabit(habitId) {
-            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
             const habit = habits.find(h => h.id === habitId);
             if (habit) {
                 habit.completed = !habit.completed;
                 if (habit.completed) {
                     habit.streak = (habit.streak || 0) + 1;
                 }
-                localStorage.setItem('userHabits', JSON.stringify(habits));
+                localStorage.setItem('uplift:habits', JSON.stringify(habits));
                 loadViewContent('habits');
-                showToast(habit.completed ? '✅ Habit completed!' : 'Habit unchecked', 'success');
+                showToast(habit.completed ? '✅ Habit completed!' : 'success');
             }
         }
         
         function deleteHabit(habitId) {
-            const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
+            const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
             const filtered = habits.filter(h => h.id !== habitId);
-            localStorage.setItem('userHabits', JSON.stringify(filtered));
+            localStorage.setItem('uplift:habits', JSON.stringify(filtered));
             
             // Directly update the habits view if it's currently active
             const habitsView = document.getElementById('habitsView');
