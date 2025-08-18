@@ -576,24 +576,7 @@
     </style>
     <!-- Optional particles.js via CDN (lightweight) -->
     <script defer src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
-    <!-- Ambient audio for token page -->
-    <audio id="uplift-audio" src="Raindrops and Reverie.mp3" preload="auto" loop muted></audio>
-    
-    <!-- Music Control Button -->
 
-    
-    <script>
-        // Auto-mute music on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const audio = document.getElementById('uplift-audio');
-            if (audio) {
-                audio.muted = true;
-                updateMusicIcon();
-            }
-        });
-        
-
-    </script>
 </head>
 <body>
   
@@ -1763,34 +1746,7 @@
                 card.setAttribute('tabindex', '0');
             });
 
-            // Ambient audio at 3% volume
-            const tokenAudio = document.getElementById('uplift-audio');
-            if (tokenAudio) {
-                tokenAudio.volume = 0.03;
-                tokenAudio.loop = true;
-                tokenAudio.muted = true;
-                const unlock = () => { tokenAudio.muted = false; tokenAudio.play().catch(()=>{}); cleanup(); };
-                const tryPlay = () => tokenAudio.play().catch(()=>{});
-                const cleanup = () => {
-                    ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
-                        document.removeEventListener(evt, unlock, listenerOpts));
-                    window.removeEventListener('scroll', unlock, true);
-                    window.removeEventListener('focus', tryPlay, true);
-                    document.removeEventListener('visibilitychange', tryPlay, true);
-                    document.removeEventListener('resume-audio', tryPlay, true);
-                };
-                const listenerOpts = { capture: true, once: true };
-                tryPlay();
-                ['click','touchstart','pointerdown','keydown','wheel'].forEach(evt =>
-                    document.addEventListener(evt, unlock, listenerOpts));
-                window.addEventListener('scroll', unlock, true);
-                window.addEventListener('focus', tryPlay, true);
-                document.addEventListener('visibilitychange', tryPlay, true);
-                // Custom resume event hook if navigation returns without full reload
-                document.addEventListener('resume-audio', tryPlay, true);
-                // Failsafe retry after visibility
-                setTimeout(tryPlay, 1500);
-            }
+
  
             // --- Live Burn Counter (hourly refresh) ---
             const CONFIG = {
