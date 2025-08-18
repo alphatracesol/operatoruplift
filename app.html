@@ -5038,104 +5038,8 @@
         }
 
         // View Creation Functions
-        function createSocialHubView() {
-            return `
-                <div class="social-hub-container" style="padding: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 style="color: var(--text-primary); font-size: 2rem;">
-                            <i class="fas fa-users"></i> Social Hub
-                        </h2>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-                        <!-- Feed Column -->
-                        <div>
-                            <!-- Create Post -->
-                            <div class="card" style="margin-bottom: 1.5rem;">
-                                <div class="card-body" style="padding: 1.5rem;">
-                                    <div style="display: flex; gap: 1rem;">
-                                        <div style="width: 48px; height: 48px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                            ${(localStorage.getItem('userName') || 'U')[0]}
-                                        </div>
-                                        <div style="flex: 1;">
-                                            <textarea placeholder="Share your progress..." style="width: 100%; min-height: 80px; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary); resize: vertical;"></textarea>
-                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                                                <button class="btn btn-primary" style="margin-left: auto;">
-                                                    <i class="fas fa-paper-plane"></i> Post
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sample Posts -->
-                            <div class="card" style="margin-bottom: 1rem;">
-                                <div class="card-body">
-                                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                                        <div style="width: 40px; height: 40px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">S</div>
-                                        <div>
-                                            <div style="font-weight: 600;">Sarah Johnson</div>
-                                            <div style="font-size: 0.875rem; color: var(--text-secondary);">2 hours ago</div>
-                                        </div>
-                                    </div>
-                                    <p>Just completed my 30-day meditation streak! 🧘‍♀️ Feeling more focused than ever.</p>
-                                    <div style="display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light);">
-                                        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-light);">
-                                            <i class="fas fa-heart"></i> 24
-                                        </button>
-                                        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-light);">
-                                            <i class="fas fa-comment"></i> 5
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sidebar -->
-                        <div>
-                            <!-- Friends -->
-                            <div class="card" style="margin-bottom: 1.5rem;">
-                                <div class="card-header">
-                                    <h3 class="card-title">Friends Online</h3>
-                                    <div class="card-icon">👥</div>
-                                </div>
-                                <div class="card-body">
-                                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0;">
-                                        <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">A</div>
-                                        <div style="flex: 1;">
-                                            <div>Alex Chen</div>
-                                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Level 25</div>
-                                        </div>
-                                        <div style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Leaderboard Preview -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Top Players</h3>
-                                    <div class="card-icon">🏆</div>
-                                </div>
-                                <div class="card-body">
-                                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0;">
-                                        <div style="font-weight: bold; width: 20px;">1</div>
-                                        <div style="flex: 1;">Mike W.</div>
-                                        <div style="color: var(--primary-color); font-weight: 600;">12,450</div>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0;">
-                                        <div style="font-weight: bold; width: 20px;">2</div>
-                                        <div style="flex: 1;">Sarah J.</div>
-                                        <div style="color: var(--primary-color); font-weight: 600;">11,200</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        // createSocialHubView function removed - using window.createSocialHubView instead
+
         
         function createWalletInterfaceView() {
             const isConnected = localStorage.getItem('walletConnected') === 'true';
@@ -5869,8 +5773,8 @@
             const typingId = addChatMessage('...', 'ai', true);
             
             try {
-                // Call DeepSeek AI (or use demo response)
-                const response = await callDeepSeekAI(message);
+                // Use the global AI message function
+                const response = await window.sendAIMessage(message);
                 
                 // Remove typing indicator and add response
                 document.getElementById(typingId)?.remove();
@@ -5908,25 +5812,6 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
             return messageId;
-        }
-        
-        async function callDeepSeekAI(message) {
-            // This is where DeepSeek API integration would go
-            // For now, return a demo response
-            if (window.DEMO_MODE) {
-                const responses = [
-                    "That's a great question! Based on your profile, I recommend focusing on small, achievable goals first.",
-                    "I understand. Let's break this down into manageable steps that align with your motivation style.",
-                    "Excellent progress! Your consistency is improving. Keep this momentum going!",
-                    "Based on your personality assessment, you work best with structured challenges. Let's create one for you.",
-                    "Remember, every small win counts. You're building habits that will transform your life!"
-                ];
-                return responses[Math.floor(Math.random() * responses.length)];
-            }
-            
-            // Real API call would go here
-            // const response = await fetch('/api/deepseek', { ... });
-            return "AI response would appear here when connected to DeepSeek API.";
         }
 
         // Settings save handlers
