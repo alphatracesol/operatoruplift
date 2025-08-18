@@ -23,6 +23,7 @@ const BUILD_FILES = [
     'dashboard.html',
     'press-release.html',
     'MVP Launch Page.html',
+    'about-us.html',
     '404.html',
     '500.html',
     'ai-chat-interface.html'

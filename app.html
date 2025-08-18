@@ -1285,6 +1285,34 @@
             }
         };
         
+        // Logout function
+        window.logout = async function() {
+            try {
+                console.log('🚪 Logout initiated...');
+                
+                if (auth && auth.currentUser) {
+                    await auth.signOut();
+                    console.log('✅ Firebase logout successful');
+                }
+                
+                // Clear local storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Show logout message
+                showToast('Logged out successfully', 'success');
+                
+                // Redirect to auth screen
+                setTimeout(() => {
+                    showAuth();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                showToast('Logout failed: ' + error.message, 'error');
+            }
+        };
+        
         // Settings functions
         window.saveProfileSettings = function() {
             const username = document.getElementById('settingsUsername')?.value;
@@ -2617,50 +2645,90 @@
     // COMPLETE FEATURE IMPLEMENTATIONS
     // ========================================
     
-    // 1. AI INTEGRATION WITH MULTIPLE PROVIDERS
+    // 1. AI INTEGRATION WITH HUGGINGFACE (FREE API)
     window.AI_CONFIG = {
-        providers: {
-            huggingface: {
-                url: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
-                headers: { 'Content-Type': 'application/json' }
-            },
-            deepseek: {
-                url: 'https://api.deepseek.com/v1/chat/completions',
-                headers: { 'Content-Type': 'application/json' }
-            }
-        },
-        currentProvider: 'huggingface'
+        provider: 'huggingface',
+        url: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer hf_demo' // Will be replaced with real token if available
+        }
     };
     
+    // Function to set HuggingFace API token
+    window.setHuggingFaceToken = function(token) {
+        if (token && token !== 'hf_demo') {
+            AI_CONFIG.headers.Authorization = `Bearer ${token}`;
+            localStorage.setItem('uplift:hf_token', token);
+            console.log('HuggingFace token set successfully');
+        }
+    };
+    
+    // Load saved token on startup
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedToken = localStorage.getItem('uplift:hf_token');
+        if (savedToken) {
+            window.setHuggingFaceToken(savedToken);
+        }
+    });
+    
+    // Global AI message function for use throughout the app
     window.sendAIMessage = async function(message) {
-        const provider = AI_CONFIG.providers[AI_CONFIG.currentProvider];
         try {
-            const response = await fetch(provider.url, {
+            console.log('🤖 AI: Sending message to HuggingFace:', message);
+            
+            // Try HuggingFace API first
+            const response = await fetch(AI_CONFIG.url, {
                 method: 'POST',
-                headers: provider.headers,
+                headers: AI_CONFIG.headers,
                 body: JSON.stringify({
                     inputs: message,
-                    parameters: { max_length: 200, temperature: 0.7 }
+                    parameters: { 
+                        max_length: 150, 
+                        temperature: 0.7,
+                        do_sample: true,
+                        top_p: 0.9
+                    }
                 })
             });
             
+            console.log('🤖 AI: Response status:', response.status);
+            
             if (response.ok) {
                 const data = await response.json();
-                return data[0]?.generated_text || data.generated_text || 'Let me help you with that!';
+                console.log('🤖 AI: Response data:', data);
+                
+                const generatedText = data[0]?.generated_text || data.generated_text;
+                if (generatedText) {
+                    // Clean up the response - remove the input message if it's repeated
+                    const cleanResponse = generatedText.replace(message, '').trim();
+                    const finalResponse = cleanResponse || 'Let me help you with that!';
+                    console.log('🤖 AI: Final response:', finalResponse);
+                    return finalResponse;
+                }
+            } else {
+                console.log('🤖 AI: API error:', response.status, response.statusText);
             }
         } catch (error) {
-            console.log('AI fallback to local responses');
+            console.log('🤖 AI: HuggingFace API error, using fallback:', error);
         }
         
-        // Fallback responses
+        // Fallback responses for when API is unavailable
         const responses = [
             "Great question! Let's break this down into actionable steps.",
             "I understand. Here's how we can approach this together.",
             "Excellent goal! Let me help you create a plan.",
             "That's a smart approach. Have you considered this angle?",
-            "Let's focus on making progress step by step."
+            "Let's focus on making progress step by step.",
+            "Based on your profile, I recommend starting small and building momentum.",
+            "That's a fantastic insight! Let me help you develop this further.",
+            "I see what you're getting at. Here's a different perspective to consider.",
+            "Your progress is impressive! Let's optimize your approach.",
+            "Great thinking! Here's how we can make this even more effective."
         ];
-        return responses[Math.floor(Math.random() * responses.length)];
+        const fallbackResponse = responses[Math.floor(Math.random() * responses.length)];
+        console.log('🤖 AI: Using fallback response:', fallbackResponse);
+        return fallbackResponse;
     };
     
     // 2. ONBOARDING MODAL
@@ -3734,6 +3802,9 @@
                         </button>
                         <button class="header-btn" onclick="showProfile()">
                             <i class="fas fa-user"></i>
+                        </button>
+                        <button class="header-btn" onclick="logout()" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>
                 </div>
