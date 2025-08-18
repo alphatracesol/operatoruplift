@@ -1,5 +1,10 @@
-# SPA Routing - Handle all routes
-/*    /app.html   200
+# Specific page routes - these must come BEFORE the catch-all
+/index.html    /index.html    200
+/uplift-token.html    /uplift-token.html    200
+/press-release.html    /press-release.html    200
+/about-us.html    /about-us.html    200
+/mvp-launch-page.html    /MVP Launch Page.html    200
+/MVP Launch Page.html    /MVP Launch Page.html    200
 
 # API Routes
 /api/*    /.netlify/functions/:splat    200
@@ -8,5 +13,14 @@
 /manifest.json    /manifest.json    200
 /sw.js    /sw.js    200
 
+# App routes - SPA routing for the main application
+/app    /app.html    200
+/app.html    /app.html    200
+/login    /app.html    200
+/dashboard    /app.html    200
+
+# SPA Routing - Handle remaining app routes (must come LAST)
+/*    /app.html    200
+
 # Fallback for 404
-/*    /app.html    404
+/*    /404.html    404
