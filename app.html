@@ -1074,23 +1074,9 @@
                                 </div>
                             </div>
                             
-                            <!-- Sample Posts -->
-                            <div class="card" style="margin-bottom: 1rem;">
-                                <div class="card-body">
-                                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                                        <div style="width: 40px; height: 40px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">S</div>
-                                        <div>
-                                            <div style="font-weight: 600;">Sarah Johnson</div>
-                                            <div style="font-size: 0.875rem; color: var(--text-secondary);">2 hours ago</div>
-                                        </div>
-                                    </div>
-                                    <p>Just completed my 30-day meditation streak! 🧘‍♀️ Feeling more focused than ever.</p>
-                                    <div style="display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light);">
-                                        <button class="btn btn-sm" onclick="showToast('Liked!', 'success')" style="background: transparent; border: 1px solid var(--border-light);">
-                                            <i class="fas fa-heart"></i> 24
-                                        </button>
-                                    </div>
-                                </div>
+                            <!-- Dynamic Posts Container -->
+                            <div id="socialPostsContainer">
+                                <!-- Posts will be dynamically loaded here -->
                             </div>
                         </div>
                         
@@ -1278,11 +1264,115 @@
         window.createPost = function() {
             const content = document.getElementById('postContent')?.value;
             if (content) {
-                showToast('Post created successfully!', 'success');
+                // Create new post object
+                const newPost = {
+                    id: Date.now().toString(),
+                    content: content,
+                    author: localStorage.getItem('userName') || 'Anonymous',
+                    authorInitial: (localStorage.getItem('userName') || 'A').charAt(0).toUpperCase(),
+                    timestamp: new Date().toISOString(),
+                    likes: 0,
+                    liked: false
+                };
+                
+                // Get existing posts from localStorage
+                const posts = JSON.parse(localStorage.getItem('socialPosts') || '[]');
+                posts.unshift(newPost); // Add new post to beginning
+                
+                // Store updated posts
+                localStorage.setItem('socialPosts', JSON.stringify(posts));
+                
+                // Clear input
                 document.getElementById('postContent').value = '';
+                
+                // Refresh the social hub view to show new post
+                const socialView = document.getElementById('socialView');
+                if (socialView) {
+                    socialView.innerHTML = window.createSocialHubView();
+                    // Re-render posts
+                    window.renderSocialPosts();
+                }
+                
+                showToast('Post created successfully!', 'success');
             } else {
                 showToast('Please enter some content', 'warning');
             }
+        };
+        
+        // Render social posts function
+        window.renderSocialPosts = function() {
+            const postsContainer = document.getElementById('socialPostsContainer');
+            if (!postsContainer) return;
+            
+            const posts = JSON.parse(localStorage.getItem('socialPosts') || '[]');
+            
+            if (posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div class="card-body" style="text-align: center; color: var(--text-secondary);">
+                            <p>No posts yet. Be the first to share your progress! 🚀</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            postsContainer.innerHTML = posts.map(post => {
+                const timeAgo = window.getTimeAgo ? window.getTimeAgo(new Date(post.timestamp)) : 'Just now';
+                return `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div class="card-body">
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="width: 40px; height: 40px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    ${post.authorInitial}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">${post.author}</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">${timeAgo}</div>
+                                </div>
+                            </div>
+                            <p>${post.content}</p>
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light);">
+                                <button class="btn btn-sm" onclick="togglePostLike('${post.id}')" style="background: transparent; border: 1px solid var(--border-light); ${post.liked ? 'color: #ef4444;' : ''}">
+                                    <i class="fas fa-heart"></i> ${post.likes}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+        
+        // Toggle post like function
+        window.togglePostLike = function(postId) {
+            const posts = JSON.parse(localStorage.getItem('socialPosts') || '[]');
+            const post = posts.find(p => p.id === postId);
+            
+            if (post) {
+                if (post.liked) {
+                    post.likes--;
+                    post.liked = false;
+                } else {
+                    post.likes++;
+                    post.liked = true;
+                }
+                
+                localStorage.setItem('socialPosts', JSON.stringify(posts));
+                window.renderSocialPosts(); // Re-render to update like count
+            }
+        };
+        
+        // Time ago helper function
+        window.getTimeAgo = function(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+            if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+            return `${Math.floor(diffInSeconds / 31536000)}y ago`;
         };
         
         // Logout function
@@ -1722,72 +1812,9 @@
         `;
     };
     
-    window.createHabitsView = function() {
-        const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
-        
-        return `
-            <div class="habits-container" style="padding: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="color: var(--text-primary); font-size: 2rem;">
-                        <i class="fas fa-calendar-check"></i> Habits
-                    </h2>
-                    <button class="btn btn-primary" onclick="openCreateHabitModal()">
-                        <i class="fas fa-plus"></i> New Habit
-                    </button>
-                </div>
-                
-                <div class="habits-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-                    ${habits.length === 0 ? `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                            <div style="font-size: 64px; margin-bottom: 1rem;">📅</div>
-                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No habits yet</h3>
-                            <p style="color: var(--text-secondary);">Create your first habit to build consistency!</p>
-                        </div>
-                    ` : habits.map(habit => `
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">${habit.title}</h3>
-                                <div class="card-icon">${habit.icon || '📅'}</div>
-                            </div>
-                            <div class="card-body">
-                                <p style="margin-bottom: 1rem;">${habit.description}</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                    <span>🔥 ${habit.streak || 0} day streak</span>
-                                    <span>${habit.frequency || 'Daily'}</span>
-                                </div>
-                                <button class="btn ${habit.completedToday ? 'btn-success' : 'btn-primary'}" 
-                                        onclick="toggleHabitComplete('${habit.id}')">
-                                    ${habit.completedToday ? '✓ Completed' : 'Mark Complete'}
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    };
+
     
-    window.createAnalyticsView = function() {
-        return `
-            <div style="padding: 2rem;">
-                <h2 style="color: var(--text-primary); font-size: 2rem; margin-bottom: 2rem;">📊 Analytics</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <div class="card">
-                        <div class="card-body">
-                            <div style="color: var(--text-muted);">Total XP</div>
-                            <div style="font-size: 2rem; color: var(--primary-color);">${localStorage.getItem('userXP') || '0'}</div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div style="color: var(--text-muted);">Streak</div>
-                            <div style="font-size: 2rem; color: var(--success);">${localStorage.getItem('userStreak') || '0'}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
+
     
     window.createBurnView = function() {
         return `
@@ -5039,6 +5066,8 @@
                         break;
                     case 'social':
                         viewContainer.innerHTML = window.createSocialHubView();
+                        // Render posts after creating the view
+                        setTimeout(() => window.renderSocialPosts(), 100);
                         break;
                     case 'wallet':
                         viewContainer.innerHTML = createWalletInterfaceView();
@@ -5630,7 +5659,16 @@
             const habits = JSON.parse(localStorage.getItem('userHabits') || '[]');
             const filtered = habits.filter(h => h.id !== habitId);
             localStorage.setItem('userHabits', JSON.stringify(filtered));
-            loadViewContent('habits');
+            
+            // Directly update the habits view if it's currently active
+            const habitsView = document.getElementById('habitsView');
+            if (habitsView && habitsView.classList.contains('active')) {
+                habitsView.innerHTML = window.createHabitsView();
+            } else {
+                // Fallback to loadViewContent if view is not active
+                loadViewContent('habits');
+            }
+            
             showToast('Habit deleted', 'info');
         }
         
