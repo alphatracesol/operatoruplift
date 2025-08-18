@@ -113,6 +113,150 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
+        
+        /* Content cards with proper styling */
+        .content-card {
+            background: var(--dark-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .content-card:hover {
+            border-color: var(--border-color-light);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Content grid for feature cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        /* Value proposition grid with proper spacing */
+        .value-proposition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin: 2rem 0;
+        }
+        
+        /* Background styling */
+        .content-section {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Feature highlight with enhanced hover effects */
+        .feature-highlight {
+            background: var(--dark-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-highlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.1), transparent);
+            transition: left 0.8s ease;
+            z-index: 0;
+        }
+        
+        .feature-highlight:hover::before {
+            left: 100%;
+        }
+        
+        .feature-highlight:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.3);
+            transform: translateY(-4px);
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list li:hover {
+            color: var(--primary-color);
+            padding-left: 1rem;
+            transform: translateX(5px);
+        }
+        
+        .feature-list li::before {
+            content: '🚀';
+            margin-right: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .feature-list li:hover::before {
+            opacity: 1;
+        }
 
         /* Gradient text */
         .gradient-text {
@@ -126,6 +270,31 @@
         .glow-gold { 
             color: #ffd166; 
             text-shadow: 0 0 12px rgba(255, 215, 0, .6), 0 0 22px rgba(255, 140, 0, .4); 
+        }
+        
+        /* Orange badge with gradient shimmer effect */
+        .orange-badge { 
+            position: relative; 
+            overflow: hidden; 
+            transition: all 0.3s ease; 
+        }
+        .orange-badge::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.3), transparent); 
+            transition: left 0.6s ease; 
+            z-index: 0; 
+        }
+        .orange-badge:hover::before { 
+            left: 100%; 
+        }
+        .orange-badge > * { 
+            position: relative; 
+            z-index: 2; 
         }
 
         /* Navigation */
@@ -449,6 +618,53 @@
             color: var(--text-muted);
             line-height: 1.6;
         }
+        
+        /* Team grid for divisions */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .team-division {
+            background: var(--dark-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .team-division:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 32px rgba(249, 115, 22, 0.2);
+            transform: translateY(-4px);
+        }
+        
+        .team-division-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .team-division-role {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .team-division-bio {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .team-leadership {
+            margin-top: 2rem;
+        }
 
         /* Call to action */
         .cta-section {
@@ -673,6 +889,10 @@
                 <p class="card-content">
                     Inspired by Sim's own experiences as a builder facing productivity tools' shortcomings, Operator Uplift aims to empower high-agency individuals—from founders to creators—to conquer inertia. Get involved by joining the beta, holding $UPLIFT, or following @OperatorUplift on X. Roadmap includes full Web3 launch in Q4 2025.
                 </p>
+                <br>
+                <div class="card-content" style="text-align: center; padding: 1rem; background: rgba(249, 115, 22, 0.1); border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.3);">
+                    <strong>#BuildInPublic on X</strong> • <a href="https://operatoruplift.com/uplift-token" target="_blank" style="color: var(--primary-color); text-decoration: none;">Litepaper/Roadmap at operatoruplift.com/uplift-token</a>
+                </div>
             </div>
         </div>
     </section>
@@ -788,25 +1008,27 @@
                 Why care, invest, or participate in Operator Uplift?
             </p>
             
-            <div class="content-card animate-on-scroll">
-                <h3 class="card-title">For Users</h3>
-                <p class="card-content">
-                    Personalized AI turns chores into wins, RPG gamification boosts retention (streaks/rewards), insights drive growth. Early adopters get free credits, exclusive $UPLIFT airdrops.
-                </p>
-            </div>
-            
-            <div class="content-card animate-on-scroll">
-                <h3 class="card-title">For Investors/Holders</h3>
-                <p class="card-content">
-                    $UPLIFT (1B supply, 9 decimals) offers utility (shop discounts/merch/staking yields) and accrual (15% revenue buyback/burn from app sales). Community-driven, transparent (monthly Solscan reports)—potential 10x+ as app scales (50+ user convos validate demand). No rug risk: 2% volume fees → 25% Marketing / 25% Development / 50% Buyback & Burn.
-                </p>
-            </div>
-            
-            <div class="content-card animate-on-scroll">
-                <h3 class="card-title">Advantages</h3>
-                <p class="card-content">
-                    Free HuggingFace AI (stubs for premium), no bloat (inline SPA), Web3 ready (wallet connect for $UPLIFT), psychological edge (Maslow/Temperaments for 80% retention boost per research). Value: From $0 to $5k community funds in hours—proven traction.
-                </p>
+            <div class="value-proposition-grid">
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">For Users</h3>
+                    <p class="card-content">
+                        Personalized AI turns chores into wins, RPG gamification boosts retention (streaks/rewards), insights drive growth. Early adopters get free credits, exclusive $UPLIFT airdrops.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">For Investors/Holders</h3>
+                    <p class="card-content">
+                        $UPLIFT (1B supply, 9 decimals) offers utility (shop discounts/merch/staking yields) and accrual (15% revenue buyback/burn from app sales). Community-driven, transparent (monthly Solscan reports)—potential 10x+ as app scales (50+ user convos validate demand). No rug risk: 2% volume fees → 25% Marketing / 25% Development / 50% Buyback & Burn.
+                    </p>
+                </div>
+                
+                <div class="content-card animate-on-scroll">
+                    <h3 class="card-title">Advantages</h3>
+                    <p class="card-content">
+                        Free HuggingFace AI (stubs for premium), no bloat (inline SPA), Web3 ready (wallet connect for $UPLIFT), psychological edge (Maslow/Temperaments for 80% retention boost per research). Value: From $0 to $5k community funds in hours—proven traction.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -872,12 +1094,49 @@
                 Meet the passionate individuals behind Operator Uplift.
             </p>
             
-            <div class="team-section">
-                <div class="team-member animate-on-scroll">
-                    <h3 class="team-name">Matt Sim</h3>
-                    <div class="team-role">Founder & CEO</div>
-                    <div class="team-bio">
-                        A prolific builder with experience in productivity tools and Delta sprint (The Residency cohort)—inspired by user frustration with "dud" apps (planning paralysis, no motivation). From 10+ crashes/50k lines lost to $5k community raise in hours, pivoting $UPLIFT to utility with Bags.fm.
+            <div class="team-grid">
+                <div class="team-division animate-on-scroll">
+                    <h3 class="team-division-title">🏗️ App Development</h3>
+                    <div class="team-division-role">Web/App Team & Web3/AI Integration</div>
+                    <div class="team-division-bio">
+                        Core development team handling web/app infrastructure, Web3 integration, AI services, and VC hunting for strategic partnerships and funding opportunities.
+                    </div>
+                </div>
+                
+                <div class="team-division animate-on-scroll">
+                    <h3 class="team-division-title">🚀 #TeamDelta</h3>
+                    <div class="team-division-role">Delta Cohort Team (The Residency)</div>
+                    <div class="team-division-bio">
+                        Hand-selected talent from The Residency Delta Chapter 1 program, leading operations, marketing, design, and overall strategic direction under Matt's leadership.
+                    </div>
+                </div>
+                
+                <div class="team-division animate-on-scroll">
+                    <h3 class="team-division-title">🌐 Community</h3>
+                    <div class="team-division-role">Leaders, Top Holders, Whales, Raiders</div>
+                    <div class="team-division-bio">
+                        Web3 community leaders, top $UPLIFT holders, whale investors, and active raiders who drive community engagement and provide strategic feedback.
+                    </div>
+                </div>
+                
+                <div class="team-division animate-on-scroll">
+                    <h3 class="team-division-title">🏠 Hacker House SF</h3>
+                    <div class="team-division-role">Physical Space Team</div>
+                    <div class="team-division-bio">
+                        Team working on building a hacker house in San Francisco (may be skipped if not fully sponsored or attached to Uplift yet).
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card animate-on-scroll" style="margin-top: 3rem;">
+                <h3 class="card-title">Leadership</h3>
+                <div class="team-leadership">
+                    <div class="team-member animate-on-scroll">
+                        <h3 class="team-name">Matt Sim (@RVAClassic)</h3>
+                        <div class="team-role">Founder & CEO</div>
+                        <div class="team-bio">
+                            A prolific builder with experience in productivity tools and Delta sprint (The Residency cohort)—inspired by user frustration with "dud" apps (planning paralysis, no motivation). From 10+ crashes/50k lines lost to $5k community raise in hours, pivoting $UPLIFT to utility with Bags.fm.
+                        </div>
                     </div>
                 </div>
             </div>

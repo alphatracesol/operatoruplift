@@ -577,7 +577,42 @@
     <!-- Optional particles.js via CDN (lightweight) -->
     <script defer src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
     <!-- Ambient audio for token page -->
-    <audio id="uplift-audio" src="Raindrops and Reverie.mp3" preload="auto" loop></audio>
+    <audio id="uplift-audio" src="Raindrops and Reverie.mp3" preload="auto" loop muted></audio>
+    
+    <!-- Music Control Button -->
+    <div id="music-control" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px; cursor: pointer; transition: all 0.3s ease;">
+        <button id="music-toggle" style="background: none; border: none; color: #f97316; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; transition: all 0.3s ease;" onclick="toggleMusic()">
+            🔇
+        </button>
+    </div>
+    
+    <script>
+        // Auto-mute music on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const audio = document.getElementById('uplift-audio');
+            if (audio) {
+                audio.muted = true;
+                updateMusicIcon();
+            }
+        });
+        
+        function toggleMusic() {
+            const audio = document.getElementById('uplift-audio');
+            const button = document.getElementById('music-toggle');
+            if (audio) {
+                audio.muted = !audio.muted;
+                updateMusicIcon();
+            }
+        }
+        
+        function updateMusicIcon() {
+            const audio = document.getElementById('uplift-audio');
+            const button = document.getElementById('music-toggle');
+            if (audio && button) {
+                button.textContent = audio.muted ? '🔇' : '🔊';
+            }
+        }
+    </script>
 </head>
 <body>
   <div id="landingPoints" style="position:fixed;right:16px;top:14px;z-index:20;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);padding:6px 10px;border-radius:10px;">
