@@ -3918,15 +3918,7 @@
                 </div>
             </header>
 
-            <!-- Landing Points and Music Control -->
-            <div id="landingPoints" style="position: fixed; right: 16px; top: 90px; z-index: 20; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.15); padding: 6px 10px; border-radius: 10px;">
-                <span aria-hidden="true" style="font-size: 18px">🟠</span>
-                <span id="landingPointsText" style="font-weight: 600;">PTS: 0</span>
-            </div>
-            
-            <div id="music-control" style="position: fixed; top: 90px; right: 120px; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px; cursor: pointer; transition: all 0.3s ease;">
-                <button id="music-toggle" style="background: none; border: none; color: #f97316; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; transition: all 0.3s ease;" onclick="toggleMusic()">🔊</button>
-            </div>
+
 
             <!-- Main Content Area -->
             <main class="main-content" id="mainContent">
@@ -6670,38 +6662,7 @@
             }, 500);
         }
         
-        // Music functionality
-        let isMusicPlaying = false;
-        let isMuted = false;
-        
-        function toggleMusic() {
-            const musicToggle = document.getElementById('music-toggle');
-            
-            if (isMuted) {
-                // Unmute
-                musicToggle.textContent = '🔊';
-                musicToggle.classList.remove('muted');
-                isMuted = false;
-                showToast('🔊 Music enabled', 'info');
-            } else {
-                // Mute
-                musicToggle.textContent = '🔇';
-                musicToggle.classList.add('muted');
-                isMuted = true;
-                showToast('🔇 Music muted', 'info');
-            }
-        }
-        
-        // Initialize music control
-        document.addEventListener('DOMContentLoaded', function() {
-            const musicToggle = document.getElementById('music-toggle');
-            if (musicToggle) {
-                // Start muted by default
-                musicToggle.textContent = '🔇';
-                musicToggle.classList.add('muted');
-                isMuted = true;
-            }
-        });
+
     </script>
 </body>
 </html>
