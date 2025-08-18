@@ -973,10 +973,30 @@
         const acceptBtn = document.getElementById('cookie-accept');
         const declineBtn = document.getElementById('cookie-decline');
         const manageCookiesLink = document.getElementById('manage-cookies');
-        if (!localStorage.getItem('cookie_consent_status')) cookieBanner?.classList.remove('hidden');
-        acceptBtn?.addEventListener('click', ()=>{ localStorage.setItem('cookie_consent_status','granted'); cookieBanner?.classList.add('hidden'); });
-        declineBtn?.addEventListener('click', ()=>{ localStorage.setItem('cookie_consent_status','denied'); cookieBanner?.classList.add('hidden'); });
-        manageCookiesLink?.addEventListener('click', (e)=>{ e.preventDefault(); localStorage.removeItem('cookie_consent_status'); cookieBanner?.classList.remove('hidden'); });
+        
+        // Check if user has already made a choice
+        const consentStatus = localStorage.getItem('cookie_consent_status');
+        if (consentStatus === 'granted' || consentStatus === 'denied') {
+          // User has already made a choice, hide banner
+          cookieBanner?.classList.add('hidden');
+        } else {
+          // User hasn't made a choice, show banner
+          cookieBanner?.classList.remove('hidden');
+        }
+        
+        acceptBtn?.addEventListener('click', ()=>{ 
+          localStorage.setItem('cookie_consent_status','granted'); 
+          cookieBanner?.classList.add('hidden'); 
+        });
+        declineBtn?.addEventListener('click', ()=>{ 
+          localStorage.setItem('cookie_consent_status','denied'); 
+          cookieBanner?.classList.add('hidden'); 
+        });
+        manageCookiesLink?.addEventListener('click', (e)=>{ 
+          e.preventDefault(); 
+          localStorage.removeItem('cookie_consent_status'); 
+          cookieBanner?.classList.remove('hidden'); 
+        });
       })();
     </script>
 
