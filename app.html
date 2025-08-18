@@ -4210,22 +4210,67 @@
         // Initialize Firebase (will be loaded from firebase-config.js)
         let auth, db;
         
-        // Wait for Firebase to be configured (prefer config provided by firebase-config.js)
-        if (!auth || !db) {
+        // Fallback Firebase configuration for development/testing
+        const fallbackFirebaseConfig = {
+            apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // Placeholder - replace with real key
+            authDomain: "operatorupliftmvp.firebaseapp.com",
+            projectId: "operatorupliftmvp",
+            storageBucket: "operatorupliftmvp.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdefghijklmnop"
+        };
+        
+        // Function to initialize Firebase with proper error handling
+        function initializeFirebase() {
             try {
+                console.log('🔍 Firebase initialization started...');
+                console.log('🔍 Available Firebase sources:');
+                console.log('  window.firebaseAuth:', !!window.firebaseAuth);
+                console.log('  window.firebaseDb:', !!window.firebaseDb);
+                console.log('  window.firebaseConfig:', !!window.firebaseConfig);
+                console.log('  typeof firebase:', typeof firebase);
+                
+                // Option 1: Use pre-initialized Firebase from firebase-config.js
                 if (window.firebaseAuth && window.firebaseDb) {
+                    console.log('✅ Using pre-initialized Firebase from firebase-config.js');
                     auth = window.firebaseAuth;
                     db = window.firebaseDb;
-                } else if (window.firebaseConfig) {
+                    return true;
+                }
+                
+                // Option 2: Use window.firebaseConfig
+                if (window.firebaseConfig && typeof firebase !== 'undefined') {
+                    console.log('✅ Using window.firebaseConfig');
                     if (!firebase.apps.length) {
                         firebase.initializeApp(window.firebaseConfig);
                     }
                     auth = firebase.auth();
                     db = firebase.firestore();
+                    return true;
                 }
+                
+                // Option 3: Use fallback configuration
+                if (typeof firebase !== 'undefined') {
+                    console.log('⚠️ No Firebase config found, using fallback for development');
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(fallbackFirebaseConfig);
+                    }
+                    auth = firebase.auth();
+                    db = firebase.firestore();
+                    return true;
+                }
+                
+                console.log('❌ No Firebase configuration found');
+                return false;
             } catch (e) {
-                console.warn('Auth init warning:', e);
+                console.error('❌ Firebase initialization error:', e);
+                return false;
             }
+        }
+        
+        // Try to initialize Firebase immediately
+        if (!initializeFirebase()) {
+            console.log('⏳ Firebase not ready, will retry...');
         }
 
         // Auth State Management
@@ -4342,22 +4387,43 @@
             setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('hidden');
                 
+                console.log('🔍 DOM Content Loaded - Setting up auth state listener...');
+                
+                // Try to initialize Firebase if not ready
+                if (!auth || !db) {
+                    console.log('🔄 Retrying Firebase initialization...');
+                    if (initializeFirebase()) {
+                        console.log('✅ Firebase initialized successfully');
+                    } else {
+                        console.log('❌ Firebase still not ready');
+                    }
+                }
+                
+                console.log('🔍 Auth object:', auth);
+                console.log('🔍 Firebase auth:', typeof firebase !== 'undefined' ? firebase.auth() : 'Firebase not loaded');
+                
                 // Check auth state
                 if (auth) {
+                    console.log('✅ Auth object found, setting up listener');
                     auth.onAuthStateChanged((user) => {
+                        console.log('🔍 Auth state changed:', user ? `User: ${user.email}` : 'No user');
                         if (user) {
+                            console.log('✅ User authenticated, showing app');
                             currentUser = user;
                             showApp();
                             loadUserData();
                         } else {
+                            console.log('❌ No user, showing auth');
                             showAuth();
                         }
                     });
                 } else if (window.DEMO_MODE) {
                     // Demo mode - skip auth
+                    console.log('🎮 Demo mode enabled, skipping auth');
                     showApp();
                     loadDemoData();
                 } else {
+                    console.log('❌ No auth object, showing auth');
                     showAuth();
                 }
             }, 1000);
