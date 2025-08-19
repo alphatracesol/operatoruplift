@@ -3857,6 +3857,10 @@
                     <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                     <span class="nav-text">Analytics</span>
                 </a>
+                <a class="nav-item" onclick="openCalendarModal()">
+                    <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="nav-text">Calendar</span>
+                </a>
                 <a class="nav-item" data-view="settings" onclick="navigate('settings')">
                     <span class="nav-icon"><i class="fas fa-cog"></i></span>
                     <span class="nav-text">Settings</span>
@@ -5090,6 +5094,253 @@
             console.log('  - User UID:', auth?.currentUser?.uid);
             console.log('  - App container display:', document.getElementById('app')?.style.display);
             console.log('  - Auth container display:', document.getElementById('authContainer')?.style.display);
+        }
+        
+        // Interactive Calendar Modal
+        window.openCalendarModal = function() {
+            const modal = document.createElement('div');
+            modal.id = 'calendarModal';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="
+                    background: var(--bg-card);
+                    border: 2px solid var(--primary-color);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    max-width: 90vw;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    position: relative;
+                ">
+                    <button class="modal-close" onclick="closeCalendarModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        color: var(--text-primary);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    ">&times;</button>
+                    
+                    <div class="calendar-header" style="text-align: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--text-primary); margin-bottom: 1rem;">
+                            <i class="fas fa-calendar-alt"></i> Interactive Calendar
+                        </h2>
+                        <div class="calendar-nav" style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 id="calendarMonthYear" style="color: var(--text-primary); min-width: 200px;">
+                                ${new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </h3>
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid" style="
+                        display: grid;
+                        grid-template-columns: repeat(7, 1fr);
+                        gap: 0.5rem;
+                        margin-bottom: 2rem;
+                    ">
+                        ${generateCalendarDays(currentYear, currentMonth)}
+                    </div>
+                    
+                    <div class="calendar-legend" style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 1rem;
+                        justify-content: center;
+                        padding: 1rem;
+                        background: var(--bg-lighter);
+                        border-radius: 8px;
+                    ">
+                        <div class="legend-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 16px; height: 16px; background: var(--success); border-radius: 50%;"></div>
+                            <span style="color: var(--text-secondary);">Habits Completed</span>
+                        </div>
+                        <div class="legend-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 16px; height: 16px; background: var(--primary-color); border-radius: 50%;"></div>
+                            <span style="color: var(--text-secondary);">Goals Progress</span>
+                        </div>
+                        <div class="legend-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 16px; height: 16px; background: var(--warning); border-radius: 50%;"></div>
+                            <span style="color: var(--text-secondary);">Today's Tasks</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
+        };
+        
+        function closeCalendarModal() {
+            const modal = document.getElementById('calendarModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function generateCalendarDays(year, month) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            let calendarHTML = '';
+            
+            // Day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                calendarHTML += `<div class="calendar-day-header" style="
+                    text-align: center;
+                    padding: 0.5rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    background: var(--bg-lighter);
+                    border-radius: 4px;
+                ">${day}</div>`;
+            });
+            
+            // Calendar days
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const isCurrentMonth = currentDate.getMonth() === month;
+                const isToday = currentDate.toDateString() === new Date().toDateString();
+                const dateString = currentDate.toDateString();
+                
+                // Get data for this date
+                const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
+                const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
+                
+                const completedHabits = habits.filter(h => h.completed).length;
+                const totalHabits = habits.length;
+                const hasGoals = goals.length > 0;
+                
+                let dayClass = 'calendar-day';
+                let dayStyle = `
+                    padding: 0.5rem;
+                    text-align: center;
+                    border: 1px solid var(--border-light);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    position: relative;
+                    min-height: 60px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                
+                if (!isCurrentMonth) {
+                    dayStyle += 'opacity: 0.3;';
+                }
+                
+                if (isToday) {
+                    dayStyle += 'border-color: var(--primary-color); border-width: 2px;';
+                }
+                
+                let indicators = '';
+                if (completedHabits > 0 && totalHabits > 0) {
+                    const completionRate = completedHabits / totalHabits;
+                    if (completionRate >= 0.8) {
+                        indicators += '<div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; margin: 2px;"></div>';
+                    } else if (completionRate >= 0.5) {
+                        indicators += '<div style="width: 8px; height: 8px; background: var(--warning); border-radius: 50%; margin: 2px;"></div>';
+                    }
+                }
+                
+                if (hasGoals) {
+                    indicators += '<div style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; margin: 2px;"></div>';
+                }
+                
+                calendarHTML += `<div class="${dayClass}" style="${dayStyle}" onclick="selectCalendarDate('${dateString}')">
+                    <div style="font-size: 0.875rem; margin-bottom: 0.25rem;">${currentDate.getDate()}</div>
+                    <div style="display: flex; gap: 2px; flex-wrap: wrap; justify-content: center;">
+                        ${indicators}
+                    </div>
+                </div>`;
+            }
+            
+            return calendarHTML;
+        }
+        
+        function changeCalendarMonth(direction) {
+            const monthYearElement = document.getElementById('calendarMonthYear');
+            const currentText = monthYearElement.textContent;
+            const currentDate = new Date(currentText + ' 1');
+            
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            
+            monthYearElement.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = generateCalendarDays(currentDate.getFullYear(), currentDate.getMonth());
+        }
+        
+        function selectCalendarDate(dateString) {
+            const selectedDate = new Date(dateString);
+            const formattedDate = selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Get data for selected date
+            const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
+            
+            let summary = `📅 ${formattedDate}\n\n`;
+            
+            if (habits.length > 0) {
+                summary += `🎯 Habits:\n`;
+                habits.forEach(habit => {
+                    summary += `  • ${habit.name}: ${habit.completed ? '✅' : '⏳'}\n`;
+                });
+            }
+            
+            if (goals.length > 0) {
+                summary += `\n🎯 Goals:\n`;
+                goals.forEach(goal => {
+                    summary += `  • ${goal.title}: ${goal.progress}% complete\n`;
+                });
+            }
+            
+            if (habits.length === 0 && goals.length === 0) {
+                summary += `\n📝 No habits or goals set for this date.`;
+            }
+            
+            showToast(summary, 'info');
         }
 
         // Update User Display
