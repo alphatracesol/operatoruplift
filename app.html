@@ -2719,90 +2719,93 @@
     // COMPLETE FEATURE IMPLEMENTATIONS
     // ========================================
     
-    // 1. AI INTEGRATION WITH HUGGINGFACE (FREE API)
+    // 1. AI INTEGRATION WITH GOOGLE GEMINI API
     window.AI_CONFIG = {
-        provider: 'huggingface',
-        url: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer hf_demo' // Will be replaced with real token if available
+        provider: 'gemini',
+        url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+        apiKey: null
+    };
+    
+    // Function to set Gemini API key
+    window.setGeminiApiKey = function(apiKey) {
+        if (apiKey && apiKey.trim()) {
+            AI_CONFIG.apiKey = apiKey.trim();
+            localStorage.setItem('uplift:gemini_api_key', apiKey.trim());
+            console.log('Gemini API key set successfully');
         }
     };
     
-    // Function to set HuggingFace API token
-    window.setHuggingFaceToken = function(token) {
-        if (token && token !== 'hf_demo') {
-            AI_CONFIG.headers.Authorization = `Bearer ${token}`;
-            localStorage.setItem('uplift:hf_token', token);
-            console.log('HuggingFace token set successfully');
-        }
-    };
-    
-    // Load saved token on startup and reset cache
-    window.addEventListener('DOMContentLoaded', () => {
-        // Reset cache for all users on every load
-        if ('caches' in window) {
-            caches.keys().then(cacheNames => {
-                cacheNames.forEach(cacheName => {
-                    caches.delete(cacheName);
-                    console.log('🗑️ Cache cleared:', cacheName);
+            // Load saved API key on startup and reset cache
+        window.addEventListener('DOMContentLoaded', () => {
+            // Reset cache for all users on every load
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    cacheNames.forEach(cacheName => {
+                        caches.delete(cacheName);
+                        console.log('🗑️ Cache cleared:', cacheName);
+                    });
                 });
-            });
-        }
-        
-        // Clear service worker cache
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                registrations.forEach(registration => {
-                    registration.unregister();
-                    console.log('🔄 Service Worker unregistered');
+            }
+            
+            // Clear service worker cache
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(registration => {
+                        registration.unregister();
+                        console.log('🔄 Service Worker unregistered');
+                    });
                 });
+            }
+            
+            // Clear localStorage items that might cause stale data
+            const keysToKeep = ['uplift:gemini_api_key', 'uplift:user_profile', 'uplift:goals', 'uplift:habits'];
+            const allKeys = Object.keys(localStorage);
+            allKeys.forEach(key => {
+                if (!keysToKeep.includes(key)) {
+                    localStorage.removeItem(key);
+                    console.log('🗑️ localStorage cleared:', key);
+                }
             });
-        }
-        
-        // Clear localStorage items that might cause stale data
-        const keysToKeep = ['uplift:hf_token', 'uplift:user_profile', 'uplift:goals', 'uplift:habits'];
-        const allKeys = Object.keys(localStorage);
-        allKeys.forEach(key => {
-            if (!keysToKeep.includes(key)) {
-                localStorage.removeItem(key);
-                console.log('🗑️ localStorage cleared:', key);
+            
+            // Clear sessionStorage
+            sessionStorage.clear();
+            console.log('🗑️ sessionStorage cleared');
+            
+            const savedApiKey = localStorage.getItem('uplift:gemini_api_key');
+            if (savedApiKey) {
+                window.setGeminiApiKey(savedApiKey);
             }
         });
-        
-        // Clear sessionStorage
-        sessionStorage.clear();
-        console.log('🗑️ sessionStorage cleared');
-        
-        const savedToken = localStorage.getItem('uplift:hf_token');
-        if (savedToken) {
-            window.setHuggingFaceToken(savedToken);
-        }
-    });
     
     // Global AI message function for use throughout the app
     window.sendAIMessage = async function(message) {
         try {
-            console.log('🤖 AI: Sending message to HuggingFace:', message);
-            console.log('🤖 AI: Using token:', AI_CONFIG.headers.Authorization);
+            console.log('🤖 AI: Sending message to Gemini:', message);
+            console.log('🤖 AI: API key set:', !!AI_CONFIG.apiKey);
             
-            // Check if we have a valid token
-            if (AI_CONFIG.headers.Authorization === 'Bearer hf_demo') {
-                console.log('🤖 AI: Using demo token, will fall back to local responses');
-                throw new Error('Demo token - no API access');
+            // Check if we have a valid API key
+            if (!AI_CONFIG.apiKey) {
+                console.log('🤖 AI: No API key set, will fall back to local responses');
+                throw new Error('No API key - no API access');
             }
             
-            // Try HuggingFace API first
-            const response = await fetch(AI_CONFIG.url, {
+            // Try Gemini API first
+            const response = await fetch(`${AI_CONFIG.url}?key=${AI_CONFIG.apiKey}`, {
                 method: 'POST',
-                headers: AI_CONFIG.headers,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
-                    inputs: message,
-                    parameters: { 
-                        max_length: 150, 
+                    contents: [{
+                        parts: [{
+                            text: `You are an AI productivity coach for Operator Uplift. Help users with goal setting, habit formation, productivity tips, and motivation. Keep responses concise, actionable, and encouraging. User message: ${message}`
+                        }]
+                    }],
+                    generationConfig: {
                         temperature: 0.7,
-                        do_sample: true,
-                        top_p: 0.9
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 150
                     }
                 })
             });
@@ -2813,18 +2816,9 @@
                 const data = await response.json();
                 console.log('🤖 AI: Response data:', data);
                 
-                const generatedText = data[0]?.generated_text || data.generated_text;
+                const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (generatedText && generatedText.trim()) {
-                    // Clean up the response - remove the input message if it's repeated
-                    let cleanResponse = generatedText.replace(message, '').trim();
-                    
-                    // If cleaning removed everything, use the original response
-                    if (!cleanResponse) {
-                        cleanResponse = generatedText.trim();
-                    }
-                    
-                    // Ensure we have a meaningful response
-                    const finalResponse = cleanResponse || 'Let me help you with that!';
+                    const finalResponse = generatedText.trim();
                     console.log('🤖 AI: Final response:', finalResponse);
                     return finalResponse;
                 } else {
@@ -2836,7 +2830,7 @@
                 console.log('🤖 AI: Error details:', errorText);
             }
         } catch (error) {
-            console.log('🤖 AI: HuggingFace API error, using fallback:', error.message);
+            console.log('🤖 AI: Gemini API error, using fallback:', error.message);
         }
         
         // Fallback responses for when API is unavailable
@@ -4262,39 +4256,39 @@
     <!-- AI Chat Modal -->
     <div id="aiChatModal" class="modal">
         <div class="modal-content" style="max-width:900px;height:80vh;display:flex;flex-direction:column;">
-            <div class="modal-header">
-                <h2>🤖 AI Assistant - HuggingFace</h2>
-                <button class="modal-close" onclick="closeAIChat()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" style="flex:1;display:flex;flex-direction:column;padding:0;">
-                <!-- API Token Input Section -->
-                <div id="tokenInputSection" style="padding:1.5rem;border-bottom:1px solid var(--border-light);background:rgba(249,115,22,0.05);">
-                    <div style="display:flex;gap:0.75rem;align-items:center;">
-                        <input id="hfTokenInput" type="password" placeholder="Enter your HuggingFace API token..." 
-                               style="flex:1;padding:0.75rem;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:12px;color:var(--text-primary);"
-                               onkeypress="if(event.key==='Enter')setHuggingFaceTokenFromInput()">
-                        <button class="btn btn-secondary" onclick="setHuggingFaceTokenFromInput()">
-                            <i class="fas fa-key"></i> Set Token
-                        </button>
-                        <button class="btn btn-sm" onclick="toggleTokenVisibility()" style="padding:0.5rem;">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-secondary);">
-                        <span id="tokenStatus">No API token set. Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a></span>
-                    </div>
+                            <div class="modal-header">
+                    <h2>🤖 AI Assistant - Google Gemini</h2>
+                    <button class="modal-close" onclick="closeAIChat()">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                
-                <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
-                    <div class="ai-message">
-                        <div class="ai-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">🤖</div>
-                        <div class="message-content" style="background:rgba(249,115,22,0.1);padding:1rem;border-radius:12px;max-width:70%;">
-                            <div>Hello! I'm your AI coach powered by HuggingFace. Please set your API token above to start chatting, or I'll use fallback responses.</div>
+                <div class="modal-body" style="flex:1;display:flex;flex-direction:column;padding:0;">
+                    <!-- API Key Input Section -->
+                    <div id="tokenInputSection" style="padding:1.5rem;border-bottom:1px solid var(--border-light);background:rgba(249,115,22,0.05);">
+                        <div style="display:flex;gap:0.75rem;align-items:center;">
+                            <input id="geminiApiKeyInput" type="password" placeholder="Enter your Gemini API key..." 
+                                    style="flex:1;padding:0.75rem;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:12px;color:var(--text-primary);"
+                                    onkeypress="if(event.key==='Enter')setGeminiApiKeyFromInput()">
+                            <button class="btn btn-secondary" onclick="setGeminiApiKeyFromInput()">
+                                <i class="fas fa-key"></i> Set API Key
+                            </button>
+                            <button class="btn btn-sm" onclick="toggleApiKeyVisibility()" style="padding:0.5rem;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-secondary);">
+                            <span id="tokenStatus">No API key set. Get your free key at <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color:var(--primary-color);">Google AI Studio</a></span>
                         </div>
                     </div>
-                </div>
+                
+                                        <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+                            <div class="ai-message">
+                                <div class="ai-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">🤖</div>
+                                <div class="message-content" style="background:rgba(249,115,22,0.1);padding:1rem;border-radius:12px;max-width:70%;">
+                                    <div>Hello! I'm your AI coach powered by Google Gemini. Please set your API key above to start chatting, or I'll use fallback responses.</div>
+                                </div>
+                            </div>
+                        </div>
                 <div style="padding:1.5rem;border-top:1px solid var(--border-light);">
                     <div style="display:flex;gap:0.75rem;">
                         <input id="aiChatInput" type="text" placeholder="Type your message..." 
@@ -5910,42 +5904,42 @@
             document.getElementById('aiChatModal').classList.remove('active');
         }
         
-        // Token management functions
-        function setHuggingFaceTokenFromInput() {
-            const tokenInput = document.getElementById('hfTokenInput');
-            const token = tokenInput.value.trim();
+        // API key management functions
+        function setGeminiApiKeyFromInput() {
+            const apiKeyInput = document.getElementById('geminiApiKeyInput');
+            const apiKey = apiKeyInput.value.trim();
             
-            if (token) {
-                window.setHuggingFaceToken(token);
-                tokenInput.value = '';
+            if (apiKey) {
+                window.setGeminiApiKey(apiKey);
+                apiKeyInput.value = '';
                 updateTokenStatus();
-                showToast('HuggingFace API token set successfully!', 'success');
+                showToast('Gemini API key set successfully!', 'success');
             } else {
-                showToast('Please enter a valid API token', 'error');
+                showToast('Please enter a valid API key', 'error');
             }
         }
         
-        function toggleTokenVisibility() {
-            const tokenInput = document.getElementById('hfTokenInput');
+        function toggleApiKeyVisibility() {
+            const apiKeyInput = document.getElementById('geminiApiKeyInput');
             const toggleBtn = document.querySelector('#tokenInputSection button:last-child i');
             
-            if (tokenInput.type === 'password') {
-                tokenInput.type = 'text';
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
                 toggleBtn.className = 'fas fa-eye-slash';
             } else {
-                tokenInput.type = 'password';
+                apiKeyInput.type = 'password';
                 toggleBtn.className = 'fas fa-eye';
             }
         }
         
         function updateTokenStatus() {
             const tokenStatus = document.getElementById('tokenStatus');
-            const savedToken = localStorage.getItem('uplift:hf_token');
+            const savedApiKey = localStorage.getItem('uplift:gemini_api_key');
             
-            if (savedToken && savedToken !== 'hf_demo') {
-                tokenStatus.innerHTML = `<span style="color:var(--success);">✓ API token set successfully</span>`;
+            if (savedApiKey && savedApiKey.trim()) {
+                tokenStatus.innerHTML = `<span style="color:var(--success);">✓ API key set successfully</span>`;
             } else {
-                tokenStatus.innerHTML = `<span style="color:var(--warning);">⚠️ Using demo mode (no API access)</span><br><small>Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a></small>`;
+                tokenStatus.innerHTML = `<span style="color:var(--warning);">⚠️ Using demo mode (no API access)</span><br><small>Get your free key at <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color:var(--primary-color);">Google AI Studio</a></small>`;
             }
         }
         
