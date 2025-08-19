@@ -1429,60 +1429,366 @@
         
         // Goals and Habits functions
         window.openCreateGoalModal = function() {
-            const title = prompt('Goal title:');
-            const description = prompt('Goal description:');
-            
-            if (title && description) {
-                const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
-                const newGoal = {
-                    id: Date.now().toString(),
-                    title,
-                    description,
-                    progress: 0,
-                    createdAt: new Date().toISOString()
-                };
-                goals.push(newGoal);
-                localStorage.setItem('uplift:goals', JSON.stringify(goals));
-                window.navigate('goals');
-                showToast('Goal created successfully!', 'success');
+            // Check if modal already exists to prevent duplicates
+            if (document.getElementById('createGoalModal')) {
+                return;
             }
+            
+            const modal = document.createElement('div');
+            modal.id = 'createGoalModal';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="
+                    background: var(--bg-card);
+                    border: 2px solid var(--primary-color);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    max-width: 500px;
+                    width: 90vw;
+                    position: relative;
+                ">
+                    <button class="modal-close" onclick="closeCreateGoalModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        color: var(--text-primary);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    ">&times;</button>
+                    
+                    <h2 style="color: var(--text-primary); margin-bottom: 1.5rem;">
+                        <i class="fas fa-bullseye"></i> Create New Goal
+                    </h2>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Goal Title</label>
+                            <input type="text" id="newGoalTitle" 
+                                   placeholder="e.g., Launch my startup, Get promoted, Learn a new skill"
+                                   style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Description</label>
+                            <textarea id="newGoalDescription" rows="3" 
+                                      placeholder="Describe your goal in detail..."
+                                      style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary); resize: vertical;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Priority</label>
+                            <select id="newGoalPriority" style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="closeCreateGoalModal()" style="flex: 1;">
+                                Cancel
+                            </button>
+                            <button class="btn btn-primary" onclick="saveNewGoal()" style="flex: 1;">
+                                <i class="fas fa-plus"></i> Create Goal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
         };
+        
+        function closeCreateGoalModal() {
+            const modal = document.getElementById('createGoalModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function saveNewGoal() {
+            const title = document.getElementById('newGoalTitle')?.value?.trim();
+            const description = document.getElementById('newGoalDescription')?.value?.trim();
+            const priority = document.getElementById('newGoalPriority')?.value || 'medium';
+            
+            if (!title || !description) {
+                showToast('Please fill in title and description', 'error');
+                return;
+            }
+            
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
+            const newGoal = {
+                id: Date.now().toString(),
+                title,
+                description,
+                progress: 0,
+                priority,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                completed: false
+            };
+            
+            goals.push(newGoal);
+            localStorage.setItem('uplift:goals', JSON.stringify(goals));
+            
+            closeCreateGoalModal();
+            window.navigate('goals');
+            showToast('Goal created successfully!', 'success');
+        }
         
         window.updateGoalProgress = function(goalId) {
-            const progress = prompt('Enter progress (0-100):');
-            if (progress !== null) {
-                const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
-                const goal = goals.find(g => g.id === goalId);
-                if (goal) {
-                    goal.progress = Math.min(100, Math.max(0, parseInt(progress)));
-                    localStorage.setItem('uplift:goals', JSON.stringify(goals));
-                    window.navigate('goals');
-                    showToast('Goal updated!', 'success');
-                }
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
+            const goal = goals.find(g => g.id === goalId);
+            
+            if (!goal) {
+                showToast('Goal not found', 'error');
+                return;
             }
+            
+            // Check if modal already exists to prevent duplicates
+            if (document.getElementById('updateProgressModal')) {
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'updateProgressModal';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="
+                    background: var(--bg-card);
+                    border: 2px solid var(--primary-color);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    max-width: 400px;
+                    width: 90vw;
+                    position: relative;
+                ">
+                    <button class="modal-close" onclick="closeUpdateProgressModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        color: var(--text-primary);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    ">&times;</button>
+                    
+                    <h2 style="color: var(--text-primary); margin-bottom: 1rem;">
+                        <i class="fas fa-chart-line"></i> Update Progress
+                    </h2>
+                    
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">${goal.title}</p>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Progress (%)</label>
+                        <input type="number" id="progressInput" value="${goal.progress}" min="0" max="100"
+                               style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="closeUpdateProgressModal()" style="flex: 1;">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary" onclick="saveGoalProgress('${goalId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Update
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
         };
         
-        window.openCreateHabitModal = function() {
-            const title = prompt('Habit title:');
-            const description = prompt('Habit description:');
-            
-            if (title && description) {
-                const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
-                const newHabit = {
-                    id: Date.now().toString(),
-                    name: title,
-                    description,
-                    streak: 0,
-                    frequency: 'Daily',
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                };
-                habits.push(newHabit);
-                localStorage.setItem('uplift:habits', JSON.stringify(habits));
-                window.navigate('habits');
-                showToast('Habit created successfully!', 'success');
+        function closeUpdateProgressModal() {
+            const modal = document.getElementById('updateProgressModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
             }
+        }
+        
+        function saveGoalProgress(goalId) {
+            const progressInput = document.getElementById('progressInput');
+            const progress = parseInt(progressInput?.value || '0');
+            
+            const goals = JSON.parse(localStorage.getItem('uplift:goals') || '[]');
+            const goal = goals.find(g => g.id === goalId);
+            
+            if (goal) {
+                goal.progress = Math.min(100, Math.max(0, progress));
+                goal.updatedAt = new Date().toISOString();
+                localStorage.setItem('uplift:goals', JSON.stringify(goals));
+                closeUpdateProgressModal();
+                window.navigate('goals');
+                showToast('Goal progress updated!', 'success');
+            }
+        }
+        
+        window.openCreateHabitModal = function() {
+            // Check if modal already exists to prevent duplicates
+            if (document.getElementById('createHabitModal')) {
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'createHabitModal';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="
+                    background: var(--bg-card);
+                    border: 2px solid var(--primary-color);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    max-width: 500px;
+                    width: 90vw;
+                    position: relative;
+                ">
+                    <button class="modal-close" onclick="closeCreateHabitModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        color: var(--text-primary);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    ">&times;</button>
+                    
+                    <h2 style="color: var(--text-primary); margin-bottom: 1.5rem;">
+                        <i class="fas fa-repeat"></i> Create New Habit
+                    </h2>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Habit Name</label>
+                            <input type="text" id="newHabitName" 
+                                   placeholder="e.g., Morning Exercise, Read 30 minutes, Meditate"
+                                   style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Description</label>
+                            <textarea id="newHabitDescription" rows="2" 
+                                      placeholder="Describe what this habit involves..."
+                                      style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary); resize: vertical;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Frequency</label>
+                            <select id="newHabitFrequency" style="width: 100%; padding: 0.75rem; background: var(--bg-lighter); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-primary);">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="closeCreateHabitModal()" style="flex: 1;">
+                                Cancel
+                            </button>
+                            <button class="btn btn-primary" onclick="saveNewHabit()" style="flex: 1;">
+                                <i class="fas fa-plus"></i> Create Habit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
         };
+        
+        function closeCreateHabitModal() {
+            const modal = document.getElementById('createHabitModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function saveNewHabit() {
+            const name = document.getElementById('newHabitName')?.value?.trim();
+            const description = document.getElementById('newHabitDescription')?.value?.trim();
+            const frequency = document.getElementById('newHabitFrequency')?.value || 'daily';
+            
+            if (!name || !description) {
+                showToast('Please fill in name and description', 'error');
+                return;
+            }
+            
+            const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
+            const newHabit = {
+                id: Date.now().toString(),
+                name,
+                description,
+                frequency,
+                completed: false,
+                streak: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            habits.push(newHabit);
+            localStorage.setItem('uplift:habits', JSON.stringify(habits));
+            
+            closeCreateHabitModal();
+            window.navigate('habits');
+            showToast('Habit created successfully!', 'success');
+        }
         
         window.toggleHabit = function(habitId) {
             const habits = JSON.parse(localStorage.getItem('uplift:habits') || '[]');
@@ -7101,7 +7407,18 @@
         }
 
         function openLuckyWheel() {
-            document.getElementById('luckyWheelModal').classList.add('active');
+            try {
+                const modal = document.getElementById('luckyWheelModal');
+                if (modal) {
+                    modal.classList.add('active');
+                } else {
+                    console.error('Lucky Wheel modal not found');
+                    showToast('Lucky Wheel not available', 'error');
+                }
+            } catch (error) {
+                console.error('Error opening Lucky Wheel:', error);
+                showToast('Error opening Lucky Wheel', 'error');
+            }
         }
         
         function closeLuckyWheel() {
@@ -7150,7 +7467,18 @@
         }
 
         function openTreasureChest() {
-            document.getElementById('treasureChestModal').classList.add('active');
+            try {
+                const modal = document.getElementById('treasureChestModal');
+                if (modal) {
+                    modal.classList.add('active');
+                } else {
+                    console.error('Treasure Chest modal not found');
+                    showToast('Treasure Chest not available', 'error');
+                }
+            } catch (error) {
+                console.error('Error opening Treasure Chest:', error);
+                showToast('Error opening Treasure Chest', 'error');
+            }
         }
         
         function closeTreasureChest() {
