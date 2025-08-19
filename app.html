@@ -2784,6 +2784,13 @@
     window.sendAIMessage = async function(message) {
         try {
             console.log('🤖 AI: Sending message to HuggingFace:', message);
+            console.log('🤖 AI: Using token:', AI_CONFIG.headers.Authorization);
+            
+            // Check if we have a valid token
+            if (AI_CONFIG.headers.Authorization === 'Bearer hf_demo') {
+                console.log('🤖 AI: Using demo token, will fall back to local responses');
+                throw new Error('Demo token - no API access');
+            }
             
             // Try HuggingFace API first
             const response = await fetch(AI_CONFIG.url, {
@@ -2820,12 +2827,16 @@
                     const finalResponse = cleanResponse || 'Let me help you with that!';
                     console.log('🤖 AI: Final response:', finalResponse);
                     return finalResponse;
+                } else {
+                    console.log('🤖 AI: Generated text is empty or undefined');
                 }
             } else {
                 console.log('🤖 AI: API error:', response.status, response.statusText);
+                const errorText = await response.text();
+                console.log('🤖 AI: Error details:', errorText);
             }
         } catch (error) {
-            console.log('🤖 AI: HuggingFace API error, using fallback:', error);
+            console.log('🤖 AI: HuggingFace API error, using fallback:', error.message);
         }
         
         // Fallback responses for when API is unavailable
@@ -5934,7 +5945,7 @@
             if (savedToken && savedToken !== 'hf_demo') {
                 tokenStatus.innerHTML = `<span style="color:var(--success);">✓ API token set successfully</span>`;
             } else {
-                tokenStatus.innerHTML = `No API token set. Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a>`;
+                tokenStatus.innerHTML = `<span style="color:var(--warning);">⚠️ Using demo mode (no API access)</span><br><small>Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--primary-color);">huggingface.co</a></small>`;
             }
         }
         
