@@ -4243,6 +4243,9 @@
                         <button class="header-btn" onclick="openTreasureChest()" title="Open Treasure Chest">
                             <i class="fas fa-gift"></i>
                         </button>
+                        <button class="header-btn" onclick="openAIChat()" title="AI Assistant">
+                            <i class="fas fa-robot"></i>
+                        </button>
                         <button class="header-btn" onclick="showProfile()">
                             <i class="fas fa-user"></i>
                         </button>
@@ -4599,29 +4602,32 @@
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <div style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-secondary);">
+                                                <div style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-secondary);">
                             <span id="tokenStatus">No API key set. Get your free key at <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color:var(--primary-color);">Google AI Studio</a></span>
                         </div>
                     </div>
                 
-                                        <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
-                            <div class="ai-message">
-                                <div class="ai-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">🤖</div>
-                                <div class="message-content" style="background:rgba(249,115,22,0.1);padding:1rem;border-radius:12px;max-width:70%;">
-                                    <div>Hello! I'm your AI coach powered by Google Gemini. Please set your API key above to start chatting, or I'll use fallback responses.</div>
-                                </div>
+                    <!-- Chat Messages Container -->
+                    <div id="aiChatContainer" style="flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+                        <div class="ai-message">
+                            <div class="ai-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">🤖</div>
+                            <div class="message-content" style="background:rgba(249,115,22,0.1);padding:1rem;border-radius:12px;max-width:70%;">
+                                <div class="ai-message-text">Hello! I'm your AI coach powered by Google Gemini. Please set your API key above to start chatting, or I'll use fallback responses.</div>
                             </div>
                         </div>
-                <div style="padding:1.5rem;border-top:1px solid var(--border-light);">
-                    <div style="display:flex;gap:0.75rem;">
-                        <input id="aiChatInput" type="text" placeholder="Type your message..." 
-                               style="flex:1;padding:0.75rem;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:12px;color:var(--text-primary);"
-                               onkeypress="if(event.key==='Enter')sendAIMessage()">
-                        <button class="btn btn-primary" onclick="sendAIMessage()">
-                            <i class="fas fa-paper-plane"></i> Send
-                        </button>
                     </div>
-                </div>
+                    
+                    <!-- Chat Input Section -->
+                    <div style="padding:1.5rem;border-top:1px solid var(--border-light);">
+                        <div style="display:flex;gap:0.75rem;">
+                            <input id="aiChatInput" type="text" placeholder="Type your message..." 
+                                   style="flex:1;padding:0.75rem;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:12px;color:var(--text-primary);"
+                                   onkeypress="if(event.key==='Enter')sendAIChatMessage()">
+                            <button class="btn btn-primary" onclick="sendAIChatMessage()">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -4735,6 +4741,21 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <!-- Firebase Configuration -->
+    <script>
+        // Environment variables injected by build process
+        window.ENV = {
+            FIREBASE_API_KEY: '',
+            FIREBASE_AUTH_DOMAIN: '',
+            FIREBASE_PROJECT_ID: '',
+            FIREBASE_STORAGE_BUCKET: '',
+            FIREBASE_MESSAGING_SENDER_ID: '',
+            FIREBASE_APP_ID: '',
+            FIREBASE_MEASUREMENT_ID: '',
+            GOOGLE_CLIENT_ID: '',
+            GOOGLE_CLIENT_SECRET: '',
+            GEMINI_API_KEY: ''
+        };
+    </script>
     <script src="firebase-config.js"></script>
     
     <script>
@@ -7524,6 +7545,277 @@
             }, 500);
         }
         
+        // ========================================
+        // AI INTEGRATION WITH GOOGLE GEMINI API
+        // ========================================
+        
+        // AI Configuration
+        window.AI_CONFIG = {
+            provider: 'gemini',
+            url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+            apiKey: null
+        };
+        
+        // Function to set Gemini API key
+        window.setGeminiApiKey = function(apiKey) {
+            // First try to get from environment variables (Netlify)
+            if (window.ENV && window.ENV.GEMINI_API_KEY) {
+                AI_CONFIG.apiKey = window.ENV.GEMINI_API_KEY;
+                console.log('✅ Gemini API key loaded from environment variables');
+                updateTokenStatus();
+                return;
+            }
+            
+            // Fallback to user input if no environment variable
+            if (apiKey && apiKey.trim()) {
+                AI_CONFIG.apiKey = apiKey.trim();
+                localStorage.setItem('uplift:gemini_api_key', apiKey.trim());
+                console.log('✅ Gemini API key set from user input');
+                updateTokenStatus();
+            }
+        };
+        
+        // Function to set API key from input field
+        function setGeminiApiKeyFromInput() {
+            const input = document.getElementById('geminiApiKeyInput');
+            const apiKey = input?.value?.trim();
+            
+            if (apiKey) {
+                window.setGeminiApiKey(apiKey);
+                input.value = '';
+                showToast('API key set successfully!', 'success');
+            } else {
+                showToast('Please enter a valid API key', 'error');
+            }
+        }
+        
+        // Function to toggle API key visibility
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('geminiApiKeyInput');
+            const button = input.nextElementSibling.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+        
+        // Function to update token status display
+        function updateTokenStatus() {
+            const tokenSection = document.getElementById('tokenInputSection');
+            const statusText = document.createElement('div');
+            statusText.style.cssText = 'margin-top:0.5rem;font-size:0.875rem;color:var(--success);';
+            
+            if (AI_CONFIG.apiKey) {
+                statusText.textContent = '✅ API key configured - AI ready!';
+                statusText.style.color = 'var(--success)';
+                tokenSection.style.background = 'rgba(16,185,129,0.1)';
+            } else {
+                statusText.textContent = '⚠️ No API key - AI unavailable';
+                statusText.style.color = 'var(--warning)';
+                tokenSection.style.background = 'rgba(249,115,22,0.05)';
+            }
+            
+            // Remove existing status
+            const existingStatus = tokenSection.querySelector('div[style*="margin-top:0.5rem"]');
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+            
+            tokenSection.appendChild(statusText);
+        }
+        
+        // Function to send AI message
+        window.sendAIMessage = async function(message) {
+            try {
+                console.log('🤖 AI: Sending message to Gemini:', message);
+                console.log('🤖 AI: API key set:', !!AI_CONFIG.apiKey);
+                
+                // Check if we have a valid API key
+                if (!AI_CONFIG.apiKey) {
+                    console.log('🤖 AI: No API key set, will fall back to local responses');
+                    throw new Error('No API key - no API access');
+                }
+                
+                // Try Gemini API first
+                const response = await fetch(`${AI_CONFIG.url}?key=${AI_CONFIG.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are an AI productivity coach for Operator Uplift. Help users with goal setting, habit formation, productivity tips, and motivation. Keep responses concise, actionable, and encouraging. User message: ${message}`
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 150
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('🤖 AI: Gemini response:', data);
+                
+                const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (generatedText && generatedText.trim()) {
+                    const finalResponse = generatedText.trim();
+                    console.log('🤖 AI: Final response:', finalResponse);
+                    return finalResponse;
+                } else {
+                    throw new Error('Empty response from Gemini');
+                }
+                
+            } catch (error) {
+                console.log('🤖 AI: Gemini API error, using fallback:', error.message);
+                
+                // Fallback responses for common queries
+                const fallbackResponses = {
+                    'goal': 'Setting clear, achievable goals is key to success! Break them down into smaller steps and track your progress daily.',
+                    'habit': 'Building habits takes consistency. Start small, be patient, and celebrate every win - no matter how small!',
+                    'motivation': 'Remember why you started! Every expert was once a beginner. Focus on progress, not perfection.',
+                    'productivity': 'Time blocking and the Pomodoro technique can boost your focus. Eliminate distractions and work in focused bursts.',
+                    'stress': 'Take deep breaths, prioritize self-care, and remember that it\'s okay to take breaks. Progress over perfection!'
+                };
+                
+                // Find best matching fallback
+                const messageLower = message.toLowerCase();
+                for (const [key, response] of Object.entries(fallbackResponses)) {
+                    if (messageLower.includes(key)) {
+                        return response;
+                    }
+                }
+                
+                return 'I\'m here to help with your productivity journey! Try asking about goals, habits, motivation, or productivity tips.';
+            }
+        };
+        
+        // Function to open AI chat modal
+        function openAIChat() {
+            const modal = document.getElementById('aiChatModal');
+            if (modal) {
+                modal.classList.add('active');
+                updateTokenStatus();
+                
+                // Initialize chat if first time
+                const chatContainer = document.getElementById('aiChatContainer');
+                if (chatContainer && chatContainer.children.length === 0) {
+                    const welcomeMessage = document.createElement('div');
+                    welcomeMessage.className = 'ai-message';
+                    welcomeMessage.innerHTML = `
+                        <div class="ai-avatar" style="background: var(--primary-color);">🤖</div>
+                        <div class="message-content">
+                            <div class="ai-message-text">Hello! I'm your AI productivity coach. I can help you with goal setting, habit formation, productivity tips, and motivation. What would you like to work on today?</div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(welcomeMessage);
+                }
+            }
+        }
+        
+        // Function to close AI chat modal
+        function closeAIChat() {
+            const modal = document.getElementById('aiChatModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+        
+        // Function to send message in AI chat
+        function sendAIChatMessage() {
+            const input = document.getElementById('aiChatInput');
+            const message = input?.value?.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            const chatContainer = document.getElementById('aiChatContainer');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'user-message';
+            userMessage.innerHTML = `
+                <div class="message-content">
+                    <div class="user-message-text">${message}</div>
+                </div>
+                <div class="user-avatar" style="background: var(--accent-color);">👤</div>
+            `;
+            chatContainer.appendChild(userMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'ai-message typing';
+            typingIndicator.innerHTML = `
+                <div class="ai-avatar" style="background: var(--primary-color);">🤖</div>
+                <div class="message-content">
+                    <div class="ai-message-text">Typing...</div>
+                </div>
+            `;
+            chatContainer.appendChild(typingIndicator);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Send to AI and get response
+            window.sendAIMessage(message).then(response => {
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add AI response
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'ai-message';
+                aiMessage.innerHTML = `
+                    <div class="ai-avatar" style="background: var(--primary-color);">🤖</div>
+                    <div class="message-content">
+                        <div class="ai-message-text">${response}</div>
+                    </div>
+                `;
+                chatContainer.appendChild(aiMessage);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+            }).catch(error => {
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'ai-message error';
+                errorMessage.innerHTML = `
+                    <div class="ai-avatar" style="background: var(--warning);">⚠️</div>
+                    <div class="message-content">
+                        <div class="ai-message-text">Sorry, I'm having trouble connecting right now. Please check your API key or try again later.</div>
+                    </div>
+                `;
+                chatContainer.appendChild(errorMessage);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        }
+        
+        // Initialize AI configuration on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Try to load API key from localStorage as fallback
+            const savedApiKey = localStorage.getItem('uplift:gemini_api_key');
+            if (savedApiKey) {
+                window.setGeminiApiKey(savedApiKey);
+            }
+        });
 
     </script>
 </body>
