@@ -4616,17 +4616,45 @@
                 // Check auth state
                 if (auth) {
                     console.log('✅ Auth object found, setting up listener');
-                    auth.onAuthStateChanged((user) => {
-                        console.log('🔍 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-                        if (user) {
-                            console.log('✅ User authenticated, showing app');
-                            currentUser = user;
+                    
+                    // Handle redirect results first (important for mobile)
+                    auth.getRedirectResult().then((result) => {
+                        if (result.user) {
+                            console.log('✅ Redirect result found, user:', result.user.email);
+                            currentUser = result.user;
                             showApp();
                             loadUserData();
                         } else {
-                            console.log('❌ No user, showing auth');
-                            showAuth();
+                            console.log('🔍 No redirect result, setting up auth state listener');
+                            // Set up auth state listener for future changes
+                            auth.onAuthStateChanged((user) => {
+                                console.log('🔍 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+                                if (user) {
+                                    console.log('✅ User authenticated, showing app');
+                                    currentUser = user;
+                                    showApp();
+                                    loadUserData();
+                                } else {
+                                    console.log('❌ No user, showing auth');
+                                    showAuth();
+                                }
+                            });
                         }
+                    }).catch((error) => {
+                        console.error('❌ Error getting redirect result:', error);
+                        // Set up auth state listener as fallback
+                        auth.onAuthStateChanged((user) => {
+                            console.log('🔍 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+                            if (user) {
+                                console.log('✅ User authenticated, showing app');
+                                currentUser = user;
+                                showApp();
+                                loadUserData();
+                            } else {
+                                console.log('❌ No user, showing auth');
+                                showAuth();
+                            }
+                        });
                     });
                 } else if (window.DEMO_MODE) {
                     // Demo mode - skip auth
@@ -4945,13 +4973,28 @@
             try {
                 const provider = window.googleProvider || new firebase.auth.GoogleAuthProvider();
                 if (!auth) throw new Error('Auth not initialized');
-                try {
-                    await auth.signInWithPopup(provider);
-                } catch (popupError) {
+                
+                // Check if we're on mobile or if popups are blocked
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const isPopupBlocked = window.open('', '_blank') === null;
+                
+                if (isMobile || isPopupBlocked) {
+                    console.log('📱 Mobile device or popup blocked, using redirect');
                     await auth.signInWithRedirect(provider);
+                    showToast('Redirecting to Google...', 'info');
+                } else {
+                    try {
+                        console.log('🖥️ Desktop device, trying popup');
+                        await auth.signInWithPopup(provider);
+                        showToast('Welcome!', 'success');
+                    } catch (popupError) {
+                        console.log('❌ Popup failed, falling back to redirect:', popupError);
+                        await auth.signInWithRedirect(provider);
+                        showToast('Redirecting to Google...', 'info');
+                    }
                 }
-                showToast('Welcome!', 'success');
             } catch (error) {
+                console.error('❌ Google sign-in error:', error);
                 showToast(error.message, 'error');
             }
         });
@@ -5037,6 +5080,16 @@
                 streak: 7
             };
             updateUserDisplay(demoData);
+        }
+        
+        // Debug authentication state
+        function debugAuthState() {
+            console.log('🔍 Debug Auth State:');
+            console.log('  - Auth object:', !!auth);
+            console.log('  - User email:', auth?.currentUser?.email);
+            console.log('  - User UID:', auth?.currentUser?.uid);
+            console.log('  - App container display:', document.getElementById('app')?.style.display);
+            console.log('  - Auth container display:', document.getElementById('authContainer')?.style.display);
         }
 
         // Update User Display
